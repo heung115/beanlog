@@ -6,6 +6,7 @@ import { TopBar } from "@/components/layout/top-bar";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { Toast } from "@/components/ui/toast";
 import { getCurrentUserIdentity } from "@/lib/actions/profile";
+import designTokens from "@/config/design-tokens.json";
 import "../globals.css";
 
 export default async function LocaleLayout({
@@ -28,7 +29,7 @@ export default async function LocaleLayout({
     <html lang={locale}>
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#FAF7F2" />
+        <meta name="theme-color" content={designTokens.colors.cream} />
         <link rel="apple-touch-icon" href="/icon-192.png" />
         <link
           rel="stylesheet"

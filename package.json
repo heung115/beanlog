@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "design:lint": "designmd lint DESIGN.md && node scripts/verify-design-tokens.mjs",
     "qa": "playwright test",
     "qa:desktop": "playwright test --project=desktop",
     "qa:security": "playwright test tests/qa/security.spec.ts --project=desktop",
@@ -18,23 +19,20 @@
     "staging:down": "node scripts/staging.mjs down"
   },
   "dependencies": {
-    "@ducanh2912/next-pwa": "10.2.9",
-    "@hookform/resolvers": "5.4.0",
     "@supabase/ssr": "0.12.3",
     "@supabase/supabase-js": "2.110.8",
-    "@tanstack/react-query": "5.101.4",
     "clsx": "2.1.1",
     "next": "16.2.11",
     "next-intl": "4.13.4",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "react-hook-form": "7.82.0",
     "recharts": "3.10.0",
     "tailwind-merge": "3.6.0",
     "zod": "4.4.3",
     "zustand": "5.0.14"
   },
   "devDependencies": {
+    "@google/design.md": "0.4.0",
     "@playwright/test": "1.62.0",
     "@tailwindcss/postcss": "4.3.3",
     "@types/node": "20.19.43",
@@ -47,6 +45,7 @@
     "typescript": "5.9.3"
   },
   "overrides": {
+    "postcss": "8.5.25",
     "sharp": "0.35.3",
     "serialize-javascript": "7.0.7"
   }

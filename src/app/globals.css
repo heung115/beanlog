@@ -18,6 +18,7 @@
   --color-process-honey: #D4A843;
   --color-process-anaerobic: #8B6BAE;
   --color-process-carbonic: #5E8B6A;
+  --color-process-decaf: #735E47;
   --color-process-other: #9B9B9B;
 
   --color-roast-light: #C4A882;
@@ -85,6 +86,19 @@ input, textarea, select, button {
   animation: rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+}
+
 /* Editorial primitives: reserve the framed surface for content that needs focus. */
 .journal-kicker {
   color: var(--color-accent);
@@ -138,7 +152,7 @@ input[type="range"].slider-brown::-webkit-slider-thumb {
   border-radius: 50%;
   background: var(--color-brown);
   border: 3px solid var(--color-surface);
-  box-shadow: 0 1px 4px rgba(62, 47, 35, 0.35);
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--color-brown) 35%, transparent);
   transition: transform 0.15s ease;
 }
 
@@ -153,7 +167,7 @@ input[type="range"].slider-brown::-moz-range-thumb {
   border-radius: 50%;
   background: var(--color-brown);
   border: 3px solid var(--color-surface);
-  box-shadow: 0 1px 4px rgba(62, 47, 35, 0.35);
+  box-shadow: 0 1px 4px color-mix(in srgb, var(--color-brown) 35%, transparent);
   transition: transform 0.15s ease;
 }
 

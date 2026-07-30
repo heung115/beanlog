@@ -19,7 +19,7 @@ export function ScoreDisplay({ score, size = "md", className }: ScoreDisplayProp
       >
         {score.toFixed(1)}
       </span>
-      <span className={cn("text-brown-light/50", size === "sm" ? "text-[10px]" : "text-xs")}>
+      <span className={cn("text-brown-light", size === "sm" ? "text-[10px]" : "text-xs")}>
         /10
       </span>
     </div>

@@ -32,7 +32,7 @@ export function BeanCard({ bean }: BeanCardProps) {
             {bean.name}
           </h3>
           <p className="mt-1 truncate text-sm text-brown-light">{bean.roastery}</p>
-          <p className="mt-2 text-xs font-medium text-brown-light/70">
+          <p className="mt-2 text-xs font-medium text-brown-light">
             {bean.origin_country}
             {bean.origin_region ? ` · ${bean.origin_region}` : ""}
           </p>
@@ -46,7 +46,7 @@ export function BeanCard({ bean }: BeanCardProps) {
           {tProcess(bean.process_method)}
         </Badge>
         <Badge className={getRoastColor(bean.roast_level)}>{tRoast(bean.roast_level)}</Badge>
-        <span className="ml-0.5 text-xs text-brown-light/70">
+        <span className="ml-0.5 text-xs text-brown-light">
           {bean.bean_type === "blend" ? t("blend") : t("singleOrigin")}
         </span>
       </div>
@@ -70,17 +70,17 @@ export function BeanCard({ bean }: BeanCardProps) {
             </span>
           ))}
           {hiddenTagCount > 0 && (
-            <span className="text-[11px] text-brown-light/60">+{hiddenTagCount}</span>
+            <span className="text-[11px] text-brown-light">+{hiddenTagCount}</span>
           )}
         </div>
       )}
 
       {/* Place + date */}
       <div className="mt-5 flex items-center justify-between border-t border-border-light pt-2.5">
-        <span className="text-xs text-brown-light/70">
+        <span className="text-xs text-brown-light">
           {bean.place_type === "cafe" ? t("cafe") : t("home")}
         </span>
-        <time className="text-xs text-brown-light/70" dateTime={bean.consumed_at}>
+        <time className="text-xs text-brown-light" dateTime={bean.consumed_at}>
           {formatDate(bean.consumed_at, locale)}
         </time>
       </div>

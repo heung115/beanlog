@@ -189,7 +189,7 @@ function Segmented<T extends string>({
           aria-checked={value === option.value}
           onClick={() => onChange(option.value)}
           className={cn(
-            "rounded px-3 py-2 text-sm font-medium transition-all duration-150",
+            "min-h-11 rounded px-3 py-2 text-sm font-medium transition-all duration-150",
             "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
             value === option.value
               ? "bg-brown text-cream shadow-sm"
@@ -979,6 +979,7 @@ export function BeanForm({
         type="button"
         onClick={() => setShowDetails((s) => !s)}
         aria-expanded={showDetails}
+        aria-controls="bean-detail-fields"
         className={cn(
           "animate-rise flex items-center justify-center gap-2 rounded-lg border border-dashed border-border py-3.5",
           "text-sm font-medium text-brown-light transition-all duration-200",
@@ -1008,15 +1009,12 @@ export function BeanForm({
         {showDetails ? t("lessDetails") : t("moreDetails")}
       </button>
 
-      {/* ── Expandable detail section ─────────────────── */}
-      <div
-        className={cn(
-          "grid transition-all duration-300 ease-out",
-          showDetails ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-        )}
-      >
-        <div className="overflow-hidden">
-          <section className="rounded-lg border border-border bg-surface p-5 md:p-6">
+      {/* Keep collapsed controls out of the accessibility tree and tab order. */}
+      {showDetails && (
+        <section
+          id="bean-detail-fields"
+          className="animate-rise rounded-lg border border-border bg-surface p-5 md:p-6"
+        >
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <Input
                 label={t("processDetail")}
@@ -1121,9 +1119,8 @@ export function BeanForm({
                 />
               </div>
             </div>
-          </section>
-        </div>
-      </div>
+        </section>
+      )}
 
       {/* ── Submit ────────────────────────────────────── */}
       <div

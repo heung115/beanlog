@@ -19,6 +19,7 @@ import {
 } from "recharts";
 import { getBeanStats } from "@/lib/actions/beans";
 import { ScoreDisplay } from "@/components/ui/score-display";
+import { chartColors } from "@/config/chart-colors";
 
 interface BeanStats {
   total: number;
@@ -34,26 +35,30 @@ interface BeanStats {
 }
 
 const BROWN_PALETTE = [
-  "#3E2F23",
-  "#6B5744",
-  "#8B7355",
-  "#A0785A",
-  "#C4A882",
-  "#D4C4A8",
+  chartColors.primary,
+  chartColors.primarySoft,
+  chartColors.secondary,
+  chartColors.accent,
+  chartColors.accentSoft,
 ];
 
 const PROCESS_COLORS: Record<string, string> = {
-  washed: "#7B9EA8",
-  natural: "#B85C6F",
-  honey: "#D4A843",
-  anaerobic: "#8B6BAE",
-  carbonic: "#5E8B6A",
-  decaf: "#8B7355",
-  other: "#9B9B9B",
+  ...chartColors.process,
 };
 
-const AXIS_TICK = { fontSize: 11, fill: "#8B7355" };
-const GRID_STROKE = "#F0EBE3";
+const AXIS_TICK = { fontSize: 11, fill: chartColors.secondary };
+const GRID_STROKE = chartColors.borderLight;
+
+const CHART_CATEGORY_LIMIT = 8;
+
+function summarizeCategories(entries: [string, number][], otherLabel: string) {
+  if (entries.length <= CHART_CATEGORY_LIMIT) return entries;
+  const visible = entries.slice(0, CHART_CATEGORY_LIMIT);
+  const otherCount = entries
+    .slice(CHART_CATEGORY_LIMIT)
+    .reduce((sum, [, count]) => sum + count, 0);
+  return [...visible, [otherLabel, otherCount] as [string, number]];
+}
 
 function ChartTooltip({
   active,
@@ -103,7 +108,7 @@ function ChartCard({
 }) {
   return (
     <div
-      className={`stats-rise ${emphasis ? "journal-panel-feature" : "journal-panel"} p-5 transition-all duration-200 hover:border-accent-light hover:shadow-[0_2px_12px_rgba(62,47,35,0.06)] ${className}`}
+      className={`stats-rise ${emphasis ? "journal-panel-feature" : "journal-panel"} p-5 transition-all duration-200 hover:border-accent-light ${className}`}
       style={{ animationDelay: `${delay}ms` }}
     >
       {children}
@@ -202,8 +207,12 @@ export default function StatsPage() {
   }
 
   /* ---------- chart data ---------- */
-  const originData = stats.byOrigin.map(([name, count]) => ({ name, count }));
-  const varietalData = stats.byVarietal.map(([name, count]) => ({ name, count }));
+  const originData = summarizeCategories(stats.byOrigin, t("otherCategories")).map(
+    ([name, count]) => ({ name, count })
+  );
+  const varietalData = summarizeCategories(stats.byVarietal, t("otherCategories")).map(
+    ([name, count]) => ({ name, count })
+  );
   const processData = stats.byProcess.map(([method, count]) => ({
     name: processLabel(method),
     label: processLabel(method),
@@ -332,7 +341,7 @@ export default function StatsPage() {
                 tick={AXIS_TICK}
               />
               <Tooltip
-                cursor={{ fill: "rgba(196,168,130,0.08)" }}
+                cursor={{ fill: chartColors.accentWash }}
                 content={<ChartTooltip suffix={cupsSuffix} />}
               />
               <Bar dataKey="count" barSize={18} radius={[0, 4, 4, 0]}>
@@ -423,7 +432,7 @@ export default function StatsPage() {
                   tick={AXIS_TICK}
                 />
                 <Tooltip
-                  cursor={{ fill: "rgba(196,168,130,0.08)" }}
+                  cursor={{ fill: chartColors.accentWash }}
                   content={<ChartTooltip suffix={cupsSuffix} />}
                 />
                 <Bar dataKey="count" barSize={18} radius={[0, 4, 4, 0]}>
@@ -452,14 +461,14 @@ export default function StatsPage() {
                 tickFormatter={(v: string) => formatMonth(v, locale)}
               />
               <YAxis allowDecimals={false} tickLine={false} axisLine={false} tick={AXIS_TICK} />
-              <Tooltip cursor={{ stroke: "#D4C4A8" }} content={<ChartTooltip suffix={cupsSuffix} />} />
+              <Tooltip cursor={{ stroke: chartColors.accentSoft }} content={<ChartTooltip suffix={cupsSuffix} />} />
               <Line
                 type="monotone"
                 dataKey="count"
-                stroke="#A0785A"
+                stroke={chartColors.accent}
                 strokeWidth={2}
-                dot={{ r: 3.5, fill: "#A0785A", strokeWidth: 0 }}
-                activeDot={{ r: 5.5, fill: "#3E2F23", strokeWidth: 0 }}
+                dot={{ r: 3.5, fill: chartColors.accent, strokeWidth: 0 }}
+                activeDot={{ r: 5.5, fill: chartColors.primary, strokeWidth: 0 }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -475,8 +484,8 @@ export default function StatsPage() {
               <CartesianGrid vertical={false} stroke={GRID_STROKE} />
               <XAxis dataKey="name" tickLine={false} axisLine={{ stroke: GRID_STROKE }} tick={AXIS_TICK} />
               <YAxis allowDecimals={false} tickLine={false} axisLine={false} tick={AXIS_TICK} />
-              <Tooltip cursor={{ fill: "rgba(196,168,130,0.08)" }} content={<ChartTooltip suffix={cupsSuffix} />} />
-              <Bar dataKey="count" fill="#6B5744" radius={[4, 4, 0, 0]} maxBarSize={36} />
+              <Tooltip cursor={{ fill: chartColors.accentWash }} content={<ChartTooltip suffix={cupsSuffix} />} />
+              <Bar dataKey="count" fill={chartColors.primarySoft} radius={[4, 4, 0, 0]} maxBarSize={36} />
             </BarChart>
           </ResponsiveContainer>
         </ChartCard>

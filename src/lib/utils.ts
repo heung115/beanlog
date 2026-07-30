@@ -20,22 +20,22 @@ export function formatScore(score: number): string {
 
 export function getProcessColor(method: string): string {
   const colors: Record<string, string> = {
-    washed: "bg-process-washed/15 text-process-washed",
-    natural: "bg-process-natural/15 text-process-natural",
-    honey: "bg-process-honey/15 text-process-honey",
-    anaerobic: "bg-process-anaerobic/15 text-process-anaerobic",
-    carbonic: "bg-process-carbonic/15 text-process-carbonic",
-    decaf: "bg-process-other/15 text-brown-medium",
-    other: "bg-process-other/15 text-process-other",
+    washed: "bg-process-washed/15 text-brown",
+    natural: "bg-process-natural/15 text-brown",
+    honey: "bg-process-honey/15 text-brown",
+    anaerobic: "bg-process-anaerobic/15 text-brown",
+    carbonic: "bg-process-carbonic/15 text-brown",
+    decaf: "bg-process-decaf/15 text-brown",
+    other: "bg-process-other/15 text-brown",
   };
   return colors[method] || colors.other;
 }
 
 export function getRoastColor(level: string): string {
   const colors: Record<string, string> = {
-    light: "bg-roast-light/20 text-roast-light",
-    medium: "bg-roast-medium/20 text-roast-medium",
-    dark: "bg-roast-dark/20 text-roast-dark",
+    light: "bg-roast-light/20 text-brown",
+    medium: "bg-roast-medium/20 text-brown",
+    dark: "bg-roast-dark/20 text-brown",
   };
   return colors[level] || colors.medium;
 }

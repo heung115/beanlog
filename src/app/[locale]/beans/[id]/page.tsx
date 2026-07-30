@@ -19,6 +19,7 @@ import { useToast } from "@/components/ui/toast";
 import { tagDisplayName } from "@/components/beans/tag-input";
 import { deleteBean, getBeanById } from "@/lib/actions/beans";
 import { findCountryPreset } from "@/data/origin-presets";
+import { chartColors } from "@/config/chart-colors";
 import {
   cn,
   formatDate,
@@ -41,19 +42,18 @@ function Card({
   children,
   className,
   delay,
-  emphasis = false,
+  testId,
 }: {
   children: React.ReactNode;
   className?: string;
   delay?: number;
-  emphasis?: boolean;
+  testId?: string;
 }) {
   return (
     <section
-      className={cn(
-        emphasis ? "journal-panel-feature animate-rise p-5 md:p-6" : "journal-panel animate-rise p-5 md:p-6",
-        className
-      )}
+      data-detail-section
+      data-testid={testId}
+      className={cn("animate-rise", className)}
       style={delay ? { animationDelay: `${delay}ms` } : undefined}
     >
       {children}
@@ -282,7 +282,7 @@ export default function BeanDetailPage() {
           {bean.name}
         </h1>
         <p className="mt-1.5 text-base text-brown-light">{bean.roastery}</p>
-        <p className="mt-3 flex items-center gap-2 text-sm text-brown-light/80">
+        <p className="mt-3 flex items-center gap-2 text-sm text-brown-light">
           <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
             <rect
               x="1"
@@ -304,7 +304,7 @@ export default function BeanDetailPage() {
       </header>
 
       {/* Score + note */}
-      <Card delay={80} emphasis>
+      <Card delay={80} className="py-6 md:py-7" testId="bean-overall-score">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
           <div className="flex shrink-0 flex-col items-center gap-1 sm:border-r sm:border-border-light sm:pr-8">
             <Overline>{t("overallScore")}</Overline>
@@ -320,22 +320,22 @@ export default function BeanDetailPage() {
 
       {/* Detail scores radar */}
       {hasDetailScores && (
-        <Card delay={120} className="mt-4">
+        <Card delay={120} className="border-t border-border-light py-6 md:py-8">
           <Overline>{t("detailedScores")}</Overline>
           <div className="mt-2 h-64">
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="72%">
-                <PolarGrid stroke="#E8E0D5" />
+                <PolarGrid stroke={chartColors.border} />
                 <PolarAngleAxis
                   dataKey="label"
-                  tick={{ fill: "#8B7355", fontSize: 12 }}
+                  tick={{ fill: chartColors.secondary, fontSize: 12 }}
                 />
                 <PolarRadiusAxis domain={[0, 5]} tick={false} axisLine={false} />
                 <Radar
                   dataKey="value"
-                  stroke="#A0785A"
+                  stroke={chartColors.accent}
                   strokeWidth={2}
-                  fill="#A0785A"
+                  fill={chartColors.accent}
                   fillOpacity={0.32}
                 />
               </RadarChart>
@@ -360,8 +360,8 @@ export default function BeanDetailPage() {
       )}
 
       {/* Origin + process */}
-      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-        <Card delay={160}>
+      <div className="grid grid-cols-1 border-t border-border-light md:grid-cols-2">
+        <Card delay={160} className="py-6 md:py-8 md:pr-8">
           <Overline>{t("originInfo")}</Overline>
           <dl className="mt-2 divide-y divide-border-light">
             <InfoRow label={t("originCountry")} value={countryName} />
@@ -379,7 +379,10 @@ export default function BeanDetailPage() {
           </dl>
         </Card>
 
-        <Card delay={200}>
+        <Card
+          delay={200}
+          className="border-t border-border-light py-6 md:border-l md:border-t-0 md:py-8 md:pl-8"
+        >
           <Overline>{t("processMethod")} · {t("roastLevel")}</Overline>
           <dl className="mt-2 divide-y divide-border-light">
             <InfoRow label={t("processMethod")} value={tp(bean.process_method)} />
@@ -399,7 +402,7 @@ export default function BeanDetailPage() {
 
       {/* Blend composition */}
       {bean.bean_type === "blend" && (bean.blend_components ?? []).length > 0 && (
-        <Card delay={180} className="mt-4">
+        <Card delay={180} className="border-t border-border-light py-6 md:py-8">
           <Overline>{t("blendComposition")}</Overline>
           <div className="mt-3 flex flex-col gap-2">
             {(bean.blend_components ?? [])
@@ -457,7 +460,7 @@ export default function BeanDetailPage() {
 
       {/* Tasting tags */}
       {tags.length > 0 && (
-        <Card delay={240} className="mt-4">
+        <Card delay={240} className="border-t border-border-light py-6 md:py-8">
           <Overline>{t("tastingNotes")}</Overline>
           <div className="mt-3 flex flex-wrap gap-2">
             {tags.map((tag) => (
@@ -474,7 +477,7 @@ export default function BeanDetailPage() {
 
       {/* Purchase */}
       {hasPurchase && (
-        <Card delay={280} className="mt-4">
+        <Card delay={280} className="border-t border-border-light py-6 md:py-8">
           <Overline>{t("purchaseInfo")}</Overline>
           <dl className="mt-2 divide-y divide-border-light">
             <InfoRow label={t("purchaseSource")} value={purchaseSourceLabel} />

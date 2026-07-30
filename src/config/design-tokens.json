@@ -1,0 +1,25 @@
+{
+  "colors": {
+    "cream": "#FAF7F2",
+    "cream-dark": "#F3EDE4",
+    "brown": "#3E2F23",
+    "brown-light": "#735E47",
+    "brown-medium": "#6B5744",
+    "accent": "#865D42",
+    "accent-light": "#C4A882",
+    "border": "#E8E0D5",
+    "border-light": "#F0EBE3",
+    "surface": "#FFFFFF",
+    "surface-warm": "#FDFBF8",
+    "process-washed": "#7B9EA8",
+    "process-natural": "#B85C6F",
+    "process-honey": "#D4A843",
+    "process-anaerobic": "#8B6BAE",
+    "process-carbonic": "#5E8B6A",
+    "process-decaf": "#735E47",
+    "process-other": "#9B9B9B",
+    "roast-light": "#C4A882",
+    "roast-medium": "#8B6B4A",
+    "roast-dark": "#4A3728"
+  }
+}

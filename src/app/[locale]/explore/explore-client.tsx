@@ -54,7 +54,7 @@ function FilterChip({ label, allLabel, value, options, onChange }: FilterChipPro
       value={value ?? ""}
       onChange={(e) => onChange(e.target.value || undefined)}
       className={cn(
-        "shrink-0 cursor-pointer appearance-none rounded-full border py-1.5 pl-3.5 pr-8 text-xs font-medium transition-colors duration-150",
+        "min-h-11 shrink-0 cursor-pointer appearance-none rounded-full border py-2 pl-3.5 pr-8 text-xs font-medium transition-colors duration-150",
         "bg-no-repeat bg-[position:right_10px_center] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40",
         active
           ? cn("border-brown bg-brown text-cream", CHEVRON_ACTIVE)
@@ -419,7 +419,7 @@ export function ExploreClient({
           value={sortValue}
           onChange={(e) => handleSortChange(e.target.value)}
           className={cn(
-            "shrink-0 cursor-pointer appearance-none rounded-md border border-border bg-surface py-1.5 pl-3 pr-8 text-xs font-medium text-brown-medium",
+            "min-h-11 shrink-0 cursor-pointer appearance-none rounded-md border border-border bg-surface py-2 pl-3 pr-8 text-xs font-medium text-brown-medium",
             "bg-no-repeat bg-[position:right_8px_center] transition-colors duration-150 hover:border-brown-light",
             "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40",
             CHEVRON

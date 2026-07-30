@@ -18,18 +18,24 @@ function SectionCard({
   danger = false,
   delay = 0,
   feature = false,
+  plain = false,
 }: {
   title: string;
   children: React.ReactNode;
   danger?: boolean;
   delay?: number;
   feature?: boolean;
+  plain?: boolean;
 }) {
   return (
     <section
-      className={`settings-rise ${feature ? "journal-panel-feature" : "journal-panel-quiet"} p-5 md:p-6 ${
-        danger ? "border-red-200 bg-red-50/30" : ""
-      }`}
+      className={`settings-rise ${
+        plain
+          ? "border-t border-border-light px-1 pt-6"
+          : feature
+            ? "journal-panel-feature p-5 md:p-6"
+            : "journal-panel-quiet p-5 md:p-6"
+      } ${danger ? "border-red-200 bg-red-50/30" : ""}`}
       style={{ animationDelay: `${delay}ms` }}
     >
       <h2
@@ -205,7 +211,7 @@ export default function SettingsPage() {
       </SectionCard>
 
       {/* ---------- language ---------- */}
-      <SectionCard title={t("language")} delay={120}>
+      <SectionCard title={t("language")} delay={120} plain>
         <div
           role="radiogroup"
           aria-label={t("language")}
@@ -220,7 +226,7 @@ export default function SettingsPage() {
                 role="radio"
                 aria-checked={active}
                 onClick={() => switchLocale(l.value)}
-                className={`rounded px-5 py-2 text-sm font-medium transition-all duration-150 ${
+                className={`min-h-11 rounded px-5 py-2 text-sm font-medium transition-all duration-150 ${
                   active
                     ? "bg-brown text-cream shadow-sm"
                     : "text-brown-light hover:text-brown"
@@ -234,7 +240,7 @@ export default function SettingsPage() {
       </SectionCard>
 
       {/* ---------- export ---------- */}
-      <SectionCard title={t("exportData")} delay={180}>
+      <SectionCard title={t("exportData")} delay={180} plain>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="flex items-start gap-2.5 text-sm leading-relaxed text-brown-light">
             <Icon path={ICONS.download} className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
@@ -252,7 +258,7 @@ export default function SettingsPage() {
       </SectionCard>
 
       {/* ---------- logout ---------- */}
-      <SectionCard title={tAuth("logout")} delay={240}>
+      <SectionCard title={tAuth("logout")} delay={240} plain>
         <Button variant="secondary" onClick={() => signOut()} className="w-full sm:w-auto">
           <Icon path={ICONS.logout} className="mr-2 h-4 w-4" />
           {tAuth("logout")}

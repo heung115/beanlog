@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import designTokens from "@/config/design-tokens.json";
 
 export const metadata: Metadata = {
   title: "Beanlog",
@@ -7,7 +8,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#FAF7F2",
+  themeColor: designTokens.colors.cream,
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
