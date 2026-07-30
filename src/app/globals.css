@@ -1,26 +1,162 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-cream: #FAF7F2;
+  --color-cream-dark: #F3EDE4;
+  --color-brown: #3E2F23;
+  --color-brown-light: #735E47;
+  --color-brown-medium: #6B5744;
+  --color-accent: #865D42;
+  --color-accent-light: #C4A882;
+  --color-border: #E8E0D5;
+  --color-border-light: #F0EBE3;
+  --color-surface: #FFFFFF;
+  --color-surface-warm: #FDFBF8;
+
+  --color-process-washed: #7B9EA8;
+  --color-process-natural: #B85C6F;
+  --color-process-honey: #D4A843;
+  --color-process-anaerobic: #8B6BAE;
+  --color-process-carbonic: #5E8B6A;
+  --color-process-other: #9B9B9B;
+
+  --color-roast-light: #C4A882;
+  --color-roast-medium: #8B6B4A;
+  --color-roast-dark: #4A3728;
+
+  --font-display: "Playfair Display", "Nanum Myeongjo", serif;
+  --font-body: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-body);
+  background-color: var(--color-cream);
+  color: var(--color-brown);
+  line-height: 1.6;
+}
+
+::selection {
+  background-color: var(--color-accent-light);
+  color: var(--color-brown);
+}
+
+input, textarea, select, button {
+  font-family: inherit;
+}
+
+/* Minimal scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brown-light);
+}
+
+/* Entrance animation */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-rise {
+  animation: rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Editorial primitives: reserve the framed surface for content that needs focus. */
+.journal-kicker {
+  color: var(--color-accent);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.journal-section-title {
+  color: var(--color-brown);
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.journal-panel {
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  background: var(--color-surface);
+}
+
+.journal-panel-feature {
+  border-top: 2px solid var(--color-brown);
+  border-radius: 0.5rem;
+  background: var(--color-surface);
+}
+
+.journal-panel-quiet {
+  border: 1px solid var(--color-border-light);
+  border-radius: 0.375rem;
+  background: var(--color-surface-warm);
+}
+
+/* Brown range slider */
+input[type="range"].slider-brown {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 3px;
+  border-radius: 9999px;
+  background: var(--color-border);
+  outline: none;
+  cursor: pointer;
+}
+
+input[type="range"].slider-brown::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--color-brown);
+  border: 3px solid var(--color-surface);
+  box-shadow: 0 1px 4px rgba(62, 47, 35, 0.35);
+  transition: transform 0.15s ease;
+}
+
+input[type="range"].slider-brown::-webkit-slider-thumb:hover,
+input[type="range"].slider-brown::-webkit-slider-thumb:active {
+  transform: scale(1.18);
+}
+
+input[type="range"].slider-brown::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-brown);
+  border: 3px solid var(--color-surface);
+  box-shadow: 0 1px 4px rgba(62, 47, 35, 0.35);
+  transition: transform 0.15s ease;
+}
+
+input[type="range"].slider-brown::-moz-range-thumb:hover {
+  transform: scale(1.18);
 }
