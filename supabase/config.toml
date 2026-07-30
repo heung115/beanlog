@@ -1,0 +1,145 @@
+project_id = "beanlog"
+
+[api]
+enabled = true
+port = 54321
+# Only expose public schema — no graphql (unused, reduces attack surface)
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+# Limit rows per request (prevents bulk data exfiltration)
+max_rows = 100
+
+[api.tls]
+enabled = false
+
+[db]
+port = 54322
+shadow_port = 54320
+health_timeout = "2m"
+major_version = 17
+
+[db.pooler]
+enabled = false
+port = 54329
+pool_mode = "transaction"
+default_pool_size = 20
+max_client_conn = 100
+
+[db.migrations]
+enabled = true
+schema_paths = []
+
+[db.seed]
+enabled = true
+sql_paths = ["./seed.sql"]
+
+[db.network_restrictions]
+enabled = false
+
+[realtime]
+enabled = false
+
+[studio]
+enabled = true
+port = 54323
+api_url = "http://127.0.0.1"
+
+[local_smtp]
+enabled = true
+port = 54324
+
+[storage]
+enabled = true
+# V1: no photo upload, keep limit small
+file_size_limit = "5MiB"
+
+[storage.s3_protocol]
+enabled = false
+
+[analytics]
+enabled = false
+
+# ============================================
+# Auth configuration
+# ============================================
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000/api/auth/callback"]
+jwt_expiry = 3600
+# Refresh tokens: rotate on use (prevents token reuse)
+enable_refresh_token_rotation = true
+# Refresh token expiry: 7 days
+refresh_token_reuse_interval = 10
+enable_signup = true
+enable_anonymous_sign_ins = false
+# Require email confirmation for email signups
+# Rate limiting
+[auth.rate_limit]
+# Max email sends per hour
+email_sent = 30
+# Max SMS sends per hour
+sms_sent = 0
+# Max token refreshes per minute
+token_refresh = 150
+# Max verify attempts per hour
+# Max web3 attempts per hour
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = true
+# Max frequency between emails
+max_frequency = "60s"
+
+# Disable phone/SMS entirely (not used)
+[auth.sms]
+enable_signup = false
+enable_confirmations = false
+
+# Google OAuth
+[auth.external.google]
+enabled = true
+client_id = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET)"
+redirect_uri = ""
+skip_nonce_check = false
+
+# Kakao OAuth
+[auth.external.kakao]
+enabled = true
+client_id = "env(SUPABASE_AUTH_EXTERNAL_KAKAO_CLIENT_ID)"
+secret = "env(SUPABASE_AUTH_EXTERNAL_KAKAO_SECRET)"
+redirect_uri = ""
+skip_nonce_check = false
+
+# Disable all other providers
+[auth.external.apple]
+enabled = false
+[auth.external.azure]
+enabled = false
+[auth.external.github]
+enabled = false
+[auth.external.facebook]
+enabled = false
+[auth.external.twitter]
+enabled = false
+[auth.external.discord]
+enabled = false
+
+[auth.mfa]
+max_enrolled_factors = 5
+
+[auth.mfa.totp]
+enroll_enabled = false
+verify_enabled = false
+
+[auth.mfa.phone]
+enroll_enabled = false
+verify_enabled = false
+
+[edge_runtime]
+enabled = false
+
+[experimental]
+orioledb_version = ""
