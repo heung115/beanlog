@@ -1,0 +1,28 @@
+services:
+  beanlog:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY:?set NEXT_PUBLIC_SUPABASE_ANON_KEY}
+        NEXT_PUBLIC_APP_URL: http://localhost:3000
+    environment:
+      # Server-side only: Docker container → host Supabase
+      SUPABASE_SERVER_URL: http://host.docker.internal:54321
+      # Runtime env for @supabase/ssr createServerClient (anon key is read from
+      # process.env at runtime in the standalone/edge bundle, not only inlined).
+      NEXT_PUBLIC_SUPABASE_URL: http://localhost:54321
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY:?set NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./server
+    env_file:
+      - ./server/.env.docker
+    ports:
+      - "8080:8080"
+    restart: unless-stopped

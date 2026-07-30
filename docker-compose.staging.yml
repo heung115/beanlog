@@ -1,0 +1,66 @@
+name: beanlog-staging
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: ${STAGING_PUBLIC_SUPABASE_URL:?run npm run staging:up}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${STAGING_SUPABASE_ANON_KEY:?run npm run staging:up}
+        NEXT_PUBLIC_APP_URL: ${STAGING_APP_URL:-http://localhost:3100}
+    environment:
+      NEXT_PUBLIC_SUPABASE_URL: ${STAGING_PUBLIC_SUPABASE_URL}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${STAGING_SUPABASE_ANON_KEY}
+      NEXT_PUBLIC_APP_URL: ${STAGING_APP_URL:-http://localhost:3100}
+      SUPABASE_SERVER_URL: ${STAGING_INTERNAL_SUPABASE_URL:-http://kong:8000}
+    ports:
+      - "127.0.0.1:${STAGING_WEB_PORT:-3100}:3000"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3000/ko/login"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    init: true
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    networks:
+      - default
+      - staging-supabase
+
+  api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    environment:
+      PORT: "8080"
+      GIN_MODE: release
+      DATABASE_URL: ${STAGING_DATABASE_URL:-postgresql://postgres:postgres@db:5432/postgres?sslmode=disable}
+      JWKS_URL: ${STAGING_JWKS_URL:-http://kong:8000/auth/v1/.well-known/jwks.json}
+      CORS_ORIGIN: ${STAGING_APP_URL:-http://localhost:3100}
+    ports:
+      - "127.0.0.1:${STAGING_API_PORT:-8180}:8080"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+    init: true
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    networks:
+      - default
+      - staging-supabase
+
+networks:
+  staging-supabase:
+    external: true
+    name: supabase_network_beanlog-staging

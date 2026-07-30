@@ -1,0 +1,5 @@
+.env
+.env.*
+beanlog-server
+coverage.out
+*.log
