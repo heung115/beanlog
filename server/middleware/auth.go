@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"math/big"
 	"net/http"
 	"strings"
@@ -32,11 +33,12 @@ type jwksResponse struct {
 }
 
 type keyProvider struct {
-	mu         sync.RWMutex
-	keys       map[string]*ecdsa.PublicKey
-	jwksURL    string
-	lastFetch  time.Time
-	cacheTTL   time.Duration
+	mu        sync.RWMutex
+	refreshMu sync.Mutex
+	keys      map[string]*ecdsa.PublicKey
+	jwksURL   string
+	lastFetch time.Time
+	cacheTTL  time.Duration
 }
 
 func newKeyProvider(jwksURL string) *keyProvider {
@@ -49,13 +51,16 @@ func newKeyProvider(jwksURL string) *keyProvider {
 
 func (kp *keyProvider) getKey(kid string) (*ecdsa.PublicKey, error) {
 	kp.mu.RLock()
-	if key, ok := kp.keys[kid]; ok && time.Since(kp.lastFetch) < kp.cacheTTL {
-		kp.mu.RUnlock()
-		return key, nil
-	}
+	key, found := kp.keys[kid]
+	cacheFresh := !kp.lastFetch.IsZero() && time.Since(kp.lastFetch) < kp.cacheTTL
 	kp.mu.RUnlock()
+	if cacheFresh {
+		if found {
+			return key, nil
+		}
+		return nil, fmt.Errorf("key not found in current JWKS")
+	}
 
-	// Fetch JWKS
 	if err := kp.refresh(); err != nil {
 		return nil, err
 	}
@@ -69,21 +74,35 @@ func (kp *keyProvider) getKey(kid string) (*ecdsa.PublicKey, error) {
 }
 
 func (kp *keyProvider) refresh() error {
+	kp.refreshMu.Lock()
+	defer kp.refreshMu.Unlock()
+
+	// Another request may have refreshed while this request waited.
+	kp.mu.RLock()
+	cacheFresh := !kp.lastFetch.IsZero() && time.Since(kp.lastFetch) < kp.cacheTTL
+	kp.mu.RUnlock()
+	if cacheFresh {
+		return nil
+	}
+
 	client := &http.Client{Timeout: 5 * time.Second}
 	resp, err := client.Get(kp.jwksURL)
 	if err != nil {
 		return fmt.Errorf("failed to fetch JWKS: %w", err)
 	}
 	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("JWKS endpoint returned status %d", resp.StatusCode)
+	}
 
 	var jwks jwksResponse
-	if err := json.NewDecoder(resp.Body).Decode(&jwks); err != nil {
+	if err := json.NewDecoder(io.LimitReader(resp.Body, 1<<20)).Decode(&jwks); err != nil {
 		return fmt.Errorf("failed to decode JWKS: %w", err)
 	}
 
 	keys := make(map[string]*ecdsa.PublicKey)
 	for _, k := range jwks.Keys {
-		if k.Kty != "EC" || k.Crv != "P-256" {
+		if k.Kty != "EC" || k.Alg != jwt.SigningMethodES256.Alg() || k.Crv != "P-256" || k.Kid == "" {
 			continue
 		}
 		xBytes, err := base64.RawURLEncoding.DecodeString(k.X)
@@ -99,7 +118,13 @@ func (kp *keyProvider) refresh() error {
 			X:     new(big.Int).SetBytes(xBytes),
 			Y:     new(big.Int).SetBytes(yBytes),
 		}
+		if !pub.Curve.IsOnCurve(pub.X, pub.Y) {
+			continue
+		}
 		keys[k.Kid] = pub
+	}
+	if len(keys) == 0 {
+		return fmt.Errorf("JWKS endpoint returned no valid ES256 keys")
 	}
 
 	kp.mu.Lock()
@@ -110,7 +135,7 @@ func (kp *keyProvider) refresh() error {
 	return nil
 }
 
-func AuthRequired(jwksURL string) gin.HandlerFunc {
+func AuthRequired(jwksURL, issuer string) gin.HandlerFunc {
 	kp := newKeyProvider(jwksURL)
 
 	return func(c *gin.Context) {
@@ -128,7 +153,7 @@ func AuthRequired(jwksURL string) gin.HandlerFunc {
 
 		token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
 			// Verify signing method is ES256
-			if _, ok := t.Method.(*jwt.SigningMethodECDSA); !ok {
+			if t.Method.Alg() != jwt.SigningMethodES256.Alg() {
 				return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
 			}
 			kid, _ := t.Header["kid"].(string)
@@ -136,7 +161,12 @@ func AuthRequired(jwksURL string) gin.HandlerFunc {
 				return nil, fmt.Errorf("missing kid in token header")
 			}
 			return kp.getKey(kid)
-		})
+		},
+			jwt.WithValidMethods([]string{jwt.SigningMethodES256.Alg()}),
+			jwt.WithExpirationRequired(),
+			jwt.WithIssuer(issuer),
+			jwt.WithAudience("authenticated"),
+		)
 		if err != nil || !token.Valid {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
 			return
@@ -151,6 +181,11 @@ func AuthRequired(jwksURL string) gin.HandlerFunc {
 		sub, _ := claims["sub"].(string)
 		if sub == "" {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing subject"})
+			return
+		}
+		role, _ := claims["role"].(string)
+		if role != "authenticated" {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid role"})
 			return
 		}
 

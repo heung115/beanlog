@@ -11,21 +11,19 @@ import (
 	"beanlog-server/models"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type StatsHandler struct {
-	DB *pgxpool.Pool
-}
+type StatsHandler struct{}
 
-func NewStatsHandler(db *pgxpool.Pool) *StatsHandler {
-	return &StatsHandler{DB: db}
+func NewStatsHandler() *StatsHandler {
+	return &StatsHandler{}
 }
 
 func (h *StatsHandler) GetStats(c *gin.Context) {
+	db := middleware.RequestDB(c)
 	userID := c.GetString(middleware.UserIDKey)
 
-	rows, err := h.DB.Query(c.Request.Context(),
+	rows, err := db.Query(c.Request.Context(),
 		`SELECT origin_country, process_method, COALESCE(varietal,''), overall_score, consumed_at, name, roastery
 		 FROM beans WHERE user_id = $1`, userID,
 	)

@@ -3,22 +3,21 @@ package handlers
 import (
 	"net/http"
 
+	"beanlog-server/middleware"
 	"beanlog-server/models"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type OriginHandler struct {
-	DB *pgxpool.Pool
-}
+type OriginHandler struct{}
 
-func NewOriginHandler(db *pgxpool.Pool) *OriginHandler {
-	return &OriginHandler{DB: db}
+func NewOriginHandler() *OriginHandler {
+	return &OriginHandler{}
 }
 
 func (h *OriginHandler) List(c *gin.Context) {
-	rows, err := h.DB.Query(c.Request.Context(),
+	db := middleware.RequestDB(c)
+	rows, err := db.Query(c.Request.Context(),
 		`SELECT id, country, region, lat, lng, altitude_range, signature, key_varietals, name_ko, name_en
 		 FROM origin_presets ORDER BY country, region`,
 	)

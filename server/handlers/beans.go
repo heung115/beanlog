@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
@@ -11,22 +12,38 @@ import (
 	"beanlog-server/models"
 
 	"github.com/gin-gonic/gin"
-	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
-type BeanHandler struct {
-	DB *pgxpool.Pool
+type BeanHandler struct{}
+
+func isInvalidBeanData(err error) bool {
+	var pgErr *pgconn.PgError
+	if !errors.As(err, &pgErr) {
+		return false
+	}
+	return strings.HasPrefix(pgErr.Code, "22") || strings.HasPrefix(pgErr.Code, "23")
 }
 
-func NewBeanHandler(db *pgxpool.Pool) *BeanHandler {
-	return &BeanHandler{DB: db}
+func writeBeanMutationError(c *gin.Context, err error, operation string) {
+	if isInvalidBeanData(err) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid bean data"})
+		return
+	}
+	c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to " + operation + " bean"})
+}
+
+func NewBeanHandler() *BeanHandler {
+	return &BeanHandler{}
 }
 
 func (h *BeanHandler) List(c *gin.Context) {
+	db := middleware.RequestDB(c)
 	userID := c.GetString(middleware.UserIDKey)
 	var f models.BeanFilters
 	if err := c.ShouldBindQuery(&f); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid query parameters"})
 		return
 	}
 	if f.Limit <= 0 || f.Limit > 100 {
@@ -121,7 +138,7 @@ func (h *BeanHandler) List(c *gin.Context) {
 	// Count query
 	countSQL := fmt.Sprintf("SELECT COUNT(*) FROM beans b WHERE %s", whereClause)
 	var total int
-	if err := h.DB.QueryRow(c.Request.Context(), countSQL, args...).Scan(&total); err != nil {
+	if err := db.QueryRow(c.Request.Context(), countSQL, args...).Scan(&total); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to count beans"})
 		return
 	}
@@ -140,7 +157,7 @@ func (h *BeanHandler) List(c *gin.Context) {
 		whereClause, sortBy, sortOrder, f.Limit, offset,
 	)
 
-	rows, err := h.DB.Query(c.Request.Context(), dataSQL, args...)
+	rows, err := db.Query(c.Request.Context(), dataSQL, args...)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to query beans"})
 		return
@@ -176,7 +193,7 @@ func (h *BeanHandler) List(c *gin.Context) {
 
 	// Load tags for all beans
 	if len(beans) > 0 {
-		h.loadTags(c.Request.Context(), userID, beans)
+		h.loadTags(c.Request.Context(), db, userID, beans)
 	}
 
 	// Filter by tag if requested (post-query)
@@ -200,7 +217,7 @@ func (h *BeanHandler) List(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"beans": beans, "count": total})
 }
 
-func (h *BeanHandler) loadTags(ctx context.Context, userID string, beans []models.Bean) {
+func (h *BeanHandler) loadTags(ctx context.Context, db pgx.Tx, userID string, beans []models.Bean) {
 	if len(beans) == 0 {
 		return
 	}
@@ -213,7 +230,7 @@ func (h *BeanHandler) loadTags(ctx context.Context, userID string, beans []model
 		args = append(args, b.ID)
 	}
 	tagSQL := "SELECT id, bean_id, user_id, tag, category FROM tasting_tags WHERE user_id = $1 AND bean_id IN (" + strings.Join(placeholders, ",") + ")"
-	rows, err := h.DB.Query(ctx, tagSQL, args...)
+	rows, err := db.Query(ctx, tagSQL, args...)
 	if err != nil {
 		return
 	}
@@ -237,12 +254,13 @@ func (h *BeanHandler) loadTags(ctx context.Context, userID string, beans []model
 }
 
 func (h *BeanHandler) GetByID(c *gin.Context) {
+	db := middleware.RequestDB(c)
 	userID := c.GetString(middleware.UserIDKey)
 	beanID := c.Param("id")
 
 	var b models.Bean
 	var roastDate, purchasedAt *time.Time
-	err := h.DB.QueryRow(c.Request.Context(),
+	err := db.QueryRow(c.Request.Context(),
 		`SELECT id, user_id, name, roastery, bean_type, origin_country,
 		        origin_region, origin_lat, origin_lng, farm_producer, varietal,
 		        process_method, process_detail, altitude_m, harvest_year,
@@ -276,8 +294,8 @@ func (h *BeanHandler) GetByID(c *gin.Context) {
 	}
 
 	// Load tags
-	h.loadTags(c.Request.Context(), userID, []models.Bean{b})
-	rows, _ := h.DB.Query(c.Request.Context(),
+	h.loadTags(c.Request.Context(), db, userID, []models.Bean{b})
+	rows, _ := db.Query(c.Request.Context(),
 		"SELECT id, bean_id, user_id, tag, category FROM tasting_tags WHERE bean_id = $1 AND user_id = $2",
 		beanID, userID,
 	)
@@ -300,10 +318,11 @@ func (h *BeanHandler) GetByID(c *gin.Context) {
 }
 
 func (h *BeanHandler) Create(c *gin.Context) {
+	db := middleware.RequestDB(c)
 	userID := c.GetString(middleware.UserIDKey)
 	var req models.CreateBeanRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid bean data"})
 		return
 	}
 
@@ -315,8 +334,9 @@ func (h *BeanHandler) Create(c *gin.Context) {
 	}
 
 	var beanID string
-	err := h.DB.QueryRow(c.Request.Context(),
-		`INSERT INTO beans (user_id, name, roastery, bean_type, origin_country, origin_region,
+	err := func() error {
+		if err := db.QueryRow(c.Request.Context(),
+			`INSERT INTO beans (user_id, name, roastery, bean_type, origin_country, origin_region,
 			origin_lat, origin_lng, farm_producer, varietal, process_method, process_detail,
 			altitude_m, harvest_year, roast_level, roast_date, consumed_at, place_type,
 			cafe_name, cafe_location, menu_name, overall_score, note,
@@ -324,41 +344,45 @@ func (h *BeanHandler) Create(c *gin.Context) {
 			purchase_source, price, weight_g, purchased_at)
 		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,$27,$28,$29,$30,$31,$32,$33)
 		RETURNING id`,
-		userID, req.Name, req.Roastery, req.BeanType, req.OriginCountry, req.OriginRegion,
-		req.OriginLat, req.OriginLng, req.FarmProducer, req.Varietal, req.ProcessMethod, req.ProcessDetail,
-		req.AltitudeM, req.HarvestYear, req.RoastLevel, req.RoastDate, consumedAt, req.PlaceType,
-		req.CafeName, req.CafeLocation, req.MenuName, req.OverallScore, req.Note,
-		req.ScoreAroma, req.ScoreAcidity, req.ScoreBody, req.ScoreSweetness, req.ScoreAftertaste, req.ScoreBalance,
-		req.PurchaseSource, req.Price, req.WeightG, req.PurchasedAt,
-	).Scan(&beanID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to create bean: " + err.Error()})
-		return
-	}
-
-	// Insert tags
-	if len(req.Tags) > 0 {
-		for _, t := range req.Tags {
-			cat := t.Category
-			if cat == "" {
-				cat = "other"
-			}
-			h.DB.Exec(c.Request.Context(),
-				"INSERT INTO tasting_tags (bean_id, user_id, tag, category) VALUES ($1,$2,$3,$4)",
-				beanID, userID, t.Tag, cat,
-			)
+			userID, req.Name, req.Roastery, req.BeanType, req.OriginCountry, req.OriginRegion,
+			req.OriginLat, req.OriginLng, req.FarmProducer, req.Varietal, req.ProcessMethod, req.ProcessDetail,
+			req.AltitudeM, req.HarvestYear, req.RoastLevel, req.RoastDate, consumedAt, req.PlaceType,
+			req.CafeName, req.CafeLocation, req.MenuName, req.OverallScore, req.Note,
+			req.ScoreAroma, req.ScoreAcidity, req.ScoreBody, req.ScoreSweetness, req.ScoreAftertaste, req.ScoreBalance,
+			req.PurchaseSource, req.Price, req.WeightG, req.PurchasedAt,
+		).Scan(&beanID); err != nil {
+			return err
 		}
+
+		for _, tag := range req.Tags {
+			category := tag.Category
+			if category == "" {
+				category = "other"
+			}
+			if _, err := db.Exec(c.Request.Context(),
+				"INSERT INTO tasting_tags (bean_id, user_id, tag, category) VALUES ($1,$2,$3,$4)",
+				beanID, userID, tag.Tag, category,
+			); err != nil {
+				return err
+			}
+		}
+		return nil
+	}()
+	if err != nil {
+		writeBeanMutationError(c, err, "create")
+		return
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"success": true, "id": beanID})
 }
 
 func (h *BeanHandler) Update(c *gin.Context) {
+	db := middleware.RequestDB(c)
 	userID := c.GetString(middleware.UserIDKey)
 	beanID := c.Param("id")
 	var req models.UpdateBeanRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid bean data"})
 		return
 	}
 
@@ -369,53 +393,67 @@ func (h *BeanHandler) Update(c *gin.Context) {
 		}
 	}
 
-	tag, err := h.DB.Exec(c.Request.Context(),
-		`UPDATE beans SET name=$1, roastery=$2, bean_type=$3, origin_country=$4, origin_region=$5,
+	err := func() error {
+		commandTag, err := db.Exec(c.Request.Context(),
+			`UPDATE beans SET name=$1, roastery=$2, bean_type=$3, origin_country=$4, origin_region=$5,
 			origin_lat=$6, origin_lng=$7, farm_producer=$8, varietal=$9, process_method=$10, process_detail=$11,
 			altitude_m=$12, harvest_year=$13, roast_level=$14, roast_date=$15, consumed_at=$16, place_type=$17,
 			cafe_name=$18, cafe_location=$19, menu_name=$20, overall_score=$21, note=$22,
 			score_aroma=$23, score_acidity=$24, score_body=$25, score_sweetness=$26, score_aftertaste=$27, score_balance=$28,
 			purchase_source=$29, price=$30, weight_g=$31, purchased_at=$32, updated_at=now()
 		WHERE id=$33 AND user_id=$34`,
-		req.Name, req.Roastery, req.BeanType, req.OriginCountry, req.OriginRegion,
-		req.OriginLat, req.OriginLng, req.FarmProducer, req.Varietal, req.ProcessMethod, req.ProcessDetail,
-		req.AltitudeM, req.HarvestYear, req.RoastLevel, req.RoastDate, consumedAt, req.PlaceType,
-		req.CafeName, req.CafeLocation, req.MenuName, req.OverallScore, req.Note,
-		req.ScoreAroma, req.ScoreAcidity, req.ScoreBody, req.ScoreSweetness, req.ScoreAftertaste, req.ScoreBalance,
-		req.PurchaseSource, req.Price, req.WeightG, req.PurchasedAt,
-		beanID, userID,
-	)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to update bean"})
-		return
-	}
-	if tag.RowsAffected() == 0 {
-		c.JSON(http.StatusNotFound, gin.H{"error": "bean not found"})
-		return
-	}
-
-	// Replace tags
-	h.DB.Exec(c.Request.Context(), "DELETE FROM tasting_tags WHERE bean_id=$1 AND user_id=$2", beanID, userID)
-	for _, t := range req.Tags {
-		cat := t.Category
-		if cat == "" {
-			cat = "other"
-		}
-		h.DB.Exec(c.Request.Context(),
-			"INSERT INTO tasting_tags (bean_id, user_id, tag, category) VALUES ($1,$2,$3,$4)",
-			beanID, userID, t.Tag, cat,
+			req.Name, req.Roastery, req.BeanType, req.OriginCountry, req.OriginRegion,
+			req.OriginLat, req.OriginLng, req.FarmProducer, req.Varietal, req.ProcessMethod, req.ProcessDetail,
+			req.AltitudeM, req.HarvestYear, req.RoastLevel, req.RoastDate, consumedAt, req.PlaceType,
+			req.CafeName, req.CafeLocation, req.MenuName, req.OverallScore, req.Note,
+			req.ScoreAroma, req.ScoreAcidity, req.ScoreBody, req.ScoreSweetness, req.ScoreAftertaste, req.ScoreBalance,
+			req.PurchaseSource, req.Price, req.WeightG, req.PurchasedAt,
+			beanID, userID,
 		)
+		if err != nil {
+			return err
+		}
+		if commandTag.RowsAffected() == 0 {
+			return pgx.ErrNoRows
+		}
+
+		if _, err := db.Exec(c.Request.Context(),
+			"DELETE FROM tasting_tags WHERE bean_id=$1 AND user_id=$2", beanID, userID,
+		); err != nil {
+			return err
+		}
+		for _, tag := range req.Tags {
+			category := tag.Category
+			if category == "" {
+				category = "other"
+			}
+			if _, err := db.Exec(c.Request.Context(),
+				"INSERT INTO tasting_tags (bean_id, user_id, tag, category) VALUES ($1,$2,$3,$4)",
+				beanID, userID, tag.Tag, category,
+			); err != nil {
+				return err
+			}
+		}
+		return nil
+	}()
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "bean not found"})
+		} else {
+			writeBeanMutationError(c, err, "update")
+		}
+		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"success": true})
 }
 
 func (h *BeanHandler) Delete(c *gin.Context) {
+	db := middleware.RequestDB(c)
 	userID := c.GetString(middleware.UserIDKey)
 	beanID := c.Param("id")
 
-	h.DB.Exec(c.Request.Context(), "DELETE FROM tasting_tags WHERE bean_id=$1 AND user_id=$2", beanID, userID)
-	tag, err := h.DB.Exec(c.Request.Context(), "DELETE FROM beans WHERE id=$1 AND user_id=$2", beanID, userID)
+	tag, err := db.Exec(c.Request.Context(), "DELETE FROM beans WHERE id=$1 AND user_id=$2", beanID, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to delete bean"})
 		return

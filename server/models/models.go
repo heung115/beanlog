@@ -74,17 +74,17 @@ type OriginPreset struct {
 // --- Request/Response DTOs ---
 
 type CreateBeanRequest struct {
-	Name            string     `json:"name" binding:"required"`
-	Roastery        string     `json:"roastery" binding:"required"`
+	Name            string     `json:"name" binding:"required,max=200"`
+	Roastery        string     `json:"roastery" binding:"required,max=200"`
 	BeanType        string     `json:"bean_type" binding:"required,oneof=single_origin blend"`
-	OriginCountry   string     `json:"origin_country" binding:"required"`
-	OriginRegion    *string    `json:"origin_region"`
+	OriginCountry   string     `json:"origin_country" binding:"required,max=100"`
+	OriginRegion    *string    `json:"origin_region" binding:"omitempty,max=100"`
 	OriginLat       *float64   `json:"origin_lat"`
 	OriginLng       *float64   `json:"origin_lng"`
-	FarmProducer    *string    `json:"farm_producer"`
-	Varietal        *string    `json:"varietal"`
+	FarmProducer    *string    `json:"farm_producer" binding:"omitempty,max=200"`
+	Varietal        *string    `json:"varietal" binding:"omitempty,max=100"`
 	ProcessMethod   string     `json:"process_method" binding:"required,oneof=washed natural honey anaerobic carbonic decaf other"`
-	ProcessDetail   *string    `json:"process_detail"`
+	ProcessDetail   *string    `json:"process_detail" binding:"omitempty,max=200"`
 	AltitudeM       *int       `json:"altitude_m"`
 	HarvestYear     *int       `json:"harvest_year"`
 	RoastLevel      string     `json:"roast_level" binding:"required,oneof=light medium dark"`
@@ -95,7 +95,7 @@ type CreateBeanRequest struct {
 	CafeLocation    *string    `json:"cafe_location"`
 	MenuName        *string    `json:"menu_name"`
 	OverallScore    float64    `json:"overall_score" binding:"required,min=1,max=10"`
-	Note            string     `json:"note"`
+	Note            string     `json:"note" binding:"max=2000"`
 	ScoreAroma      *int       `json:"score_aroma"`
 	ScoreAcidity    *int       `json:"score_acidity"`
 	ScoreBody       *int       `json:"score_body"`
@@ -106,12 +106,12 @@ type CreateBeanRequest struct {
 	Price           *int       `json:"price"`
 	WeightG         *int       `json:"weight_g"`
 	PurchasedAt     *string    `json:"purchased_at"`
-	Tags            []TagInput `json:"tags"`
+	Tags            []TagInput `json:"tags" binding:"max=100,dive"`
 }
 
 type TagInput struct {
-	Tag      string `json:"tag" binding:"required"`
-	Category string `json:"category"`
+	Tag      string `json:"tag" binding:"required,max=50"`
+	Category string `json:"category" binding:"omitempty,oneof=fruity floral sweet nutty cocoa spice roasted sour green other"`
 }
 
 type UpdateBeanRequest = CreateBeanRequest
@@ -160,6 +160,6 @@ type CountEntry struct {
 }
 
 type UpdateProfileRequest struct {
-	DisplayName string `json:"display_name" binding:"required"`
-	Locale      string `json:"locale" binding:"required"`
+	DisplayName string `json:"display_name" binding:"required,max=50"`
+	Locale      string `json:"locale" binding:"required,oneof=ko en"`
 }
