@@ -19,6 +19,7 @@ function envValue(name: string): string {
 }
 
 export const qaBaseURL = process.env.QA_BASE_URL ?? "http://localhost:3000";
+export const qaApiURL = process.env.QA_API_URL;
 export const localSupabaseUrl = process.env.QA_SUPABASE_URL ?? envValue("API_URL");
 export const localAnonKey = process.env.QA_SUPABASE_ANON_KEY ?? envValue("ANON_KEY");
 const serviceRoleKey =

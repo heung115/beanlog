@@ -17,7 +17,7 @@ export default defineConfig({
     video: "retain-on-failure",
   },
   projects: [
-    { name: "desktop", use: { ...devices["Desktop Chrome"] } },
+    { name: "desktop", use: { ...devices["Desktop Chrome"] }, grepInvert: /@mobile/ },
     { name: "mobile", use: { ...devices["iPhone 13"] }, grep: /@mobile/ },
   ],
   webServer: externalServer

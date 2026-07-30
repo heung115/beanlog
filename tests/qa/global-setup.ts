@@ -37,17 +37,18 @@ export default async function globalSetup() {
   const fixtures = JSON.parse(await fs.readFile(fixturePath, "utf8")) as Fixture[];
   const sourceNote = "[QA:unspecialty-775] 언스페셜티 7월 월픽 상품 정보 기반 테스트 등록";
 
+  // These accounts are dedicated to the automated harness. Clear every row,
+  // including a partially-written row left by an older broken API build, so
+  // each run starts from an exact and reproducible 30-record boundary.
   const { error: primaryCleanupError } = await primary
     .from("beans")
     .delete()
-    .eq("user_id", primaryId)
-    .like("note", "[QA:%");
+    .eq("user_id", primaryId);
   if (primaryCleanupError) throw primaryCleanupError;
   const { error: isolationCleanupError } = await isolation
     .from("beans")
     .delete()
-    .eq("user_id", isolationId)
-    .like("note", "[QA:%");
+    .eq("user_id", isolationId);
   if (isolationCleanupError) throw isolationCleanupError;
 
   const rows = fixtures.map((fixture, index) => ({
