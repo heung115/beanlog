@@ -1,4 +1,5 @@
 import { execFileSync, spawnSync } from "node:child_process";
+import { randomBytes } from "node:crypto";
 import fs from "node:fs";
 import http from "node:http";
 import path from "node:path";
@@ -8,6 +9,7 @@ const root = path.resolve(import.meta.dirname, "..");
 const runtimeRoot = path.join(root, ".staging");
 const runtimeSupabase = path.join(runtimeRoot, "supabase");
 const envFile = path.join(runtimeRoot, "docker.env");
+const databaseSecretFile = path.join(runtimeRoot, "api-database-url.secret");
 const composeFile = path.join(root, "docker-compose.staging.yml");
 const command = process.argv[2] ?? "help";
 
@@ -147,7 +149,68 @@ async function hardenSupabaseBindings() {
   }
 }
 
-function writeEnvironment(status) {
+function provisionApiDatabaseRole() {
+  const password = randomBytes(32).toString("base64url");
+  const sql = `
+do $$
+begin
+  if not exists (select 1 from pg_roles where rolname = 'beanlog_api') then
+    create role beanlog_api login noinherit nosuperuser nocreatedb nocreaterole noreplication nobypassrls;
+  end if;
+end;
+$$;
+alter role beanlog_api with login noinherit nosuperuser nocreatedb nocreaterole noreplication nobypassrls password '${password}';
+do $$
+declare
+  granted_role record;
+begin
+  for granted_role in
+    select role.rolname, grantor.rolname as grantor_name
+    from pg_auth_members membership
+    join pg_roles role on role.oid = membership.roleid
+    join pg_roles member on member.oid = membership.member
+    join pg_roles grantor on grantor.oid = membership.grantor
+    where member.rolname = 'beanlog_api'
+  loop
+    execute format(
+      'revoke %I from beanlog_api granted by %I',
+      granted_role.rolname,
+      granted_role.grantor_name
+    );
+  end loop;
+end;
+$$;
+grant authenticated to beanlog_api;
+`;
+  const result = spawnSync(
+    "docker",
+    [
+      "exec",
+      "-i",
+      "supabase_db_beanlog-staging",
+      "psql",
+      "-v",
+      "ON_ERROR_STOP=1",
+      "-U",
+      "supabase_admin",
+      "-d",
+      "postgres",
+      "-q",
+    ],
+    {
+      cwd: root,
+      input: sql,
+      encoding: "utf8",
+      stdio: ["pipe", "ignore", "pipe"],
+    }
+  );
+  if (result.status !== 0) {
+    throw new Error("Failed to provision the staging API database role.");
+  }
+  return `postgresql://beanlog_api:${encodeURIComponent(password)}@db:5432/postgres?sslmode=disable&application_name=beanlog-api`;
+}
+
+function writeEnvironment(status, databaseUrl) {
   const values = {
     STAGING_WEB_PORT: "3100",
     STAGING_API_PORT: "8180",
@@ -156,11 +219,13 @@ function writeEnvironment(status) {
     STAGING_INTERNAL_SUPABASE_URL: "http://kong:8000",
     STAGING_SUPABASE_ANON_KEY: status.ANON_KEY,
     STAGING_SUPABASE_SERVICE_ROLE_KEY: status.SERVICE_ROLE_KEY,
-    STAGING_DATABASE_URL:
-      "postgresql://postgres:postgres@db:5432/postgres?sslmode=disable",
+    STAGING_DATABASE_URL_FILE: databaseSecretFile,
     STAGING_JWKS_URL: "http://kong:8000/auth/v1/.well-known/jwks.json",
+    STAGING_JWT_ISSUER: `${status.API_URL}/auth/v1`,
   };
   fs.mkdirSync(runtimeRoot, { recursive: true });
+  fs.writeFileSync(databaseSecretFile, `${databaseUrl}\n`, { mode: 0o600 });
+  fs.chmodSync(databaseSecretFile, 0o600);
   fs.writeFileSync(
     envFile,
     `${Object.entries(values)
@@ -168,6 +233,7 @@ function writeEnvironment(status) {
       .join("\n")}\n`,
     { mode: 0o600 }
   );
+  fs.chmodSync(envFile, 0o600);
 }
 
 async function waitFor(url, label, timeoutMs = 120_000) {
@@ -214,9 +280,13 @@ async function up() {
   );
   supabase(["migration", "up", "--local"]);
   const status = readStatus();
-  writeEnvironment(status);
+  const databaseUrl = provisionApiDatabaseRole();
+  writeEnvironment(status, databaseUrl);
   await hardenSupabaseBindings();
-  compose(["up", "-d", "--build", "--remove-orphans"]);
+  // The API database password rotates on every run. Compose does not recreate
+  // a service when only a mounted secret file's contents change, so force a
+  // recreation to ensure the API reads the newly issued credential.
+  compose(["up", "-d", "--build", "--force-recreate", "--remove-orphans"]);
   await waitFor("http://localhost:3100/ko/login", "Beanlog web");
   await waitFor("http://localhost:8180/health", "Beanlog API");
   console.log("\nInternal staging is ready:");
@@ -237,6 +307,7 @@ async function qa() {
       ...process.env,
       QA_EXTERNAL_SERVER: "1",
       QA_BASE_URL: env.STAGING_APP_URL,
+      QA_API_URL: `http://localhost:${env.STAGING_API_PORT}`,
       QA_SUPABASE_URL: env.STAGING_PUBLIC_SUPABASE_URL,
       QA_SUPABASE_ANON_KEY: env.STAGING_SUPABASE_ANON_KEY,
       QA_SUPABASE_SERVICE_ROLE_KEY: env.STAGING_SUPABASE_SERVICE_ROLE_KEY,

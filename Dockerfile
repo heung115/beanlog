@@ -1,4 +1,4 @@
-FROM node:22-alpine AS base
+FROM node:22.23.2-alpine3.24@sha256:c610fcdfb1d5b4740dd70c284ed3cb16bb857e0f7166196e36a5501df7a3aa32 AS base
 
 FROM base AS deps
 WORKDIR /app
@@ -28,6 +28,11 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+# The standalone server only needs the Node runtime. Remove package managers
+# and server source maps from the production image to reduce attack surface.
+RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx \
+    /opt/yarn* /usr/local/bin/yarn /usr/local/bin/yarnpkg && \
+    find /app -type f -name '*.map' -delete
 USER nextjs
 EXPOSE 3000
 ENV PORT=3000
