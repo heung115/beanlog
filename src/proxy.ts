@@ -12,6 +12,13 @@ export async function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
+  if (!["GET", "HEAD", "POST"].includes(request.method)) {
+    return new NextResponse(null, {
+      status: 405,
+      headers: { Allow: "GET, HEAD, POST" },
+    });
+  }
+
   const response = await updateSession(request);
 
   // Respect auth redirects (e.g. unauthenticated user -> /login).

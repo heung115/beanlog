@@ -9,29 +9,38 @@ export type SignInState = { error?: string };
 
 const signInSchema = z.object({
   email: z.string().trim().email(),
-  password: z.string().min(1),
+  password: z.string().min(1).max(1024),
+});
+
+const signUpSchema = z.object({
+  email: z.string().trim().email().max(320),
+  password: z.string().min(8).max(128),
+  displayName: z.string().trim().min(1).max(50),
 });
 
 export async function signUp(email: string, password: string, displayName: string) {
+  const parsed = signUpSchema.safeParse({ email, password, displayName });
+  if (!parsed.success) return { error: "Invalid signup data" };
+
   const supabase = await createClient();
 
   const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
+    email: parsed.data.email,
+    password: parsed.data.password,
     options: {
-      data: { display_name: displayName },
+      data: { display_name: parsed.data.displayName },
     },
   });
 
   if (error) {
-    return { error: error.message };
+    return { error: "Unable to create account" };
   }
 
   if (data.user) {
     await supabase.from("profiles").upsert({
       id: data.user.id,
-      email,
-      display_name: displayName,
+      email: parsed.data.email,
+      display_name: parsed.data.displayName,
       locale: "ko",
     });
   }
@@ -60,7 +69,7 @@ export async function signInAction(
   });
 
   if (error) {
-    return { error: error.message };
+    return { error: "Invalid credentials" };
   }
 
   redirect("/explore");
@@ -85,7 +94,7 @@ export async function signInWithOAuth(provider: "google" | "kakao") {
   });
 
   if (error) {
-    return { error: error.message };
+    return { error: "OAuth sign-in is unavailable" };
   }
 
   if (data.url) {

@@ -12,6 +12,10 @@ import {
 } from "@/lib/validation/beans";
 
 const originIdSchema = z.number().int().positive();
+const profileUpdateSchema = z.object({
+  displayName: z.string().trim().min(1).max(50),
+  locale: z.enum(["ko", "en"]),
+});
 
 const nativeBeanSchema = z.object({
   name: z.string().trim().min(1).max(200),
@@ -180,7 +184,7 @@ export async function createBean(formData: BeanFormData) {
     p_components: components,
   });
 
-  if (error) return { error: error.message };
+  if (error) return { error: "Unable to save bean" };
 
   revalidatePath("/explore");
   revalidatePath("/stats");
@@ -266,7 +270,7 @@ export async function updateBean(id: string, formData: BeanFormData) {
     p_components: components,
   });
 
-  if (error) return { error: error.message };
+  if (error) return { error: "Unable to update bean" };
 
   revalidatePath("/explore");
   revalidatePath(`/beans/${id}`);
@@ -292,7 +296,7 @@ export async function deleteBean(id: string) {
     .eq("id", parsedId.data)
     .eq("user_id", user.id);
 
-  if (error) return { error: error.message };
+  if (error) return { error: "Unable to delete bean" };
 
   revalidatePath("/explore");
   revalidatePath("/stats");
@@ -518,12 +522,15 @@ export async function updateProfile(displayName: string, locale: string) {
 
   if (!user) return { error: "Unauthorized" };
 
+  const parsed = profileUpdateSchema.safeParse({ displayName, locale });
+  if (!parsed.success) return { error: "Invalid profile data" };
+
   const { error } = await supabase
     .from("profiles")
-    .update({ display_name: displayName, locale })
+    .update({ display_name: parsed.data.displayName, locale: parsed.data.locale })
     .eq("id", user.id);
 
-  if (error) return { error: error.message };
+  if (error) return { error: "Unable to update profile" };
   return { success: true };
 }
 
@@ -533,11 +540,8 @@ export async function deleteAccount() {
 
   if (!user) return { error: "Unauthorized" };
 
-  await supabase.from("tasting_tags").delete().eq("user_id", user.id);
-  await supabase.from("blend_components").delete().eq("user_id", user.id);
-  await supabase.from("beans").delete().eq("user_id", user.id);
-  await supabase.from("profiles").delete().eq("id", user.id);
-  await supabase.auth.admin.deleteUser(user.id).catch(() => {});
+  const { error } = await supabase.rpc("delete_current_account");
+  if (error) return { error: "Unable to delete account" };
   await supabase.auth.signOut();
 
   redirect("/login");
