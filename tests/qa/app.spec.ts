@@ -75,6 +75,22 @@ test("search handles PostgREST punctuation as plain text and recovers", async ({
   await expect(page.getByText(/#37 파나마 로스트 오리진/)).toBeVisible();
 });
 
+test("varietal filter separates multi-varietal records into single options", async ({ page }) => {
+  await login(page);
+  const varietalFilter = page.getByLabel("품종");
+
+  await expect(varietalFilter.locator('option[value="Catuai"]')).toHaveCount(1);
+  await expect(varietalFilter.locator('option[value="Typica"]')).toHaveCount(1);
+  await expect(varietalFilter.locator('option[value="Catimor"]')).toHaveCount(1);
+  await expect(
+    varietalFilter.locator('option[value="Catuai, Typica, Catimor"]')
+  ).toHaveCount(0);
+
+  await varietalFilter.selectOption("Catuai");
+  await expect(page.getByText("1개 기록")).toBeVisible();
+  await expect(page.getByText(/#15 태국 치앙 마이/)).toBeVisible();
+});
+
 test("create form preserves roastery on save-and-continue and persists details", async ({ page }) => {
   await login(page);
   await page.goto("/ko/beans/new");

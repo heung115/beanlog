@@ -7,6 +7,7 @@ import { getBeans } from "@/lib/actions/beans";
 import { BeanCard } from "@/components/beans/bean-card";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { splitVarietals } from "@/lib/coffee/varietals";
 import { originPresets } from "@/data/origin-presets";
 import type {
   BeanFilters,
@@ -232,7 +233,9 @@ export function ExploreClient({
         fetched.forEach((b) => {
           if (b.origin_country) origins.add(b.origin_country);
           if (b.roastery) roasteries.add(b.roastery.trim());
-          if (b.varietal) varietals.add(b.varietal.trim());
+          for (const varietal of splitVarietals(b.varietal)) {
+            varietals.add(varietal);
+          }
         });
         return {
           origins: [...origins].sort(),

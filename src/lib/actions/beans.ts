@@ -10,6 +10,7 @@ import {
   beanFormSchema,
   beanIdSchema,
 } from "@/lib/validation/beans";
+import { splitVarietals } from "@/lib/coffee/varietals";
 
 const originIdSchema = z.number().int().positive();
 const profileUpdateSchema = z.object({
@@ -408,7 +409,9 @@ export async function getBeanFilterOptions() {
   for (const bean of data ?? []) {
     if (bean.origin_country) origins.add(bean.origin_country);
     if (bean.roastery?.trim()) roasteries.add(bean.roastery.trim());
-    if (bean.varietal?.trim()) varietals.add(bean.varietal.trim());
+    for (const varietal of splitVarietals(bean.varietal)) {
+      varietals.add(varietal);
+    }
   }
   return {
     origins: [...origins].sort(),
