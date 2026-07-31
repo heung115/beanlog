@@ -1,16 +1,35 @@
 import { execFileSync } from "node:child_process";
 import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { deriveStagingRuntime } from "./staging-runtime.mjs";
 
 const root = new URL("../", import.meta.url);
+const rootPath = fileURLToPath(root);
+const gitCommonDir = path.resolve(
+  rootPath,
+  execFileSync("git", ["rev-parse", "--git-common-dir"], {
+    cwd: root,
+    encoding: "utf8",
+  }).trim()
+);
+const runtime = deriveStagingRuntime({ root: rootPath, gitCommonDir });
 const fixtures = JSON.parse(
   fs.readFileSync(new URL("tests/fixtures/unspecialty-july-2026.json", root), "utf8")
 );
-const status = execFileSync("npx", ["supabase", "status", "-o", "env"], {
+const status = execFileSync("npx", [
+  "supabase",
+  "status",
+  "-o",
+  "env",
+  "--workdir",
+  runtime.runtimeRoot,
+], {
   cwd: root,
   encoding: "utf8",
 });
 const dbUrl = status.match(/^DB_URL="?([^"\n]+)"?$/m)?.[1];
-if (!dbUrl) throw new Error("Local Supabase DB_URL not found");
+if (!dbUrl) throw new Error("Staging Supabase DB_URL not found");
 
 const quote = (value) => `'${String(value).replaceAll("'", "''")}'`;
 const nullable = (value) => (value === undefined ? "null" : quote(value));

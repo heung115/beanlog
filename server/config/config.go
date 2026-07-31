@@ -17,10 +17,10 @@ type Config struct {
 func Load() *Config {
 	return &Config{
 		Port:        getEnv("PORT", "8080"),
-		DatabaseURL: getEnvOrFile("DATABASE_URL", "DATABASE_URL_FILE", "postgres://authenticator:postgres@localhost:54322/postgres?sslmode=disable"),
-		JWKSURL:     getEnv("JWKS_URL", "http://localhost:54321/auth/v1/.well-known/jwks.json"),
-		JWTIssuer:   getEnv("JWT_ISSUER", "http://127.0.0.1:54321/auth/v1"),
-		CORSOrigin:  getEnv("CORS_ORIGIN", "http://localhost:3000"),
+		DatabaseURL: getEnvOrFile("DATABASE_URL", "DATABASE_URL_FILE", "postgres://authenticator:postgres@localhost:55322/postgres?sslmode=disable"),
+		JWKSURL:     getEnv("JWKS_URL", "http://localhost:55321/auth/v1/.well-known/jwks.json"),
+		JWTIssuer:   getEnv("JWT_ISSUER", "http://127.0.0.1:55321/auth/v1"),
+		CORSOrigin:  getEnv("CORS_ORIGIN", "http://localhost:3100"),
 	}
 }
 

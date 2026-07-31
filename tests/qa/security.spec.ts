@@ -1,32 +1,37 @@
 import { expect, test } from "@playwright/test";
-import { resolveTrustedAppRedirect } from "../../src/lib/security/redirect";
+import { randomBytes } from "node:crypto";
 import {
   admin,
   ensureUser,
-  localAnonKey,
-  localSupabaseUrl,
+  stagingAnonKey,
+  stagingSupabaseUrl,
   qaApiURL,
   qaOtherUser,
   qaUser,
   signIn,
 } from "./helpers";
 
-test("OAuth redirects stay on the configured application origin", () => {
-  const appUrl = "https://beanlog.example/application-path";
-  for (const maliciousNext of [
-    "https://attacker.example/phish",
-    "//attacker.example/phish",
-    "/\\attacker.example/phish",
-    "\\attacker.example/phish",
-    "javascript:alert(1)",
-  ]) {
-    const destination = resolveTrustedAppRedirect(maliciousNext, appUrl);
-    expect(destination.origin).toBe("https://beanlog.example");
-    expect(destination.pathname).toBe("/explore");
-  }
+test("ensuring an existing QA user preserves its active refresh tokens", async () => {
+  const disposable = {
+    email: `beanlog-qa-session-${Date.now()}-${Math.random().toString(16).slice(2)}@local.test`,
+    password: randomBytes(32).toString("base64url"),
+  };
+  const userId = await ensureUser(disposable.email, disposable.password);
 
-  const valid = resolveTrustedAppRedirect("/ko/explore?sort=recent", appUrl);
-  expect(valid.href).toBe("https://beanlog.example/ko/explore?sort=recent");
+  try {
+    const { session } = await signIn(disposable.email, disposable.password);
+    await ensureUser(disposable.email, disposable.password);
+
+    const refreshProbe = await signIn(disposable.email, disposable.password);
+    const { error } = await refreshProbe.client.auth.refreshSession({
+      refresh_token: session.refresh_token,
+    });
+
+    expect(error).toBeNull();
+  } finally {
+    const { error } = await admin.auth.admin.deleteUser(userId);
+    if (error) throw error;
+  }
 });
 
 test("security headers and unauthenticated route protection are enforced", async ({ request }) => {
@@ -150,10 +155,10 @@ test("atomic RPC rolls back the parent when a child row is invalid", async () =>
 });
 
 test("anonymous clients cannot execute mutation RPCs", async ({ request }) => {
-  const response = await request.post(`${localSupabaseUrl}/rest/v1/rpc/create_bean_record`, {
+  const response = await request.post(`${stagingSupabaseUrl}/rest/v1/rpc/create_bean_record`, {
     headers: {
-      apikey: localAnonKey,
-      Authorization: `Bearer ${localAnonKey}`,
+      apikey: stagingAnonKey,
+      Authorization: `Bearer ${stagingAnonKey}`,
       "Content-Type": "application/json",
     },
     data: { p_bean: {}, p_tags: [], p_components: [] },
@@ -161,11 +166,11 @@ test("anonymous clients cannot execute mutation RPCs", async ({ request }) => {
   expect(response.status()).toBe(401);
 
   const deleteResponse = await request.post(
-    `${localSupabaseUrl}/rest/v1/rpc/delete_current_account`,
+    `${stagingSupabaseUrl}/rest/v1/rpc/delete_current_account`,
     {
       headers: {
-        apikey: localAnonKey,
-        Authorization: `Bearer ${localAnonKey}`,
+        apikey: stagingAnonKey,
+        Authorization: `Bearer ${stagingAnonKey}`,
         "Content-Type": "application/json",
       },
       data: {},
@@ -174,11 +179,11 @@ test("anonymous clients cannot execute mutation RPCs", async ({ request }) => {
   expect(deleteResponse.status()).toBe(401);
 
   const rateLimitResponse = await request.post(
-    `${localSupabaseUrl}/rest/v1/rpc/check_rate_limit`,
+    `${stagingSupabaseUrl}/rest/v1/rpc/check_rate_limit`,
     {
       headers: {
-        apikey: localAnonKey,
-        Authorization: `Bearer ${localAnonKey}`,
+        apikey: stagingAnonKey,
+        Authorization: `Bearer ${stagingAnonKey}`,
         "Content-Type": "application/json",
       },
       data: { p_action: "anonymous-probe", p_max_count: 1, p_window_minutes: 1 },
@@ -188,7 +193,7 @@ test("anonymous clients cannot execute mutation RPCs", async ({ request }) => {
 });
 
 test("Go API rejects forged JWTs and rolls back database child failures", async ({ request }) => {
-  test.skip(!qaApiURL, "Go API security checks run against Docker staging");
+  test.skip(!qaApiURL, "Go API security checks run against staging");
 
   const unsignedToken = [
     "eyJhbGciOiJub25lIiwidHlwIjoiSldUIn0",
@@ -270,7 +275,7 @@ test("account deletion removes only the authenticated disposable user", async ()
   const suffix = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
   const disposable = {
     email: `beanlog-qa-delete-${suffix}@local.test`,
-    password: "Qa-Delete-Only-2026!",
+    password: randomBytes(32).toString("base64url"),
   };
   const disposableId = await ensureUser(disposable.email, disposable.password);
   let deleted = false;

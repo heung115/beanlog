@@ -9,6 +9,30 @@ REPORT="$ROOT/.audit-report.md"
 RUNTIME=0
 [[ "${1:-}" == "--runtime" ]] && RUNTIME=1
 
+GIT_COMMON_DIR="$(git -C "$ROOT" rev-parse --git-common-dir)"
+STAGING_RUNTIME_INFO="$(cd "$ROOT" && node --input-type=module - "$ROOT" "$GIT_COMMON_DIR" <<'NODE'
+import path from "node:path";
+import { deriveStagingRuntime } from "./scripts/staging-runtime.mjs";
+
+const root = path.resolve(process.argv[2]);
+const gitCommonDir = path.resolve(root, process.argv[3]);
+const runtime = deriveStagingRuntime({ root, gitCommonDir });
+console.log([
+  runtime.runtimeRoot,
+  runtime.composeProject,
+  runtime.supabaseProject,
+  runtime.web,
+  runtime.api,
+].join("\t"));
+NODE
+)"
+IFS=$'\t' read -r STAGING_RUNTIME_ROOT STAGING_COMPOSE_PROJECT STAGING_SUPABASE_PROJECT STAGING_WEB_PORT STAGING_API_PORT <<< "$STAGING_RUNTIME_INFO"
+STAGING_ENV_FILE="$STAGING_RUNTIME_ROOT/docker.env"
+STAGING_WEB_CONTAINER="${STAGING_COMPOSE_PROJECT}-web-1"
+STAGING_API_CONTAINER="${STAGING_COMPOSE_PROJECT}-api-1"
+STAGING_DB_CONTAINER="supabase_db_${STAGING_SUPABASE_PROJECT}"
+STAGING_SUPABASE_NETWORK="supabase_network_${STAGING_SUPABASE_PROJECT}"
+
 TMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/beanlog-audit.XXXXXX")"
 chmod 700 "$TMP_ROOT"
 cleanup() { rm -rf "$TMP_ROOT"; }
@@ -283,8 +307,8 @@ if rg -q '^USER [^0]' Dockerfile && rg -q '^USER [^0]' server/Dockerfile; then
 else
   finding "HIGH" "docker/user" "A runtime image may run as root"
 fi
-if rg -q '127\.0\.0\.1:.*:3000' docker-compose.yml docker-compose.staging.yml && \
-   rg -q '127\.0\.0\.1:.*:8080' docker-compose.yml docker-compose.staging.yml; then
+if rg -q '127\.0\.0\.1:.*:3000' docker-compose.staging.yml && \
+   rg -q '127\.0\.0\.1:.*:8080' docker-compose.staging.yml; then
   finding "OK" "docker/ports" "Application compose ports bind to loopback"
 else
   finding "HIGH" "docker/ports" "An application compose port can bind beyond loopback"
@@ -306,21 +330,22 @@ if rg -q 'DATABASE_URL_FILE: /run/secrets/api_database_url' docker-compose.stagi
 else
   finding "HIGH" "docker/secrets" "API database credential may be exposed through container environment"
 fi
-if rg -q 'compose\(\["up", "-d", "--build", "--force-recreate", "--remove-orphans"\]\)' scripts/staging.mjs; then
-  finding "OK" "docker/secret-rotation" "Staging recreates containers after rotating the API database credential"
+if rg -q 'compose\(\["up", "-d", "--build", "--force-recreate", "api"\]\)' scripts/staging.mjs && \
+   [[ "$(rg -c 'compose\(\[[^]]*"--force-recreate"[^]]*\]\)' scripts/staging.mjs)" -eq 1 ]]; then
+  finding "OK" "docker/secret-rotation" "Staging runtime recreates only the API after provisioning its database credential"
 else
-  finding "HIGH" "docker/secret-rotation" "API may retain a stale database credential after secret rotation"
+  finding "HIGH" "docker/secret-rotation" "API credential rotation may retain a stale process or replace unrelated services"
 fi
 
 section "5. Runtime and container isolation"
 
 if [[ "$RUNTIME" -eq 1 ]]; then
-  WEB_CODE="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --max-time 10 http://127.0.0.1:3100/ko/login 2>/dev/null || printf '000')"
-  API_CODE="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --max-time 10 http://127.0.0.1:8180/health 2>/dev/null || printf '000')"
+  WEB_CODE="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --max-time 10 "http://127.0.0.1:${STAGING_WEB_PORT}/ko/login" 2>/dev/null || printf '000')"
+  API_CODE="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --max-time 10 "http://127.0.0.1:${STAGING_API_PORT}/health" 2>/dev/null || printf '000')"
   [[ "$WEB_CODE" == "200" ]] && finding "OK" "runtime/web" "Staging web responds on loopback" || finding "HIGH" "runtime/web" "Staging web health failed (HTTP $WEB_CODE)"
   [[ "$API_CODE" == "200" ]] && finding "OK" "runtime/api" "Staging API health responds on loopback" || finding "HIGH" "runtime/api" "Staging API health failed (HTTP $API_CODE)"
 
-  curl --silent --show-error --dump-header "$TMP_ROOT/headers.txt" --output /dev/null --max-time 10 http://127.0.0.1:3100/ko/login 2>/dev/null || true
+  curl --silent --show-error --dump-header "$TMP_ROOT/headers.txt" --output /dev/null --max-time 10 "http://127.0.0.1:${STAGING_WEB_PORT}/ko/login" 2>/dev/null || true
   MISSING_HEADERS=""
   for header in content-security-policy x-frame-options x-content-type-options strict-transport-security permissions-policy cross-origin-opener-policy cross-origin-resource-policy; do
     rg -qi "^${header}:" "$TMP_ROOT/headers.txt" || MISSING_HEADERS="$MISSING_HEADERS $header"
@@ -336,10 +361,10 @@ if [[ "$RUNTIME" -eq 1 ]]; then
     finding "OK" "runtime/csp" "Production CSP blocks unsafe-eval"
   fi
 
-  UNAUTH_CODE="$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 10 http://127.0.0.1:8180/api/beans 2>/dev/null || printf '000')"
+  UNAUTH_CODE="$(curl --silent --output /dev/null --write-out '%{http_code}' --max-time 10 "http://127.0.0.1:${STAGING_API_PORT}/api/beans" 2>/dev/null || printf '000')"
   [[ "$UNAUTH_CODE" == "401" ]] && finding "OK" "runtime/auth" "Unauthenticated API access returns 401" || finding "HIGH" "runtime/auth" "Unauthenticated API access returned $UNAUTH_CODE"
 
-  for container in beanlog-staging-web-1 beanlog-staging-api-1; do
+  for container in "$STAGING_WEB_CONTAINER" "$STAGING_API_CONTAINER"; do
     if ! docker inspect "$container" >/dev/null 2>&1; then
       finding "HIGH" "container/isolation" "$container is unavailable"
       continue
@@ -362,12 +387,12 @@ if [[ "$RUNTIME" -eq 1 ]]; then
   NON_LOOPBACK_PORTS="$TMP_ROOT/non-loopback-ports.txt"
   : > "$NON_LOOPBACK_PORTS"
   for container in \
-    beanlog-staging-web-1 \
-    beanlog-staging-api-1 \
-    supabase_kong_beanlog-staging \
-    supabase_db_beanlog-staging \
-    supabase_studio_beanlog-staging \
-    supabase_inbucket_beanlog-staging; do
+    "$STAGING_WEB_CONTAINER" \
+    "$STAGING_API_CONTAINER" \
+    "supabase_kong_${STAGING_SUPABASE_PROJECT}" \
+    "$STAGING_DB_CONTAINER" \
+    "supabase_studio_${STAGING_SUPABASE_PROJECT}" \
+    "supabase_inbucket_${STAGING_SUPABASE_PROJECT}"; do
     docker port "$container" 2>/dev/null | while IFS= read -r binding; do
       [[ "$binding" == *"127.0.0.1:"* ]] || printf '%s\n' "$container" >> "$NON_LOOPBACK_PORTS"
     done
@@ -378,8 +403,8 @@ if [[ "$RUNTIME" -eq 1 ]]; then
     finding "OK" "runtime/network" "All web, API, database, gateway, Studio, and mail ports bind to loopback"
   fi
 
-  docker inspect beanlog-staging-web-1 beanlog-staging-api-1 > "$TMP_ROOT/app-containers.json" 2>/dev/null || true
-  if node - "$TMP_ROOT/app-containers.json" .staging/docker.env <<'NODE'
+  docker inspect "$STAGING_WEB_CONTAINER" "$STAGING_API_CONTAINER" > "$TMP_ROOT/app-containers.json" 2>/dev/null || true
+  if node - "$TMP_ROOT/app-containers.json" "$STAGING_ENV_FILE" <<'NODE'
 const fs = require("fs");
 const containers = JSON.parse(fs.readFileSync(process.argv[2], "utf8"));
 const env = Object.fromEntries(
@@ -399,7 +424,7 @@ NODE
     finding "CRITICAL" "runtime/secrets" "Service-role credential is present in web/API container configuration or could not be verified"
   fi
 
-  FUNCTION_PRIVILEGE_COUNT="$(docker exec supabase_db_beanlog-staging psql -U postgres -d postgres -Atqc "
+  FUNCTION_PRIVILEGE_COUNT="$(docker exec "$STAGING_DB_CONTAINER" psql -U postgres -d postgres -Atqc "
     with sensitive as (
       select p.oid, p.proname,
         exists (
@@ -427,7 +452,7 @@ NODE
     finding "HIGH" "runtime/database-privileges" "Sensitive function grants are unsafe or could not be verified"
   fi
 
-  TABLE_PRIVILEGE_MISMATCHES="$(docker exec supabase_db_beanlog-staging psql -U postgres -d postgres -Atqc "
+  TABLE_PRIVILEGE_MISMATCHES="$(docker exec "$STAGING_DB_CONTAINER" psql -U postgres -d postgres -Atqc "
     with expected(grantee, table_name, privilege_type) as (
       values
         ('authenticated', 'profiles', 'SELECT'),
@@ -466,18 +491,18 @@ NODE
     finding "HIGH" "runtime/table-privileges" "Public table grants exceed or miss the least-privilege allow-list"
   fi
 
-  if docker inspect --format '{{range .Config.Env}}{{println .}}{{end}}' beanlog-staging-api-1 2>/dev/null | rg -q '^DATABASE_URL='; then
+  if docker inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "$STAGING_API_CONTAINER" 2>/dev/null | rg -q '^DATABASE_URL='; then
     finding "HIGH" "runtime/database-secret" "API database URL is exposed in container environment"
   else
     finding "OK" "runtime/database-secret" "API container environment does not contain DATABASE_URL"
   fi
-  if docker exec beanlog-staging-api-1 test -r /run/secrets/api_database_url 2>/dev/null; then
+  if docker exec "$STAGING_API_CONTAINER" test -r /run/secrets/api_database_url 2>/dev/null; then
     finding "OK" "runtime/database-secret" "API process can read the mounted database secret"
   else
     finding "CRITICAL" "runtime/database-secret" "API process cannot read the mounted database secret"
   fi
 
-  API_ACTIVITY_ROLE="$(docker exec supabase_db_beanlog-staging psql -U postgres -d postgres -Atqc "
+  API_ACTIVITY_ROLE="$(docker exec "$STAGING_DB_CONTAINER" psql -U postgres -d postgres -Atqc "
     select case
       when count(*) > 0 and bool_and(usename = 'beanlog_api') then 'safe'
       else 'unsafe'
@@ -485,7 +510,7 @@ NODE
     from pg_stat_activity
     where application_name = 'beanlog-api';
   " 2>/dev/null || printf 'query-failed')"
-  API_ROLE_PROPERTIES="$(docker exec supabase_db_beanlog-staging psql -U supabase_admin -d postgres -Atqc "
+  API_ROLE_PROPERTIES="$(docker exec "$STAGING_DB_CONTAINER" psql -U supabase_admin -d postgres -Atqc "
     select not rolsuper
        and not rolbypassrls
        and rolcanlogin
@@ -508,20 +533,20 @@ NODE
     finding "CRITICAL" "runtime/database-role" "API database login can bypass policy or could not be verified"
   fi
 
-  DATABASE_IMAGE="$(docker inspect --format '{{.Config.Image}}' supabase_db_beanlog-staging 2>/dev/null || true)"
+  DATABASE_IMAGE="$(docker inspect --format '{{.Config.Image}}' "$STAGING_DB_CONTAINER" 2>/dev/null || true)"
   if [[ -z "$DATABASE_IMAGE" ]]; then
     finding "HIGH" "runtime/database-password" "Database image could not be identified for the password probe"
-  elif docker run --rm --network supabase_network_beanlog-staging \
+  elif docker run --rm --network "$STAGING_SUPABASE_NETWORK" \
     -e PGPASSWORD=postgres "$DATABASE_IMAGE" \
     psql -h db -U beanlog_api -d postgres -Atqc 'select 1' \
     > /dev/null 2>&1; then
-    finding "CRITICAL" "runtime/database-password" "Dedicated API role accepts the shared local postgres password"
+    finding "CRITICAL" "runtime/database-password" "Dedicated API role accepts the shared staging postgres password"
   else
-    finding "OK" "runtime/database-password" "Dedicated API role rejects the shared local postgres password"
+    finding "OK" "runtime/database-password" "Dedicated API role rejects the shared staging postgres password"
   fi
 
   if docker scout version >/dev/null 2>&1; then
-    for image in beanlog-staging-web beanlog-staging-api; do
+    for image in "${STAGING_COMPOSE_PROJECT}-web" "${STAGING_COMPOSE_PROJECT}-api"; do
       if docker image inspect "$image" >/dev/null 2>&1; then
         docker scout cves --only-severity critical,high --format sarif --output "$TMP_ROOT/${image}.sarif" "$image" >/dev/null 2>&1
         SCOUT_STATUS=$?

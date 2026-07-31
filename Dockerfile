@@ -5,6 +5,17 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci
 
+FROM deps AS dev
+WORKDIR /app
+ENV NODE_ENV=development
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs && \
+    ln -s /tmp/next-env.d.ts /app/next-env.d.ts && \
+    chown -h nextjs:nodejs /app/next-env.d.ts
+USER nextjs
+EXPOSE 3000
+CMD ["node_modules/.bin/next", "dev", "-H", "0.0.0.0", "-p", "3000"]
+
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules

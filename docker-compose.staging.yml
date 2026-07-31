@@ -1,19 +1,23 @@
-name: beanlog-staging
+name: ${STAGING_COMPOSE_PROJECT_NAME:-beanlog-staging}
 
 services:
   web:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        NEXT_PUBLIC_SUPABASE_URL: ${STAGING_PUBLIC_SUPABASE_URL:?run npm run staging:up}
-        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${STAGING_SUPABASE_ANON_KEY:?run npm run staging:up}
-        NEXT_PUBLIC_APP_URL: ${STAGING_APP_URL:-http://localhost:3100}
+      target: dev
     environment:
       NEXT_PUBLIC_SUPABASE_URL: ${STAGING_PUBLIC_SUPABASE_URL}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${STAGING_SUPABASE_ANON_KEY}
       NEXT_PUBLIC_APP_URL: ${STAGING_APP_URL:-http://localhost:3100}
       SUPABASE_SERVER_URL: ${STAGING_INTERNAL_SUPABASE_URL:-http://kong:8000}
+      NEXT_DEPLOYMENT_ID: ${STAGING_DEPLOYMENT_ID:-beanlog-staging}
+    volumes:
+      - ./src:/app/src:ro
+      - ./public:/app/public:ro
+      - ./next.config.ts:/app/next.config.ts:ro
+      - ./postcss.config.mjs:/app/postcss.config.mjs:ro
+      - ./tsconfig.json:/app/tsconfig.json:ro
     ports:
       - "127.0.0.1:${STAGING_WEB_PORT:-3100}:3000"
     healthcheck:
@@ -27,10 +31,13 @@ services:
     read_only: true
     tmpfs:
       - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=1001,gid=1001,mode=1777
-      - /app/.next/cache:rw,noexec,nosuid,nodev,size=64m,uid=1001,gid=1001,mode=0700
-    pids_limit: 200
-    mem_limit: 512m
-    cpus: 1.0
+      - /app/.next:rw,noexec,nosuid,nodev,size=512m,uid=1001,gid=1001,mode=0700
+    pids_limit: 300
+    # Turbopack keeps compiled route graphs in memory. A full browser QA pass
+    # exceeded 1 GiB and Docker restarted the dev server, interrupting active
+    # browser tabs and making the session appear logged out.
+    mem_limit: 3g
+    cpus: 2.0
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -79,7 +86,7 @@ services:
 networks:
   staging-supabase:
     external: true
-    name: supabase_network_beanlog-staging
+    name: ${STAGING_SUPABASE_NETWORK:-supabase_network_beanlog-staging}
 
 secrets:
   api_database_url:

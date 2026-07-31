@@ -1,3 +1,5 @@
+# Canonical template for staging development runtimes. The primary checkout
+# keeps these values; linked worktrees render isolated IDs, ports, and URLs.
 project_id = "beanlog-staging"
 
 [api]
@@ -78,8 +80,7 @@ max_frequency = "60s"
 enable_signup = false
 enable_confirmations = false
 
-# Internal staging deliberately does not copy local OAuth secrets. Email login
-# is sufficient for the automated and manual staging checks.
+# Staging uses email login for deterministic QA.
 [auth.external.google]
 enabled = false
 

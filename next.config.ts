@@ -5,7 +5,7 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 const isDevelopment = process.env.NODE_ENV === "development";
 const publicSupabaseOrigin = (() => {
   try {
-    return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? "http://localhost:54321").origin;
+    return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? "http://localhost:55321").origin;
   } catch {
     return "'self'";
   }
@@ -50,6 +50,7 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   output: "standalone",
+  deploymentId: process.env.NEXT_DEPLOYMENT_ID,
   poweredByHeader: false,
   experimental: {
     proxyClientMaxBodySize: "1mb",
