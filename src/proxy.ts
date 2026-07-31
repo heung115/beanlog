@@ -1,5 +1,8 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { updateSession } from "@/lib/supabase/middleware";
+import {
+  preserveAuthResponse,
+  updateSession,
+} from "@/lib/supabase/middleware";
 import createIntlMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 
@@ -27,7 +30,7 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
-  return intlMiddleware(request);
+  return preserveAuthResponse(response, intlMiddleware(request));
 }
 
 export const config = {

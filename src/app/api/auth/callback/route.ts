@@ -6,7 +6,7 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
   const configuredAppUrl =
-    process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+    process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3100";
   const next = resolveTrustedAppRedirect(
     searchParams.get("next"),
     configuredAppUrl

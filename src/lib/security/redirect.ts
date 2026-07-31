@@ -1,4 +1,4 @@
-const localDevelopmentOrigin = "http://localhost:3000";
+const localDevelopmentOrigin = "http://localhost:3100";
 
 function trustedOrigin(configuredAppUrl: string): string {
   try {
