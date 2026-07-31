@@ -168,6 +168,9 @@
     "allType": "Type",
     "allRoast": "Roast",
     "results": "{count} records",
+    "viewMode": "View mode",
+    "listView": "List view",
+    "gridView": "Grid view",
     "loadMore": "Load more"
   },
   "origins": {

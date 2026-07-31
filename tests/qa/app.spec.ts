@@ -164,11 +164,13 @@ test("collapsed detail fields stay out of the DOM and expand on demand", async (
   await expect(page.locator('input[name="process_detail"]')).toBeVisible();
 });
 
-test("coffee category badges meet WCAG AA text contrast", async ({ page }) => {
+test("coffee card metadata uses the readable secondary text token", async ({ page }) => {
   await login(page);
-  const colors = await page
-    .locator('[data-bean-card] span[class*="bg-process-"], [data-bean-card] span[class*="bg-roast-"]')
-    .evaluateAll((badges) => badges.map((badge) => getComputedStyle(badge).color));
+  const metadata = page.getByTestId("bean-card-metadata");
+  await expect(metadata.first()).toBeVisible();
+  const colors = await metadata.evaluateAll((elements) =>
+    elements.map((element) => getComputedStyle(element).color)
+  );
 
   expect(colors.length).toBeGreaterThan(0);
   const expectedColor = await page.evaluate(
@@ -180,13 +182,13 @@ test("coffee category badges meet WCAG AA text contrast", async ({ page }) => {
       probe.remove();
       return computed;
     },
-    designTokens.colors.brown
+    designTokens.colors["brown-medium"]
   );
   expect(new Set(colors)).toEqual(new Set([expectedColor]));
   await expectNoSeriousA11yViolations(page);
 });
 
-test("explore uses restrained corners for cards, filters, and labels", async ({ page }) => {
+test("explore uses restrained corners for cards and filters", async ({ page }) => {
   await login(page);
   await page.getByRole("button", { name: "필터" }).click();
 
@@ -196,13 +198,76 @@ test("explore uses restrained corners for cards, filters, and labels", async ({ 
     page.locator('select[aria-label="산지"]').evaluate((element) => getComputedStyle(element).borderRadius),
     firstCard.evaluate((element) => getComputedStyle(element).borderRadius),
   ]);
-  const labelRadii = await page
-    .locator('[data-bean-card] span[class*="bg-process-"], [data-bean-card] span[class*="bg-roast-"]')
-    .evaluateAll((labels) => labels.map((label) => getComputedStyle(label).borderRadius));
-
   expect(new Set(radii)).toEqual(new Set(["2px"]));
-  expect(labelRadii.length).toBeGreaterThan(0);
-  expect(new Set(labelRadii)).toEqual(new Set(["2px"]));
+});
+
+test("explore switches between grid and list views and restores the choice", async ({ page }) => {
+  await login(page);
+
+  const grid = page.getByTestId("bean-grid");
+  const cards = page.getByTestId("bean-card");
+  await expect(cards.first()).toBeVisible();
+  await page.getByRole("button", { name: "그리드 보기" }).click();
+
+  const gridLayout = await grid.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      columns: style.gridTemplateColumns.split(" ").filter(Boolean).length,
+      width: element.getBoundingClientRect().width,
+      scrollWidth: element.scrollWidth,
+    };
+  });
+  expect(gridLayout.columns).toBe(2);
+  expect(gridLayout.scrollWidth).toBeLessThanOrEqual(gridLayout.width + 1);
+
+  const firstRow = await cards.evaluateAll((elements) =>
+    elements.slice(0, 2).map((element) => {
+      const rect = element.getBoundingClientRect();
+      return { top: rect.top, height: rect.height };
+    })
+  );
+  expect(firstRow).toHaveLength(2);
+  expect(Math.abs(firstRow[0].top - firstRow[1].top)).toBeLessThanOrEqual(1);
+  expect(Math.abs(firstRow[0].height - firstRow[1].height)).toBeLessThanOrEqual(1);
+
+  const listButton = page.getByRole("button", { name: "목록 보기" });
+  await listButton.click();
+  await expect(listButton).toHaveAttribute("aria-pressed", "true");
+  await expect(grid).toHaveAttribute("data-view", "list");
+  expect(
+    await grid.evaluate((element) =>
+      getComputedStyle(element).gridTemplateColumns.split(" ").filter(Boolean).length
+    )
+  ).toBe(1);
+
+  await page.reload();
+  await expect(page.getByTestId("bean-grid")).toHaveAttribute("data-view", "list");
+  await expect(page.getByRole("button", { name: "목록 보기" })).toHaveAttribute(
+    "aria-pressed",
+    "true"
+  );
+});
+
+test("@mobile explore keeps the record grid to one column", async ({ page }) => {
+  await login(page);
+
+  const grid = page.getByTestId("bean-grid");
+  await expect(page.getByTestId("bean-card").first()).toBeVisible();
+  await expect(page.getByRole("button", { name: "목록 보기" })).toBeHidden();
+  await expect(page.getByRole("button", { name: "그리드 보기" })).toBeHidden();
+  const layout = await grid.evaluate((element) => {
+    const rect = element.getBoundingClientRect();
+    return {
+      columns: getComputedStyle(element).gridTemplateColumns.split(" ").filter(Boolean).length,
+      width: rect.width,
+      scrollWidth: element.scrollWidth,
+    };
+  });
+  expect(layout.columns).toBe(1);
+  expect(layout.scrollWidth).toBeLessThanOrEqual(layout.width + 1);
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)
+  ).toBe(true);
 });
 
 test("explore progressively discloses aligned filters without overflow", async ({ page }) => {
@@ -356,6 +421,103 @@ test("bean detail uses white cards without a dark overall-score top rule", async
   expect(appearance.scoreBorderTopWidth).toBe("1px");
   expect(appearance.scoreBorderTopColor).toBe(expectedBorder);
   await expectNoSeriousA11yViolations(page);
+});
+
+test("bean detail keeps review and cup notes before origin guidance", async ({ page }) => {
+  await login(page);
+  await page.getByRole("searchbox").fill("#11 브라질");
+  const beanCard = page.locator("[data-bean-card]").filter({ hasText: "#11 브라질" });
+  await expect(beanCard).toBeVisible();
+  await beanCard.locator('a[href*="/beans/"]').click();
+
+  const score = page.getByTestId("bean-overall-score");
+  const cupNotes = page.getByTestId("bean-cup-notes");
+  const origin = page.getByTestId("bean-origin-info");
+  const processRoast = page.getByTestId("bean-process-roast-info");
+  await expect(score).toBeVisible();
+  await expect(score.getByText(/언스페셜티 7월 월픽/)).toBeVisible();
+  await expect(cupNotes).toContainText("초콜릿");
+  await expect(cupNotes).toContainText("캐러멜");
+  await expect(origin).toBeVisible();
+  await expect(processRoast).toBeVisible();
+
+  const followsExpectedOrder = await page.evaluate(() => {
+    const ids = [
+      "bean-overall-score",
+      "bean-cup-notes",
+      "bean-origin-info",
+      "bean-process-roast-info",
+    ];
+    const elements = ids.map((id) => document.querySelector(`[data-testid="${id}"]`));
+    return elements.every(Boolean) && elements.slice(0, -1).every((element, index) =>
+      Boolean(
+        element &&
+          elements[index + 1] &&
+          element.compareDocumentPosition(elements[index + 1]!) &
+            Node.DOCUMENT_POSITION_FOLLOWING
+      )
+    );
+  });
+  expect(followsExpectedOrder).toBe(true);
+
+  const reviewStyle = await score.locator("p").last().evaluate((element) => ({
+    fontStyle: getComputedStyle(element).fontStyle,
+    text: element.textContent,
+  }));
+  expect(reviewStyle.fontStyle).toBe("normal");
+  expect(reviewStyle.text).not.toMatch(/^[“\"]/);
+  expect(reviewStyle.text).not.toMatch(/[”\"]$/);
+
+  const editButton = page.getByRole("button", { name: "수정", exact: true });
+  expect(
+    await editButton.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return [
+        style.borderTopWidth,
+        style.borderRightWidth,
+        style.borderBottomWidth,
+        style.borderLeftWidth,
+      ];
+    })
+  ).toEqual(["0px", "0px", "0px", "0px"]);
+  await expect(page.getByText("싱글오리진", { exact: true })).toHaveCount(0);
+
+  const guideLink = page.getByTestId("origin-detail-guide-link");
+  await expect(guideLink).toHaveText("브라질 산지 가이드 보기");
+  await guideLink.click();
+  await expect(page).toHaveURL(/\/ko\/origins\/brazil$/);
+  await expect(page.getByText("견과", { exact: true })).toBeVisible();
+  await expect(page.getByText("세하도", { exact: true })).toBeVisible();
+});
+
+test("@mobile bean detail keeps cup-note order without horizontal overflow", async ({ page }) => {
+  await login(page);
+  await page.getByRole("searchbox").fill("#11 브라질");
+  const beanCard = page.locator("[data-bean-card]").filter({ hasText: "#11 브라질" });
+  await beanCard.locator('a[href*="/beans/"]').click();
+
+  await expect(page.getByTestId("bean-cup-notes")).toContainText("초콜릿");
+  const followsExpectedOrder = await page.evaluate(() => {
+    const ids = [
+      "bean-overall-score",
+      "bean-cup-notes",
+      "bean-origin-info",
+      "bean-process-roast-info",
+    ];
+    const elements = ids.map((id) => document.querySelector(`[data-testid="${id}"]`));
+    return elements.every(Boolean) && elements.slice(0, -1).every((element, index) =>
+      Boolean(
+        element &&
+          elements[index + 1] &&
+          element.compareDocumentPosition(elements[index + 1]!) &
+            Node.DOCUMENT_POSITION_FOLLOWING
+      )
+    );
+  });
+  expect(followsExpectedOrder).toBe(true);
+  expect(
+    await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)
+  ).toBe(true);
 });
 
 test("native forms work with JavaScript disabled", async ({ browser }) => {

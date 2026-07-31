@@ -18,7 +18,48 @@ import type {
 } from "@/types/database";
 
 const PAGE_SIZE = 20;
+const VIEW_STORAGE_KEY = "beanlog:explore-view";
+const VIEW_CHANGE_EVENT = "beanlog:explore-view-change";
 const subscribeToHydration = () => () => {};
+type ViewMode = "grid" | "list";
+let fallbackViewMode: ViewMode = "grid";
+
+function getStoredViewMode(): ViewMode {
+  if (typeof window === "undefined") return fallbackViewMode;
+  try {
+    const storedView = window.localStorage.getItem(VIEW_STORAGE_KEY);
+    if (storedView === "grid" || storedView === "list") fallbackViewMode = storedView;
+  } catch {
+    // Keep the in-memory preference when browser storage is unavailable.
+  }
+  return fallbackViewMode;
+}
+
+function getDefaultViewMode(): ViewMode {
+  return "grid";
+}
+
+function subscribeToViewMode(onStoreChange: () => void) {
+  const handleStorage = (event: StorageEvent) => {
+    if (event.key === VIEW_STORAGE_KEY) onStoreChange();
+  };
+  window.addEventListener("storage", handleStorage);
+  window.addEventListener(VIEW_CHANGE_EVENT, onStoreChange);
+  return () => {
+    window.removeEventListener("storage", handleStorage);
+    window.removeEventListener(VIEW_CHANGE_EVENT, onStoreChange);
+  };
+}
+
+function storeViewMode(nextView: ViewMode) {
+  fallbackViewMode = nextView;
+  try {
+    window.localStorage.setItem(VIEW_STORAGE_KEY, nextView);
+  } catch {
+    // The current tab can still switch views when persistence is unavailable.
+  }
+  window.dispatchEvent(new Event(VIEW_CHANGE_EVENT));
+}
 
 const PROCESS_METHODS: ProcessMethod[] = [
   "washed",
@@ -175,6 +216,11 @@ export function ExploreClient({
   const [total, setTotal] = useState(initialTotal);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+  const viewMode = useSyncExternalStore(
+    subscribeToViewMode,
+    getStoredViewMode,
+    getDefaultViewMode
+  );
   const hydrated = useSyncExternalStore(
     subscribeToHydration,
     () => true,
@@ -187,6 +233,8 @@ export function ExploreClient({
   }>(initialFilterOptions);
   const initialFetch = useRef(true);
   const appliedSearch = useRef<string | undefined>(undefined);
+
+  const changeView = (nextView: ViewMode) => storeViewMode(nextView);
 
   // Debounce search input -> filters (300ms)
   useEffect(() => {
@@ -569,23 +617,58 @@ export function ExploreClient({
         </div>
       )}
 
-      {/* Result count / clear */}
+      {/* Result count / view mode */}
       <div className="mt-5 flex items-center justify-between">
         <p className="text-xs text-brown-light">
           {loading ? t("results", { count: 0 }) : t("results", { count: total })}
         </p>
-        {filters.search && activeFilterItems.length === 0 && (
+        <div
+          className="hidden items-center border border-border bg-surface md:flex"
+          role="group"
+          aria-label={t("viewMode")}
+        >
           <button
-            onClick={clearFilters}
-            className="text-xs font-medium text-accent transition-colors duration-150 hover:text-brown"
+            type="button"
+            aria-label={t("listView")}
+            aria-pressed={viewMode === "list"}
+            onClick={() => changeView("list")}
+            className={cn(
+              "flex min-h-11 min-w-11 items-center justify-center text-brown-light transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/50",
+              viewMode === "list" && "bg-cream-dark text-brown"
+            )}
           >
-            {t("clearFilters")}
+            <svg aria-hidden="true" width="17" height="17" viewBox="0 0 17 17" fill="none">
+              <path d="M2 4h13M2 8.5h13M2 13h13" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+            </svg>
           </button>
-        )}
+          <button
+            type="button"
+            aria-label={t("gridView")}
+            aria-pressed={viewMode === "grid"}
+            onClick={() => changeView("grid")}
+            className={cn(
+              "flex min-h-11 min-w-11 items-center justify-center border-l border-border text-brown-light transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/50",
+              viewMode === "grid" && "bg-cream-dark text-brown"
+            )}
+          >
+            <svg aria-hidden="true" width="17" height="17" viewBox="0 0 17 17" fill="none">
+              <rect x="2" y="2" width="5" height="5" stroke="currentColor" strokeWidth="1.3" />
+              <rect x="10" y="2" width="5" height="5" stroke="currentColor" strokeWidth="1.3" />
+              <rect x="2" y="10" width="5" height="5" stroke="currentColor" strokeWidth="1.3" />
+              <rect x="10" y="10" width="5" height="5" stroke="currentColor" strokeWidth="1.3" />
+            </svg>
+          </button>
+        </div>
       </div>
 
-      {/* Timeline */}
-      <div className="mt-4 flex flex-col gap-2.5">
+      <div
+        data-testid="bean-grid"
+        data-view={viewMode}
+        className={cn(
+          "mt-4 grid grid-cols-1 gap-3",
+          viewMode === "grid" && "md:grid-cols-2"
+        )}
+      >
         {loading ? (
           <>
             <SkeletonCard />
@@ -595,7 +678,7 @@ export function ExploreClient({
         ) : beans.length === 0 ? (
           <EmptyState hasFilters={hasActiveFilters} onClear={clearFilters} />
         ) : (
-          beans.map((bean) => <BeanCard key={bean.id} bean={bean} />)
+          beans.map((bean) => <BeanCard key={bean.id} bean={bean} view={viewMode} />)
         )}
       </div>
 

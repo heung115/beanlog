@@ -3,25 +3,26 @@
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import type { BeanWithTags } from "@/types/database";
-import { Badge } from "@/components/ui/badge";
 import { ScoreDisplay } from "@/components/ui/score-display";
+import { tagDisplayName } from "@/components/beans/tag-input";
 import {
   findCountryPreset,
   originSlug,
 } from "@/data/origin-presets";
-import { formatDate, getProcessColor, getRoastColor } from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 
 interface BeanCardProps {
   bean: BeanWithTags;
+  view?: "grid" | "list";
 }
 
-export function BeanCard({ bean }: BeanCardProps) {
+export function BeanCard({ bean, view = "grid" }: BeanCardProps) {
   const t = useTranslations("beans");
   const tProcess = useTranslations("process");
   const tRoast = useTranslations("roast");
   const locale = useLocale();
 
-  const visibleTags = (bean.tasting_tags ?? []).slice(0, 3);
+  const visibleTags = (bean.tasting_tags ?? []).slice(0, 2);
   const hiddenTagCount = (bean.tasting_tags ?? []).length - visibleTags.length;
   const countryPreset = bean.origin_country
     ? findCountryPreset(bean.origin_country)
@@ -38,7 +39,12 @@ export function BeanCard({ bean }: BeanCardProps) {
   return (
     <article
       data-bean-card
-      className="journal-panel group relative border-l-2 border-l-transparent px-5 py-4 transition-all duration-200 hover:border-l-accent hover:border-t-border hover:border-r-border hover:border-b-border hover:bg-surface-warm md:px-6 md:py-5"
+      data-testid="bean-card"
+      data-view={view}
+      className={cn(
+        "journal-panel group relative flex flex-col border-l-2 border-l-transparent px-5 py-4 transition-all duration-200 hover:border-l-accent hover:border-t-border hover:border-r-border hover:border-b-border hover:bg-surface-warm md:px-5 md:py-5",
+        view === "grid" ? "min-h-64" : "min-h-0"
+      )}
     >
       <Link
         href={`/${locale}/beans/${bean.id}`}
@@ -48,11 +54,11 @@ export function BeanCard({ bean }: BeanCardProps) {
         <span className="sr-only">{bean.name}</span>
       </Link>
 
-      <div className="pointer-events-none relative z-10">
+      <div className="pointer-events-none relative z-10 flex h-full flex-1 flex-col">
         {/* Name / roastery / origin + score */}
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <h3 className="font-display text-lg font-bold leading-snug text-brown transition-colors duration-150 group-hover:text-accent">
+            <h3 className="line-clamp-2 font-display text-lg font-bold leading-snug text-brown transition-colors duration-150 group-hover:text-accent">
               {bean.name}
             </h3>
             <p className="mt-1 truncate text-sm text-brown-light">{bean.roastery}</p>
@@ -102,21 +108,20 @@ export function BeanCard({ bean }: BeanCardProps) {
           <ScoreDisplay score={bean.overall_score} className="shrink-0" />
         </div>
 
-        {/* Process / roast / type */}
-        <div className="mt-4 flex flex-wrap items-center gap-1.5">
-          <Badge className={getProcessColor(bean.process_method)}>
-            {tProcess(bean.process_method)}
-          </Badge>
-          <Badge className={getRoastColor(bean.roast_level)}>
-            {tRoast(bean.roast_level)}
-          </Badge>
-          <span className="ml-0.5 text-xs text-brown-light">
-            {bean.bean_type === "blend" ? t("blend") : t("singleOrigin")}
-          </span>
-        </div>
+        <p
+          data-testid="bean-card-metadata"
+          className="mt-4 text-xs font-medium text-brown-medium"
+        >
+          {[
+            tProcess(bean.process_method),
+            tRoast(bean.roast_level),
+            bean.bean_type === "blend" ? t("blend") : null,
+          ]
+            .filter(Boolean)
+            .join(" · ")}
+        </p>
 
-        {/* One-line note */}
-        {bean.note && (
+        {view === "list" && bean.note && (
           <p className="mt-4 line-clamp-2 text-sm leading-relaxed text-brown-medium">
             {bean.note}
           </p>
@@ -130,7 +135,7 @@ export function BeanCard({ bean }: BeanCardProps) {
                 key={tag.id}
                 className="rounded-sm bg-cream-dark px-2 py-0.5 text-[11px] text-brown-medium"
               >
-                {tag.tag}
+                {tagDisplayName(tag.tag, locale)}
               </span>
             ))}
             {hiddenTagCount > 0 && (
@@ -140,7 +145,12 @@ export function BeanCard({ bean }: BeanCardProps) {
         )}
 
         {/* Place + date */}
-        <div className="mt-5 flex items-center justify-between border-t border-border-light pt-2.5">
+        <div
+          className={cn(
+            "flex items-center justify-between border-t border-border-light pt-3",
+            view === "grid" ? "mt-auto" : "mt-5"
+          )}
+        >
           <span className="text-xs text-brown-light">
             {bean.place_type === "cafe" ? t("cafe") : t("home")}
           </span>

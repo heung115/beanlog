@@ -92,6 +92,21 @@ export default async function globalSetup() {
   const { error: fixtureError } = await primary.from("beans").insert([...rows, ...baselineRows]);
   if (fixtureError) throw fixtureError;
 
+  const { data: cupNoteBean, error: cupNoteBeanError } = await primary
+    .from("beans")
+    .select("id")
+    .eq("user_id", primaryId)
+    .eq("name", fixtures[0].name)
+    .single();
+  if (cupNoteBeanError || !cupNoteBean) {
+    throw cupNoteBeanError ?? new Error("QA cup-note bean lookup failed");
+  }
+  const { error: cupNoteError } = await primary.from("tasting_tags").insert([
+    { bean_id: cupNoteBean.id, user_id: primaryId, tag: "chocolate", category: "cocoa" },
+    { bean_id: cupNoteBean.id, user_id: primaryId, tag: "caramel", category: "sweet" },
+  ]);
+  if (cupNoteError) throw cupNoteError;
+
   const { error: isolationError } = await isolation.from("beans").insert({
     user_id: isolationId,
     name: "[QA] 다른 사용자 비공개 원두",

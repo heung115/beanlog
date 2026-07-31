@@ -12,7 +12,6 @@ import {
   RadarChart,
   ResponsiveContainer,
 } from "recharts";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScoreDisplay } from "@/components/ui/score-display";
 import { useToast } from "@/components/ui/toast";
@@ -20,12 +19,7 @@ import { tagDisplayName } from "@/components/beans/tag-input";
 import { deleteBean, getBeanById } from "@/lib/actions/beans";
 import { findCountryPreset, originSlug } from "@/data/origin-presets";
 import { chartColors } from "@/config/chart-colors";
-import {
-  cn,
-  formatDate,
-  getProcessColor,
-  getRoastColor,
-} from "@/lib/utils";
+import { cn, formatDate } from "@/lib/utils";
 import type { BeanWithTags } from "@/types/database";
 
 function InfoRow({
@@ -255,7 +249,7 @@ export default function BeanDetailPage() {
         ) : (
           <div className="flex items-center gap-2">
             <Button
-              variant="secondary"
+              variant="ghost"
               size="sm"
               onClick={() => router.push(`/${locale}/beans/${bean.id}/edit`)}
             >
@@ -275,19 +269,19 @@ export default function BeanDetailPage() {
 
       {/* Header */}
       <header className="animate-rise mb-6" style={{ animationDelay: "40ms" }}>
-        <div className="mb-3 flex flex-wrap items-center gap-2">
-          <Badge>{bean.bean_type === "blend" ? t("blend") : t("singleOrigin")}</Badge>
-          <Badge className={getProcessColor(bean.process_method)}>
-            {tp(bean.process_method)}
-          </Badge>
-          <Badge className={getRoastColor(bean.roast_level)}>
-            {tr(bean.roast_level)}
-          </Badge>
-        </div>
         <h1 className="font-display text-3xl font-bold leading-tight tracking-tight text-brown md:text-4xl">
           {bean.name}
         </h1>
         <p className="mt-1.5 text-base text-brown-light">{bean.roastery}</p>
+        <p className="mt-3 text-sm font-medium text-brown-medium">
+          {[
+            bean.bean_type === "blend" ? t("blend") : null,
+            tp(bean.process_method),
+            tr(bean.roast_level),
+          ]
+            .filter(Boolean)
+            .join(" · ")}
+        </p>
         <p className="mt-3 flex items-center gap-2 text-sm text-brown-light">
           <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
             <rect
@@ -316,17 +310,32 @@ export default function BeanDetailPage() {
             <Overline>{t("overallScore")}</Overline>
             <ScoreDisplay score={bean.overall_score} size="lg" />
           </div>
-          <blockquote className="flex-1">
-            <p className="font-display text-lg leading-relaxed text-brown-medium italic">
-              “{bean.note}”
-            </p>
-          </blockquote>
+          <p className="flex-1 text-base leading-relaxed text-brown-medium">
+            {bean.note}
+          </p>
         </div>
       </Card>
 
+      {/* Cup notes */}
+      {tags.length > 0 && (
+        <Card delay={120} className="mt-4" testId="bean-cup-notes">
+          <Overline>{t("tastingNotes")}</Overline>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {tags.map((tag) => (
+              <span
+                key={tag.id}
+                className="rounded-sm border border-border bg-cream-dark/60 px-2.5 py-1 text-xs font-medium text-brown-medium"
+              >
+                {tagDisplayName(tag.tag, locale)}
+              </span>
+            ))}
+          </div>
+        </Card>
+      )}
+
       {/* Detail scores radar */}
       {hasDetailScores && (
-        <Card delay={120} className="mt-4">
+        <Card delay={160} className="mt-4">
           <Overline>{t("detailedScores")}</Overline>
           <div className="mt-2 h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -367,7 +376,7 @@ export default function BeanDetailPage() {
 
       {/* Origin + process */}
       <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-        <Card delay={160}>
+        <Card delay={200} testId="bean-origin-info">
           <Overline>{t("originInfo")}</Overline>
           <dl className="mt-2 divide-y divide-border-light">
             <InfoRow
@@ -429,7 +438,7 @@ export default function BeanDetailPage() {
           )}
         </Card>
 
-        <Card delay={200}>
+        <Card delay={240} testId="bean-process-roast-info">
           <Overline>{t("processMethod")} · {t("roastLevel")}</Overline>
           <dl className="mt-2 divide-y divide-border-light">
             <InfoRow label={t("processMethod")} value={tp(bean.process_method)} />
@@ -552,23 +561,6 @@ export default function BeanDetailPage() {
                   </div>
                 );
               })}
-          </div>
-        </Card>
-      )}
-
-      {/* Tasting tags */}
-      {tags.length > 0 && (
-        <Card delay={240} className="mt-4">
-          <Overline>{t("tastingNotes")}</Overline>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {tags.map((tag) => (
-              <span
-                key={tag.id}
-                className="rounded-sm border border-border bg-cream-dark/60 px-2.5 py-1 text-xs font-medium text-brown-medium transition-colors hover:border-accent"
-              >
-                {tagDisplayName(tag.tag, locale)}
-              </span>
-            ))}
           </div>
         </Card>
       )}
