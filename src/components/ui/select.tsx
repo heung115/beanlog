@@ -24,7 +24,7 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(
           ref={ref}
           id={selectId}
           className={cn(
-            "w-full rounded-md border border-border bg-surface px-3 py-2.5 text-sm text-brown",
+            "w-full rounded-sm border border-border bg-surface px-3 py-2.5 text-sm text-brown",
             "focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/30",
             "transition-colors duration-150 appearance-none",
             "bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cpath%20fill%3D%22%238B7355%22%20d%3D%22M2%204l4%204%204-4%22%2F%3E%3C%2Fsvg%3E')] bg-[position:right_12px_center] bg-no-repeat pr-8",

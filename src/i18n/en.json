@@ -112,6 +112,9 @@
     "altitudeRange": "Altitude",
     "signature": "Profile",
     "keyVarietals": "Key varietals",
+    "originFlavorGuide": "What to expect from this origin",
+    "originFlavorGuideHint": "Flavors and textures commonly associated with this origin.",
+    "viewOriginGuide": "View {country} origin guide",
     "purchaseOnline": "Online",
     "purchaseRoastery": "Roastery",
     "purchaseCafe": "Café",
@@ -153,6 +156,7 @@
     "searchPlaceholder": "Search beans, roasteries, notes...",
     "filters": "Filters",
     "clearFilters": "Clear filters",
+    "removeFilter": "Remove {label} filter: {value}",
     "sortBy": "Sort",
     "sortNewest": "Newest",
     "sortScore": "Highest score",
@@ -165,6 +169,20 @@
     "allRoast": "Roast",
     "results": "{count} records",
     "loadMore": "Load more"
+  },
+  "origins": {
+    "guide": "COFFEE ORIGIN GUIDE",
+    "backToJournal": "Back to journal",
+    "intro": "Explore the flavors and major growing regions commonly associated with coffee from {country}.",
+    "cupProfile": "Typical flavors and character",
+    "cupProfileHint": "A cup profile often found in specialty coffee",
+    "growingConditions": "Growing information",
+    "altitude": "Typical growing altitude",
+    "keyVarietals": "Key varietals",
+    "regions": "Major producing regions",
+    "regionsHint": "Regions frequently associated with this country's coffee",
+    "regionCount": "{count} regions",
+    "disclaimer": "Origin information describes broad tendencies. The actual cup can vary with the specific region, varietal, processing, roast, and brewing method."
   },
   "stats": {
     "title": "Coffee stats",

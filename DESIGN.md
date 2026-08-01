@@ -8,13 +8,13 @@ colors:
   secondary: "#735E47"
   accent: "#865D42"
   accent-soft: "#C4A882"
-  neutral: "#FAF7F2"
+  neutral: "#FCFAF7"
   neutral-strong: "#F3EDE4"
   surface: "#FFFFFF"
   surface-warm: "#FDFBF8"
   border: "#E8E0D5"
   border-light: "#F0EBE3"
-  on-primary: "#FAF7F2"
+  on-primary: "#FCFAF7"
   error: "#B91C1C"
   on-error: "#FFFFFF"
   process-washed: "#7B9EA8"
@@ -29,19 +29,19 @@ colors:
   roast-dark: "#4A3728"
 typography:
   display-xl:
-    fontFamily: Playfair Display, Nanum Myeongjo, serif
+    fontFamily: Pretendard, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
     fontSize: 2.25rem
     fontWeight: 700
     lineHeight: 1.15
     letterSpacing: -0.02em
   display-lg:
-    fontFamily: Playfair Display, Nanum Myeongjo, serif
+    fontFamily: Pretendard, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
     fontSize: 1.875rem
     fontWeight: 700
     lineHeight: 1.2
     letterSpacing: -0.02em
   heading-md:
-    fontFamily: Playfair Display, Nanum Myeongjo, serif
+    fontFamily: Pretendard, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
     fontSize: 1.125rem
     fontWeight: 700
     lineHeight: 1.35
@@ -77,8 +77,8 @@ spacing:
   page-gutter-desktop: 1.5rem
   content-max-width: 56rem
 rounded:
-  sm: 0.375rem
-  md: 0.5rem
+  sm: 0.125rem
+  md: 0.125rem
   full: 9999px
 components:
   button-primary:
@@ -110,14 +110,14 @@ components:
     backgroundColor: "{colors.neutral-strong}"
     textColor: "{colors.primary-soft}"
     typography: "{typography.caption}"
-    rounded: "{rounded.full}"
-    padding: 0.125rem 0.625rem
+    rounded: "{rounded.sm}"
+    padding: 0.125rem 0.5rem
   filter-chip-active:
     backgroundColor: "{colors.primary}"
     textColor: "{colors.on-primary}"
     typography: "{typography.caption}"
-    rounded: "{rounded.full}"
-    padding: 0.375rem 0.875rem
+    rounded: "{rounded.sm}"
+    padding: 0.375rem 0.75rem
 ---
 
 # Beanlog Design System
@@ -138,7 +138,7 @@ The palette is built from warm paper neutrals and coffee browns. Pure white is r
 - **Primary soft (`#6B5744`)** supports secondary text and primary hover states.
 - **Secondary (`#735E47`)** is for captions and metadata that must remain readable but visually quiet.
 - **Accent (`#865D42`)** indicates focus, selection, links, and restrained highlights. It is not a general decorative fill.
-- **Neutral (`#FAF7F2`)** is the application canvas; **surface (`#FFFFFF`)** and **surface warm (`#FDFBF8`)** create shallow tonal layers.
+- **Neutral (`#FCFAF7`)** is the application canvas; **surface (`#FFFFFF`)** and **surface warm (`#FDFBF8`)** create shallow tonal layers.
 - Borders (`#E8E0D5`, `#F0EBE3`) create hierarchy before shadows are introduced.
 - Process and roast colors communicate coffee-domain categories only. Never reuse them as generic status colors. On pale category fills, use espresso-brown text rather than the category hue so compact labels meet WCAG AA.
 - Error red is reserved for destructive actions and validation failures.
@@ -147,11 +147,9 @@ All normal-sized text must meet WCAG AA contrast. Do not place secondary brown, 
 
 ## Typography
 
-Display typography uses **Playfair Display**, falling back to **Nanum Myeongjo** for Korean and then a generic serif. It gives names, page titles, scores, and editorial section headings the character of a tasting journal.
+All display, body, and interface typography uses **Pretendard**, with system sans-serif fallbacks. This keeps Korean, Latin text, and numerals visually consistent across bean names, scores, controls, metadata, notes, and charts. Hierarchy comes from size, weight, spacing, and tabular numerals rather than mixing type families.
 
-Body and interface typography use **Pretendard**, with system sans-serif fallbacks. Controls, metadata, long notes, and charts should prioritize compact readability. Use tabular numerals for changing scores, totals, prices, percentages, and chart values.
-
-Reserve bold display type for meaningful hierarchy. A screen should usually have one dominant title; avoid turning every card label into a serif headline.
+Reserve bold display type for meaningful hierarchy. A screen should usually have one dominant title; avoid making every card label look like a headline.
 
 ## Layout
 
@@ -171,17 +169,17 @@ Motion is restrained. The standard entrance is a short rise-and-fade of roughly 
 
 ## Shapes
 
-The shape language is gently editorial rather than playful. Controls and focused panels use an 8px radius; quieter inset regions may use 6px. Pills and circles are limited to tags, filter chips, avatars, score markers, and compact status-like elements.
+The shape language is restrained and editorial rather than playful. Content panels, controls, labels, and inset regions use a near-square 2px radius. Hierarchy should come from spacing, type, rules, and tonal surfaces instead of soft card silhouettes.
 
-Do not introduce large, soft card radii or mixed radius scales. Domain charts and icons should use simple strokes and geometric shapes that match the existing navigation icons.
+Pills are not a default container. Reserve circles for controls whose meaning or mechanics are inherently circular, such as avatars, slider thumbs, chart points, and loading indicators. Domain charts and icons should use simple strokes and geometric shapes that match the existing navigation icons.
 
 ## Components
 
 - **Buttons:** Primary buttons use espresso brown on cream. Secondary buttons are transparent with a visible border. Ghost buttons are for low-priority actions. Only destructive actions use red.
-- **Inputs:** Inputs use a white surface, one-pixel warm border, 8px radius, and accent focus treatment. Labels remain outside the control. Placeholder text must be visibly subordinate but legible.
+- **Inputs:** Inputs use a white surface, one-pixel warm border, 2px radius, and accent focus treatment. Labels remain outside the control. Placeholder text must be visibly subordinate but legible.
 - **Journal panels:** Use white for standard panels and warm white for quiet panels. Prefer borders and spacing to drop shadows.
 - **Bean cards:** Lead with bean name and score, then roastery and origin. Process, roast, and type are supporting metadata. Notes and tasting tags must not overpower identity and score.
-- **Badges and filter chips:** Badges describe data; filter chips change a query. An active filter uses the primary fill. Category colors must keep consistent meanings across lists, detail pages, forms, and charts.
+- **Badges and filter controls:** Badges describe data and use compact, near-square labels; filters change a query and use the same low rectangular control language as other inputs. An active filter uses the primary fill. Category colors must keep consistent meanings across lists, detail pages, forms, and charts.
 - **Charts:** Use the coffee-brown sequence for neutral series and domain category colors for process data. Labels and tooltips use the same typography and surface rules as the rest of the application.
 - **Navigation:** The active destination is indicated through color and a rule, not a filled card. The mobile add action may be visually elevated because it is the central workflow.
 - **Empty and loading states:** Use quiet line illustrations, concise copy, and one clear next action. Skeletons should reproduce the real content structure without decorative animation beyond a subtle pulse.

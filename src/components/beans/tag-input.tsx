@@ -69,11 +69,11 @@ export function TagInput({ value, onChange }: TagInputProps) {
     <div className="flex flex-col gap-4">
       {/* Selected tags */}
       {value.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2 rounded-md border border-border-light bg-cream-dark/60 p-3">
+        <div className="flex flex-wrap items-center gap-2 rounded-sm border border-border-light bg-cream-dark/60 p-3">
           {value.map((v) => (
             <span
               key={v.tag}
-              className="animate-rise inline-flex items-center gap-1.5 rounded-full bg-brown py-1 pl-3 pr-1.5 text-xs font-medium text-cream"
+              className="animate-rise inline-flex items-center gap-1.5 rounded-sm bg-brown py-1 pl-2.5 pr-1.5 text-xs font-medium text-cream"
             >
               {tagDisplayName(v.tag, locale)}
               <button
@@ -112,7 +112,7 @@ export function TagInput({ value, onChange }: TagInputProps) {
         }}
         placeholder={t("tastingNotesPlaceholder")}
         className={cn(
-          "w-full rounded-md border border-border bg-surface px-3 py-2.5 text-sm text-brown placeholder:text-brown-light/40",
+          "w-full rounded-sm border border-border bg-surface px-3 py-2.5 text-sm text-brown placeholder:text-brown-light/40",
           "transition-colors duration-150 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/30"
         )}
       />
@@ -139,7 +139,7 @@ export function TagInput({ value, onChange }: TagInputProps) {
                       onClick={() => togglePreset(preset)}
                       aria-pressed={selected}
                       className={cn(
-                        "rounded-full border px-3 py-1 text-xs transition-all duration-150",
+                        "rounded-sm border px-2.5 py-1 text-xs transition-all duration-150",
                         "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
                         selected
                           ? "border-brown bg-brown text-cream shadow-sm"

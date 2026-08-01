@@ -18,7 +18,7 @@ import { ScoreDisplay } from "@/components/ui/score-display";
 import { useToast } from "@/components/ui/toast";
 import { tagDisplayName } from "@/components/beans/tag-input";
 import { deleteBean, getBeanById } from "@/lib/actions/beans";
-import { findCountryPreset } from "@/data/origin-presets";
+import { findCountryPreset, originSlug } from "@/data/origin-presets";
 import { chartColors } from "@/config/chart-colors";
 import {
   cn,
@@ -28,7 +28,13 @@ import {
 } from "@/lib/utils";
 import type { BeanWithTags } from "@/types/database";
 
-function InfoRow({ label, value }: { label: string; value?: string | null }) {
+function InfoRow({
+  label,
+  value,
+}: {
+  label: string;
+  value?: React.ReactNode;
+}) {
   if (!value) return null;
   return (
     <div className="flex items-baseline justify-between gap-4 py-2">
@@ -53,7 +59,7 @@ function Card({
     <section
       data-detail-section
       data-testid={testId}
-      className={cn("animate-rise", className)}
+      className={cn("journal-panel animate-rise p-5 md:p-6", className)}
       style={delay ? { animationDelay: `${delay}ms` } : undefined}
     >
       {children}
@@ -164,7 +170,7 @@ export default function BeanDetailPage() {
     ? locale === "ko"
       ? countryPreset.countryKo
       : countryPreset.country
-    : bean.origin_country;
+    : bean.origin_country ?? "";
 
   const radarData = [
     { key: "aroma", label: t("aroma"), value: bean.score_aroma ?? 0 },
@@ -304,7 +310,7 @@ export default function BeanDetailPage() {
       </header>
 
       {/* Score + note */}
-      <Card delay={80} className="py-6 md:py-7" testId="bean-overall-score">
+      <Card delay={80} testId="bean-overall-score">
         <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
           <div className="flex shrink-0 flex-col items-center gap-1 sm:border-r sm:border-border-light sm:pr-8">
             <Overline>{t("overallScore")}</Overline>
@@ -320,7 +326,7 @@ export default function BeanDetailPage() {
 
       {/* Detail scores radar */}
       {hasDetailScores && (
-        <Card delay={120} className="border-t border-border-light py-6 md:py-8">
+        <Card delay={120} className="mt-4">
           <Overline>{t("detailedScores")}</Overline>
           <div className="mt-2 h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -360,11 +366,14 @@ export default function BeanDetailPage() {
       )}
 
       {/* Origin + process */}
-      <div className="grid grid-cols-1 border-t border-border-light md:grid-cols-2">
-        <Card delay={160} className="py-6 md:py-8 md:pr-8">
+      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+        <Card delay={160}>
           <Overline>{t("originInfo")}</Overline>
           <dl className="mt-2 divide-y divide-border-light">
-            <InfoRow label={t("originCountry")} value={countryName} />
+            <InfoRow
+              label={t("originCountry")}
+              value={countryName}
+            />
             <InfoRow label={t("originRegion")} value={bean.origin_region} />
             <InfoRow
               label={t("originSubregion")}
@@ -377,12 +386,50 @@ export default function BeanDetailPage() {
             <InfoRow label={t("farmProducer")} value={bean.farm_producer} />
             <InfoRow label={t("varietal")} value={bean.varietal} />
           </dl>
+          {countryPreset && (
+            <Link
+              data-testid="origin-detail-guide-link"
+              href={`/${locale}/origins/${originSlug(countryPreset.country)}`}
+              className="mt-4 flex min-h-10 w-full items-center justify-between gap-3 rounded-sm border border-border bg-surface-warm px-3 text-xs font-semibold text-accent transition-colors hover:border-accent hover:bg-cream-dark hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+            >
+              <span className="inline-flex items-center gap-2">
+                <svg
+                  aria-hidden="true"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                >
+                  <path
+                    d="M8 14s4-3.8 4-7a4 4 0 10-8 0c0 3.2 4 7 4 7z"
+                    stroke="currentColor"
+                    strokeWidth="1.3"
+                    strokeLinejoin="round"
+                  />
+                  <circle cx="8" cy="7" r="1.35" stroke="currentColor" strokeWidth="1.2" />
+                </svg>
+                {t("viewOriginGuide", { country: countryName })}
+              </span>
+              <svg
+                aria-hidden="true"
+                width="11"
+                height="11"
+                viewBox="0 0 12 12"
+                fill="none"
+              >
+                <path
+                  d="M4 2.5L7.5 6 4 9.5"
+                  stroke="currentColor"
+                  strokeWidth="1.25"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </Link>
+          )}
         </Card>
 
-        <Card
-          delay={200}
-          className="border-t border-border-light py-6 md:border-l md:border-t-0 md:py-8 md:pl-8"
-        >
+        <Card delay={200}>
           <Overline>{t("processMethod")} · {t("roastLevel")}</Overline>
           <dl className="mt-2 divide-y divide-border-light">
             <InfoRow label={t("processMethod")} value={tp(bean.process_method)} />
@@ -400,9 +447,60 @@ export default function BeanDetailPage() {
         </Card>
       </div>
 
+      {countryPreset && (
+        <Card
+          delay={220}
+          className="mt-4 border-t-2 border-t-brown"
+          testId="origin-flavor-guide"
+        >
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <Overline>{t("originFlavorGuide")}</Overline>
+              <p className="mt-1 text-xs text-brown-light">
+                {t("originFlavorGuideHint")}
+              </p>
+            </div>
+            <Link
+              href={`/${locale}/origins/${originSlug(countryPreset.country)}`}
+              className="inline-flex min-h-9 shrink-0 items-center gap-1 self-start rounded-sm border border-border px-3 text-xs font-medium text-accent transition-colors hover:border-accent hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+            >
+              {t("viewOriginGuide", { country: countryName })}
+              <svg
+                aria-hidden="true"
+                width="11"
+                height="11"
+                viewBox="0 0 12 12"
+                fill="none"
+              >
+                <path
+                  d="M4 2.5L7.5 6 4 9.5"
+                  stroke="currentColor"
+                  strokeWidth="1.25"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </Link>
+          </div>
+          <p className="mt-5 font-display text-xl font-semibold leading-relaxed text-brown md:text-2xl">
+            {locale === "ko" ? countryPreset.signatureKo : countryPreset.signature}
+          </p>
+          <div className="mt-5 border-t border-border-light pt-4">
+            <p className="text-xs font-medium text-brown-light">
+              {t("originRegion")}
+            </p>
+            <p className="mt-1.5 text-sm leading-relaxed text-brown-medium">
+              {countryPreset.regions
+                .map((region) => (locale === "ko" ? region.nameKo : region.name))
+                .join(" · ")}
+            </p>
+          </div>
+        </Card>
+      )}
+
       {/* Blend composition */}
       {bean.bean_type === "blend" && (bean.blend_components ?? []).length > 0 && (
-        <Card delay={180} className="border-t border-border-light py-6 md:py-8">
+        <Card delay={180} className="mt-4">
           <Overline>{t("blendComposition")}</Overline>
           <div className="mt-3 flex flex-col gap-2">
             {(bean.blend_components ?? [])
@@ -460,13 +558,13 @@ export default function BeanDetailPage() {
 
       {/* Tasting tags */}
       {tags.length > 0 && (
-        <Card delay={240} className="border-t border-border-light py-6 md:py-8">
+        <Card delay={240} className="mt-4">
           <Overline>{t("tastingNotes")}</Overline>
           <div className="mt-3 flex flex-wrap gap-2">
             {tags.map((tag) => (
               <span
                 key={tag.id}
-                className="rounded-full border border-border bg-cream-dark/60 px-3 py-1 text-xs font-medium text-brown-medium transition-colors hover:border-accent"
+                className="rounded-sm border border-border bg-cream-dark/60 px-2.5 py-1 text-xs font-medium text-brown-medium transition-colors hover:border-accent"
               >
                 {tagDisplayName(tag.tag, locale)}
               </span>
@@ -477,7 +575,7 @@ export default function BeanDetailPage() {
 
       {/* Purchase */}
       {hasPurchase && (
-        <Card delay={280} className="border-t border-border-light py-6 md:py-8">
+        <Card delay={280} className="mt-4">
           <Overline>{t("purchaseInfo")}</Overline>
           <dl className="mt-2 divide-y divide-border-light">
             <InfoRow label={t("purchaseSource")} value={purchaseSourceLabel} />

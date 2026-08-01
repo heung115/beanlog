@@ -112,6 +112,9 @@
     "altitudeRange": "고도",
     "signature": "특징",
     "keyVarietals": "대표 품종",
+    "originFlavorGuide": "이 산지에서 기대할 수 있는 맛",
+    "originFlavorGuideHint": "일반적으로 자주 나타나는 향미와 질감이에요.",
+    "viewOriginGuide": "{country} 산지 가이드 보기",
     "purchaseOnline": "온라인",
     "purchaseRoastery": "로스터리 직영",
     "purchaseCafe": "카페",
@@ -153,6 +156,7 @@
     "searchPlaceholder": "원두, 로스터리, 메모 검색...",
     "filters": "필터",
     "clearFilters": "필터 초기화",
+    "removeFilter": "{label} {value} 필터 제거",
     "sortBy": "정렬",
     "sortNewest": "최신순",
     "sortScore": "점수 높은순",
@@ -165,6 +169,20 @@
     "allRoast": "배전",
     "results": "{count}개 기록",
     "loadMore": "더 보기"
+  },
+  "origins": {
+    "guide": "COFFEE ORIGIN GUIDE",
+    "backToJournal": "커피 기록으로",
+    "intro": "{country} 커피에서 자주 만나는 향미와 대표 재배 지역을 살펴보세요.",
+    "cupProfile": "대표적인 맛과 특징",
+    "cupProfileHint": "스페셜티 커피에서 흔히 기대할 수 있는 컵 프로필",
+    "growingConditions": "재배 정보",
+    "altitude": "대표 재배 고도",
+    "keyVarietals": "주요 품종",
+    "regions": "대표 생산 지역",
+    "regionsHint": "이 나라의 커피 산지로 자주 소개되는 지역",
+    "regionCount": "{count}개 지역",
+    "disclaimer": "산지 정보는 전반적인 경향을 설명합니다. 실제 맛은 세부 지역, 품종, 가공 방식, 로스팅과 추출에 따라 달라질 수 있어요."
   },
   "stats": {
     "title": "커피 통계",

@@ -283,6 +283,20 @@ export function findCountryPreset(country: string): OriginPresetData | undefined
   );
 }
 
+export function originSlug(country: string): string {
+  return country
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+}
+
+export function findCountryPresetBySlug(
+  slug: string
+): OriginPresetData | undefined {
+  return originPresets.find((preset) => originSlug(preset.country) === slug);
+}
+
 export function findRegionCoords(
   country: string,
   region: string

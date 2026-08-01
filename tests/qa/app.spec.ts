@@ -52,13 +52,17 @@ test("login uses POST, keeps credentials out of URL, and has no serious accessib
 
 test("30 records paginate without duplicates and all-data filter options are available", async ({ page }) => {
   await login(page);
-  await page.getByLabel("로스터리").selectOption({ label: "QA Boundary Roastery" });
+  await page.getByRole("button", { name: "필터" }).click();
+  await page.locator('select[aria-label="로스터리"]').selectOption({ label: "QA Boundary Roastery" });
   await expect(page.getByText("10개 기록")).toBeVisible();
+  await expect(
+    page.getByRole("button", { name: "로스터리 QA Boundary Roastery 필터 제거" })
+  ).toBeVisible();
 
-  const originFilter = page.getByLabel("산지");
+  const originFilter = page.locator('select[aria-label="산지"]');
   await expect(originFilter.locator('option[value="Vietnam"]')).toHaveCount(1);
 
-  const cards = page.locator('a[href*="/beans/"] h3');
+  const cards = page.locator("[data-bean-card] h3");
   await expect(cards).toHaveCount(10);
   await expect(page.getByRole("button", { name: "더 보기" })).toHaveCount(0);
   const names = await cards.allTextContents();
@@ -75,9 +79,45 @@ test("search handles PostgREST punctuation as plain text and recovers", async ({
   await expect(page.getByText(/#37 파나마 로스트 오리진/)).toBeVisible();
 });
 
+test("origin links open flavor and regional guidance", async ({ page }) => {
+  await login(page);
+  await page.getByRole("searchbox").fill("#12 에티오피아");
+  await expect(page.getByText("1개 기록")).toBeVisible();
+
+  const originGuideLink = page.getByRole("link", {
+    name: "에티오피아 산지 가이드 보기",
+  });
+  await expect(originGuideLink).toHaveText("에티오피아 산지 가이드 보기");
+  const originGuideLinkBox = await originGuideLink.boundingBox();
+  expect(originGuideLinkBox?.height).toBeGreaterThanOrEqual(40);
+  await originGuideLink.click();
+  await expect(page).toHaveURL(/\/ko\/origins\/ethiopia$/);
+  await expect(page.getByRole("heading", { level: 1, name: "에티오피아" })).toBeVisible();
+  await expect(page.getByText("화사한 꽃향", { exact: true })).toBeVisible();
+  await expect(page.getByText("예가체프", { exact: true })).toBeVisible();
+
+  await page.goto("/ko/explore");
+  await page.getByRole("searchbox").fill("#12 에티오피아");
+  await expect(page.getByText("1개 기록")).toBeVisible();
+  const beanCard = page.locator("[data-bean-card]").filter({
+    hasText: "#12 에티오피아",
+  });
+  await beanCard.locator('a[href*="/beans/"]').click();
+  await expect(page.getByTestId("origin-flavor-guide")).toContainText(
+    "화사한 꽃향, 시트러스, 베리, 차 같은 바디"
+  );
+  const detailOriginGuideLink = page.getByTestId("origin-detail-guide-link");
+  await expect(detailOriginGuideLink).toHaveText("에티오피아 산지 가이드 보기");
+  const detailOriginGuideLinkBox = await detailOriginGuideLink.boundingBox();
+  expect(detailOriginGuideLinkBox?.height).toBeGreaterThanOrEqual(40);
+  await detailOriginGuideLink.click();
+  await expect(page).toHaveURL(/\/ko\/origins\/ethiopia$/);
+});
+
 test("varietal filter separates multi-varietal records into single options", async ({ page }) => {
   await login(page);
-  const varietalFilter = page.getByLabel("품종");
+  await page.getByRole("button", { name: "필터" }).click();
+  const varietalFilter = page.locator('select[aria-label="품종"]');
 
   await expect(varietalFilter.locator('option[value="Catuai"]')).toHaveCount(1);
   await expect(varietalFilter.locator('option[value="Typica"]')).toHaveCount(1);
@@ -88,7 +128,9 @@ test("varietal filter separates multi-varietal records into single options", asy
 
   await varietalFilter.selectOption("Catuai");
   await expect(page.getByText("1개 기록")).toBeVisible();
-  await expect(page.getByText(/#15 태국 치앙 마이/)).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 3, name: /#15 태국 치앙 마이/ })
+  ).toBeVisible();
 });
 
 test("create form preserves roastery on save-and-continue and persists details", async ({ page }) => {
@@ -125,7 +167,7 @@ test("collapsed detail fields stay out of the DOM and expand on demand", async (
 test("coffee category badges meet WCAG AA text contrast", async ({ page }) => {
   await login(page);
   const colors = await page
-    .locator('a[href*="/beans/"] span[class*="bg-process-"], a[href*="/beans/"] span[class*="bg-roast-"]')
+    .locator('[data-bean-card] span[class*="bg-process-"], [data-bean-card] span[class*="bg-roast-"]')
     .evaluateAll((badges) => badges.map((badge) => getComputedStyle(badge).color));
 
   expect(colors.length).toBeGreaterThan(0);
@@ -144,26 +186,122 @@ test("coffee category badges meet WCAG AA text contrast", async ({ page }) => {
   await expectNoSeriousA11yViolations(page);
 });
 
-test("bean detail uses one canvas and keeps the overall score free of a top rule", async ({ page }) => {
+test("explore uses restrained corners for cards, filters, and labels", async ({ page }) => {
   await login(page);
-  const firstBeanCard = page
-    .locator('a[href*="/beans/"]')
-    .filter({ has: page.locator("h3") })
-    .first();
+  await page.getByRole("button", { name: "필터" }).click();
+
+  const firstCard = page.locator("[data-bean-card]").first();
+  const radii = await Promise.all([
+    page.getByRole("searchbox").evaluate((element) => getComputedStyle(element).borderRadius),
+    page.locator('select[aria-label="산지"]').evaluate((element) => getComputedStyle(element).borderRadius),
+    firstCard.evaluate((element) => getComputedStyle(element).borderRadius),
+  ]);
+  const labelRadii = await page
+    .locator('[data-bean-card] span[class*="bg-process-"], [data-bean-card] span[class*="bg-roast-"]')
+    .evaluateAll((labels) => labels.map((label) => getComputedStyle(label).borderRadius));
+
+  expect(new Set(radii)).toEqual(new Set(["2px"]));
+  expect(labelRadii.length).toBeGreaterThan(0);
+  expect(new Set(labelRadii)).toEqual(new Set(["2px"]));
+});
+
+test("explore progressively discloses aligned filters without overflow", async ({ page }) => {
+  await login(page);
+
+  const filterToggle = page.getByRole("button", { name: "필터" });
+  await expect(filterToggle).toHaveAttribute("aria-expanded", "false");
+  await expect(page.locator("#explore-filter-panel")).toHaveCount(0);
+  await expect(page.locator("main select")).toHaveCount(1);
+
+  await filterToggle.click();
+  await expect(filterToggle).toHaveAttribute("aria-expanded", "true");
+  await expect(page.locator("#explore-filter-panel")).toBeVisible();
+
+  const layout = await page.evaluate(() => {
+    const search = document.querySelector<HTMLElement>('main input[type="search"]');
+    const filterButton = document.querySelector<HTMLElement>(
+      'main button[aria-controls="explore-filter-panel"]'
+    );
+    const sort = document.querySelector<HTMLElement>('main select[aria-label="정렬"]');
+    const panel = document.querySelector<HTMLElement>("#explore-filter-panel");
+    const controls = Array.from(
+      document.querySelectorAll<HTMLElement>("#explore-filter-panel select")
+    );
+    if (!search || !filterButton || !sort || !panel) {
+      throw new Error("Missing explore filter controls");
+    }
+
+    const searchRect = search.getBoundingClientRect();
+    const filterButtonRect = filterButton.getBoundingClientRect();
+    const sortRect = sort.getBoundingClientRect();
+    const panelRect = panel.getBoundingClientRect();
+    const rects = controls.map((control) => {
+      const rect = control.getBoundingClientRect();
+      return {
+        label: control.getAttribute("aria-label"),
+        left: rect.left,
+        right: rect.right,
+        top: rect.top,
+        width: rect.width,
+      };
+    });
+
+    return {
+      toolbar: [searchRect, filterButtonRect, sortRect].map((rect) => ({
+        left: rect.left,
+        right: rect.right,
+        top: rect.top,
+        bottom: rect.bottom,
+      })),
+      panel: { left: panelRect.left, right: panelRect.right },
+      rects,
+      documentOverflow:
+        document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    };
+  });
+
+  expect(layout.rects).toHaveLength(6);
+  expect(layout.documentOverflow).toBe(0);
+  expect(new Set(layout.toolbar.map((rect) => Math.round(rect.top))).size).toBe(1);
+  expect(new Set(layout.toolbar.map((rect) => Math.round(rect.bottom))).size).toBe(1);
+  expect(layout.toolbar[1].left).toBeGreaterThan(layout.toolbar[0].right);
+  expect(layout.toolbar[2].left).toBeGreaterThan(layout.toolbar[1].right);
+  expect(new Set(layout.rects.map((rect) => Math.round(rect.top))).size).toBe(2);
+  expect(
+    Math.max(...layout.rects.map((rect) => rect.width)) -
+      Math.min(...layout.rects.map((rect) => rect.width))
+  ).toBeLessThanOrEqual(1);
+  expect(layout.rects[0].left).toBeCloseTo(layout.panel.left, 0);
+  expect(layout.rects[2].right).toBeCloseTo(layout.panel.right, 0);
+
+  for (const rowStart of [0, 3]) {
+    for (let index = rowStart + 1; index < rowStart + 3; index += 1) {
+      expect(layout.rects[index].left).toBeGreaterThan(layout.rects[index - 1].right);
+    }
+  }
+});
+
+test("bean detail uses white cards without a dark overall-score top rule", async ({ page }) => {
+  await login(page);
+  const firstBeanCard = page.locator('[data-bean-card] a[href*="/beans/"]').first();
   await firstBeanCard.click();
   await expect(page).toHaveURL(/\/beans\/(?!new(?:[/?#]|$))[^/?#]+/);
   await expect(page.getByTestId("bean-overall-score")).toBeVisible();
 
   const appearance = await page.evaluate(() => {
     const score = document.querySelector<HTMLElement>('[data-testid="bean-overall-score"]');
+    const title = document.querySelector<HTMLElement>("main h1");
     const sections = Array.from(
       document.querySelectorAll<HTMLElement>("[data-detail-section]")
     );
     if (!score) throw new Error("Missing overall score section");
+    if (!title) throw new Error("Missing bean title");
 
     const scoreStyle = getComputedStyle(score);
     return {
       bodyBackground: getComputedStyle(document.body).backgroundColor,
+      bodyFontFamily: getComputedStyle(document.body).fontFamily,
+      titleFontFamily: getComputedStyle(title).fontFamily,
       sectionBackgrounds: sections.map(
         (section) => getComputedStyle(section).backgroundColor
       ),
@@ -171,6 +309,7 @@ test("bean detail uses one canvas and keeps the overall score free of a top rule
         (section) => getComputedStyle(section).borderRadius
       ),
       scoreBorderTopWidth: scoreStyle.borderTopWidth,
+      scoreBorderTopColor: scoreStyle.borderTopColor,
     };
   });
 
@@ -185,13 +324,37 @@ test("bean detail uses one canvas and keeps the overall score free of a top rule
     },
     designTokens.colors.cream
   );
+  const expectedSurface = await page.evaluate(
+    (token) => {
+      const probe = document.createElement("span");
+      probe.style.backgroundColor = token;
+      document.body.appendChild(probe);
+      const computed = getComputedStyle(probe).backgroundColor;
+      probe.remove();
+      return computed;
+    },
+    designTokens.colors.surface
+  );
+  const expectedBorder = await page.evaluate(
+    (token) => {
+      const probe = document.createElement("span");
+      probe.style.borderTop = `1px solid ${token}`;
+      document.body.appendChild(probe);
+      const computed = getComputedStyle(probe).borderTopColor;
+      probe.remove();
+      return computed;
+    },
+    designTokens.colors.border
+  );
 
   expect(appearance.bodyBackground).toBe(expectedCanvas);
+  expect(appearance.titleFontFamily).toBe(appearance.bodyFontFamily);
   expect(new Set(appearance.sectionBackgrounds)).toEqual(
-    new Set(["rgba(0, 0, 0, 0)"])
+    new Set([expectedSurface])
   );
-  expect(new Set(appearance.sectionRadii)).toEqual(new Set(["0px"]));
-  expect(appearance.scoreBorderTopWidth).toBe("0px");
+  expect(new Set(appearance.sectionRadii)).toEqual(new Set(["2px"]));
+  expect(appearance.scoreBorderTopWidth).toBe("1px");
+  expect(appearance.scoreBorderTopColor).toBe(expectedBorder);
   await expectNoSeriousA11yViolations(page);
 });
 
@@ -237,9 +400,36 @@ test("@mobile repeated-entry form does not overflow horizontally", async ({ page
 
 test("@mobile filters and navigation provide comfortable touch targets", async ({ page }) => {
   await login(page);
-  const heights = await page.locator("main select, body > nav a").evaluateAll((elements) =>
+  const filterToggle = page.getByRole("button", { name: "필터" });
+  await expect(page.locator("#explore-filter-panel")).toHaveCount(0);
+  await filterToggle.click();
+
+  const heights = await page.locator("main select, main button[aria-controls], body > nav a").evaluateAll((elements) =>
     elements.map((element) => element.getBoundingClientRect().height)
   );
+  const widths = await page.evaluate(() => {
+    const search = document.querySelector<HTMLElement>('main input[type="search"]');
+    const filterButton = document.querySelector<HTMLElement>(
+      'main button[aria-controls="explore-filter-panel"]'
+    );
+    const sort = document.querySelector<HTMLElement>('main select[aria-label="정렬"]');
+    const detailFilters = Array.from(
+      document.querySelectorAll<HTMLElement>("#explore-filter-panel select")
+    );
+    if (!search || !filterButton || !sort) throw new Error("Missing mobile explore controls");
+    return {
+      search: search.getBoundingClientRect().width,
+      filter: filterButton.getBoundingClientRect().width,
+      sort: sort.getBoundingClientRect().width,
+      details: detailFilters.map((filter) => filter.getBoundingClientRect().width),
+      documentOverflow:
+        document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    };
+  });
   expect(heights.length).toBeGreaterThan(0);
   expect(Math.min(...heights)).toBeGreaterThanOrEqual(44);
+  expect(widths.filter).toBeCloseTo(widths.sort, 0);
+  expect(widths.details).toHaveLength(6);
+  expect(Math.max(...widths.details) - Math.min(...widths.details)).toBeLessThanOrEqual(1);
+  expect(widths.documentOverflow).toBe(0);
 });

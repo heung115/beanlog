@@ -32,11 +32,6 @@ const PROCESS_METHODS: ProcessMethod[] = [
 const ROAST_LEVELS: RoastLevel[] = ["light", "medium", "dark"];
 const BEAN_TYPES: BeanType[] = ["single_origin", "blend"];
 
-const CHEVRON =
-  "bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cpath%20fill%3D%22%238B7355%22%20d%3D%22M2%204l4%204%204-4%22%2F%3E%3C%2Fsvg%3E')]";
-const CHEVRON_ACTIVE =
-  "bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cpath%20fill%3D%22%23FAF7F2%22%20d%3D%22M2%204l4%204%204-4%22%2F%3E%3C%2Fsvg%3E')]";
-
 interface FilterChipProps {
   label: string;
   allLabel: string;
@@ -47,34 +42,46 @@ interface FilterChipProps {
 
 function FilterChip({ label, allLabel, value, options, onChange }: FilterChipProps) {
   const active = Boolean(value);
-  const selected = options.find((o) => o.value === value);
 
   return (
-    <select
-      aria-label={label}
-      value={value ?? ""}
-      onChange={(e) => onChange(e.target.value || undefined)}
-      className={cn(
-        "min-h-11 shrink-0 cursor-pointer appearance-none rounded-full border py-2 pl-3.5 pr-8 text-xs font-medium transition-colors duration-150",
-        "bg-no-repeat bg-[position:right_10px_center] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40",
-        active
-          ? cn("border-brown bg-brown text-cream", CHEVRON_ACTIVE)
-          : cn("border-border bg-surface text-brown-medium hover:border-brown-light", CHEVRON)
-      )}
-    >
-      <option value="">{active && selected ? selected.label : allLabel}</option>
-      {options.map((o) => (
-        <option key={o.value} value={o.value}>
-          {o.label}
-        </option>
-      ))}
-    </select>
+    <div className="relative min-w-0">
+      <select
+        aria-label={label}
+        value={value ?? ""}
+        onChange={(e) => onChange(e.target.value || undefined)}
+        className={cn(
+          "min-h-11 w-full cursor-pointer appearance-none rounded-sm border py-2 pl-3 pr-9 text-xs font-medium transition-colors duration-150",
+          "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40",
+          active
+            ? "border-brown bg-brown text-cream"
+            : "border-border bg-surface text-brown-medium hover:border-brown-light"
+        )}
+      >
+        <option value="">{allLabel}</option>
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+      <svg
+        aria-hidden="true"
+        className={cn(
+          "pointer-events-none absolute right-3 top-1/2 h-3 w-3 -translate-y-1/2",
+          active ? "text-cream" : "text-brown-light"
+        )}
+        viewBox="0 0 12 12"
+        fill="none"
+      >
+        <path d="m2.5 4.25 3.5 3.5 3.5-3.5" stroke="currentColor" strokeWidth="1.5" />
+      </svg>
+    </div>
   );
 }
 
 function SkeletonCard() {
   return (
-    <div className="animate-pulse rounded-lg border border-border bg-surface p-5">
+    <div className="animate-pulse rounded-sm border border-border bg-surface p-5">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <div className="h-5 w-2/3 rounded bg-cream-dark" />
@@ -84,8 +91,8 @@ function SkeletonCard() {
         <div className="h-7 w-12 rounded bg-cream-dark" />
       </div>
       <div className="mt-4 flex gap-1.5">
-        <div className="h-5 w-14 rounded-full bg-cream-dark" />
-        <div className="h-5 w-14 rounded-full bg-cream-dark" />
+        <div className="h-5 w-14 rounded-sm bg-cream-dark" />
+        <div className="h-5 w-14 rounded-sm bg-cream-dark" />
       </div>
       <div className="mt-4 h-px bg-border-light" />
       <div className="mt-3 flex justify-between">
@@ -129,7 +136,7 @@ function EmptyState({
       ) : (
         <Link
           href="/beans/new"
-          className="mt-6 inline-flex items-center justify-center rounded-md bg-brown px-6 py-3 text-base font-medium text-cream transition-colors duration-150 hover:bg-brown-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
+          className="mt-6 inline-flex items-center justify-center rounded-sm bg-brown px-6 py-3 text-base font-medium text-cream transition-colors duration-150 hover:bg-brown-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
         >
           {t("addFirst")}
         </Link>
@@ -158,6 +165,7 @@ export function ExploreClient({
   const locale = useLocale();
 
   const [searchInput, setSearchInput] = useState("");
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState<BeanFilters>({
     sort_by: "consumed_at",
     sort_order: "desc",
@@ -332,6 +340,71 @@ export function ExploreClient({
     label: b === "blend" ? tBeans("blend") : tBeans("singleOrigin"),
   }));
 
+  const activeFilterItems = [
+    {
+      key: "origin_country",
+      label: t("allOrigins"),
+      value: filters.origin_country,
+      valueLabel: originOptions.find((option) => option.value === filters.origin_country)?.label,
+    },
+    {
+      key: "process_method",
+      label: t("allProcess"),
+      value: filters.process_method,
+      valueLabel: processOptions.find((option) => option.value === filters.process_method)?.label,
+    },
+    {
+      key: "varietal",
+      label: t("allVarietal"),
+      value: filters.varietal,
+      valueLabel: varietalOptions.find((option) => option.value === filters.varietal)?.label,
+    },
+    {
+      key: "roastery",
+      label: t("allRoastery"),
+      value: filters.roastery,
+      valueLabel: roasteryOptions.find((option) => option.value === filters.roastery)?.label,
+    },
+    {
+      key: "bean_type",
+      label: t("allType"),
+      value: filters.bean_type,
+      valueLabel: typeOptions.find((option) => option.value === filters.bean_type)?.label,
+    },
+    {
+      key: "roast_level",
+      label: t("allRoast"),
+      value: filters.roast_level,
+      valueLabel: roastOptions.find((option) => option.value === filters.roast_level)?.label,
+    },
+  ].filter(
+    (item): item is typeof item & { value: string; valueLabel: string } =>
+      Boolean(item.value && item.valueLabel)
+  );
+
+  const removeFilter = (key: string) => {
+    switch (key) {
+      case "origin_country":
+        updateFilter("origin_country", undefined);
+        break;
+      case "process_method":
+        updateFilter("process_method", undefined);
+        break;
+      case "varietal":
+        updateFilter("varietal", undefined);
+        break;
+      case "roastery":
+        updateFilter("roastery", undefined);
+        break;
+      case "bean_type":
+        updateFilter("bean_type", undefined);
+        break;
+      case "roast_level":
+        updateFilter("roast_level", undefined);
+        break;
+    }
+  };
+
   return (
     <div className="mx-auto w-full max-w-4xl">
       {/* Title */}
@@ -341,105 +414,167 @@ export function ExploreClient({
         </h1>
       </header>
 
-      {/* Search */}
-      <div className="relative">
-        <svg
-          className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-brown-light/50"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <circle cx="11" cy="11" r="7" />
-          <path d="M21 21l-4.35-4.35" />
-        </svg>
-        <input
-          type="search"
-          disabled={!hydrated}
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          placeholder={t("searchPlaceholder")}
-          aria-label={t("search")}
-          className={cn(
-            "w-full rounded-md border border-border bg-surface py-2.5 pl-10 pr-3 text-sm text-brown",
-            "placeholder:text-brown-light/40 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/30",
-            "transition-colors duration-150 disabled:cursor-wait disabled:opacity-70"
-          )}
-        />
-      </div>
-
-      {/* Filter chips + sort */}
-      <div className="mt-2.5 flex items-center gap-2">
-        <div className="flex flex-1 gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          <FilterChip
-            label={t("allOrigins")}
-            allLabel={t("allOrigins")}
-            value={filters.origin_country}
-            options={originOptions}
-            onChange={(v) => updateFilter("origin_country", v)}
-          />
-          <FilterChip
-            label={t("allProcess")}
-            allLabel={t("allProcess")}
-            value={filters.process_method}
-            options={processOptions}
-            onChange={(v) => updateFilter("process_method", v as ProcessMethod | undefined)}
-          />
-          <FilterChip
-            label={t("allVarietal")}
-            allLabel={t("allVarietal")}
-            value={filters.varietal}
-            options={varietalOptions}
-            onChange={(v) => updateFilter("varietal", v)}
-          />
-          <FilterChip
-            label={t("allRoastery")}
-            allLabel={t("allRoastery")}
-            value={filters.roastery}
-            options={roasteryOptions}
-            onChange={(v) => updateFilter("roastery", v)}
-          />
-          <FilterChip
-            label={t("allType")}
-            allLabel={t("allType")}
-            value={filters.bean_type}
-            options={typeOptions}
-            onChange={(v) => updateFilter("bean_type", v as BeanType | undefined)}
-          />
-          <FilterChip
-            label={t("allRoast")}
-            allLabel={t("allRoast")}
-            value={filters.roast_level}
-            options={roastOptions}
-            onChange={(v) => updateFilter("roast_level", v as RoastLevel | undefined)}
+      {/* Keep the default toolbar small; detailed criteria open only when needed. */}
+      <div className="grid grid-cols-2 gap-2 md:grid-cols-[minmax(0,1fr)_auto_auto]">
+        <div className="relative col-span-2 md:col-span-1">
+          <svg
+            className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-brown-light/50"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <circle cx="11" cy="11" r="7" />
+            <path d="M21 21l-4.35-4.35" />
+          </svg>
+          <input
+            type="search"
+            disabled={!hydrated}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            placeholder={t("searchPlaceholder")}
+            aria-label={t("search")}
+            className={cn(
+              "min-h-11 w-full rounded-sm border border-border bg-surface py-2.5 pl-10 pr-3 text-sm text-brown",
+              "placeholder:text-brown-light/40 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/30",
+              "transition-colors duration-150 disabled:cursor-wait disabled:opacity-70"
+            )}
           />
         </div>
 
-        <select
-          aria-label={t("sortBy")}
-          value={sortValue}
-          onChange={(e) => handleSortChange(e.target.value)}
+        <button
+          type="button"
+          aria-expanded={filtersOpen}
+          aria-controls="explore-filter-panel"
+          onClick={() => setFiltersOpen((open) => !open)}
           className={cn(
-            "min-h-11 shrink-0 cursor-pointer appearance-none rounded-md border border-border bg-surface py-2 pl-3 pr-8 text-xs font-medium text-brown-medium",
-            "bg-no-repeat bg-[position:right_8px_center] transition-colors duration-150 hover:border-brown-light",
+            "inline-flex min-h-11 items-center justify-center gap-2 rounded-sm border px-3 text-xs font-medium transition-colors duration-150",
             "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40",
-            CHEVRON
+            filtersOpen
+              ? "border-brown bg-brown text-cream"
+              : "border-border bg-surface text-brown-medium hover:border-brown-light"
           )}
         >
-          <option value="newest">{t("sortNewest")}</option>
-          <option value="score">{t("sortScore")}</option>
-          <option value="name">{t("sortName")}</option>
-        </select>
+          <svg aria-hidden="true" className="h-4 w-4" viewBox="0 0 16 16" fill="none">
+            <path d="M2 4h12M4.5 8h7M6.5 12h3" stroke="currentColor" strokeWidth="1.5" />
+          </svg>
+          <span>{t("filters")}</span>
+          {activeFilterItems.length > 0 && (
+            <span className="border-l border-current/30 pl-2 tabular-nums">
+              {activeFilterItems.length}
+            </span>
+          )}
+        </button>
+
+        <div className="relative min-w-0 md:w-36">
+          <select
+            aria-label={t("sortBy")}
+            value={sortValue}
+            onChange={(e) => handleSortChange(e.target.value)}
+            className={cn(
+              "min-h-11 w-full cursor-pointer appearance-none rounded-sm border border-border bg-surface py-2 pl-3 pr-9 text-xs font-medium text-brown-medium",
+              "transition-colors duration-150 hover:border-brown-light focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+            )}
+          >
+            <option value="newest">{t("sortNewest")}</option>
+            <option value="score">{t("sortScore")}</option>
+            <option value="name">{t("sortName")}</option>
+          </select>
+          <svg
+            aria-hidden="true"
+            className="pointer-events-none absolute right-3 top-1/2 h-3 w-3 -translate-y-1/2 text-brown-light"
+            viewBox="0 0 12 12"
+            fill="none"
+          >
+            <path d="m2.5 4.25 3.5 3.5 3.5-3.5" stroke="currentColor" strokeWidth="1.5" />
+          </svg>
+        </div>
       </div>
+
+      {filtersOpen && (
+        <div id="explore-filter-panel" className="mt-3 border-y border-border-light py-3">
+          <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
+            <FilterChip
+              label={t("allOrigins")}
+              allLabel={t("allOrigins")}
+              value={filters.origin_country}
+              options={originOptions}
+              onChange={(v) => updateFilter("origin_country", v)}
+            />
+            <FilterChip
+              label={t("allProcess")}
+              allLabel={t("allProcess")}
+              value={filters.process_method}
+              options={processOptions}
+              onChange={(v) => updateFilter("process_method", v as ProcessMethod | undefined)}
+            />
+            <FilterChip
+              label={t("allVarietal")}
+              allLabel={t("allVarietal")}
+              value={filters.varietal}
+              options={varietalOptions}
+              onChange={(v) => updateFilter("varietal", v)}
+            />
+            <FilterChip
+              label={t("allRoastery")}
+              allLabel={t("allRoastery")}
+              value={filters.roastery}
+              options={roasteryOptions}
+              onChange={(v) => updateFilter("roastery", v)}
+            />
+            <FilterChip
+              label={t("allType")}
+              allLabel={t("allType")}
+              value={filters.bean_type}
+              options={typeOptions}
+              onChange={(v) => updateFilter("bean_type", v as BeanType | undefined)}
+            />
+            <FilterChip
+              label={t("allRoast")}
+              allLabel={t("allRoast")}
+              value={filters.roast_level}
+              options={roastOptions}
+              onChange={(v) => updateFilter("roast_level", v as RoastLevel | undefined)}
+            />
+          </div>
+        </div>
+      )}
+
+      {activeFilterItems.length > 0 && (
+        <div className="mt-3 flex items-start justify-between gap-4">
+          <div className="flex flex-wrap gap-x-4 gap-y-2">
+            {activeFilterItems.map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                aria-label={t("removeFilter", { label: item.label, value: item.valueLabel })}
+                onClick={() => removeFilter(item.key)}
+                className="inline-flex min-h-8 items-center gap-1.5 border-b border-border-light text-xs text-brown-medium transition-colors duration-150 hover:border-brown hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+              >
+                <span className="text-brown-light">{item.label}</span>
+                <span>{item.valueLabel}</span>
+                <span aria-hidden="true">×</span>
+              </button>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={clearFilters}
+            className="shrink-0 py-1.5 text-xs font-medium text-accent transition-colors duration-150 hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+          >
+            {t("clearFilters")}
+          </button>
+        </div>
+      )}
 
       {/* Result count / clear */}
       <div className="mt-5 flex items-center justify-between">
         <p className="text-xs text-brown-light">
           {loading ? t("results", { count: 0 }) : t("results", { count: total })}
         </p>
-        {hasActiveFilters && (
+        {filters.search && activeFilterItems.length === 0 && (
           <button
             onClick={clearFilters}
             className="text-xs font-medium text-accent transition-colors duration-150 hover:text-brown"
