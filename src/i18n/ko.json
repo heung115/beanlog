@@ -6,6 +6,7 @@
   "nav": {
     "explore": "기록",
     "add": "기록하기",
+    "origins": "산지 정보",
     "stats": "통계",
     "settings": "설정",
     "account": "내 계정",
@@ -175,6 +176,10 @@
   },
   "origins": {
     "guide": "COFFEE ORIGIN GUIDE",
+    "indexTitle": "커피 산지 정보",
+    "indexIntro": "나라별 대표 향미와 재배 지역을 비교하고 궁금한 산지를 살펴보세요.",
+    "indexCount": "{count}개 산지",
+    "viewCountry": "{country} 자세히 보기",
     "backToJournal": "커피 기록으로",
     "intro": "{country} 커피에서 자주 만나는 향미와 대표 재배 지역을 살펴보세요.",
     "cupProfile": "대표적인 맛과 특징",

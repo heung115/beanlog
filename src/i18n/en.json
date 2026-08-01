@@ -6,6 +6,7 @@
   "nav": {
     "explore": "Journal",
     "add": "Log",
+    "origins": "Origins",
     "stats": "Stats",
     "settings": "Settings",
     "account": "Account",
@@ -175,6 +176,10 @@
   },
   "origins": {
     "guide": "COFFEE ORIGIN GUIDE",
+    "indexTitle": "Coffee origins",
+    "indexIntro": "Compare typical flavors and growing regions, then explore any origin in detail.",
+    "indexCount": "{count} origins",
+    "viewCountry": "Explore {country}",
     "backToJournal": "Back to journal",
     "intro": "Explore the flavors and major growing regions commonly associated with coffee from {country}.",
     "cupProfile": "Typical flavors and character",

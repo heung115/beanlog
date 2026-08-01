@@ -81,17 +81,24 @@ test("search handles PostgREST punctuation as plain text and recovers", async ({
   ).toBeVisible();
 });
 
-test("origin links open flavor and regional guidance", async ({ page }) => {
+test("origin hub opens flavor and regional guidance without card shortcuts", async ({ page }) => {
   await login(page);
   await page.getByRole("searchbox").fill("#12 에티오피아");
   await expect(page.getByText("1개 기록")).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "에티오피아 산지 가이드 보기" })
+  ).toHaveCount(0);
+
+  const originTab = page.getByRole("link", { name: "산지 정보", exact: true }).first();
+  await originTab.click();
+  await expect(page).toHaveURL(/\/ko\/origins$/);
+  await expect(page.getByRole("heading", { level: 1, name: "커피 산지 정보" })).toBeVisible();
+  await expect(page.getByText("20개 산지")).toBeVisible();
 
   const originGuideLink = page.getByRole("link", {
-    name: "에티오피아 산지 가이드 보기",
+    name: "에티오피아 자세히 보기",
   });
-  await expect(originGuideLink).toHaveText("에티오피아 산지 가이드 보기");
-  const originGuideLinkBox = await originGuideLink.boundingBox();
-  expect(originGuideLinkBox?.height).toBeGreaterThanOrEqual(40);
+  await expect(originGuideLink).toBeVisible();
   await originGuideLink.click();
   await expect(page).toHaveURL(/\/ko\/origins\/ethiopia$/);
   await expect(page.getByRole("heading", { level: 1, name: "에티오피아" })).toBeVisible();

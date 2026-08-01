@@ -25,7 +25,7 @@ export default async function OriginDetailPage({
   return (
     <article className="mx-auto max-w-2xl pb-8">
       <Link
-        href={`/${locale}/explore`}
+        href={`/${locale}/origins`}
         className="group inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-brown-light transition-colors hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
       >
         <svg
@@ -44,7 +44,7 @@ export default async function OriginDetailPage({
             strokeLinejoin="round"
           />
         </svg>
-        {t("backToJournal")}
+        {t("indexTitle")}
       </Link>
 
       <header className="animate-rise pb-8 pt-4 md:pb-10 md:pt-7">

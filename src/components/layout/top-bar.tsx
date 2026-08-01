@@ -17,6 +17,7 @@ export function TopBar({ user }: TopBarProps) {
   const links = [
     { href: "/explore", label: t("explore") },
     { href: "/beans/new", label: t("add") },
+    { href: "/origins", label: t("origins") },
     { href: "/stats", label: t("stats") },
     { href: "/settings", label: t("settings") },
   ];

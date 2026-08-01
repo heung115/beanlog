@@ -5,10 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import type { BeanWithTags } from "@/types/database";
 import { ScoreDisplay } from "@/components/ui/score-display";
 import { tagDisplayName } from "@/components/beans/tag-input";
-import {
-  findCountryPreset,
-  originSlug,
-} from "@/data/origin-presets";
+import { findCountryPreset } from "@/data/origin-presets";
 import { cn, formatDate } from "@/lib/utils";
 
 interface BeanCardProps {
@@ -32,9 +29,6 @@ export function BeanCard({ bean, view = "grid" }: BeanCardProps) {
       ? countryPreset.countryKo
       : countryPreset.country
     : bean.origin_country ?? "";
-  const originHref = countryPreset
-    ? `/${locale}/origins/${originSlug(countryPreset.country)}`
-    : null;
 
   return (
     <article
@@ -63,44 +57,6 @@ export function BeanCard({ bean, view = "grid" }: BeanCardProps) {
               {countryName}
               {bean.origin_region ? ` · ${bean.origin_region}` : ""}
             </p>
-            {originHref && (
-              <Link
-                href={originHref}
-                className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-sm border border-border bg-surface-warm px-3 text-xs font-semibold text-accent transition-colors hover:border-accent hover:bg-cream-dark hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
-              >
-                <svg
-                  aria-hidden="true"
-                  width="14"
-                  height="14"
-                  viewBox="0 0 16 16"
-                  fill="none"
-                >
-                  <path
-                    d="M8 14s4-3.8 4-7a4 4 0 10-8 0c0 3.2 4 7 4 7z"
-                    stroke="currentColor"
-                    strokeWidth="1.3"
-                    strokeLinejoin="round"
-                  />
-                  <circle cx="8" cy="7" r="1.35" stroke="currentColor" strokeWidth="1.2" />
-                </svg>
-                {t("viewOriginGuide", { country: countryName })}
-                <svg
-                  aria-hidden="true"
-                  width="11"
-                  height="11"
-                  viewBox="0 0 12 12"
-                  fill="none"
-                >
-                  <path
-                    d="M4 2.5L7.5 6 4 9.5"
-                    stroke="currentColor"
-                    strokeWidth="1.25"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </Link>
-            )}
           </div>
           <ScoreDisplay score={bean.overall_score} className="shrink-0" />
         </div>

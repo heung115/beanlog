@@ -12,6 +12,7 @@ export function BottomNav() {
   const links = [
     { href: "/explore", label: t("explore"), icon: JournalIcon },
     { href: "/beans/new", label: t("add"), icon: PlusIcon, primary: true },
+    { href: "/origins", label: t("origins"), icon: OriginIcon },
     { href: "/stats", label: t("stats"), icon: ChartIcon },
     { href: "/settings", label: t("settings"), icon: GearIcon },
   ];
@@ -26,7 +27,7 @@ export function BottomNav() {
               key={href}
               href={href}
               className={cn(
-                "flex min-h-14 min-w-12 flex-col items-center justify-center gap-0.5 px-3 py-2 text-[10px] font-medium transition-colors",
+                "flex min-h-14 min-w-12 flex-1 flex-col items-center justify-center gap-0.5 px-1 py-2 text-[10px] font-medium transition-colors",
                 primary
                   ? "text-accent"
                   : isActive
@@ -72,6 +73,15 @@ function ChartIcon({ className }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
       <path d="M18 20V10M12 20V4M6 20v-6" />
+    </svg>
+  );
+}
+
+function OriginIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 21s6-5.2 6-11a6 6 0 10-12 0c0 5.8 6 11 6 11z" />
+      <circle cx="12" cy="10" r="2" />
     </svg>
   );
 }
