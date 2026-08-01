@@ -76,7 +76,9 @@ test("search handles PostgREST punctuation as plain text and recovers", async ({
   await expect(page.getByText("0개 기록")).toBeVisible();
   await search.fill("#37 파나마");
   await expect(page.getByText("1개 기록")).toBeVisible();
-  await expect(page.getByText(/#37 파나마 로스트 오리진/)).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: /#37 파나마 로스트 오리진/ })
+  ).toBeVisible();
 });
 
 test("origin links open flavor and regional guidance", async ({ page }) => {
@@ -348,7 +350,7 @@ test("explore progressively discloses aligned filters without overflow", async (
 
 test("bean detail uses white cards without a dark overall-score top rule", async ({ page }) => {
   await login(page);
-  const firstBeanCard = page.locator('[data-bean-card] a[href*="/beans/"]').first();
+  const firstBeanCard = page.locator('[data-bean-card] h3 a[href*="/beans/"]').first();
   await firstBeanCard.click();
   await expect(page).toHaveURL(/\/beans\/(?!new(?:[/?#]|$))[^/?#]+/);
   await expect(page.getByTestId("bean-overall-score")).toBeVisible();
@@ -428,7 +430,7 @@ test("bean detail keeps review and cup notes before origin guidance", async ({ p
   await page.getByRole("searchbox").fill("#11 브라질");
   const beanCard = page.locator("[data-bean-card]").filter({ hasText: "#11 브라질" });
   await expect(beanCard).toBeVisible();
-  await beanCard.locator('a[href*="/beans/"]').click();
+  await beanCard.locator('h3 a[href*="/beans/"]').click();
 
   const score = page.getByTestId("bean-overall-score");
   const cupNotes = page.getByTestId("bean-cup-notes");
@@ -544,7 +546,11 @@ test("native forms work with JavaScript disabled", async ({ browser }) => {
     .evaluate((button: HTMLButtonElement) => button.click());
   await expect(page).toHaveURL(/\/ko\/explore$/);
   await expect(
-    page.getByRole("link", { name: /\[QA:native\] JS 비활성 저장 QA Native Roastery/ }).first()
+    page
+      .locator("[data-bean-card]")
+      .filter({ hasText: "[QA:native] JS 비활성 저장" })
+      .filter({ hasText: "QA Native Roastery" })
+      .first()
   ).toBeVisible();
   await context.close();
 });

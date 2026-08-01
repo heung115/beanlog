@@ -46,20 +46,17 @@ export function BeanCard({ bean, view = "grid" }: BeanCardProps) {
         view === "grid" ? "min-h-64" : "min-h-0"
       )}
     >
-      <Link
-        href={`/${locale}/beans/${bean.id}`}
-        aria-label={bean.name}
-        className="absolute inset-0 z-0 rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
-      >
-        <span className="sr-only">{bean.name}</span>
-      </Link>
-
-      <div className="pointer-events-none relative z-10 flex h-full flex-1 flex-col">
+      <div className="relative z-10 flex h-full flex-1 flex-col">
         {/* Name / roastery / origin + score */}
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <h3 className="line-clamp-2 font-display text-lg font-bold leading-snug text-brown transition-colors duration-150 group-hover:text-accent">
-              {bean.name}
+              <Link
+                href={`/${locale}/beans/${bean.id}`}
+                className="rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+              >
+                {bean.name}
+              </Link>
             </h3>
             <p className="mt-1 truncate text-sm text-brown-light">{bean.roastery}</p>
             <p className="mt-2 text-xs font-medium text-brown-light">
@@ -69,7 +66,7 @@ export function BeanCard({ bean, view = "grid" }: BeanCardProps) {
             {originHref && (
               <Link
                 href={originHref}
-                className="pointer-events-auto relative z-20 mt-3 inline-flex min-h-10 items-center gap-2 rounded-sm border border-border bg-surface-warm px-3 text-xs font-semibold text-accent transition-colors hover:border-accent hover:bg-cream-dark hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+                className="mt-3 inline-flex min-h-10 items-center gap-2 rounded-sm border border-border bg-surface-warm px-3 text-xs font-semibold text-accent transition-colors hover:border-accent hover:bg-cream-dark hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
               >
                 <svg
                   aria-hidden="true"
