@@ -30,7 +30,7 @@ export default async function OriginsPage({
         </div>
       </header>
 
-      <ul className="grid gap-px border-b border-border bg-border sm:grid-cols-2">
+      <ul className="mt-6 grid gap-4 sm:grid-cols-2 md:mt-8 md:gap-5">
         {originPresets.map((preset, index) => {
           const countryName = isKorean ? preset.countryKo : preset.country;
           const secondaryName = isKorean ? preset.country : preset.countryKo;
@@ -41,11 +41,11 @@ export default async function OriginsPage({
             .join(" · ");
 
           return (
-            <li key={preset.country} className="bg-cream">
+            <li key={preset.country}>
               <Link
                 href={`/${locale}/origins/${originSlug(preset.country)}`}
                 aria-label={t("viewCountry", { country: countryName })}
-                className="group flex h-full min-h-52 flex-col bg-surface px-5 py-5 transition-colors hover:bg-surface-warm focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/40 md:px-6 md:py-6"
+                className="group flex h-full min-h-64 flex-col rounded-sm border border-border bg-surface px-5 py-5 transition-colors hover:border-accent hover:bg-surface-warm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 md:px-6 md:py-6"
               >
                 <div className="flex items-start justify-between gap-4">
                   <div>
@@ -62,14 +62,19 @@ export default async function OriginsPage({
                   </span>
                 </div>
 
-                <p className="mt-5 text-sm font-medium leading-relaxed text-brown">
+                <p className="mt-6 text-sm font-medium leading-6 text-brown">
                   {signature}
                 </p>
-                <p className="mt-3 text-xs leading-relaxed text-brown-light">
-                  {regions}
-                </p>
+                <div className="mt-6">
+                  <p className="text-[11px] font-medium text-brown-light">
+                    {t("regions")}
+                  </p>
+                  <p className="mt-2 text-xs leading-5 text-brown-medium">
+                    {regions}
+                  </p>
+                </div>
 
-                <span className="mt-auto flex items-center justify-between border-t border-border-light pt-4 text-xs font-semibold text-accent">
+                <span className="mt-auto flex items-center justify-between pt-7 text-xs font-semibold text-accent">
                   {t("viewCountry", { country: countryName })}
                   <svg aria-hidden="true" width="14" height="14" viewBox="0 0 14 14" fill="none">
                     <path d="M5 2.5L9.5 7 5 11.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
