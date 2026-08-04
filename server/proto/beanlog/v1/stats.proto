@@ -1,0 +1,41 @@
+syntax = "proto3";
+
+package beanlog.v1;
+
+option go_package = "beanlog-server/gen/beanlog/v1;beanlogv1";
+
+// StatsService는 사용자의 원두 기록 집계를 제공한다.
+// 읽기 전용이라 gRPC 학습용 첫 서비스로 적합하다.
+service StatsService {
+  // GetStats는 현재 인증된 사용자의 원두 통계를 반환한다.
+  rpc GetStats(GetStatsRequest) returns (GetStatsResponse);
+}
+
+message GetStatsRequest {
+  // 현재는 추가 필터가 없지만, 확장성을 위해 빈 요청 메시지를 둔다.
+  // 예: 기간 필터, 원산지 필터 등을 나중에 추가.
+}
+
+message GetStatsResponse {
+  int32 total = 1;
+  double avg_score = 2;
+  BestBean best = 3;
+  string top_origin = 4;
+  string top_process = 5;
+  repeated CountEntry by_origin = 6;
+  repeated CountEntry by_process = 7;
+  repeated CountEntry by_varietal = 8;
+  repeated CountEntry by_month = 9;
+  repeated CountEntry score_dist = 10;
+}
+
+message BestBean {
+  string name = 1;
+  string roastery = 2;
+  double score = 3;
+}
+
+message CountEntry {
+  string key = 1;
+  int32 count = 2;
+}

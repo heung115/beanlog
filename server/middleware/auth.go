@@ -135,8 +135,64 @@ func (kp *keyProvider) refresh() error {
 	return nil
 }
 
+// TokenVerifier validates Supabase-issued ES256 JWTs against a JWKS endpoint.
+// It is transport-agnostic so the REST (Gin) and gRPC layers share one set of
+// signature, issuer, audience, and role checks instead of duplicating them.
+type TokenVerifier struct {
+	keys   *keyProvider
+	issuer string
+}
+
+func NewTokenVerifier(jwksURL, issuer string) *TokenVerifier {
+	return &TokenVerifier{
+		keys:   newKeyProvider(jwksURL),
+		issuer: issuer,
+	}
+}
+
+// Verify validates tokenStr (a raw JWT without the "Bearer " prefix) and
+// returns the authenticated user id (the JWT subject). It enforces ES256,
+// a known kid, required expiration, the configured issuer, the
+// "authenticated" audience, and the "authenticated" role claim.
+func (v *TokenVerifier) Verify(tokenStr string) (string, error) {
+	token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
+		// Verify signing method is ES256
+		if t.Method.Alg() != jwt.SigningMethodES256.Alg() {
+			return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
+		}
+		kid, _ := t.Header["kid"].(string)
+		if kid == "" {
+			return nil, fmt.Errorf("missing kid in token header")
+		}
+		return v.keys.getKey(kid)
+	},
+		jwt.WithValidMethods([]string{jwt.SigningMethodES256.Alg()}),
+		jwt.WithExpirationRequired(),
+		jwt.WithIssuer(v.issuer),
+		jwt.WithAudience("authenticated"),
+	)
+	if err != nil || !token.Valid {
+		return "", fmt.Errorf("invalid token")
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return "", fmt.Errorf("invalid claims")
+	}
+
+	sub, _ := claims["sub"].(string)
+	if sub == "" {
+		return "", fmt.Errorf("missing subject")
+	}
+	role, _ := claims["role"].(string)
+	if role != "authenticated" {
+		return "", fmt.Errorf("invalid role")
+	}
+	return sub, nil
+}
+
 func AuthRequired(jwksURL, issuer string) gin.HandlerFunc {
-	kp := newKeyProvider(jwksURL)
+	verifier := NewTokenVerifier(jwksURL, issuer)
 
 	return func(c *gin.Context) {
 		header := c.GetHeader("Authorization")
@@ -151,45 +207,13 @@ func AuthRequired(jwksURL, issuer string) gin.HandlerFunc {
 			return
 		}
 
-		token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
-			// Verify signing method is ES256
-			if t.Method.Alg() != jwt.SigningMethodES256.Alg() {
-				return nil, fmt.Errorf("unexpected signing method: %v", t.Header["alg"])
-			}
-			kid, _ := t.Header["kid"].(string)
-			if kid == "" {
-				return nil, fmt.Errorf("missing kid in token header")
-			}
-			return kp.getKey(kid)
-		},
-			jwt.WithValidMethods([]string{jwt.SigningMethodES256.Alg()}),
-			jwt.WithExpirationRequired(),
-			jwt.WithIssuer(issuer),
-			jwt.WithAudience("authenticated"),
-		)
-		if err != nil || !token.Valid {
+		userID, err := verifier.Verify(tokenStr)
+		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
 			return
 		}
 
-		claims, ok := token.Claims.(jwt.MapClaims)
-		if !ok {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid claims"})
-			return
-		}
-
-		sub, _ := claims["sub"].(string)
-		if sub == "" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "missing subject"})
-			return
-		}
-		role, _ := claims["role"].(string)
-		if role != "authenticated" {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid role"})
-			return
-		}
-
-		c.Set(UserIDKey, sub)
+		c.Set(UserIDKey, userID)
 		c.Next()
 	}
 }
