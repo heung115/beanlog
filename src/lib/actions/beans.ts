@@ -4,15 +4,14 @@ import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import type { BeanFormData } from "@/types/database";
+import type { BeanFormData, BeanWithTags } from "@/types/database";
 import {
   beanFiltersSchema,
   beanFormSchema,
   beanIdSchema,
 } from "@/lib/validation/beans";
-import { splitVarietals } from "@/lib/coffee/varietals";
+import { apiFetch } from "@/lib/api/client";
 
-const originIdSchema = z.number().int().positive();
 const profileUpdateSchema = z.object({
   displayName: z.string().trim().min(1).max(50),
   locale: z.enum(["ko", "en"]),
@@ -37,130 +36,23 @@ const nativeBeanSchema = z.object({
   locale: z.enum(["ko", "en"]).default("ko"),
 });
 
-type OriginSelection = {
-  origin_country: string | null;
-  origin_country_id: number | null;
-  origin_region: string | null;
-  origin_region_id: number | null;
-  origin_subregions: string[];
-  origin_entity_id: number | null;
-  farm_producer: string | null;
-  origin_lat: number | null;
-  origin_lng: number | null;
+// Go API response shapes (snake_case, matching server/models).
+type GoCountEntry = { key: string; count: number };
+type GoStats = {
+  total: number;
+  avg_score: number;
+  best: { name: string; roastery: string; score: number } | null;
+  top_origin: GoCountEntry | null;
+  top_process: GoCountEntry | null;
+  by_origin: GoCountEntry[] | null;
+  by_process: GoCountEntry[] | null;
+  by_varietal: GoCountEntry[] | null;
+  by_month: GoCountEntry[] | null;
+  score_dist: GoCountEntry[] | null;
 };
 
-function nullableText(value: string | undefined): string | null {
-  const trimmed = value?.trim();
-  return trimmed || null;
-}
-
-/**
- * Accept direct entry, but never trust an ID supplied by the browser. A selected
- * region/entity must belong to the selected country before it is persisted.
- */
-async function resolveOriginSelection(
-  supabase: Awaited<ReturnType<typeof createClient>>,
-  formData: BeanFormData
-): Promise<{ selection: OriginSelection } | { error: string }> {
-  const emptySelection: OriginSelection = {
-    origin_country: null,
-    origin_country_id: null,
-    origin_region: null,
-    origin_region_id: null,
-    origin_subregions: [],
-    origin_entity_id: null,
-    farm_producer: null,
-    origin_lat: null,
-    origin_lng: null,
-  };
-
-  if (formData.bean_type === "blend") {
-    return { selection: emptySelection };
-  }
-
-  const countryId = originIdSchema.safeParse(formData.origin_country_id);
-  if (!countryId.success) {
-    return {
-      selection: {
-        ...emptySelection,
-        origin_country: nullableText(formData.origin_country),
-        origin_region: nullableText(formData.origin_region),
-        origin_subregions: formData.origin_subregions ?? [],
-        farm_producer: nullableText(formData.farm_producer),
-        origin_lat: formData.origin_lat ?? null,
-        origin_lng: formData.origin_lng ?? null,
-      },
-    };
-  }
-
-  const { data: country, error: countryError } = await supabase
-    .from("origin_countries")
-    .select("id, name_en")
-    .eq("id", countryId.data)
-    .single();
-  if (countryError || !country) return { error: "Invalid origin country" };
-
-  const selection: OriginSelection = {
-    ...emptySelection,
-    origin_country: country.name_en,
-    origin_country_id: country.id,
-    origin_region: nullableText(formData.origin_region),
-    origin_subregions: formData.origin_subregions ?? [],
-    farm_producer: nullableText(formData.farm_producer),
-    origin_lat: formData.origin_lat ?? null,
-    origin_lng: formData.origin_lng ?? null,
-  };
-
-  const regionId = originIdSchema.safeParse(formData.origin_region_id);
-  if (regionId.success) {
-    const { data: region, error: regionError } = await supabase
-      .from("origin_regions")
-      .select("id, country_id, display_name, canonical_region_id")
-      .eq("id", regionId.data)
-      .eq("country_id", country.id)
-      .single();
-    if (
-      regionError ||
-      !region ||
-      region.canonical_region_id !== region.id ||
-      !region.display_name
-    ) {
-      return { error: "Invalid origin region" };
-    }
-
-    selection.origin_region_id = region.id;
-    selection.origin_region = region.display_name;
-  }
-
-  const entityId = originIdSchema.safeParse(formData.origin_entity_id);
-  if (!entityId.success) return { selection };
-  if (!selection.origin_region_id) return { error: "Select an origin region first" };
-
-  const { data: entity, error: entityError } = await supabase
-    .from("origin_entities")
-    .select("id, country_id, region_id, name")
-    .eq("id", entityId.data)
-    .eq("country_id", country.id)
-    .single();
-  if (entityError || !entity) return { error: "Invalid farm or producer" };
-
-  const { data: entityRegion, error: entityRegionError } = await supabase
-    .from("origin_regions")
-    .select("canonical_region_id")
-    .eq("id", entity.region_id)
-    .single();
-  if (
-    entityRegionError ||
-    !entityRegion ||
-    entityRegion.canonical_region_id !== selection.origin_region_id
-  ) {
-    return { error: "Invalid farm or producer" };
-  }
-
-  selection.origin_entity_id = entity.id;
-  selection.farm_producer = entity.name;
-  return { selection };
-}
+const toTuples = (entries: GoCountEntry[] | null): [string, number][] =>
+  (entries ?? []).map((e) => [e.key, e.count]);
 
 export async function createBean(formData: BeanFormData) {
   const supabase = await createClient();
@@ -171,25 +63,17 @@ export async function createBean(formData: BeanFormData) {
   const parsed = beanFormSchema.safeParse(formData);
   if (!parsed.success) return { error: "Invalid bean data" };
 
-  const { tags, blend_components, ...beanData } = parsed.data;
-  const origin = await resolveOriginSelection(supabase, parsed.data);
-  if ("error" in origin) return { error: origin.error };
-
-  const components = blend_components.map((component, index) => ({
-    ...component,
-    sort_order: index,
-  }));
-  const { data: beanId, error } = await supabase.rpc("create_bean_record", {
-    p_bean: { ...beanData, ...origin.selection },
-    p_tags: tags,
-    p_components: components,
-  });
-
-  if (error) return { error: "Unable to save bean" };
-
-  revalidatePath("/explore");
-  revalidatePath("/stats");
-  return { success: true, id: beanId };
+  try {
+    const result = await apiFetch<{ success: boolean; id: string }>("/api/beans", {
+      method: "POST",
+      body: parsed.data,
+    });
+    revalidatePath("/explore");
+    revalidatePath("/stats");
+    return { success: true, id: result.id };
+  } catch {
+    return { error: "Unable to save bean" };
+  }
 }
 
 /**
@@ -256,27 +140,18 @@ export async function updateBean(id: string, formData: BeanFormData) {
   const parsed = beanFormSchema.safeParse(formData);
   if (!parsedId.success || !parsed.success) return { error: "Invalid bean data" };
 
-  const { tags, blend_components, ...beanData } = parsed.data;
-  const origin = await resolveOriginSelection(supabase, parsed.data);
-  if ("error" in origin) return { error: origin.error };
-
-  const components = blend_components.map((component, index) => ({
-    ...component,
-    sort_order: index,
-  }));
-  const { error } = await supabase.rpc("update_bean_record", {
-    p_id: parsedId.data,
-    p_bean: { ...beanData, ...origin.selection },
-    p_tags: tags,
-    p_components: components,
-  });
-
-  if (error) return { error: "Unable to update bean" };
-
-  revalidatePath("/explore");
-  revalidatePath(`/beans/${id}`);
-  revalidatePath("/stats");
-  return { success: true };
+  try {
+    await apiFetch<{ success: boolean }>(`/api/beans/${parsedId.data}`, {
+      method: "PUT",
+      body: parsed.data,
+    });
+    revalidatePath("/explore");
+    revalidatePath(`/beans/${id}`);
+    revalidatePath("/stats");
+    return { success: true };
+  } catch {
+    return { error: "Unable to update bean" };
+  }
 }
 
 export async function deleteBean(id: string) {
@@ -288,20 +163,16 @@ export async function deleteBean(id: string) {
   const parsedId = beanIdSchema.safeParse(id);
   if (!parsedId.success) return { error: "Invalid bean id" };
 
-  await supabase.from("tasting_tags").delete().eq("bean_id", parsedId.data).eq("user_id", user.id);
-  await supabase.from("blend_components").delete().eq("bean_id", parsedId.data).eq("user_id", user.id);
-
-  const { error } = await supabase
-    .from("beans")
-    .delete()
-    .eq("id", parsedId.data)
-    .eq("user_id", user.id);
-
-  if (error) return { error: "Unable to delete bean" };
-
-  revalidatePath("/explore");
-  revalidatePath("/stats");
-  return { success: true };
+  try {
+    await apiFetch<{ success: boolean }>(`/api/beans/${parsedId.data}`, {
+      method: "DELETE",
+    });
+    revalidatePath("/explore");
+    revalidatePath("/stats");
+    return { success: true };
+  } catch {
+    return { error: "Unable to delete bean" };
+  }
 }
 
 export async function getBeans(filters?: {
@@ -329,66 +200,33 @@ export async function getBeans(filters?: {
 
   const parsed = beanFiltersSchema.safeParse(filters ?? {});
   if (!parsed.success) return { beans: [], count: 0, error: "Invalid filters" };
-  const safeFilters = parsed.data;
-  const { limit, page } = safeFilters;
-  const from = page * limit;
-  const to = from + limit - 1;
+  const f = parsed.data;
 
-  const relation = safeFilters.tag
-    ? "*, tasting_tags!inner(*), blend_components(*)"
-    : "*, tasting_tags(*), blend_components(*)";
-  let query = supabase
-    .from("beans")
-    .select(relation, { count: "exact" })
-    .eq("user_id", user.id);
-
-  if (safeFilters.origin_country) {
-    query = query.eq("origin_country", safeFilters.origin_country);
+  try {
+    const result = await apiFetch<{ beans: BeanWithTags[]; count: number }>("/api/beans", {
+      query: {
+        origin_country: f.origin_country,
+        process_method: f.process_method,
+        varietal: f.varietal,
+        roastery: f.roastery,
+        bean_type: f.bean_type,
+        roast_level: f.roast_level,
+        score_min: f.score_min,
+        score_max: f.score_max,
+        tag: f.tag,
+        date_from: f.date_from,
+        date_to: f.date_to,
+        search: f.search,
+        sort_by: f.sort_by,
+        sort_order: f.sort_order,
+        page: f.page,
+        limit: f.limit,
+      },
+    });
+    return { beans: result.beans, count: result.count };
+  } catch {
+    return { beans: [], count: 0 };
   }
-  if (safeFilters.process_method) {
-    query = query.eq("process_method", safeFilters.process_method);
-  }
-  if (safeFilters.varietal) {
-    query = query.ilike("varietal", `%${safeFilters.varietal}%`);
-  }
-  if (safeFilters.roastery) {
-    query = query.ilike("roastery", `%${safeFilters.roastery}%`);
-  }
-  if (safeFilters.bean_type) {
-    query = query.eq("bean_type", safeFilters.bean_type);
-  }
-  if (safeFilters.roast_level) {
-    query = query.eq("roast_level", safeFilters.roast_level);
-  }
-  if (safeFilters.score_min !== undefined) {
-    query = query.gte("overall_score", safeFilters.score_min);
-  }
-  if (safeFilters.score_max !== undefined) {
-    query = query.lte("overall_score", safeFilters.score_max);
-  }
-  if (safeFilters.date_from) {
-    query = query.gte("consumed_at", safeFilters.date_from);
-  }
-  if (safeFilters.date_to) {
-    query = query.lte("consumed_at", safeFilters.date_to);
-  }
-  if (safeFilters.search) {
-    const value = safeFilters.search.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
-    query = query.or(
-      `name.ilike."*${value}*",roastery.ilike."*${value}*",note.ilike."*${value}*"`
-    );
-  }
-  if (safeFilters.tag) query = query.eq("tasting_tags.tag", safeFilters.tag);
-
-  const sortBy = safeFilters.sort_by;
-  const sortOrder = safeFilters.sort_order === "asc";
-  query = query.order(sortBy, { ascending: sortOrder });
-
-  const { data, count, error } = await query.range(from, to);
-
-  if (error) return { beans: [], count: 0 };
-
-  return { beans: data || [], count: count || 0 };
 }
 
 export async function getBeanFilterOptions() {
@@ -396,28 +234,13 @@ export async function getBeanFilterOptions() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { origins: [], roasteries: [], varietals: [] };
 
-  const { data, error } = await supabase
-    .from("beans")
-    .select("origin_country, roastery, varietal")
-    .eq("user_id", user.id)
-    .limit(5000);
-  if (error) return { origins: [], roasteries: [], varietals: [] };
-
-  const origins = new Set<string>();
-  const roasteries = new Set<string>();
-  const varietals = new Set<string>();
-  for (const bean of data ?? []) {
-    if (bean.origin_country) origins.add(bean.origin_country);
-    if (bean.roastery?.trim()) roasteries.add(bean.roastery.trim());
-    for (const varietal of splitVarietals(bean.varietal)) {
-      varietals.add(varietal);
-    }
+  try {
+    return await apiFetch<{ origins: string[]; roasteries: string[]; varietals: string[] }>(
+      "/api/beans/filter-options"
+    );
+  } catch {
+    return { origins: [], roasteries: [], varietals: [] };
   }
-  return {
-    origins: [...origins].sort(),
-    roasteries: [...roasteries].sort(),
-    varietals: [...varietals].sort(),
-  };
 }
 
 export async function getBeanById(id: string) {
@@ -429,14 +252,11 @@ export async function getBeanById(id: string) {
   const parsedId = beanIdSchema.safeParse(id);
   if (!parsedId.success) return null;
 
-  const { data } = await supabase
-    .from("beans")
-    .select("*, tasting_tags(*), blend_components(*)")
-    .eq("id", parsedId.data)
-    .eq("user_id", user.id)
-    .single();
-
-  return data;
+  try {
+    return await apiFetch<BeanWithTags>(`/api/beans/${parsedId.data}`);
+  } catch {
+    return null;
+  }
 }
 
 export async function getBeanStats() {
@@ -445,52 +265,31 @@ export async function getBeanStats() {
 
   if (!user) return null;
 
-  const { data: beans } = await supabase
-    .from("beans")
-    .select("origin_country, process_method, varietal, overall_score, consumed_at, name, roastery")
-    .eq("user_id", user.id);
-
-  if (!beans || beans.length === 0) return null;
-
-  const total = beans.length;
-  const avgScore = beans.reduce((sum, b) => sum + b.overall_score, 0) / total;
-  const best = beans.reduce((max, b) => (b.overall_score > max.overall_score ? b : max), beans[0]);
-
-  const byOrigin: Record<string, number> = {};
-  const byProcess: Record<string, number> = {};
-  const byVarietal: Record<string, number> = {};
-  const byMonth: Record<string, number> = {};
-  const scoreDist: Record<string, number> = {};
-
-  beans.forEach((b) => {
-    if (b.origin_country) {
-      byOrigin[b.origin_country] = (byOrigin[b.origin_country] || 0) + 1;
-    }
-    byProcess[b.process_method] = (byProcess[b.process_method] || 0) + 1;
-    if (b.varietal) byVarietal[b.varietal] = (byVarietal[b.varietal] || 0) + 1;
-
-    const month = new Date(b.consumed_at).toISOString().slice(0, 7);
-    byMonth[month] = (byMonth[month] || 0) + 1;
-
-    const bucket = Math.floor(b.overall_score);
-    const key = `${bucket}`;
-    scoreDist[key] = (scoreDist[key] || 0) + 1;
-  });
-
-  const topOrigin = Object.entries(byOrigin).sort((a, b) => b[1] - a[1])[0];
-  const topProcess = Object.entries(byProcess).sort((a, b) => b[1] - a[1])[0];
+  let stats: GoStats | null;
+  try {
+    stats = await apiFetch<GoStats | null>("/api/stats");
+  } catch {
+    return null;
+  }
+  if (!stats || stats.total === 0) return null;
 
   return {
-    total,
-    avgScore: Math.round(avgScore * 10) / 10,
-    best: { name: best.name, roastery: best.roastery, score: best.overall_score },
-    byOrigin: Object.entries(byOrigin).sort((a, b) => b[1] - a[1]),
-    byProcess: Object.entries(byProcess).sort((a, b) => b[1] - a[1]),
-    byVarietal: Object.entries(byVarietal).sort((a, b) => b[1] - a[1]),
-    byMonth: Object.entries(byMonth).sort((a, b) => a[0].localeCompare(b[0])),
-    scoreDist: Object.entries(scoreDist).sort((a, b) => Number(a[0]) - Number(b[0])),
-    topOrigin,
-    topProcess,
+    total: stats.total,
+    avgScore: stats.avg_score,
+    best: stats.best
+      ? { name: stats.best.name, roastery: stats.best.roastery, score: stats.best.score }
+      : { name: "", roastery: "", score: 0 },
+    byOrigin: toTuples(stats.by_origin),
+    byProcess: toTuples(stats.by_process),
+    byVarietal: toTuples(stats.by_varietal),
+    byMonth: toTuples(stats.by_month),
+    scoreDist: toTuples(stats.score_dist),
+    topOrigin: stats.top_origin
+      ? ([stats.top_origin.key, stats.top_origin.count] as [string, number])
+      : undefined,
+    topProcess: stats.top_process
+      ? ([stats.top_process.key, stats.top_process.count] as [string, number])
+      : undefined,
   };
 }
 
@@ -500,23 +299,15 @@ export async function exportData() {
 
   if (!user) return null;
 
-  const { data: beans } = await supabase
-    .from("beans")
-    .select("*, tasting_tags(*), blend_components(*)")
-    .eq("user_id", user.id)
-    .order("consumed_at", { ascending: false });
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .single();
-
-  return {
-    exported_at: new Date().toISOString(),
-    profile,
-    beans: beans || [],
-  };
+  try {
+    return await apiFetch<{
+      exported_at: string;
+      profile: unknown;
+      beans: BeanWithTags[];
+    }>("/api/export");
+  } catch {
+    return null;
+  }
 }
 
 export async function updateProfile(displayName: string, locale: string) {
@@ -528,13 +319,15 @@ export async function updateProfile(displayName: string, locale: string) {
   const parsed = profileUpdateSchema.safeParse({ displayName, locale });
   if (!parsed.success) return { error: "Invalid profile data" };
 
-  const { error } = await supabase
-    .from("profiles")
-    .update({ display_name: parsed.data.displayName, locale: parsed.data.locale })
-    .eq("id", user.id);
-
-  if (error) return { error: "Unable to update profile" };
-  return { success: true };
+  try {
+    await apiFetch<{ success: boolean }>("/api/profile", {
+      method: "PUT",
+      body: { display_name: parsed.data.displayName, locale: parsed.data.locale },
+    });
+    return { success: true };
+  } catch {
+    return { error: "Unable to update profile" };
+  }
 }
 
 export async function deleteAccount() {

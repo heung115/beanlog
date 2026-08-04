@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"time"
 
 	"beanlog-server/middleware"
 	"beanlog-server/models"
@@ -56,9 +57,13 @@ func (h *ProfileHandler) UpdateProfile(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"success": true})
 }
 
+// ExportData returns the caller's full dataset in the same shape the frontend
+// download expects: exported_at, profile, and beans with nested tags and blend
+// components.
 func (h *ProfileHandler) ExportData(c *gin.Context) {
 	db := middleware.RequestDB(c)
 	userID := c.GetString(middleware.UserIDKey)
+	beanH := NewBeanHandler()
 
 	var p models.Profile
 	if err := db.QueryRow(c.Request.Context(),
@@ -70,7 +75,8 @@ func (h *ProfileHandler) ExportData(c *gin.Context) {
 
 	rows, err := db.Query(c.Request.Context(),
 		`SELECT id, user_id, name, roastery, bean_type, origin_country,
-		        origin_region, origin_lat, origin_lng, farm_producer, varietal,
+		        origin_country_id, origin_region, origin_region_id, origin_subregions,
+		        origin_lat, origin_lng, farm_producer, origin_entity_id, varietal,
 		        process_method, process_detail, altitude_m, harvest_year,
 		        roast_level, roast_date, consumed_at, place_type,
 		        cafe_name, cafe_location, menu_name, overall_score, note,
@@ -85,26 +91,42 @@ func (h *ProfileHandler) ExportData(c *gin.Context) {
 	}
 	defer rows.Close()
 
-	var beans []models.Bean
+	beans := []models.Bean{}
 	for rows.Next() {
 		var b models.Bean
+		var roastDate, purchasedAt *time.Time
 		if err := rows.Scan(
 			&b.ID, &b.UserID, &b.Name, &b.Roastery, &b.BeanType, &b.OriginCountry,
-			&b.OriginRegion, &b.OriginLat, &b.OriginLng, &b.FarmProducer, &b.Varietal,
+			&b.OriginCountryID, &b.OriginRegion, &b.OriginRegionID, &b.OriginSubregions,
+			&b.OriginLat, &b.OriginLng, &b.FarmProducer, &b.OriginEntityID, &b.Varietal,
 			&b.ProcessMethod, &b.ProcessDetail, &b.AltitudeM, &b.HarvestYear,
-			&b.RoastLevel, &b.RoastDate, &b.ConsumedAt, &b.PlaceType,
+			&b.RoastLevel, &roastDate, &b.ConsumedAt, &b.PlaceType,
 			&b.CafeName, &b.CafeLocation, &b.MenuName, &b.OverallScore, &b.Note,
 			&b.ScoreAroma, &b.ScoreAcidity, &b.ScoreBody, &b.ScoreSweetness,
 			&b.ScoreAftertaste, &b.ScoreBalance, &b.PurchaseSource, &b.Price,
-			&b.WeightG, &b.PurchasedAt, &b.CreatedAt, &b.UpdatedAt,
+			&b.WeightG, &purchasedAt, &b.CreatedAt, &b.UpdatedAt,
 		); err != nil {
 			continue
+		}
+		if roastDate != nil {
+			s := roastDate.Format("2006-01-02")
+			b.RoastDate = &s
+		}
+		if purchasedAt != nil {
+			s := purchasedAt.Format("2006-01-02")
+			b.PurchasedAt = &s
 		}
 		beans = append(beans, b)
 	}
 
+	if len(beans) > 0 {
+		beanH.loadTags(c.Request.Context(), db, userID, beans)
+		beanH.loadBlendComponents(c.Request.Context(), db, userID, beans)
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"profile": p,
-		"beans":   beans,
+		"exported_at": time.Now().UTC().Format(time.RFC3339),
+		"profile":     p,
+		"beans":       beans,
 	})
 }

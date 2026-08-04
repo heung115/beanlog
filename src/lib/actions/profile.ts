@@ -1,6 +1,7 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { apiFetch } from "@/lib/api/client";
 import type { Profile } from "@/types/database";
 
 export interface CurrentUserIdentity {
@@ -16,11 +17,15 @@ export async function getCurrentUserIdentity(): Promise<CurrentUserIdentity | nu
 
   if (!user) return null;
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("display_name")
-    .eq("id", user.id)
-    .maybeSingle();
+  // display_name lives in the profiles table (data), so it comes from the Go
+  // API; presence/identity still comes from Supabase Auth.
+  let profileDisplayName = "";
+  try {
+    const profile = await apiFetch<{ display_name: string | null }>("/api/profile");
+    profileDisplayName = profile.display_name?.trim() ?? "";
+  } catch {
+    // fall back to auth metadata / email below
+  }
 
   const metadataDisplayName =
     typeof user.user_metadata.display_name === "string"
@@ -28,7 +33,7 @@ export async function getCurrentUserIdentity(): Promise<CurrentUserIdentity | nu
       : "";
   const emailName = user.email?.split("@")[0] ?? "";
   const displayName =
-    profile?.display_name?.trim() || metadataDisplayName || emailName || "User";
+    profileDisplayName || metadataDisplayName || emailName || "User";
 
   return { displayName };
 }
@@ -39,11 +44,9 @@ export async function getProfile(): Promise<Profile | null> {
 
   if (!user) return null;
 
-  const { data } = await supabase
-    .from("profiles")
-    .select("*")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  return data;
+  try {
+    return await apiFetch<Profile>("/api/profile");
+  } catch {
+    return null;
+  }
 }

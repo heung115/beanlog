@@ -26,7 +26,7 @@ export async function signUp(email: string, password: string, displayName: strin
 
   const supabase = await createClient();
 
-  const { data, error } = await supabase.auth.signUp({
+  const { error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
     options: {
@@ -38,15 +38,8 @@ export async function signUp(email: string, password: string, displayName: strin
     return { error: "Unable to create account" };
   }
 
-  if (data.user) {
-    await supabase.from("profiles").upsert({
-      id: data.user.id,
-      email: parsed.data.email,
-      display_name: parsed.data.displayName,
-      locale: "ko",
-    });
-  }
-
+  // The profiles row is created by the handle_new_user database trigger from
+  // raw_user_meta_data.display_name; no separate data write is needed here.
   return { success: true };
 }
 

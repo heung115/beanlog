@@ -42,30 +42,35 @@ func Setup(cfg *config.Config, db *pgxpool.Pool) *gin.Engine {
 		c.JSON(200, gin.H{"status": "ok"})
 	})
 
-	// Origin presets are reference data, but should only be returned to signed-in users.
-	originH := handlers.NewOriginHandler()
-
 	// Authenticated routes
+	originH := handlers.NewOriginHandler()
+	beanH := handlers.NewBeanHandler()
+	statsH := handlers.NewStatsHandler()
+	profileH := handlers.NewProfileHandler()
+
 	auth := r.Group("/api")
 	auth.Use(middleware.AuthRequired(cfg.JWKSURL, cfg.JWTIssuer))
 	auth.Use(middleware.RequestDatabase(db))
 	{
+		// Origin presets + catalog (reference data for signed-in users)
 		auth.GET("/origins", originH.List)
+		auth.GET("/origins/countries", originH.Countries)
+		auth.GET("/origins/countries/:countryId/regions", originH.Regions)
+		auth.GET("/origins/countries/:countryId/regions/:regionId/entities", originH.Entities)
+		auth.GET("/origins/subregions", originH.UserSubregions)
 
 		// Beans
-		beanH := handlers.NewBeanHandler()
 		auth.GET("/beans", beanH.List)
+		auth.GET("/beans/filter-options", beanH.FilterOptions)
 		auth.GET("/beans/:id", beanH.GetByID)
 		auth.POST("/beans", beanH.Create)
 		auth.PUT("/beans/:id", beanH.Update)
 		auth.DELETE("/beans/:id", beanH.Delete)
 
 		// Stats
-		statsH := handlers.NewStatsHandler()
 		auth.GET("/stats", statsH.GetStats)
 
 		// Profile
-		profileH := handlers.NewProfileHandler()
 		auth.GET("/profile", profileH.GetProfile)
 		auth.PUT("/profile", profileH.UpdateProfile)
 		auth.GET("/export", profileH.ExportData)

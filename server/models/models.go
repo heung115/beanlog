@@ -17,10 +17,14 @@ type Bean struct {
 	Roastery        string       `json:"roastery" db:"roastery"`
 	BeanType        string       `json:"bean_type" db:"bean_type"`
 	OriginCountry   string       `json:"origin_country" db:"origin_country"`
+	OriginCountryID *int64       `json:"origin_country_id" db:"origin_country_id"`
 	OriginRegion    *string      `json:"origin_region" db:"origin_region"`
+	OriginRegionID  *int64       `json:"origin_region_id" db:"origin_region_id"`
+	OriginSubregions []string    `json:"origin_subregions" db:"origin_subregions"`
 	OriginLat       *float64     `json:"origin_lat" db:"origin_lat"`
 	OriginLng       *float64     `json:"origin_lng" db:"origin_lng"`
 	FarmProducer    *string      `json:"farm_producer" db:"farm_producer"`
+	OriginEntityID  *int64       `json:"origin_entity_id" db:"origin_entity_id"`
 	Varietal        *string      `json:"varietal" db:"varietal"`
 	ProcessMethod   string       `json:"process_method" db:"process_method"`
 	ProcessDetail   *string      `json:"process_detail" db:"process_detail"`
@@ -47,7 +51,8 @@ type Bean struct {
 	PurchasedAt     *string      `json:"purchased_at" db:"purchased_at"`
 	CreatedAt       time.Time    `json:"created_at" db:"created_at"`
 	UpdatedAt       time.Time    `json:"updated_at" db:"updated_at"`
-	TastingTags     []TastingTag `json:"tasting_tags,omitempty"`
+	TastingTags     []TastingTag     `json:"tasting_tags"`
+	BlendComponents []BlendComponent `json:"blend_components"`
 }
 
 type TastingTag struct {
@@ -56,6 +61,23 @@ type TastingTag struct {
 	UserID   string `json:"user_id" db:"user_id"`
 	Tag      string `json:"tag" db:"tag"`
 	Category string `json:"category" db:"category"`
+}
+
+// BlendComponent is one single-origin that makes up a blend. The table stores
+// free-text origin fields only (no catalog ids), matching create_bean_record.
+type BlendComponent struct {
+	ID               string   `json:"id" db:"id"`
+	BeanID           string   `json:"bean_id" db:"bean_id"`
+	UserID           string   `json:"user_id" db:"user_id"`
+	OriginCountry    string   `json:"origin_country" db:"origin_country"`
+	OriginRegion     *string  `json:"origin_region" db:"origin_region"`
+	OriginSubregions []string `json:"origin_subregions" db:"origin_subregions"`
+	FarmProducer     *string  `json:"farm_producer" db:"farm_producer"`
+	Varietal         *string  `json:"varietal" db:"varietal"`
+	ProcessMethod    *string  `json:"process_method" db:"process_method"`
+	ProcessDetail    *string  `json:"process_detail" db:"process_detail"`
+	Percentage       float64  `json:"percentage" db:"percentage"`
+	SortOrder        int      `json:"sort_order" db:"sort_order"`
 }
 
 type OriginPreset struct {
@@ -77,11 +99,15 @@ type CreateBeanRequest struct {
 	Name            string     `json:"name" binding:"required,max=200"`
 	Roastery        string     `json:"roastery" binding:"required,max=200"`
 	BeanType        string     `json:"bean_type" binding:"required,oneof=single_origin blend"`
-	OriginCountry   string     `json:"origin_country" binding:"required,max=100"`
-	OriginRegion    *string    `json:"origin_region" binding:"omitempty,max=100"`
+	OriginCountry   string     `json:"origin_country" binding:"omitempty,max=100"`
+	OriginCountryID *int64     `json:"origin_country_id"`
+	OriginRegion    *string    `json:"origin_region" binding:"omitempty,max=200"`
+	OriginRegionID  *int64     `json:"origin_region_id"`
+	OriginSubregions []string  `json:"origin_subregions"`
 	OriginLat       *float64   `json:"origin_lat"`
 	OriginLng       *float64   `json:"origin_lng"`
-	FarmProducer    *string    `json:"farm_producer" binding:"omitempty,max=200"`
+	FarmProducer    *string    `json:"farm_producer" binding:"omitempty,max=300"`
+	OriginEntityID  *int64     `json:"origin_entity_id"`
 	Varietal        *string    `json:"varietal" binding:"omitempty,max=100"`
 	ProcessMethod   string     `json:"process_method" binding:"required,oneof=washed natural honey anaerobic carbonic decaf other"`
 	ProcessDetail   *string    `json:"process_detail" binding:"omitempty,max=200"`
@@ -91,9 +117,9 @@ type CreateBeanRequest struct {
 	RoastDate       *string    `json:"roast_date"`
 	ConsumedAt      *string    `json:"consumed_at"`
 	PlaceType       string     `json:"place_type" binding:"required,oneof=cafe home"`
-	CafeName        *string    `json:"cafe_name"`
-	CafeLocation    *string    `json:"cafe_location"`
-	MenuName        *string    `json:"menu_name"`
+	CafeName        *string    `json:"cafe_name" binding:"omitempty,max=200"`
+	CafeLocation    *string    `json:"cafe_location" binding:"omitempty,max=200"`
+	MenuName        *string    `json:"menu_name" binding:"omitempty,max=200"`
 	OverallScore    float64    `json:"overall_score" binding:"required,min=1,max=10"`
 	Note            string     `json:"note" binding:"max=2000"`
 	ScoreAroma      *int       `json:"score_aroma"`
@@ -102,11 +128,12 @@ type CreateBeanRequest struct {
 	ScoreSweetness  *int       `json:"score_sweetness"`
 	ScoreAftertaste *int       `json:"score_aftertaste"`
 	ScoreBalance    *int       `json:"score_balance"`
-	PurchaseSource  *string    `json:"purchase_source"`
+	PurchaseSource  *string    `json:"purchase_source" binding:"omitempty,oneof=online roastery cafe other"`
 	Price           *int       `json:"price"`
 	WeightG         *int       `json:"weight_g"`
 	PurchasedAt     *string    `json:"purchased_at"`
 	Tags            []TagInput `json:"tags" binding:"max=100,dive"`
+	BlendComponents []BlendComponentInput `json:"blend_components" binding:"max=50,dive"`
 }
 
 type TagInput struct {
@@ -114,7 +141,49 @@ type TagInput struct {
 	Category string `json:"category" binding:"omitempty,oneof=fruity floral sweet nutty cocoa spice roasted sour green other"`
 }
 
+// BlendComponentInput is the client-supplied shape for one blend component. It
+// mirrors the columns create_bean_record inserts into blend_components.
+type BlendComponentInput struct {
+	OriginCountry    string   `json:"origin_country" binding:"required,max=100"`
+	OriginRegion     *string  `json:"origin_region" binding:"omitempty,max=200"`
+	OriginSubregions []string `json:"origin_subregions"`
+	FarmProducer     *string  `json:"farm_producer" binding:"omitempty,max=300"`
+	Varietal         *string  `json:"varietal" binding:"omitempty,max=100"`
+	ProcessMethod    *string  `json:"process_method" binding:"omitempty,oneof=washed natural honey anaerobic carbonic decaf other"`
+	ProcessDetail    *string  `json:"process_detail" binding:"omitempty,max=200"`
+	Percentage       float64  `json:"percentage" binding:"required,gt=0,lte=100"`
+	SortOrder        int      `json:"sort_order"`
+}
+
 type UpdateBeanRequest = CreateBeanRequest
+
+// --- Origin catalog options (mirror the frontend selector actions) ---
+
+type OriginCountryOption struct {
+	ID     int64   `json:"id"`
+	NameEn string  `json:"name_en"`
+	NameKo *string `json:"name_ko"`
+}
+
+type OriginRegionOption struct {
+	ID     int64   `json:"id"`
+	Name   string  `json:"name"`
+	NameKo *string `json:"name_ko"`
+}
+
+type OriginEntityOption struct {
+	ID       int64   `json:"id"`
+	Name     string  `json:"name"`
+	NameKo   *string `json:"name_ko"`
+	EntityType *string `json:"entity_type"`
+}
+
+// BeanFilterOptions are the distinct values used to populate the filter UI.
+type BeanFilterOptions struct {
+	Origins    []string `json:"origins"`
+	Roasteries []string `json:"roasteries"`
+	Varietals  []string `json:"varietals"`
+}
 
 type BeanFilters struct {
 	OriginCountry string `form:"origin_country"`

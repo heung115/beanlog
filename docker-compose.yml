@@ -9,6 +9,8 @@ services:
     environment:
       # Server-side only: Docker container → host Supabase
       SUPABASE_SERVER_URL: http://host.docker.internal:54321
+      # Server Actions reach the Go API by its compose service name.
+      GO_API_URL: ${GO_API_URL:-http://api:8080}
       # Runtime env for @supabase/ssr createServerClient (anon key is read from
       # process.env at runtime in the standalone/edge bundle, not only inlined).
       NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:-http://localhost:54321}

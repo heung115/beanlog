@@ -11,6 +11,8 @@ services:
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${STAGING_SUPABASE_ANON_KEY}
       NEXT_PUBLIC_APP_URL: ${STAGING_APP_URL:-http://localhost:3100}
       SUPABASE_SERVER_URL: ${STAGING_INTERNAL_SUPABASE_URL:-http://kong:8000}
+      # Server Actions reach the Go API by its compose service name.
+      GO_API_URL: ${STAGING_GO_API_URL:-http://api:8080}
       NEXT_DEPLOYMENT_ID: ${STAGING_DEPLOYMENT_ID:-beanlog-staging}
     volumes:
       - ./src:/app/src:ro
@@ -31,7 +33,7 @@ services:
     read_only: true
     tmpfs:
       - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=1001,gid=1001,mode=1777
-      - /app/.next:rw,noexec,nosuid,nodev,size=512m,uid=1001,gid=1001,mode=0700
+      - /app/.next:rw,noexec,nosuid,nodev,size=1g,uid=1001,gid=1001,mode=0700
     pids_limit: 300
     # Turbopack keeps compiled route graphs in memory. A full browser QA pass
     # exceeded 1 GiB and Docker restarted the dev server, interrupting active
