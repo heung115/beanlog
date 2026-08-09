@@ -63,7 +63,7 @@ test("security headers and unauthenticated route protection are enforced", async
   expect(poisonedCallback.headers().location).toBe("http://localhost:3100/login");
 });
 
-test("RLS prevents cross-user reads, inserts, updates, and deletes", async () => {
+test("RLS and table privileges prevent cross-user access and direct writes", async () => {
   const { client: primary } = await signIn(qaUser.email, qaUser.password);
   const { client: other } = await signIn(qaOtherUser.email, qaOtherUser.password);
   const { data: otherBean, error: otherReadError } = await other
@@ -86,16 +86,16 @@ test("RLS prevents cross-user reads, inserts, updates, and deletes", async () =>
     .update({ note: "cross-user overwrite" })
     .eq("id", otherBean!.id)
     .select("id");
-  expect(updateError).toBeNull();
-  expect(changed).toEqual([]);
+  expect(updateError).toMatchObject({ code: "42501" });
+  expect(changed).toBeNull();
 
   const { data: deleted, error: deleteError } = await primary
     .from("beans")
     .delete()
     .eq("id", otherBean!.id)
     .select("id");
-  expect(deleteError).toBeNull();
-  expect(deleted).toEqual([]);
+  expect(deleteError).toMatchObject({ code: "42501" });
+  expect(deleted).toBeNull();
 
   const { error: insertError } = await primary.from("beans").insert({
     user_id: otherBean!.user_id,
@@ -110,7 +110,7 @@ test("RLS prevents cross-user reads, inserts, updates, and deletes", async () =>
     overall_score: 8,
     note: "must fail",
   });
-  expect(insertError).toBeTruthy();
+  expect(insertError).toMatchObject({ code: "42501" });
 
   const { error: foreignTagError } = await primary.from("tasting_tags").insert({
     bean_id: otherBean!.id,
@@ -118,7 +118,7 @@ test("RLS prevents cross-user reads, inserts, updates, and deletes", async () =>
     tag: "foreign-parent",
     category: "other",
   });
-  expect(foreignTagError).toBeTruthy();
+  expect(foreignTagError).toMatchObject({ code: "42501" });
 
   const { error: foreignComponentError } = await primary.from("blend_components").insert({
     bean_id: otherBean!.id,
@@ -127,7 +127,165 @@ test("RLS prevents cross-user reads, inserts, updates, and deletes", async () =>
     percentage: 100,
     sort_order: 0,
   });
-  expect(foreignComponentError).toBeTruthy();
+  expect(foreignComponentError).toMatchObject({ code: "42501" });
+});
+
+test("authenticated PostgREST writes cannot bypass bean or profile invariants", async () => {
+  const suffix = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+  const disposable = {
+    email: `beanlog-qa-direct-write-${suffix}@local.test`,
+    password: randomBytes(32).toString("base64url"),
+  };
+  const userId = await ensureUser(disposable.email, disposable.password);
+
+  try {
+    const { client } = await signIn(disposable.email, disposable.password);
+    const beanPayload = {
+      name: "[QA] direct-write boundary",
+      roastery: "QA Security",
+      bean_type: "single_origin",
+      origin_country: "Kenya",
+      process_method: "washed",
+      roast_level: "light",
+      consumed_at: "2026-07-30T12:00:00.000Z",
+      place_type: "home",
+      overall_score: 8,
+      note: "only verified RPCs may mutate beans",
+    };
+
+    const invalidBlendName = `[QA] invalid direct blend ${suffix}`;
+    const { error: invalidBlendError } = await client.from("beans").insert({
+      ...beanPayload,
+      user_id: userId,
+      name: invalidBlendName,
+      bean_type: "blend",
+      origin_country: null,
+    });
+    expect.soft(invalidBlendError, "direct invalid blend insert").toMatchObject({ code: "42501" });
+
+    const { data: blendId, error: blendCreateError } = await client.rpc(
+      "create_bean_record",
+      {
+        p_bean: {
+          ...beanPayload,
+          name: `[QA] valid RPC blend ${suffix}`,
+          bean_type: "blend",
+          origin_country: null,
+        },
+        p_tags: [],
+        p_components: [
+          { origin_country: "Kenya", percentage: 60, sort_order: 0 },
+          { origin_country: "Ethiopia", percentage: 40, sort_order: 1 },
+        ],
+      }
+    );
+    expect(blendCreateError).toBeNull();
+
+    const { error: componentUpdateError } = await client
+      .from("blend_components")
+      .update({ percentage: 10 })
+      .eq("bean_id", blendId);
+    expect.soft(componentUpdateError, "direct component percentage update").toMatchObject({ code: "42501" });
+
+    const { data: blendComponentsBeforeDelete } = await client
+      .from("blend_components")
+      .select("id")
+      .eq("bean_id", blendId)
+      .order("sort_order");
+    const { error: componentDeleteError } = await client
+      .from("blend_components")
+      .delete()
+      .eq("id", blendComponentsBeforeDelete?.[0]?.id);
+    expect.soft(componentDeleteError, "direct component delete").toMatchObject({ code: "42501" });
+
+    const { data: singleId, error: singleCreateError } = await client.rpc(
+      "create_bean_record",
+      {
+        p_bean: { ...beanPayload, name: `[QA] valid RPC single ${suffix}` },
+        p_tags: [],
+        p_components: [],
+      }
+    );
+    expect(singleCreateError).toBeNull();
+
+    const { error: componentInsertError } = await client
+      .from("blend_components")
+      .insert({
+        bean_id: singleId,
+        user_id: userId,
+        origin_country: "Colombia",
+        percentage: 100,
+        sort_order: 0,
+      });
+    expect.soft(componentInsertError, "direct single-origin component insert").toMatchObject({ code: "42501" });
+
+    const { error: tagInsertError } = await client.from("tasting_tags").insert({
+      bean_id: singleId,
+      user_id: userId,
+      tag: "direct-write",
+      category: "other",
+    });
+    expect.soft(tagInsertError, "direct tasting tag insert").toMatchObject({ code: "42501" });
+
+    const { error: beanUpdateError } = await client
+      .from("beans")
+      .update({ bean_type: "blend", origin_country: null })
+      .eq("id", singleId);
+    expect.soft(beanUpdateError, "direct bean update").toMatchObject({ code: "42501" });
+
+    const { data: originalProfile, error: profileReadError } = await client
+      .from("profiles")
+      .select("email,created_at")
+      .eq("id", userId)
+      .single();
+    expect(profileReadError).toBeNull();
+    const { error: protectedProfileError } = await client
+      .from("profiles")
+      .update({ email: `forged-${suffix}@local.test`, created_at: "2000-01-01T00:00:00Z" })
+      .eq("id", userId);
+    expect.soft(protectedProfileError, "protected profile column update").toMatchObject({ code: "42501" });
+
+    const { error: allowedProfileError } = await client
+      .from("profiles")
+      .update({ display_name: "Allowed QA Name", locale: "en" })
+      .eq("id", userId);
+    expect(allowedProfileError).toBeNull();
+
+    const { error: beanDeleteError } = await client.from("beans").delete().eq("id", singleId);
+    expect.soft(beanDeleteError, "direct bean delete").toMatchObject({ code: "42501" });
+
+    const { count: invalidBlendCount } = await client
+      .from("beans")
+      .select("id", { count: "exact", head: true })
+      .eq("name", invalidBlendName);
+    expect.soft(invalidBlendCount, "invalid blend was not persisted").toBe(0);
+
+    const { data: components } = await client
+      .from("blend_components")
+      .select("percentage")
+      .eq("bean_id", blendId)
+      .order("sort_order");
+    expect.soft(components?.map((component) => Number(component.percentage))).toEqual([60, 40]);
+
+    const { data: singleComponents } = await client
+      .from("blend_components")
+      .select("id")
+      .eq("bean_id", singleId);
+    expect.soft(singleComponents).toEqual([]);
+
+    const { data: protectedProfile } = await client
+      .from("profiles")
+      .select("email,created_at,display_name,locale")
+      .eq("id", userId)
+      .single();
+    expect.soft(protectedProfile?.email).toBe(originalProfile?.email);
+    expect.soft(protectedProfile?.created_at).toBe(originalProfile?.created_at);
+    expect.soft(protectedProfile?.display_name).toBe("Allowed QA Name");
+    expect.soft(protectedProfile?.locale).toBe("en");
+  } finally {
+    const { error } = await admin.auth.admin.deleteUser(userId);
+    if (error) throw error;
+  }
 });
 
 test("atomic RPC rolls back the parent when a child row is invalid", async () => {
@@ -256,6 +414,80 @@ test("Go API rejects forged JWTs and rolls back database child failures", async 
   expect(error).toBeNull();
   expect(count).toBe(0);
 
+  const validName = `[QA:go-lifecycle] ${Date.now()}`;
+  const validCreate = await request.post(`${qaApiURL}/api/beans`, {
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+      "Content-Type": "application/json",
+    },
+    data: {
+      name: validName,
+      roastery: "QA Go Lifecycle",
+      bean_type: "blend",
+      process_method: "washed",
+      roast_level: "medium",
+      consumed_at: "2026-07-30T12:00:00.000Z",
+      place_type: "home",
+      overall_score: 8,
+      note: "verified mutation RPC lifecycle",
+      blend_components: [
+        { origin_country: "Kenya", percentage: 60 },
+        { origin_country: "Ethiopia", percentage: 40 },
+      ],
+    },
+  });
+  const validCreateBody = await validCreate.text();
+  expect(validCreate.status(), validCreateBody).toBe(201);
+  const validBeanId = (JSON.parse(validCreateBody) as { id: string }).id;
+
+  const validDelete = await request.delete(`${qaApiURL}/api/beans/${validBeanId}`, {
+    headers: { Authorization: `Bearer ${session.access_token}` },
+  });
+  expect(validDelete.status()).toBe(200);
+  const deletedLookup = await request.get(`${qaApiURL}/api/beans/${validBeanId}`, {
+    headers: { Authorization: `Bearer ${session.access_token}` },
+  });
+  expect(deletedLookup.status()).toBe(404);
+
+  const profileBeforeResponse = await request.get(`${qaApiURL}/api/profile`, {
+    headers: { Authorization: `Bearer ${session.access_token}` },
+  });
+  expect(profileBeforeResponse.status()).toBe(200);
+  const profileBefore = (await profileBeforeResponse.json()) as {
+    display_name: string | null;
+    locale: string;
+    email: string;
+    created_at: string;
+  };
+  const profileUpdate = await request.put(`${qaApiURL}/api/profile`, {
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+      "Content-Type": "application/json",
+    },
+    data: { display_name: "Beanlog QA Security", locale: "en" },
+  });
+  expect(profileUpdate.status()).toBe(200);
+  const profileAfterResponse = await request.get(`${qaApiURL}/api/profile`, {
+    headers: { Authorization: `Bearer ${session.access_token}` },
+  });
+  const profileAfter = (await profileAfterResponse.json()) as typeof profileBefore;
+  expect(profileAfter.display_name).toBe("Beanlog QA Security");
+  expect(profileAfter.locale).toBe("en");
+  expect(profileAfter.email).toBe(profileBefore.email);
+  expect(profileAfter.created_at).toBe(profileBefore.created_at);
+
+  const profileRestore = await request.put(`${qaApiURL}/api/profile`, {
+    headers: {
+      Authorization: `Bearer ${session.access_token}`,
+      "Content-Type": "application/json",
+    },
+    data: {
+      display_name: profileBefore.display_name ?? "Beanlog QA",
+      locale: profileBefore.locale,
+    },
+  });
+  expect(profileRestore.status()).toBe(200);
+
   const removedLegacyDelete = await request.delete(`${qaApiURL}/api/account`, {
     headers: { Authorization: `Bearer ${session.access_token}` },
   });
@@ -282,18 +514,21 @@ test("account deletion removes only the authenticated disposable user", async ()
 
   try {
     const { client } = await signIn(disposable.email, disposable.password);
-    const { error: insertError } = await client.from("beans").insert({
-      user_id: disposableId,
-      name: "[QA] disposable account bean",
-      roastery: "QA Delete",
-      bean_type: "single_origin",
-      origin_country: "Kenya",
-      process_method: "washed",
-      roast_level: "light",
-      consumed_at: "2026-07-30T12:00:00.000Z",
-      place_type: "home",
-      overall_score: 8,
-      note: "must cascade with account deletion",
+    const { error: insertError } = await client.rpc("create_bean_record", {
+      p_bean: {
+        name: "[QA] disposable account bean",
+        roastery: "QA Delete",
+        bean_type: "single_origin",
+        origin_country: "Kenya",
+        process_method: "washed",
+        roast_level: "light",
+        consumed_at: "2026-07-30T12:00:00.000Z",
+        place_type: "home",
+        overall_score: 8,
+        note: "must cascade with account deletion",
+      },
+      p_tags: [],
+      p_components: [],
     });
     expect(insertError).toBeNull();
 

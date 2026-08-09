@@ -12,6 +12,7 @@ interface TopBarProps {
 
 export function TopBar({ user }: TopBarProps) {
   const pathname = usePathname();
+  const appPathname = pathname.replace(/^\/(ko|en)(?=\/|$)/, "") || "/";
   const t = useTranslations("nav");
 
   const links = [
@@ -30,11 +31,12 @@ export function TopBar({ user }: TopBarProps) {
         </Link>
         <nav className="flex items-center gap-1">
           {links.map(({ href, label }) => {
-            const isActive = pathname === href || pathname.startsWith(href + "/");
+            const isActive = appPathname === href || appPathname.startsWith(href + "/");
             return (
               <Link
                 key={href}
                 href={href}
+                aria-current={isActive ? "page" : undefined}
                 className={cn(
                   "border-b-2 border-transparent px-3 py-2 text-sm font-medium transition-colors",
                   isActive

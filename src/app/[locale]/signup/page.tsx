@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { Button } from "@/components/ui/button";
+import { Button, buttonClassName } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { signUp, signInWithOAuth } from "@/lib/actions/auth";
 import { brand } from "@/config/brand";
@@ -49,8 +49,8 @@ export default function SignupPage() {
           <p className="journal-kicker mb-3">{brand.name}</p>
           <h2 className="font-display text-2xl font-bold text-brown">{t("signup")}</h2>
           <p className="mt-3 text-sm text-brown-light">{t("signupSuccess")}</p>
-          <Link href="/login" className="mt-6 inline-block">
-            <Button variant="secondary">{t("goLogin")}</Button>
+          <Link href="/login" className={buttonClassName({ variant: "secondary", className: "mt-6" })}>
+            {t("goLogin")}
           </Link>
         </div>
       </div>

@@ -1,10 +1,39 @@
 import { ButtonHTMLAttributes, forwardRef } from "react";
 import { cn } from "@/lib/utils";
 
+type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
+type ButtonSize = "sm" | "md" | "lg";
+
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "ghost" | "danger";
-  size?: "sm" | "md" | "lg";
+  variant?: ButtonVariant;
+  size?: ButtonSize;
   loading?: boolean;
+}
+
+export function buttonClassName({
+  variant = "primary",
+  size = "md",
+  className,
+}: {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  className?: string;
+} = {}) {
+  return cn(
+    "inline-flex items-center justify-center rounded-sm font-medium transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 disabled:cursor-not-allowed disabled:opacity-50",
+    {
+      "bg-brown text-cream hover:bg-brown-medium": variant === "primary",
+      "bg-transparent border border-border text-brown hover:bg-cream-dark": variant === "secondary",
+      "bg-transparent text-brown-light hover:text-brown hover:bg-cream-dark": variant === "ghost",
+      "bg-red-700 text-white hover:bg-red-800": variant === "danger",
+    },
+    {
+      "min-h-11 text-sm px-3 py-1.5": size === "sm",
+      "min-h-11 text-sm px-4 py-2.5": size === "md",
+      "min-h-12 text-base px-6 py-3": size === "lg",
+    },
+    className
+  );
 }
 
 const Button = forwardRef<HTMLButtonElement, ButtonProps>(
@@ -13,21 +42,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       <button
         ref={ref}
         disabled={disabled || loading}
-        className={cn(
-          "inline-flex items-center justify-center rounded-sm font-medium transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 disabled:cursor-not-allowed disabled:opacity-50",
-          {
-            "bg-brown text-cream hover:bg-brown-medium": variant === "primary",
-            "bg-transparent border border-border text-brown hover:bg-cream-dark": variant === "secondary",
-            "bg-transparent text-brown-light hover:text-brown hover:bg-cream-dark": variant === "ghost",
-            "bg-red-700 text-white hover:bg-red-800": variant === "danger",
-          },
-          {
-            "min-h-11 text-sm px-3 py-1.5": size === "sm",
-            "min-h-11 text-sm px-4 py-2.5": size === "md",
-            "min-h-12 text-base px-6 py-3": size === "lg",
-          },
-          className
-        )}
+        className={buttonClassName({ variant, size, className })}
         {...props}
       >
         {loading && (

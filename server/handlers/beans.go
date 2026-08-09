@@ -558,15 +558,17 @@ func writeOriginResolutionError(c *gin.Context, err error) {
 
 func (h *BeanHandler) Delete(c *gin.Context) {
 	db := middleware.RequestDB(c)
-	userID := c.GetString(middleware.UserIDKey)
 	beanID := c.Param("id")
 
-	tag, err := db.Exec(c.Request.Context(), "DELETE FROM beans WHERE id=$1 AND user_id=$2", beanID, userID)
+	var deleted bool
+	err := db.QueryRow(c.Request.Context(),
+		"SELECT public.delete_bean_record($1::uuid)", beanID,
+	).Scan(&deleted)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to delete bean"})
 		return
 	}
-	if tag.RowsAffected() == 0 {
+	if !deleted {
 		c.JSON(http.StatusNotFound, gin.H{"error": "bean not found"})
 		return
 	}

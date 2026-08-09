@@ -1,7 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 import axe from "axe-core";
 import { qaBaseURL, qaUser } from "./helpers";
-import designTokens from "../../src/config/design-tokens.json";
+import designTokens from "../../src/config/design-tokens.json" with { type: "json" };
 
 async function login(page: Page) {
   await page.goto("/ko/login");

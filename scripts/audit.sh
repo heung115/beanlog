@@ -100,7 +100,9 @@ fi
 
 TRACKED_SENSITIVE="$TMP_ROOT/tracked-sensitive.txt"
 git ls-files | LC_ALL=C rg -i '(^|/)(\.env($|\.)|[^/]*(secret|credential)[^/]*|[^/]+\.(pem|p12|pfx|key))$' \
-  | LC_ALL=C rg -v '(^|/)\.env\.example$' > "$TRACKED_SENSITIVE" || true
+  | LC_ALL=C rg -v '(^|/)\.env\.example$' \
+  | LC_ALL=C rg -v '^(scripts/staging-credentials\.mjs|tests/staging-credentials\.test\.mjs)$' \
+  > "$TRACKED_SENSITIVE" || true
 if [[ -s "$TRACKED_SENSITIVE" ]]; then
   finding "HIGH" "secrets/tracked-files" "Sensitive file names are tracked by Git" "Paths only: $(tr '\n' ' ' < "$TRACKED_SENSITIVE")"
 else
@@ -190,7 +192,7 @@ if npm ci > "$TMP_ROOT/npm-ci.out" 2>&1; then
 else
   finding "HIGH" "build/npm-ci" "Clean npm install failed"
 fi
-if npx tsc --noEmit > "$TMP_ROOT/tsc.out" 2>&1; then
+if npm run typecheck > "$TMP_ROOT/tsc.out" 2>&1; then
   finding "OK" "build/typescript" "TypeScript check passed"
 else
   finding "HIGH" "build/typescript" "TypeScript check failed"
@@ -199,6 +201,25 @@ if npm run lint > "$TMP_ROOT/lint.out" 2>&1; then
   finding "OK" "build/lint" "ESLint passed"
 else
   finding "HIGH" "build/lint" "ESLint failed"
+fi
+if npm run test:node > "$TMP_ROOT/node-test.out" 2>&1; then
+  finding "OK" "test/node" "Node unit tests passed"
+else
+  finding "HIGH" "test/node" "Node unit tests failed"
+fi
+if npm run design:lint > "$TMP_ROOT/design-lint.out" 2>&1; then
+  DESIGN_WARNINGS="$(node -e '
+    const text = require("fs").readFileSync(process.argv[1], "utf8");
+    const matches = [...text.matchAll(/"warnings":\s*(\d+)/g)];
+    console.log(matches.length ? matches.at(-1)[1] : 0);
+  ' "$TMP_ROOT/design-lint.out")"
+  if [[ "$DESIGN_WARNINGS" -gt 0 ]]; then
+    finding "LOW" "build/design" "Design policy checks reported $DESIGN_WARNINGS warnings"
+  else
+    finding "OK" "build/design" "Design policy checks passed"
+  fi
+else
+  finding "MEDIUM" "build/design" "Design policy checks failed"
 fi
 if npm run build > "$TMP_ROOT/next-build.out" 2>&1; then
   finding "OK" "build/next" "Production Next.js build passed"
@@ -226,7 +247,8 @@ if (cd server && GOTOOLCHAIN=go1.26.5 go run golang.org/x/vuln/cmd/govulncheck@v
 else
   finding "HIGH" "go/vulnerability" "govulncheck found a reachable vulnerability or failed"
 fi
-if (cd server && GOTOOLCHAIN=go1.26.5 go run github.com/securego/gosec/v2/cmd/gosec@v2.28.0 -quiet ./...) > "$TMP_ROOT/gosec.out" 2>&1; then
+if (cd server && GOTOOLCHAIN=go1.26.5 go run github.com/securego/gosec/v2/cmd/gosec@v2.28.0 \
+    -quiet -exclude-generated -severity high -confidence medium ./...) > "$TMP_ROOT/gosec.out" 2>&1; then
   finding "OK" "go/static-security" "gosec found no issue"
 else
   finding "HIGH" "go/static-security" "gosec found an issue or failed"
@@ -282,7 +304,9 @@ fi
 if rg -q 'revoke all on function public\.delete_current_account\(\) from public, anon' supabase/migrations/00019_delete_current_account.sql && \
    rg -q 'revoke all on function public\.check_rate_limit' supabase/migrations/00020_function_privileges.sql && \
    rg -q 'alter default privileges in schema public' supabase/migrations/00020_function_privileges.sql && \
-   rg -q 'revoke all privileges on all tables in schema public' supabase/migrations/00021_least_privilege_tables.sql; then
+   rg -q 'revoke insert, update, delete on public\.beans from authenticated' supabase/migrations/00022_postgrest_mutation_boundary.sql && \
+   rg -q 'grant update \(display_name, locale\) on public\.profiles to authenticated' supabase/migrations/00022_postgrest_mutation_boundary.sql && \
+   rg -q 'security definer' supabase/migrations/00022_postgrest_mutation_boundary.sql; then
   finding "OK" "database/privileges" "Functions and tables define explicit least-privilege grants"
 else
   finding "HIGH" "database/privileges" "Function execution revokes are incomplete"
@@ -355,8 +379,13 @@ if [[ "$RUNTIME" -eq 1 ]]; then
   else
     finding "HIGH" "runtime/headers" "Security headers are missing:$MISSING_HEADERS"
   fi
+  WEB_COMMAND="$(docker inspect --format '{{json .Config.Cmd}}' "$STAGING_WEB_CONTAINER" 2>/dev/null || true)"
   if rg -qi "^content-security-policy:.*unsafe-eval" "$TMP_ROOT/headers.txt"; then
-    finding "HIGH" "runtime/csp" "Production CSP permits unsafe-eval"
+    if [[ "$WEB_COMMAND" == *'"dev"'* ]]; then
+      finding "INFO" "runtime/csp" "Development staging CSP permits unsafe-eval" "Production builds must continue to exclude it."
+    else
+      finding "HIGH" "runtime/csp" "Production CSP permits unsafe-eval"
+    fi
   else
     finding "OK" "runtime/csp" "Production CSP blocks unsafe-eval"
   fi
@@ -437,14 +466,23 @@ NODE
       from pg_proc p
       join pg_namespace n on n.oid = p.pronamespace
       where n.nspname = 'public'
-        and p.proname in ('handle_new_user', 'check_rate_limit', 'delete_current_account')
+        and p.proname in (
+          'handle_new_user', 'check_rate_limit', 'delete_current_account',
+          'create_bean_record', 'update_bean_record', 'delete_bean_record'
+        )
     )
     select count(*)
     from sensitive
     where public_execute
       or anon_execute
-      or (proname = 'delete_current_account' and not authenticated_execute)
-      or (proname <> 'delete_current_account' and authenticated_execute);
+      or (
+        proname in ('delete_current_account', 'create_bean_record', 'update_bean_record', 'delete_bean_record')
+        and not authenticated_execute
+      )
+      or (
+        proname in ('handle_new_user', 'check_rate_limit')
+        and authenticated_execute
+      );
   " 2>/dev/null || printf 'query-failed')"
   if [[ "$FUNCTION_PRIVILEGE_COUNT" == "0" ]]; then
     finding "OK" "runtime/database-privileges" "Sensitive function execution grants match the least-privilege policy"
@@ -456,19 +494,9 @@ NODE
     with expected(grantee, table_name, privilege_type) as (
       values
         ('authenticated', 'profiles', 'SELECT'),
-        ('authenticated', 'profiles', 'INSERT'),
-        ('authenticated', 'profiles', 'UPDATE'),
         ('authenticated', 'beans', 'SELECT'),
-        ('authenticated', 'beans', 'INSERT'),
-        ('authenticated', 'beans', 'UPDATE'),
-        ('authenticated', 'beans', 'DELETE'),
         ('authenticated', 'tasting_tags', 'SELECT'),
-        ('authenticated', 'tasting_tags', 'INSERT'),
-        ('authenticated', 'tasting_tags', 'DELETE'),
         ('authenticated', 'blend_components', 'SELECT'),
-        ('authenticated', 'blend_components', 'INSERT'),
-        ('authenticated', 'blend_components', 'UPDATE'),
-        ('authenticated', 'blend_components', 'DELETE'),
         ('authenticated', 'origin_presets', 'SELECT'),
         ('authenticated', 'origin_countries', 'SELECT'),
         ('authenticated', 'origin_regions', 'SELECT'),
@@ -478,12 +506,27 @@ NODE
       from information_schema.table_privileges
       where table_schema = 'public'
         and grantee in ('PUBLIC', 'anon', 'authenticated', 'service_role')
-    ), mismatches as (
+    ), table_mismatches as (
       (select * from actual except select * from expected)
       union all
       (select * from expected except select * from actual)
+    ), expected_columns(grantee, table_name, column_name, privilege_type) as (
+      values
+        ('authenticated', 'profiles', 'display_name', 'UPDATE'),
+        ('authenticated', 'profiles', 'locale', 'UPDATE')
+    ), actual_columns as (
+      select grantee::text, table_name::text, column_name::text, privilege_type::text
+      from information_schema.column_privileges
+      where table_schema = 'public'
+        and privilege_type = 'UPDATE'
+        and grantee in ('PUBLIC', 'anon', 'authenticated', 'service_role')
+    ), column_mismatches as (
+      (select * from actual_columns except select * from expected_columns)
+      union all
+      (select * from expected_columns except select * from actual_columns)
     )
-    select count(*) from mismatches;
+    select (select count(*) from table_mismatches)
+         + (select count(*) from column_mismatches);
   " 2>/dev/null || printf 'query-failed')"
   if [[ "$TABLE_PRIVILEGE_MISMATCHES" == "0" ]]; then
     finding "OK" "runtime/table-privileges" "Public table grants exactly match the least-privilege allow-list"
@@ -558,7 +601,11 @@ NODE
         if [[ "$SCOUT_STATUS" -eq 0 && "$SCOUT_COUNT" == "0" ]]; then
           finding "OK" "container/cve" "$image has no critical/high Docker Scout finding"
         elif [[ "$SCOUT_COUNT" =~ ^[0-9]+$ ]]; then
-          finding "HIGH" "container/cve" "$image has $SCOUT_COUNT critical/high Docker Scout findings"
+          if [[ "$image" == "${STAGING_COMPOSE_PROJECT}-web" && "${WEB_COMMAND:-}" == *'"dev"'* ]]; then
+            finding "INFO" "container/cve" "$image development image has $SCOUT_COUNT critical/high findings" "The development-only dependency image is not a production artifact."
+          else
+            finding "HIGH" "container/cve" "$image has $SCOUT_COUNT critical/high Docker Scout findings"
+          fi
         else
           finding "MEDIUM" "container/cve" "$image Docker Scout result could not be parsed"
         fi

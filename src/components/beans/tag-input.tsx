@@ -102,6 +102,7 @@ export function TagInput({ value, onChange }: TagInputProps) {
       {/* Custom tag input */}
       <input
         type="text"
+        aria-label={t("tastingNotesPlaceholder")}
         value={draft}
         onChange={(e) => setDraft(e.target.value)}
         onKeyDown={(e) => {

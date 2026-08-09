@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { ensureUser, qaOtherUser, qaUser, signIn } from "./helpers";
 
 type Fixture = {
@@ -13,6 +14,35 @@ type Fixture = {
   price?: number;
   weight_g?: number;
 };
+
+async function deleteAllBeans(client: SupabaseClient, userId: string) {
+  const { data: beans, error: listError } = await client
+    .from("beans")
+    .select("id")
+    .eq("user_id", userId);
+  if (listError) throw listError;
+
+  for (const bean of beans ?? []) {
+    const { data: deleted, error } = await client.rpc("delete_bean_record", {
+      p_id: bean.id,
+    });
+    if (error || !deleted) throw error ?? new Error(`Failed to delete QA bean ${bean.id}`);
+  }
+}
+
+async function createBean(
+  client: SupabaseClient,
+  bean: Record<string, unknown>,
+  tags: Array<{ tag: string; category: string }> = []
+) {
+  const { data, error } = await client.rpc("create_bean_record", {
+    p_bean: bean,
+    p_tags: tags,
+    p_components: [],
+  });
+  if (error || !data) throw error ?? new Error("Failed to create QA bean");
+  return data as string;
+}
 
 export default async function globalSetup() {
   const primaryId = await ensureUser(qaUser.email, qaUser.password);
@@ -40,20 +70,11 @@ export default async function globalSetup() {
   // These accounts are dedicated to the automated harness. Clear every row,
   // including a partially-written row left by an older broken API build, so
   // each run starts from an exact and reproducible 30-record boundary.
-  const { error: primaryCleanupError } = await primary
-    .from("beans")
-    .delete()
-    .eq("user_id", primaryId);
-  if (primaryCleanupError) throw primaryCleanupError;
-  const { error: isolationCleanupError } = await isolation
-    .from("beans")
-    .delete()
-    .eq("user_id", isolationId);
-  if (isolationCleanupError) throw isolationCleanupError;
+  await deleteAllBeans(primary, primaryId);
+  await deleteAllBeans(isolation, isolationId);
 
   const rows = fixtures.map((fixture, index) => ({
     ...fixture,
-    user_id: primaryId,
     roastery: "커피화 로스터스",
     bean_type: "single_origin",
     roast_level: index % 3 === 0 ? "light" : "medium",
@@ -77,7 +98,6 @@ export default async function globalSetup() {
     "Honduras",
   ];
   const baselineRows = baselineCountries.map((country, index) => ({
-    user_id: primaryId,
     name: `[QA baseline ${String(index + 1).padStart(2, "0")}] ${country}`,
     roastery: "QA Boundary Roastery",
     bean_type: "single_origin",
@@ -89,26 +109,20 @@ export default async function globalSetup() {
     overall_score: 7,
     note: "[QA:pagination] 20건 경계와 전체 필터 옵션 검증용",
   }));
-  const { error: fixtureError } = await primary.from("beans").insert([...rows, ...baselineRows]);
-  if (fixtureError) throw fixtureError;
-
-  const { data: cupNoteBean, error: cupNoteBeanError } = await primary
-    .from("beans")
-    .select("id")
-    .eq("user_id", primaryId)
-    .eq("name", fixtures[0].name)
-    .single();
-  if (cupNoteBeanError || !cupNoteBean) {
-    throw cupNoteBeanError ?? new Error("QA cup-note bean lookup failed");
+  for (const [index, row] of [...rows, ...baselineRows].entries()) {
+    await createBean(
+      primary,
+      row,
+      index === 0
+        ? [
+            { tag: "chocolate", category: "cocoa" },
+            { tag: "caramel", category: "sweet" },
+          ]
+        : []
+    );
   }
-  const { error: cupNoteError } = await primary.from("tasting_tags").insert([
-    { bean_id: cupNoteBean.id, user_id: primaryId, tag: "chocolate", category: "cocoa" },
-    { bean_id: cupNoteBean.id, user_id: primaryId, tag: "caramel", category: "sweet" },
-  ]);
-  if (cupNoteError) throw cupNoteError;
 
-  const { error: isolationError } = await isolation.from("beans").insert({
-    user_id: isolationId,
+  await createBean(isolation, {
     name: "[QA] 다른 사용자 비공개 원두",
     roastery: "Isolation Roastery",
     bean_type: "single_origin",
@@ -120,5 +134,4 @@ export default async function globalSetup() {
     overall_score: 9,
     note: "[QA:isolation] 반드시 다른 사용자에게 보이지 않아야 함",
   });
-  if (isolationError) throw isolationError;
 }

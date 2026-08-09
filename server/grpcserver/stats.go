@@ -107,7 +107,7 @@ func (s *StatsServer) GetStats(ctx context.Context, _ *beanlogv1.GetStatsRequest
 	}
 
 	resp := &beanlogv1.GetStatsResponse{
-		Total:      int32(total),
+		Total:      saturatingInt32(total),
 		AvgScore:   math.Round(sumScore/float64(total)*10) / 10,
 		Best:       &beanlogv1.BestBean{Name: best.name, Roastery: best.roastery, Score: best.score},
 		ByOrigin:   countEntries(byOrigin, true),
@@ -128,12 +128,31 @@ func (s *StatsServer) GetStats(ctx context.Context, _ *beanlogv1.GetStatsRequest
 func countEntries(m map[string]int, desc bool) []*beanlogv1.CountEntry {
 	entries := make([]*beanlogv1.CountEntry, 0, len(m))
 	for k, v := range m {
-		entries = append(entries, &beanlogv1.CountEntry{Key: k, Count: int32(v)})
+		entries = append(entries, &beanlogv1.CountEntry{Key: k, Count: saturatingInt32(v)})
 	}
 	if desc {
-		sort.Slice(entries, func(i, j int) bool { return entries[i].Count > entries[j].Count })
+		sort.Slice(entries, func(i, j int) bool {
+			if entries[i].Count == entries[j].Count {
+				return entries[i].Key < entries[j].Key
+			}
+			return entries[i].Count > entries[j].Count
+		})
 	} else {
 		sort.Slice(entries, func(i, j int) bool { return entries[i].Key < entries[j].Key })
 	}
 	return entries
+}
+
+func saturatingInt32(value int) int32 {
+	const (
+		maxInt32 = 1<<31 - 1
+		minInt32 = -1 << 31
+	)
+	if value > maxInt32 {
+		return maxInt32
+	}
+	if value < minInt32 {
+		return minInt32
+	}
+	return int32(value)
 }

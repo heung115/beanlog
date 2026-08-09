@@ -29,7 +29,11 @@ export function Toast() {
 
   return (
     <div className="fixed bottom-20 left-1/2 z-50 -translate-x-1/2 md:bottom-8">
-      <div className="rounded-md bg-brown px-4 py-2.5 text-sm text-cream shadow-lg">
+      <div
+        role="status"
+        aria-live="polite"
+        className="rounded-md bg-brown px-4 py-2.5 text-sm text-cream shadow-lg"
+      >
         {message}
       </div>
     </div>

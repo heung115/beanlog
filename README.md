@@ -39,15 +39,16 @@ Docker Desktop이 필요합니다.
 ```bash
 npm install
 npm run staging:up     # 스테이징 실행 → http://localhost:3100
-npm run staging:qa     # 전체 QA (27개)
+npm run staging:qa     # 전체 QA (28개)
 npm run staging:down   # 종료
 ```
 
-빌드와 린트:
+일상 점검과 심층 감사:
 
 ```bash
-npm run build
-npm run lint
+npm run check          # 타입·린트·단위 테스트·디자인·빌드 전체 실행
+npm run check:fast     # 빌드를 제외한 빠른 점검
+npm run audit          # 의존성·보안·컨테이너 설정까지 심층 감사
 ```
 
 ## 문서

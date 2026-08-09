@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { BeanForm } from "@/components/beans/bean-form";
-import { Button } from "@/components/ui/button";
+import { buttonClassName } from "@/components/ui/button";
 import { getBeanById } from "@/lib/actions/beans";
 import type { BeanWithTags } from "@/types/database";
 
@@ -61,8 +61,11 @@ export default function EditBeanPage() {
             {t("notFound")}
           </p>
           <p className="mt-2 text-sm text-brown-light">{t("notFoundSub")}</p>
-          <Link href={`/${locale}/explore`} className="mt-6 inline-block">
-            <Button variant="secondary">{t("back")}</Button>
+          <Link
+            href={`/${locale}/explore`}
+            className={buttonClassName({ variant: "secondary", className: "mt-6" })}
+          >
+            {t("back")}
           </Link>
         </div>
       ) : (

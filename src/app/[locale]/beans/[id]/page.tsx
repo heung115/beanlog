@@ -12,7 +12,7 @@ import {
   RadarChart,
   ResponsiveContainer,
 } from "recharts";
-import { Button } from "@/components/ui/button";
+import { Button, buttonClassName } from "@/components/ui/button";
 import { ScoreDisplay } from "@/components/ui/score-display";
 import { useToast } from "@/components/ui/toast";
 import { tagDisplayName } from "@/components/beans/tag-input";
@@ -149,8 +149,11 @@ export default function BeanDetailPage() {
             {t("notFound")}
           </p>
           <p className="mt-2 text-sm text-brown-light">{t("notFoundSub")}</p>
-          <Link href={`/${locale}/explore`} className="mt-6 inline-block">
-            <Button variant="secondary">{t("back")}</Button>
+          <Link
+            href={`/${locale}/explore`}
+            className={buttonClassName({ variant: "secondary", className: "mt-6" })}
+          >
+            {t("back")}
           </Link>
         </div>
       </div>

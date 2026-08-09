@@ -56,7 +56,10 @@ func nullIfEmpty(s *string) *string {
 // to the selected country and be canonical; an entity must belong to the
 // selected region's canonical group. Blends carry no single origin.
 func resolveOriginSelection(ctx context.Context, db pgx.Tx, req *models.CreateBeanRequest) (*originSelection, error) {
-	sel := &originSelection{}
+	// Keep JSON payloads array-shaped even when a blend has no parent origin.
+	// A nil slice marshals as JSON null, which the mutation RPC cannot pass to
+	// jsonb_array_elements_text.
+	sel := &originSelection{OriginSubregions: []string{}}
 
 	if req.BeanType == "blend" {
 		return sel, nil
