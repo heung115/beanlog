@@ -306,7 +306,10 @@ if rg -q 'revoke all on function public\.delete_current_account\(\) from public,
    rg -q 'alter default privileges in schema public' supabase/migrations/00020_function_privileges.sql && \
    rg -q 'revoke insert, update, delete on public\.beans from authenticated' supabase/migrations/00022_postgrest_mutation_boundary.sql && \
    rg -q 'grant update \(display_name, locale\) on public\.profiles to authenticated' supabase/migrations/00022_postgrest_mutation_boundary.sql && \
-   rg -q 'security definer' supabase/migrations/00022_postgrest_mutation_boundary.sql; then
+   rg -q 'security definer' supabase/migrations/00022_postgrest_mutation_boundary.sql && \
+   rg -q 'jsonb_array_length\(p_tags\) > 100' supabase/migrations/00023_bound_mutation_payloads.sql && \
+   rg -q 'jsonb_array_length\(p_components\) > 50' supabase/migrations/00023_bound_mutation_payloads.sql && \
+   rg -q 'octet_length\(p_bean::text\)' supabase/migrations/00023_bound_mutation_payloads.sql; then
   finding "OK" "database/privileges" "Functions and tables define explicit least-privilege grants"
 else
   finding "HIGH" "database/privileges" "Function execution revokes are incomplete"
@@ -346,6 +349,15 @@ if [[ -f .staging/docker.env ]]; then
   fi
 else
   finding "INFO" "docker/compose" "Staging env absent; Compose rendering skipped"
+fi
+if rg -q 'staging-gateway' docker-compose.staging.yml && \
+   rg -q 'staging-database' docker-compose.staging.yml && \
+   ! rg -q '^[[:space:]]+- staging-supabase$' docker-compose.staging.yml && \
+   rg -q 'ensurePrivateServiceNetworks' scripts/staging.mjs && \
+   rg -q 'meta,studio' scripts/staging.mjs; then
+  finding "OK" "docker/network-separation" "Application containers use narrow gateway/database networks and omit management services"
+else
+  finding "HIGH" "docker/network-separation" "Application containers may share the Supabase management network"
 fi
 if rg -q 'DATABASE_URL_FILE: /run/secrets/api_database_url' docker-compose.staging.yml && \
    ! rg -q '^[[:space:]]+DATABASE_URL:' docker-compose.staging.yml && \
@@ -429,7 +441,31 @@ if [[ "$RUNTIME" -eq 1 ]]; then
   if [[ -s "$NON_LOOPBACK_PORTS" ]]; then
     finding "HIGH" "runtime/network" "A staging service publishes beyond loopback" "Containers only: $(sort -u "$NON_LOOPBACK_PORTS" | tr '\n' ' ')"
   else
-    finding "OK" "runtime/network" "All web, API, database, gateway, Studio, and mail ports bind to loopback"
+    finding "OK" "runtime/network" "All web, API, database, gateway, and mail ports bind to loopback"
+  fi
+
+  APP_MANAGEMENT_ACCESS="safe"
+  for container in "$STAGING_WEB_CONTAINER" "$STAGING_API_CONTAINER"; do
+    ATTACHED_NETWORKS="$(docker inspect --format '{{json .NetworkSettings.Networks}}' "$container" 2>/dev/null || true)"
+    if [[ "$ATTACHED_NETWORKS" == *"$STAGING_SUPABASE_NETWORK"* ]]; then
+      APP_MANAGEMENT_ACCESS="unsafe"
+    fi
+    if docker exec "$container" wget -q --spider --timeout=2 http://pg_meta:8080/ >/dev/null 2>&1 || \
+       docker exec "$container" wget -q --spider --timeout=2 http://studio:3000/ >/dev/null 2>&1; then
+      APP_MANAGEMENT_ACCESS="unsafe"
+    fi
+  done
+  for management_container in \
+    "supabase_pg_meta_${STAGING_SUPABASE_PROJECT}" \
+    "supabase_studio_${STAGING_SUPABASE_PROJECT}"; do
+    if docker inspect "$management_container" >/dev/null 2>&1; then
+      APP_MANAGEMENT_ACCESS="unsafe"
+    fi
+  done
+  if [[ "$APP_MANAGEMENT_ACCESS" == "safe" ]]; then
+    finding "OK" "runtime/management-network" "Application containers cannot reach Supabase management services"
+  else
+    finding "HIGH" "runtime/management-network" "Application containers can reach a Supabase management service or network"
   fi
 
   docker inspect "$STAGING_WEB_CONTAINER" "$STAGING_API_CONTAINER" > "$TMP_ROOT/app-containers.json" 2>/dev/null || true
@@ -468,7 +504,8 @@ NODE
       where n.nspname = 'public'
         and p.proname in (
           'handle_new_user', 'check_rate_limit', 'delete_current_account',
-          'create_bean_record', 'update_bean_record', 'delete_bean_record'
+          'create_bean_record', 'update_bean_record', 'delete_bean_record',
+          'assert_bean_mutation_payload'
         )
     )
     select count(*)
@@ -481,6 +518,10 @@ NODE
       )
       or (
         proname in ('handle_new_user', 'check_rate_limit')
+        and authenticated_execute
+      )
+      or (
+        proname = 'assert_bean_mutation_payload'
         and authenticated_execute
       );
   " 2>/dev/null || printf 'query-failed')"

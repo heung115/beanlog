@@ -15,6 +15,8 @@ import (
 
 type StatsHandler struct{}
 
+const maxStatsBeans = 10000
+
 func NewStatsHandler() *StatsHandler {
 	return &StatsHandler{}
 }
@@ -25,7 +27,7 @@ func (h *StatsHandler) GetStats(c *gin.Context) {
 
 	rows, err := db.Query(c.Request.Context(),
 		`SELECT origin_country, process_method, COALESCE(varietal,''), overall_score, consumed_at, name, roastery
-		 FROM beans WHERE user_id = $1`, userID,
+		 FROM beans WHERE user_id = $1 LIMIT $2`, userID, maxStatsBeans+1,
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to query stats"})
@@ -42,9 +44,18 @@ func (h *StatsHandler) GetStats(c *gin.Context) {
 	for rows.Next() {
 		var b beanRow
 		if err := rows.Scan(&b.origin, &b.process, &b.varietal, &b.score, &b.consumedAt, &b.name, &b.roastery); err != nil {
-			continue
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to query stats"})
+			return
 		}
 		beanRows = append(beanRows, b)
+	}
+	if err := rows.Err(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to query stats"})
+		return
+	}
+	if len(beanRows) > maxStatsBeans {
+		c.JSON(http.StatusRequestEntityTooLarge, gin.H{"error": "dataset too large for statistics"})
+		return
 	}
 
 	if len(beanRows) == 0 {

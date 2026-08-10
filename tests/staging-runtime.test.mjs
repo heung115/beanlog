@@ -59,6 +59,19 @@ test("an existing API database credential is reused across staging startups", ()
   assert.match(stagingRuntime, /if \(storedDatabaseUrl\)/);
 });
 
+test("application containers are isolated from Supabase management services", () => {
+  const webService = compose.match(/\n  web:[\s\S]*?\n  api:/)?.[0] ?? "";
+  const apiService = compose.match(/\n  api:[\s\S]*?\nnetworks:/)?.[0] ?? "";
+
+  assert.doesNotMatch(webService, /staging-supabase/);
+  assert.doesNotMatch(apiService, /staging-supabase/);
+  assert.match(webService, /staging-gateway/);
+  assert.match(apiService, /staging-gateway/);
+  assert.match(apiService, /staging-database/);
+  assert.match(stagingRuntime, /ensurePrivateServiceNetworks/);
+  assert.match(stagingRuntime, /meta,studio/);
+});
+
 test("the primary checkout keeps its established staging endpoints", () => {
   const primaryRoot = path.resolve("/repo/coffee-info");
   const runtime = deriveStagingRuntime({
@@ -156,6 +169,8 @@ test("staging commands consistently use the derived worktree runtime", () => {
   assert.match(stagingRuntime, /runtime\.supabaseProject/);
   assert.match(stagingRuntime, /renderSupabaseConfig/);
   assert.match(stagingRuntime, /STAGING_SUPABASE_NETWORK/);
+  assert.match(stagingRuntime, /STAGING_GATEWAY_NETWORK/);
+  assert.match(stagingRuntime, /STAGING_DATABASE_NETWORK/);
   assert.match(stagingRuntime, /STAGING_DEPLOYMENT_ID/);
   assert.doesNotMatch(stagingRuntime, /supabase_(kong|db|studio|inbucket)_beanlog-staging/);
   assert.doesNotMatch(stagingRuntime, /--project-id", "beanlog-staging"/);

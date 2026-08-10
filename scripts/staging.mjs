@@ -26,6 +26,8 @@ const envFile = path.join(runtimeRoot, "docker.env");
 const databaseSecretFile = path.join(runtimeRoot, "api-database-url.secret");
 const composeFile = path.join(root, "docker-compose.staging.yml");
 const command = process.argv[2] ?? "help";
+const gatewayNetwork = `${runtime.composeProject}-gateway`;
+const databaseNetwork = `${runtime.composeProject}-database`;
 
 function run(bin, args, options = {}) {
   const { capture, env: extraEnv, ...execOptions } = options;
@@ -58,7 +60,8 @@ function compose(args, options = {}) {
       ...options,
       env: {
         STAGING_COMPOSE_PROJECT_NAME: runtime.composeProject,
-        STAGING_SUPABASE_NETWORK: `supabase_network_${runtime.supabaseProject}`,
+        STAGING_GATEWAY_NETWORK: gatewayNetwork,
+        STAGING_DATABASE_NETWORK: databaseNetwork,
         ...(options.env ?? {}),
       },
     }
@@ -180,10 +183,58 @@ async function hardenSupabaseBindings() {
   for (const name of [
     `supabase_kong_${runtime.supabaseProject}`,
     `supabase_db_${runtime.supabaseProject}`,
-    `supabase_studio_${runtime.supabaseProject}`,
     `supabase_inbucket_${runtime.supabaseProject}`,
   ]) {
     await bindContainerPortsToLoopback(name);
+  }
+}
+
+function ensureDockerNetwork(name) {
+  const inspected = spawnSync("docker", ["network", "inspect", name], {
+    cwd: root,
+    stdio: "ignore",
+  });
+  if (inspected.status === 0) return;
+  run("docker", ["network", "create", "--driver", "bridge", "--internal", name]);
+}
+
+function connectContainerToNetwork(container, network, alias) {
+  const connected = spawnSync(
+    "docker",
+    ["inspect", "--format", `{{with index .NetworkSettings.Networks \"${network}\"}}connected{{end}}`, container],
+    { cwd: root, encoding: "utf8" }
+  );
+  if (connected.status === 0 && connected.stdout.trim() === "connected") return;
+  run("docker", ["network", "connect", "--alias", alias, network, container]);
+}
+
+function ensurePrivateServiceNetworks() {
+  ensureDockerNetwork(gatewayNetwork);
+  ensureDockerNetwork(databaseNetwork);
+  connectContainerToNetwork(
+    `supabase_kong_${runtime.supabaseProject}`,
+    gatewayNetwork,
+    "kong"
+  );
+  connectContainerToNetwork(
+    `supabase_db_${runtime.supabaseProject}`,
+    databaseNetwork,
+    "db"
+  );
+}
+
+function removeSupabaseManagementContainers() {
+  for (const name of [
+    `supabase_pg_meta_${runtime.supabaseProject}`,
+    `supabase_studio_${runtime.supabaseProject}`,
+  ]) {
+    spawnSync("docker", ["rm", "--force", name], { cwd: root, stdio: "ignore" });
+  }
+}
+
+function removePrivateServiceNetworks() {
+  for (const name of [gatewayNetwork, databaseNetwork]) {
+    spawnSync("docker", ["network", "rm", name], { cwd: root, stdio: "ignore" });
   }
 }
 
@@ -254,6 +305,8 @@ function writeEnvironment(status, databaseUrl) {
   const values = {
     STAGING_COMPOSE_PROJECT_NAME: runtime.composeProject,
     STAGING_SUPABASE_NETWORK: `supabase_network_${runtime.supabaseProject}`,
+    STAGING_GATEWAY_NETWORK: gatewayNetwork,
+    STAGING_DATABASE_NETWORK: databaseNetwork,
     STAGING_DEPLOYMENT_ID: runtime.composeProject,
     STAGING_WEB_PORT: String(runtime.web),
     STAGING_API_PORT: String(runtime.api),
@@ -325,14 +378,16 @@ async function up() {
       "supabase",
       "start",
       "--exclude",
-      "realtime,storage-api,imgproxy,logflare,vector,edge-runtime",
+      "realtime,storage-api,imgproxy,logflare,vector,edge-runtime,meta,studio",
       "--workdir",
       runtimeRoot,
     ],
     { capture: true, stdio: ["ignore", "pipe", "pipe"] }
   );
+  removeSupabaseManagementContainers();
   supabase(["migration", "up", "--local"]);
   const status = readStatus();
+  ensurePrivateServiceNetworks();
   const storedDatabaseUrl = readStoredDatabaseUrl();
   const databaseUrl = storedDatabaseUrl ?? provisionApiDatabaseRole();
   writeEnvironment(status, databaseUrl);
@@ -355,7 +410,6 @@ async function up() {
   console.log(`  App:      http://localhost:${runtime.web}`);
   console.log(`  API:      http://localhost:${runtime.api}/health`);
   console.log(`  Supabase: http://localhost:${runtime.supabaseApi}`);
-  console.log(`  Studio:   http://localhost:${runtime.supabaseStudio}`);
   console.log("Run `npm run staging:qa` for the test suite.");
 }
 
@@ -389,6 +443,7 @@ function down() {
   if (fs.existsSync(path.join(runtimeSupabase, "config.toml"))) {
     supabase(["stop", "--project-id", runtime.supabaseProject]);
   }
+  removePrivateServiceNetworks();
   console.log("Staging environment stopped. Database volumes were preserved.");
 }
 
@@ -399,7 +454,6 @@ function status() {
       ["App", `http://localhost:${runtime.web}/ko/login`],
       ["API", `http://localhost:${runtime.api}/health`],
       ["Supabase", `http://localhost:${runtime.supabaseApi}/auth/v1/health`],
-      ["Studio", `http://localhost:${runtime.supabaseStudio}`],
     ];
     for (const [label, url] of checks) console.log(`${label.padEnd(9)} ${url}`);
   }

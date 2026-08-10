@@ -12,6 +12,8 @@ import (
 
 type ProfileHandler struct{}
 
+const maxExportBeans = 5000
+
 func NewProfileHandler() *ProfileHandler {
 	return &ProfileHandler{}
 }
@@ -83,7 +85,7 @@ func (h *ProfileHandler) ExportData(c *gin.Context) {
 		        score_aroma, score_acidity, score_body, score_sweetness,
 		        score_aftertaste, score_balance, purchase_source, price,
 		        weight_g, purchased_at, created_at, updated_at
-		 FROM beans WHERE user_id = $1 ORDER BY consumed_at DESC`, userID,
+		 FROM beans WHERE user_id = $1 ORDER BY consumed_at DESC LIMIT $2`, userID, maxExportBeans+1,
 	)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to export data"})
@@ -106,7 +108,8 @@ func (h *ProfileHandler) ExportData(c *gin.Context) {
 			&b.ScoreAftertaste, &b.ScoreBalance, &b.PurchaseSource, &b.Price,
 			&b.WeightG, &purchasedAt, &b.CreatedAt, &b.UpdatedAt,
 		); err != nil {
-			continue
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to export data"})
+			return
 		}
 		if roastDate != nil {
 			s := roastDate.Format("2006-01-02")
@@ -117,6 +120,14 @@ func (h *ProfileHandler) ExportData(c *gin.Context) {
 			b.PurchasedAt = &s
 		}
 		beans = append(beans, b)
+	}
+	if err := rows.Err(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to export data"})
+		return
+	}
+	if len(beans) > maxExportBeans {
+		c.JSON(http.StatusRequestEntityTooLarge, gin.H{"error": "dataset too large to export"})
+		return
 	}
 
 	if len(beans) > 0 {

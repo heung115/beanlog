@@ -251,6 +251,45 @@ test("authenticated PostgREST writes cannot bypass bean or profile invariants", 
       .eq("id", userId);
     expect(allowedProfileError).toBeNull();
 
+    const oversizedTagsName = `[QA] oversized tags ${suffix}`;
+    const { error: oversizedTagsError } = await client.rpc("create_bean_record", {
+      p_bean: { ...beanPayload, name: oversizedTagsName },
+      p_tags: Array.from({ length: 101 }, (_, index) => ({
+        tag: `limit-${index}`,
+        category: "other",
+      })),
+      p_components: [],
+    });
+    expect.soft(oversizedTagsError, "RPC tag limit").toMatchObject({ code: "22023" });
+
+    const oversizedComponentsName = `[QA] oversized components ${suffix}`;
+    const { error: oversizedComponentsError } = await client.rpc("create_bean_record", {
+      p_bean: {
+        ...beanPayload,
+        name: oversizedComponentsName,
+        bean_type: "blend",
+        origin_country: null,
+      },
+      p_tags: [],
+      p_components: Array.from({ length: 51 }, (_, index) => ({
+        origin_country: `Origin ${index}`,
+        percentage: index === 0 ? 100 : 0,
+        sort_order: index,
+      })),
+    });
+    expect.soft(oversizedComponentsError, "RPC component limit").toMatchObject({ code: "22023" });
+
+    const { error: oversizedUpdateError } = await client.rpc("update_bean_record", {
+      p_id: singleId,
+      p_bean: { ...beanPayload, name: `[QA] oversized update ${suffix}` },
+      p_tags: Array.from({ length: 101 }, (_, index) => ({
+        tag: `update-limit-${index}`,
+        category: "other",
+      })),
+      p_components: [],
+    });
+    expect.soft(oversizedUpdateError, "RPC update tag limit").toMatchObject({ code: "22023" });
+
     const { error: beanDeleteError } = await client.from("beans").delete().eq("id", singleId);
     expect.soft(beanDeleteError, "direct bean delete").toMatchObject({ code: "42501" });
 
@@ -259,6 +298,12 @@ test("authenticated PostgREST writes cannot bypass bean or profile invariants", 
       .select("id", { count: "exact", head: true })
       .eq("name", invalidBlendName);
     expect.soft(invalidBlendCount, "invalid blend was not persisted").toBe(0);
+
+    const { count: oversizedPayloadCount } = await client
+      .from("beans")
+      .select("id", { count: "exact", head: true })
+      .in("name", [oversizedTagsName, oversizedComponentsName]);
+    expect.soft(oversizedPayloadCount, "oversized RPC payloads were not persisted").toBe(0);
 
     const { data: components } = await client
       .from("blend_components")

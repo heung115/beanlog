@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"bytes"
+	"errors"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -9,7 +10,12 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-const requestDatabaseKey = "request_database"
+const (
+	requestDatabaseKey       = "request_database"
+	maxBufferedResponseBytes = 8 << 20
+)
+
+var errBufferedResponseTooLarge = errors.New("buffered response exceeds limit")
 
 // bufferedResponseWriter keeps the response private until the request's
 // database transaction commits. API handlers do not stream or hijack
@@ -17,10 +23,11 @@ const requestDatabaseKey = "request_database"
 // prevents a successful response from escaping before a failed commit.
 type bufferedResponseWriter struct {
 	gin.ResponseWriter
-	header http.Header
-	body   bytes.Buffer
-	status int
-	size   int
+	header     http.Header
+	body       bytes.Buffer
+	status     int
+	size       int
+	overflowed bool
 }
 
 func newBufferedResponseWriter(writer gin.ResponseWriter) *bufferedResponseWriter {
@@ -51,6 +58,11 @@ func (writer *bufferedResponseWriter) WriteHeaderNow() {
 
 func (writer *bufferedResponseWriter) Write(data []byte) (int, error) {
 	writer.WriteHeaderNow()
+	if writer.overflowed || len(data) > maxBufferedResponseBytes-writer.body.Len() {
+		writer.overflowed = true
+		writer.body.Reset()
+		return 0, errBufferedResponseTooLarge
+	}
 	written, err := writer.body.Write(data)
 	writer.size += written
 	return written, err
@@ -74,6 +86,10 @@ func (writer *bufferedResponseWriter) Written() bool {
 
 func (writer *bufferedResponseWriter) Flush() {
 	writer.WriteHeaderNow()
+}
+
+func (writer *bufferedResponseWriter) Overflowed() bool {
+	return writer.overflowed
 }
 
 func (writer *bufferedResponseWriter) flushTo(destination gin.ResponseWriter) error {
@@ -134,6 +150,11 @@ func RequestDatabase(pool *pgxpool.Pool) gin.HandlerFunc {
 		c.Set(requestDatabaseKey, tx)
 		c.Next()
 		c.Writer = originalWriter
+		if buffered.Overflowed() {
+			_ = tx.Rollback(ctx)
+			c.AbortWithStatusJSON(http.StatusRequestEntityTooLarge, gin.H{"error": "response too large"})
+			return
+		}
 
 		if buffered.Status() >= http.StatusBadRequest {
 			_ = tx.Rollback(ctx)

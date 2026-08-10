@@ -46,7 +46,7 @@ services:
       - ALL
     networks:
       - default
-      - staging-supabase
+      - staging-gateway
 
   api:
     build:
@@ -83,12 +83,16 @@ services:
       - ALL
     networks:
       - default
-      - staging-supabase
+      - staging-gateway
+      - staging-database
 
 networks:
-  staging-supabase:
+  staging-gateway:
     external: true
-    name: ${STAGING_SUPABASE_NETWORK:-supabase_network_beanlog-staging}
+    name: ${STAGING_GATEWAY_NETWORK:-beanlog-staging-gateway}
+  staging-database:
+    external: true
+    name: ${STAGING_DATABASE_NETWORK:-beanlog-staging-database}
 
 secrets:
   api_database_url:
