@@ -20,7 +20,7 @@
 | 백엔드 | Go (Gin) REST API, 학습용 gRPC Stats 서비스 |
 | 인증 | Supabase Auth — Google/Kakao OAuth, JWT |
 | 데이터베이스 | Supabase / PostgreSQL 17 — RLS, 원자적 저장 함수 |
-| 인프라 / 검증 | Docker, Playwright QA 27개 |
+| 인프라 / 검증 | Docker, Playwright QA 28개 |
 
 ## 구조
 
@@ -50,11 +50,3 @@ npm run check          # 타입·린트·단위 테스트·디자인·빌드 전
 npm run check:fast     # 빌드를 제외한 빠른 점검
 npm run audit          # 의존성·보안·컨테이너 설정까지 심층 감사
 ```
-
-## 문서
-
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — 구조와 설계 결정
-- [docs/STAGING.md](docs/STAGING.md) — 스테이징 환경 구성
-- [docs/SECURITY_AUDIT.md](docs/SECURITY_AUDIT.md) — 보안 점검
-- [docs/GRPC.md](docs/GRPC.md) — gRPC Stats 서비스
-- [docs/oauth-setup.md](docs/oauth-setup.md) — OAuth 설정

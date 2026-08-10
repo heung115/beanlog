@@ -38,6 +38,7 @@ yarn-error.log*
 .env*
 !.env.example
 /supabase/client_secret_*.json
+/secrets/
 
 # vercel
 .vercel
@@ -48,4 +49,6 @@ next-env.d.ts
 CONTEXT.md
 
 # personal / local-only docs (not part of the repo)
+/AGENTS.md
+/docs/
 docs/TROUBLESHOOTING.md

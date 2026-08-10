@@ -1,0 +1,198 @@
+name: Beanlog CI/CD
+
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: beanlog-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: "22.18.0"
+  GO_VERSION: "1.26.5"
+
+jobs:
+  verify:
+    name: Verify
+    runs-on: ubuntu-24.04
+    env:
+      # Production build validation does not need real credentials. Runtime
+      # credentials stay in the deployment environment.
+      NEXT_PUBLIC_SUPABASE_URL: https://example.supabase.co
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key
+      NEXT_PUBLIC_APP_URL: https://example.com
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: server/go.sum
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run quality gate
+        run: npm run check
+
+  build-images:
+    name: Build and publish images
+    # Keep source verification green before the production Supabase values
+    # are configured. Once all three repository variables exist, main pushes
+    # publish the deployable images.
+    if: >-
+      github.event_name == 'push' && github.ref == 'refs/heads/main' &&
+      vars.NEXT_PUBLIC_SUPABASE_URL != '' &&
+      vars.NEXT_PUBLIC_SUPABASE_ANON_KEY != '' &&
+      vars.NEXT_PUBLIC_APP_URL != ''
+    needs: verify
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      web-image: ${{ steps.image-names.outputs.web-image }}
+      api-image: ${{ steps.image-names.outputs.api-image }}
+      tag: ${{ steps.image-names.outputs.tag }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Resolve image names
+        id: image-names
+        shell: bash
+        run: |
+          set -euo pipefail
+          owner="$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"
+          {
+            echo "web-image=ghcr.io/${owner}/beanlog-web"
+            echo "api-image=ghcr.io/${owner}/beanlog-api"
+            echo "tag=${GITHUB_SHA}"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Validate public build variables
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
+        run: |
+          set -euo pipefail
+          for variable in NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_SUPABASE_ANON_KEY NEXT_PUBLIC_APP_URL; do
+            if [ -z "${!variable:-}" ]; then
+              echo "Repository variable ${variable} is required to publish the production web image." >&2
+              exit 1
+            fi
+          done
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and publish web image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: |
+            ${{ steps.image-names.outputs.web-image }}:${{ steps.image-names.outputs.tag }}
+            ${{ steps.image-names.outputs.web-image }}:latest
+          build-args: |
+            NEXT_PUBLIC_SUPABASE_URL=${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
+            NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+            NEXT_PUBLIC_APP_URL=${{ vars.NEXT_PUBLIC_APP_URL }}
+          cache-from: type=gha,scope=beanlog-web
+          cache-to: type=gha,mode=max,scope=beanlog-web
+
+      - name: Build and publish API image
+        uses: docker/build-push-action@v6
+        with:
+          context: server
+          file: server/Dockerfile
+          push: true
+          tags: |
+            ${{ steps.image-names.outputs.api-image }}:${{ steps.image-names.outputs.tag }}
+            ${{ steps.image-names.outputs.api-image }}:latest
+          cache-from: type=gha,scope=beanlog-api
+          cache-to: type=gha,mode=max,scope=beanlog-api
+
+  deploy:
+    name: Deploy to production
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.DEPLOY_ENABLED == 'true'
+    needs: build-images
+    runs-on: ubuntu-24.04
+    environment:
+      name: production
+    steps:
+      - name: Prepare SSH
+        shell: bash
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          set -euo pipefail
+          for variable in DEPLOY_HOST DEPLOY_USER DEPLOY_SSH_KEY DEPLOY_KNOWN_HOSTS; do
+            if [ -z "${!variable:-}" ]; then
+              echo "Deployment secret ${variable} is required when DEPLOY_ENABLED=true." >&2
+              exit 1
+            fi
+          done
+          install -d -m 700 "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$HOME/.ssh/beanlog_deploy"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/beanlog_deploy" "$HOME/.ssh/known_hosts"
+
+      - name: Pull images and restart Compose services
+        shell: bash
+        env:
+          DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
+          DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
+          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
+          WEB_IMAGE: ${{ needs.build-images.outputs.web-image }}
+          API_IMAGE: ${{ needs.build-images.outputs.api-image }}
+          IMAGE_TAG: ${{ needs.build-images.outputs.tag }}
+        run: |
+          set -euo pipefail
+          if [ -z "$DEPLOY_PATH" ]; then
+            echo "DEPLOY_PATH is required when DEPLOY_ENABLED=true." >&2
+            exit 1
+          fi
+          case "$DEPLOY_PATH" in
+            /*) ;;
+            *) echo "DEPLOY_PATH must be an absolute server directory." >&2; exit 1 ;;
+          esac
+          if [[ "$DEPLOY_PATH" == *"'"* ]]; then
+            echo "DEPLOY_PATH cannot contain a single quote." >&2
+            exit 1
+          fi
+          remote_path="$(printf '%q' "$DEPLOY_PATH")"
+          ssh -i "$HOME/.ssh/beanlog_deploy" \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            "$DEPLOY_USER@$DEPLOY_HOST" \
+            "cd $remote_path && export WEB_IMAGE='$WEB_IMAGE' API_IMAGE='$API_IMAGE' NEXT_DEPLOYMENT_ID='$IMAGE_TAG' && docker compose --env-file .env.production -f docker-compose.production.yml pull web api && docker compose --env-file .env.production -f docker-compose.production.yml up -d --no-build --remove-orphans --wait && docker compose --env-file .env.production -f docker-compose.production.yml ps"
