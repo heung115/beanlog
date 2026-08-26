@@ -80,33 +80,17 @@ jobs:
           printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
           chmod 600 "$HOME/.ssh/beanmap_deploy" "$HOME/.ssh/known_hosts"
 
-      - name: Package the verified source
-        shell: bash
-        run: git archive --format=tar.gz --output="beanmap-${GITHUB_SHA}.tar.gz" HEAD
-
-      - name: Upload source and rebuild the deployed services
+      - name: Stream verified source and rebuild the deployed services
         shell: bash
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-          RELEASE_ARCHIVE: beanmap-${{ github.sha }}.tar.gz
         run: |
           set -euo pipefail
-          # These are fixed to the directories used by the deployed Oracle
-          # instance. They are intentionally not configurable from secrets.
-          source_path="/srv/beanlog/app-src"
-          compose_path="/srv/beanlog/app"
-          if [ ! -s "$RELEASE_ARCHIVE" ]; then
-            echo "Release archive was not created." >&2
-            exit 1
-          fi
-          remote_archive="/tmp/${RELEASE_ARCHIVE}"
-          scp -i "$HOME/.ssh/beanmap_deploy" \
+          # The server account has a forced command. It accepts only this
+          # tar stream and cannot open a shell, tunnel, or arbitrary command.
+          git archive --format=tar.gz HEAD | ssh -T -i "$HOME/.ssh/beanmap_deploy" \
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \
-            "$RELEASE_ARCHIVE" "$DEPLOY_USER@$DEPLOY_HOST:$remote_archive"
-          ssh -i "$HOME/.ssh/beanmap_deploy" \
-            -o BatchMode=yes \
-            -o StrictHostKeyChecking=yes \
-            "$DEPLOY_USER@$DEPLOY_HOST" \
-            "set -euo pipefail; source_path='$source_path'; compose_path='$compose_path'; archive='$remote_archive'; release_dir=\"\$(mktemp -d /tmp/beanmap-release.XXXXXX)\"; trap 'rm -rf \"\$release_dir\" \"\$archive\"' EXIT; tar -xzf \"\$archive\" -C \"\$release_dir\"; sudo mkdir -p \"\$source_path\"; sudo rsync -a --delete --exclude='.env*' --exclude='.audit-report.md' --exclude='CONTEXT.md' --exclude='.staging/' \"\$release_dir/\" \"\$source_path/\"; sudo docker compose --project-directory \"\$compose_path\" -f \"\$compose_path/docker-compose.yml\" up -d --build --remove-orphans --wait; sudo docker compose --project-directory \"\$compose_path\" -f \"\$compose_path/docker-compose.yml\" ps"
+            -o RequestTTY=no \
+            "$DEPLOY_USER@$DEPLOY_HOST"
