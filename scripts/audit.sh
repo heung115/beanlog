@@ -227,27 +227,27 @@ else
   finding "HIGH" "build/next" "Production Next.js build failed"
 fi
 
-if (cd server && GOTOOLCHAIN=go1.26.5 go test -race ./...) > "$TMP_ROOT/go-test.out" 2>&1; then
+if (cd server && GOTOOLCHAIN=go1.26.6 go test -race ./...) > "$TMP_ROOT/go-test.out" 2>&1; then
   finding "OK" "go/test" "Go tests passed with race detector"
 else
   finding "HIGH" "go/test" "Go tests or race detector failed"
 fi
-if (cd server && GOTOOLCHAIN=go1.26.5 go vet ./...) > "$TMP_ROOT/go-vet.out" 2>&1; then
+if (cd server && GOTOOLCHAIN=go1.26.6 go vet ./...) > "$TMP_ROOT/go-vet.out" 2>&1; then
   finding "OK" "go/vet" "go vet passed"
 else
   finding "HIGH" "go/vet" "go vet failed"
 fi
-if (cd server && GOTOOLCHAIN=go1.26.5 go build -trimpath -o "$TMP_ROOT/beanlog-server" .) > "$TMP_ROOT/go-build.out" 2>&1; then
+if (cd server && GOTOOLCHAIN=go1.26.6 go build -trimpath -o "$TMP_ROOT/beanlog-server" .) > "$TMP_ROOT/go-build.out" 2>&1; then
   finding "OK" "go/build" "Go production binary built"
 else
   finding "HIGH" "go/build" "Go production build failed"
 fi
-if (cd server && GOTOOLCHAIN=go1.26.5 go run golang.org/x/vuln/cmd/govulncheck@v1.6.0 ./...) > "$TMP_ROOT/govulncheck.out" 2>&1; then
+if (cd server && GOTOOLCHAIN=go1.26.6 go run golang.org/x/vuln/cmd/govulncheck@v1.7.0 ./...) > "$TMP_ROOT/govulncheck.out" 2>&1; then
   finding "OK" "go/vulnerability" "No reachable Go vulnerability found"
 else
   finding "HIGH" "go/vulnerability" "govulncheck found a reachable vulnerability or failed"
 fi
-if (cd server && GOTOOLCHAIN=go1.26.5 go run github.com/securego/gosec/v2/cmd/gosec@v2.28.0 \
+if (cd server && GOTOOLCHAIN=go1.26.6 go run github.com/securego/gosec/v2/cmd/gosec@v2.28.0 \
     -quiet -exclude-generated -severity high -confidence medium ./...) > "$TMP_ROOT/gosec.out" 2>&1; then
   finding "OK" "go/static-security" "gosec found no issue"
 else
