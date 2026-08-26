@@ -50,6 +50,30 @@ test("login uses POST, keeps credentials out of URL, and has no serious accessib
   expect(page.url()).not.toContain("password");
 });
 
+test("legal notices are public and signup requires an explicit agreement", async ({ page }) => {
+  await page.goto("/ko/privacy");
+  await expect(page).toHaveURL(/\/ko\/privacy$/);
+  await expect(
+    page.getByRole("heading", { level: 1, name: "개인정보 처리방침" })
+  ).toBeVisible();
+  await expect(page.getByText("일본(Oracle Cloud Infrastructure 도쿄 리전)")).toBeVisible();
+  await expect(page.getByRole("navigation")).toHaveCount(0);
+  await expectNoSeriousA11yViolations(page);
+
+  await page.goto("/ko/signup");
+  const agreement = page.getByRole("checkbox", { name: /만 14세 이상이며/ });
+  await expect(agreement).not.toBeChecked();
+  await expect(page.getByRole("button", { name: "Google로 계속" })).toBeDisabled();
+  await expect(page.getByRole("link", { name: "이용약관" })).toHaveAttribute(
+    "href",
+    "/ko/terms"
+  );
+
+  await agreement.check();
+  await expect(page.getByRole("button", { name: "Google로 계속" })).toBeEnabled();
+  await expectNoSeriousA11yViolations(page);
+});
+
 test("30 records paginate without duplicates and all-data filter options are available", async ({ page }) => {
   await login(page);
   await page.getByRole("button", { name: "필터" }).click();

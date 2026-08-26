@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button, buttonClassName } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { signUp, signInWithOAuth } from "@/lib/actions/auth";
@@ -10,6 +10,7 @@ import { brand } from "@/config/brand";
 
 export default function SignupPage() {
   const t = useTranslations("auth");
+  const locale = useLocale();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
@@ -17,6 +18,7 @@ export default function SignupPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -29,7 +31,7 @@ export default function SignupPage() {
 
     setLoading(true);
     try {
-      const result = await signUp(email, password, displayName);
+      const result = await signUp(email, password, displayName, acceptedTerms);
       if (result?.error) {
         setError(t("signupError"));
       } else {
@@ -98,6 +100,7 @@ export default function SignupPage() {
             minLength={6}
             autoComplete="new-password"
           />
+
           <Input
             label={t("passwordConfirm")}
             type="password"
@@ -110,6 +113,38 @@ export default function SignupPage() {
             autoComplete="new-password"
           />
 
+          <label className="flex cursor-pointer items-start gap-2.5 text-sm leading-6 text-brown-light">
+            <input
+              type="checkbox"
+              checked={acceptedTerms}
+              onChange={(event) => setAcceptedTerms(event.target.checked)}
+              required
+              className="mt-1 h-4 w-4 shrink-0 rounded border-border accent-accent"
+            />
+            <span>
+              {t.rich("legalAgreement", {
+                terms: (chunks) => (
+                  <Link
+                    href={`/${locale}/terms`}
+                    className="font-medium text-accent underline underline-offset-4"
+                    target="_blank"
+                  >
+                    {chunks}
+                  </Link>
+                ),
+                privacy: (chunks) => (
+                  <Link
+                    href={`/${locale}/privacy`}
+                    className="font-medium text-accent underline underline-offset-4"
+                    target="_blank"
+                  >
+                    {chunks}
+                  </Link>
+                ),
+              })}
+            </span>
+          </label>
+
           {error && <p className="text-sm text-red-600">{error}</p>}
 
           <Button type="submit" loading={loading} className="mt-2 w-full">
@@ -119,7 +154,7 @@ export default function SignupPage() {
 
         <div className="my-6 flex items-center gap-3">
           <div className="h-px flex-1 bg-border" />
-          <span className="text-xs text-brown-light/60">{t("orContinueWith")}</span>
+          <span className="text-xs text-brown-light">{t("orContinueWith")}</span>
           <div className="h-px flex-1 bg-border" />
         </div>
 
@@ -127,7 +162,8 @@ export default function SignupPage() {
           <Button
             variant="secondary"
             className="w-full"
-            onClick={() => signInWithOAuth("google")}
+            disabled={!acceptedTerms}
+            onClick={() => signInWithOAuth("google", acceptedTerms)}
           >
             <GoogleIcon className="mr-2 h-4 w-4" />
             {t("loginWithGoogle")}
@@ -135,7 +171,8 @@ export default function SignupPage() {
           <Button
             variant="secondary"
             className="w-full border-[#FEE500] bg-[#FEE500] text-[#191919] hover:bg-[#FEE500]/90"
-            onClick={() => signInWithOAuth("kakao")}
+            disabled={!acceptedTerms}
+            onClick={() => signInWithOAuth("kakao", acceptedTerms)}
           >
             <KakaoIcon className="mr-2 h-4 w-4" />
             {t("loginWithKakao")}

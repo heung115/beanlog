@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
@@ -70,6 +71,7 @@ function Icon({ path, className = "h-4 w-4" }: { path: string; className?: strin
 const ICONS = {
   globe: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm-9 9h18M12 3c2.5 2.4 3.8 5.6 3.8 9s-1.3 6.6-3.8 9c-2.5-2.4-3.8-5.6-3.8-9S9.5 5.4 12 3Z",
   download: "M12 4v11m0 0 4.5-4.5M12 15l-4.5-4.5M4 19h16",
+  document: "M7 3h7l4 4v14H7V3Zm7 0v5h5M10 12h5m-5 4h5",
   logout: "M14 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-2M9 12h11m0 0-3-3m3 3-3 3",
   trash: "M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m3 0-.8 12.1a2 2 0 0 1-2 1.9H8.8a2 2 0 0 1-2-1.9L6 7m4 4v6m4-6v6",
 };
@@ -257,8 +259,28 @@ export default function SettingsPage() {
         </div>
       </SectionCard>
 
+      {/* ---------- legal ---------- */}
+      <SectionCard title={t("legal")} delay={240} plain>
+        <div className="grid gap-2 sm:grid-cols-2">
+          <Link
+            href={`/${locale}/terms`}
+            className="flex min-h-11 items-center gap-2.5 border-b border-border-light px-1 py-2 text-sm font-medium text-brown transition-colors hover:border-accent hover:text-accent"
+          >
+            <Icon path={ICONS.document} className="h-4 w-4 text-accent" />
+            {t("terms")}
+          </Link>
+          <Link
+            href={`/${locale}/privacy`}
+            className="flex min-h-11 items-center gap-2.5 border-b border-border-light px-1 py-2 text-sm font-medium text-brown transition-colors hover:border-accent hover:text-accent"
+          >
+            <Icon path={ICONS.document} className="h-4 w-4 text-accent" />
+            {t("privacy")}
+          </Link>
+        </div>
+      </SectionCard>
+
       {/* ---------- logout ---------- */}
-      <SectionCard title={tAuth("logout")} delay={240} plain>
+      <SectionCard title={tAuth("logout")} delay={300} plain>
         <Button variant="secondary" onClick={() => signOut()} className="w-full sm:w-auto">
           <Icon path={ICONS.logout} className="mr-2 h-4 w-4" />
           {tAuth("logout")}
@@ -266,7 +288,7 @@ export default function SettingsPage() {
       </SectionCard>
 
       {/* ---------- danger zone ---------- */}
-      <SectionCard title={t("dangerZone")} danger delay={300}>
+      <SectionCard title={t("dangerZone")} danger delay={360}>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="flex items-start gap-2.5 text-sm leading-relaxed text-brown-light">
             <Icon path={ICONS.trash} className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />

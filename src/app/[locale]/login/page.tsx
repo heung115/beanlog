@@ -1,8 +1,8 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { signInAction, signInWithOAuth } from "@/lib/actions/auth";
@@ -10,7 +10,9 @@ import { brand } from "@/config/brand";
 
 export default function LoginPage() {
   const t = useTranslations("auth");
+  const locale = useLocale();
   const [state, formAction, pending] = useActionState(signInAction, {});
+  const [socialTermsAccepted, setSocialTermsAccepted] = useState(false);
 
   return (
     <div className="flex min-h-[80vh] flex-col items-center justify-center">
@@ -66,10 +68,41 @@ export default function LoginPage() {
         </div>
 
         <div className="flex flex-col gap-3">
+          <label className="mb-1 flex cursor-pointer items-start gap-2.5 text-xs leading-5 text-brown-light">
+            <input
+              type="checkbox"
+              checked={socialTermsAccepted}
+              onChange={(event) => setSocialTermsAccepted(event.target.checked)}
+              className="mt-0.5 h-4 w-4 shrink-0 rounded border-border accent-accent"
+            />
+            <span>
+              {t.rich("socialLegalAgreement", {
+                terms: (chunks) => (
+                  <Link
+                    href={`/${locale}/terms`}
+                    className="font-medium text-accent underline underline-offset-4"
+                    target="_blank"
+                  >
+                    {chunks}
+                  </Link>
+                ),
+                privacy: (chunks) => (
+                  <Link
+                    href={`/${locale}/privacy`}
+                    className="font-medium text-accent underline underline-offset-4"
+                    target="_blank"
+                  >
+                    {chunks}
+                  </Link>
+                ),
+              })}
+            </span>
+          </label>
           <Button
             variant="secondary"
             className="w-full"
-            onClick={() => signInWithOAuth("google")}
+            disabled={!socialTermsAccepted}
+            onClick={() => signInWithOAuth("google", socialTermsAccepted)}
           >
             <GoogleIcon className="mr-2 h-4 w-4" />
             {t("loginWithGoogle")}
@@ -77,7 +110,8 @@ export default function LoginPage() {
           <Button
             variant="secondary"
             className="w-full border-[#FEE500] bg-[#FEE500] text-[#191919] hover:bg-[#FEE500]/90"
-            onClick={() => signInWithOAuth("kakao")}
+            disabled={!socialTermsAccepted}
+            onClick={() => signInWithOAuth("kakao", socialTermsAccepted)}
           >
             <KakaoIcon className="mr-2 h-4 w-4" />
             {t("loginWithKakao")}

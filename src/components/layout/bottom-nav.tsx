@@ -10,6 +10,10 @@ export function BottomNav() {
   const appPathname = pathname.replace(/^\/(ko|en)(?=\/|$)/, "") || "/";
   const t = useTranslations("nav");
 
+  if (/^\/(login|signup|privacy|terms)\/?$/.test(appPathname)) {
+    return null;
+  }
+
   const links = [
     { href: "/explore", label: t("explore"), icon: JournalIcon },
     { href: "/beans/new", label: t("add"), icon: PlusIcon, primary: true },

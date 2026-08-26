@@ -15,6 +15,10 @@ export function TopBar({ user }: TopBarProps) {
   const appPathname = pathname.replace(/^\/(ko|en)(?=\/|$)/, "") || "/";
   const t = useTranslations("nav");
 
+  if (/^\/(login|signup|privacy|terms)\/?$/.test(appPathname)) {
+    return null;
+  }
+
   const links = [
     { href: "/explore", label: t("explore") },
     { href: "/beans/new", label: t("add") },

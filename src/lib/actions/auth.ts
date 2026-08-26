@@ -19,10 +19,16 @@ const signUpSchema = z.object({
   email: z.string().trim().email().max(320),
   password: z.string().min(8).max(128),
   displayName: z.string().trim().min(1).max(50),
+  acceptedTerms: z.literal(true),
 });
 
-export async function signUp(email: string, password: string, displayName: string) {
-  const parsed = signUpSchema.safeParse({ email, password, displayName });
+export async function signUp(
+  email: string,
+  password: string,
+  displayName: string,
+  acceptedTerms: boolean
+) {
+  const parsed = signUpSchema.safeParse({ email, password, displayName, acceptedTerms });
   if (!parsed.success) return { error: "Invalid signup data" };
 
   const supabase = await createClient();
@@ -73,7 +79,14 @@ export async function signInAction(
   redirect("/explore");
 }
 
-export async function signInWithOAuth(provider: "google" | "kakao") {
+export async function signInWithOAuth(
+  provider: "google" | "kakao",
+  acceptedTerms: boolean
+) {
+  if (acceptedTerms !== true) {
+    return { error: "Terms must be accepted" };
+  }
+
   // The authorize URL must use the browser-accessible Supabase host, while
   // the shared server adapter persists the PKCE verifier for the callback.
   const supabase = await createPublicClient({ persistSession: true });
