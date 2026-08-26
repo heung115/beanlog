@@ -1,4 +1,4 @@
-name: ${STAGING_COMPOSE_PROJECT_NAME:-beanlog-staging}
+name: ${STAGING_COMPOSE_PROJECT_NAME:-beanmap-staging}
 
 services:
   web:
@@ -13,7 +13,7 @@ services:
       SUPABASE_SERVER_URL: ${STAGING_INTERNAL_SUPABASE_URL:-http://kong:8000}
       # Server Actions reach the Go API by its compose service name.
       GO_API_URL: ${STAGING_GO_API_URL:-http://api:8080}
-      NEXT_DEPLOYMENT_ID: ${STAGING_DEPLOYMENT_ID:-beanlog-staging}
+      NEXT_DEPLOYMENT_ID: ${STAGING_DEPLOYMENT_ID:-beanmap-staging}
     volumes:
       - ./src:/app/src:ro
       - ./public:/app/public:ro
@@ -89,10 +89,10 @@ services:
 networks:
   staging-gateway:
     external: true
-    name: ${STAGING_GATEWAY_NETWORK:-beanlog-staging-gateway}
+    name: ${STAGING_GATEWAY_NETWORK:-beanmap-staging-gateway}
   staging-database:
     external: true
-    name: ${STAGING_DATABASE_NETWORK:-beanlog-staging-database}
+    name: ${STAGING_DATABASE_NETWORK:-beanmap-staging-database}
 
 secrets:
   api_database_url:

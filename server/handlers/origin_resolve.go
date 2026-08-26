@@ -5,7 +5,7 @@ import (
 	"errors"
 	"strings"
 
-	"beanlog-server/models"
+	"beanmap-server/models"
 
 	"github.com/jackc/pgx/v5"
 )

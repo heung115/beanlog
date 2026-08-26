@@ -35,7 +35,7 @@ const stagingCredentials = fs.readFileSync(
 test("the staging web uses the HMR development image with read-only source mounts", () => {
   assert.match(
     compose,
-    /^name: \$\{STAGING_COMPOSE_PROJECT_NAME:-beanlog-staging\}$/m
+    /^name: \$\{STAGING_COMPOSE_PROJECT_NAME:-beanmap-staging\}$/m
   );
   assert.match(compose, /target: dev/);
   assert.match(compose, /\.\/src:\/app\/src:ro/);
@@ -73,7 +73,7 @@ test("application containers are isolated from Supabase management services", ()
 });
 
 test("the primary checkout keeps its established staging endpoints", () => {
-  const primaryRoot = path.resolve("/repo/coffee-info");
+  const primaryRoot = path.resolve("/repo/beanmap");
   const runtime = deriveStagingRuntime({
     root: primaryRoot,
     gitCommonDir: path.join(primaryRoot, ".git"),
@@ -81,21 +81,21 @@ test("the primary checkout keeps its established staging endpoints", () => {
 
   assert.equal(runtime.isPrimary, true);
   assert.equal(runtime.runtimeRoot, path.join(primaryRoot, ".staging"));
-  assert.equal(runtime.composeProject, "beanlog-staging");
-  assert.equal(runtime.supabaseProject, "beanlog-staging");
+  assert.equal(runtime.composeProject, "beanmap-staging");
+  assert.equal(runtime.supabaseProject, "beanmap-staging");
   assert.equal(runtime.web, 3100);
   assert.equal(runtime.api, 8180);
   assert.equal(runtime.supabaseApi, 55321);
 });
 
 test("linked worktrees receive isolated projects, runtime roots, and valid ports", () => {
-  const gitCommonDir = path.resolve("/repo/coffee-info/.git");
+  const gitCommonDir = path.resolve("/repo/beanmap/.git");
   const first = deriveStagingRuntime({
-    root: "/worktrees/alpha/coffee-info",
+    root: "/worktrees/alpha/beanmap",
     gitCommonDir,
   });
   const second = deriveStagingRuntime({
-    root: "/worktrees/beta/coffee-info",
+    root: "/worktrees/beta/beanmap",
     gitCommonDir,
   });
 
@@ -127,8 +127,8 @@ test("the Supabase template is rendered for the selected worktree", () => {
     "utf8"
   );
   const runtime = deriveStagingRuntime({
-    root: "/worktrees/auth/coffee-info",
-    gitCommonDir: "/repo/coffee-info/.git",
+    root: "/worktrees/auth/beanmap",
+    gitCommonDir: "/repo/beanmap/.git",
   });
   const rendered = renderSupabaseConfig(template, runtime);
 
@@ -172,8 +172,8 @@ test("staging commands consistently use the derived worktree runtime", () => {
   assert.match(stagingRuntime, /STAGING_GATEWAY_NETWORK/);
   assert.match(stagingRuntime, /STAGING_DATABASE_NETWORK/);
   assert.match(stagingRuntime, /STAGING_DEPLOYMENT_ID/);
-  assert.doesNotMatch(stagingRuntime, /supabase_(kong|db|studio|inbucket)_beanlog-staging/);
-  assert.doesNotMatch(stagingRuntime, /--project-id", "beanlog-staging"/);
+  assert.doesNotMatch(stagingRuntime, /supabase_(kong|db|studio|inbucket)_beanmap-staging/);
+  assert.doesNotMatch(stagingRuntime, /--project-id", "beanmap-staging"/);
   assert.match(seedScript, /deriveStagingRuntime/);
   assert.match(seedScript, /runtime\.runtimeRoot/);
   assert.match(qaHelpers, /deriveStagingRuntime/);
@@ -193,6 +193,6 @@ test("the legacy local development files remain available", () => {
     false
   );
   assert.match(packageJson.scripts.dev, /scripts\/staging\.mjs up/);
-  assert.doesNotMatch(compose, /LOCAL_|beanlog-local|local-supabase/);
+  assert.doesNotMatch(compose, /LOCAL_|beanmap-local|local-supabase/);
   assert.doesNotMatch(stagingRuntime, /path\.join\(root, "\.local"\)/);
 });

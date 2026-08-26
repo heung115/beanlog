@@ -1,6 +1,6 @@
 {
-  "name": "Beanlog",
-  "short_name": "Beanlog",
+  "name": "beanmap",
+  "short_name": "beanmap",
   "description": "My Coffee Bean Journal",
   "start_url": "/ko/explore",
   "display": "standalone",

@@ -1,5 +1,5 @@
 services:
-  beanlog:
+  beanmap:
     build:
       context: .
       args:

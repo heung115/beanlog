@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"time"
 
-	"beanlog-server/config"
-	"beanlog-server/routes"
+	"beanmap-server/config"
+	"beanmap-server/routes"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -52,7 +52,7 @@ func main() {
 
 	r := routes.Setup(cfg, pool)
 
-	log.Printf("Beanlog API server starting on %s", cfg.Addr())
+	log.Printf("beanmap API server starting on %s", cfg.Addr())
 	server := &http.Server{
 		Addr:              cfg.Addr(),
 		Handler:           r,

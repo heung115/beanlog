@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import designTokens from "@/config/design-tokens.json";
 
 export const metadata: Metadata = {
-  title: "Beanlog",
+  title: "beanmap",
   description: "My Coffee Bean Journal",
   manifest: "/manifest.json",
 };

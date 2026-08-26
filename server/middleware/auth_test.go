@@ -62,7 +62,7 @@ func TestAuthRequiredValidatesTokenBoundary(t *testing.T) {
 	if err != nil {
 		t.Fatalf("generate key: %v", err)
 	}
-	issuer := "https://auth.beanlog.test/auth/v1"
+	issuer := "https://auth.beanmap.test/auth/v1"
 	jwks := testJWKS(t, &privateKey.PublicKey)
 
 	now := time.Now()
@@ -121,7 +121,7 @@ func TestAuthRequiredRejectsUnsignedToken(t *testing.T) {
 	}
 	jwks := testJWKS(t, &privateKey.PublicKey)
 	router := gin.New()
-	router.Use(AuthRequired(jwks.URL, "https://auth.beanlog.test/auth/v1"))
+	router.Use(AuthRequired(jwks.URL, "https://auth.beanmap.test/auth/v1"))
 	router.GET("/protected", func(context *gin.Context) { context.Status(http.StatusNoContent) })
 
 	unsignedHeader := base64.RawURLEncoding.EncodeToString([]byte(`{"alg":"none","typ":"JWT"}`))

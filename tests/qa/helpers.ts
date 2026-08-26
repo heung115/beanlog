@@ -81,7 +81,7 @@ export async function ensureUser(email: string, password: string) {
     email,
     password,
     email_confirm: true,
-    user_metadata: { display_name: "Beanlog QA" },
+    user_metadata: { display_name: "beanmap QA" },
   });
   if (error || !data.user) throw error ?? new Error("QA user creation failed");
   return data.user.id;

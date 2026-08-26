@@ -29,7 +29,7 @@ function readCredentials(file) {
 function newAccount(label) {
   const suffix = randomBytes(12).toString("hex");
   return {
-    email: `beanlog-qa-${label}-${suffix}@local.test`,
+    email: `beanmap-qa-${label}-${suffix}@local.test`,
     password: randomBytes(32).toString("base64url"),
   };
 }

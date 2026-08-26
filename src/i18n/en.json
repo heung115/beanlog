@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Beanlog",
+    "name": "beanmap",
     "tagline": "My Coffee Bean Journal"
   },
   "nav": {
@@ -20,8 +20,8 @@
     "password": "Password",
     "passwordConfirm": "Confirm password",
     "displayName": "Display name",
-    "loginTitle": "Welcome to Beanlog",
-    "signupTitle": "Get started with Beanlog",
+    "loginTitle": "Welcome to beanmap",
+    "signupTitle": "Get started with beanmap",
     "loginWithGoogle": "Continue with Google",
     "loginWithKakao": "Continue with Kakao",
     "noAccount": "Don't have an account?",

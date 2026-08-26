@@ -1,6 +1,6 @@
 ---
 version: alpha
-name: Beanlog Coffee Journal
+name: beanmap Coffee Journal
 description: A warm, editorial design system for a private coffee tasting journal.
 colors:
   primary: "#3E2F23"
@@ -120,11 +120,11 @@ components:
     padding: 0.375rem 0.75rem
 ---
 
-# Beanlog Design System
+# beanmap Design System
 
 ## Overview
 
-Beanlog is a personal coffee journal, not a marketplace or an operational dashboard. Its visual language combines the warmth of a paper tasting notebook with the clarity of a modern data tool. Screens should feel calm, tactile, and editorial while remaining fast to scan on mobile.
+beanmap is a personal coffee journal, not a marketplace or an operational dashboard. Its visual language combines the warmth of a paper tasting notebook with the clarity of a modern data tool. Screens should feel calm, tactile, and editorial while remaining fast to scan on mobile.
 
 The primary audience records coffee immediately after drinking it and later returns to compare origins, processes, scores, and tasting impressions. The interface should therefore prioritize quick entry, legible metadata, and the user's own notes over decorative content.
 
@@ -153,7 +153,7 @@ Reserve bold display type for meaningful hierarchy. A screen should usually have
 
 ## Layout
 
-Beanlog is mobile-first. The main application column is capped at `56rem`, with a `1rem` mobile gutter and a `1.5rem` desktop gutter. Detail and form content may use a narrower reading width when that improves focus.
+beanmap is mobile-first. The main application column is capped at `56rem`, with a `1rem` mobile gutter and a `1.5rem` desktop gutter. Detail and form content may use a narrower reading width when that improves focus.
 
 Spacing follows a 4px base rhythm, with 8px, 12px, 16px, 24px, 32px, and 48px as the preferred steps. Use smaller steps inside a component and larger steps between conceptual sections. Do not compensate for unclear hierarchy by wrapping every group in another card.
 

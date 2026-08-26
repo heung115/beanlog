@@ -3,9 +3,9 @@ package routes
 import (
 	"net/http"
 
-	"beanlog-server/config"
-	"beanlog-server/handlers"
-	"beanlog-server/middleware"
+	"beanmap-server/config"
+	"beanmap-server/handlers"
+	"beanmap-server/middleware"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"

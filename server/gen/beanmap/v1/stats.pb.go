@@ -2,9 +2,9 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.34.1
-// source: beanlog/v1/stats.proto
+// source: beanmap/v1/stats.proto
 
-package beanlogv1
+package beanmapv1
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -29,7 +29,7 @@ type GetStatsRequest struct {
 
 func (x *GetStatsRequest) Reset() {
 	*x = GetStatsRequest{}
-	mi := &file_beanlog_v1_stats_proto_msgTypes[0]
+	mi := &file_beanmap_v1_stats_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -41,7 +41,7 @@ func (x *GetStatsRequest) String() string {
 func (*GetStatsRequest) ProtoMessage() {}
 
 func (x *GetStatsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_beanlog_v1_stats_proto_msgTypes[0]
+	mi := &file_beanmap_v1_stats_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -54,7 +54,7 @@ func (x *GetStatsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetStatsRequest.ProtoReflect.Descriptor instead.
 func (*GetStatsRequest) Descriptor() ([]byte, []int) {
-	return file_beanlog_v1_stats_proto_rawDescGZIP(), []int{0}
+	return file_beanmap_v1_stats_proto_rawDescGZIP(), []int{0}
 }
 
 type GetStatsResponse struct {
@@ -75,7 +75,7 @@ type GetStatsResponse struct {
 
 func (x *GetStatsResponse) Reset() {
 	*x = GetStatsResponse{}
-	mi := &file_beanlog_v1_stats_proto_msgTypes[1]
+	mi := &file_beanmap_v1_stats_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -87,7 +87,7 @@ func (x *GetStatsResponse) String() string {
 func (*GetStatsResponse) ProtoMessage() {}
 
 func (x *GetStatsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_beanlog_v1_stats_proto_msgTypes[1]
+	mi := &file_beanmap_v1_stats_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -100,7 +100,7 @@ func (x *GetStatsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetStatsResponse.ProtoReflect.Descriptor instead.
 func (*GetStatsResponse) Descriptor() ([]byte, []int) {
-	return file_beanlog_v1_stats_proto_rawDescGZIP(), []int{1}
+	return file_beanmap_v1_stats_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *GetStatsResponse) GetTotal() int32 {
@@ -184,7 +184,7 @@ type BestBean struct {
 
 func (x *BestBean) Reset() {
 	*x = BestBean{}
-	mi := &file_beanlog_v1_stats_proto_msgTypes[2]
+	mi := &file_beanmap_v1_stats_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -196,7 +196,7 @@ func (x *BestBean) String() string {
 func (*BestBean) ProtoMessage() {}
 
 func (x *BestBean) ProtoReflect() protoreflect.Message {
-	mi := &file_beanlog_v1_stats_proto_msgTypes[2]
+	mi := &file_beanmap_v1_stats_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -209,7 +209,7 @@ func (x *BestBean) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BestBean.ProtoReflect.Descriptor instead.
 func (*BestBean) Descriptor() ([]byte, []int) {
-	return file_beanlog_v1_stats_proto_rawDescGZIP(), []int{2}
+	return file_beanmap_v1_stats_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *BestBean) GetName() string {
@@ -243,7 +243,7 @@ type CountEntry struct {
 
 func (x *CountEntry) Reset() {
 	*x = CountEntry{}
-	mi := &file_beanlog_v1_stats_proto_msgTypes[3]
+	mi := &file_beanmap_v1_stats_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -255,7 +255,7 @@ func (x *CountEntry) String() string {
 func (*CountEntry) ProtoMessage() {}
 
 func (x *CountEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_beanlog_v1_stats_proto_msgTypes[3]
+	mi := &file_beanmap_v1_stats_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -268,7 +268,7 @@ func (x *CountEntry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CountEntry.ProtoReflect.Descriptor instead.
 func (*CountEntry) Descriptor() ([]byte, []int) {
-	return file_beanlog_v1_stats_proto_rawDescGZIP(), []int{3}
+	return file_beanmap_v1_stats_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *CountEntry) GetKey() string {
@@ -285,30 +285,30 @@ func (x *CountEntry) GetCount() int32 {
 	return 0
 }
 
-var File_beanlog_v1_stats_proto protoreflect.FileDescriptor
+var File_beanmap_v1_stats_proto protoreflect.FileDescriptor
 
-const file_beanlog_v1_stats_proto_rawDesc = "" +
+const file_beanmap_v1_stats_proto_rawDesc = "" +
 	"\n" +
-	"\x16beanlog/v1/stats.proto\x12\n" +
-	"beanlog.v1\"\x11\n" +
+	"\x16beanmap/v1/stats.proto\x12\n" +
+	"beanmap.v1\"\x11\n" +
 	"\x0fGetStatsRequest\"\xbe\x03\n" +
 	"\x10GetStatsResponse\x12\x14\n" +
 	"\x05total\x18\x01 \x01(\x05R\x05total\x12\x1b\n" +
 	"\tavg_score\x18\x02 \x01(\x01R\bavgScore\x12(\n" +
-	"\x04best\x18\x03 \x01(\v2\x14.beanlog.v1.BestBeanR\x04best\x12\x1d\n" +
+	"\x04best\x18\x03 \x01(\v2\x14.beanmap.v1.BestBeanR\x04best\x12\x1d\n" +
 	"\n" +
 	"top_origin\x18\x04 \x01(\tR\ttopOrigin\x12\x1f\n" +
 	"\vtop_process\x18\x05 \x01(\tR\n" +
 	"topProcess\x123\n" +
-	"\tby_origin\x18\x06 \x03(\v2\x16.beanlog.v1.CountEntryR\bbyOrigin\x125\n" +
+	"\tby_origin\x18\x06 \x03(\v2\x16.beanmap.v1.CountEntryR\bbyOrigin\x125\n" +
 	"\n" +
-	"by_process\x18\a \x03(\v2\x16.beanlog.v1.CountEntryR\tbyProcess\x127\n" +
-	"\vby_varietal\x18\b \x03(\v2\x16.beanlog.v1.CountEntryR\n" +
+	"by_process\x18\a \x03(\v2\x16.beanmap.v1.CountEntryR\tbyProcess\x127\n" +
+	"\vby_varietal\x18\b \x03(\v2\x16.beanmap.v1.CountEntryR\n" +
 	"byVarietal\x121\n" +
-	"\bby_month\x18\t \x03(\v2\x16.beanlog.v1.CountEntryR\abyMonth\x125\n" +
+	"\bby_month\x18\t \x03(\v2\x16.beanmap.v1.CountEntryR\abyMonth\x125\n" +
 	"\n" +
 	"score_dist\x18\n" +
-	" \x03(\v2\x16.beanlog.v1.CountEntryR\tscoreDist\"P\n" +
+	" \x03(\v2\x16.beanmap.v1.CountEntryR\tscoreDist\"P\n" +
 	"\bBestBean\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x1a\n" +
 	"\broastery\x18\x02 \x01(\tR\broastery\x12\x14\n" +
@@ -318,36 +318,36 @@ const file_beanlog_v1_stats_proto_rawDesc = "" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05count\x18\x02 \x01(\x05R\x05count2U\n" +
 	"\fStatsService\x12E\n" +
-	"\bGetStats\x12\x1b.beanlog.v1.GetStatsRequest\x1a\x1c.beanlog.v1.GetStatsResponseB)Z'beanlog-server/gen/beanlog/v1;beanlogv1b\x06proto3"
+	"\bGetStats\x12\x1b.beanmap.v1.GetStatsRequest\x1a\x1c.beanmap.v1.GetStatsResponseB)Z'beanmap-server/gen/beanmap/v1;beanmapv1b\x06proto3"
 
 var (
-	file_beanlog_v1_stats_proto_rawDescOnce sync.Once
-	file_beanlog_v1_stats_proto_rawDescData []byte
+	file_beanmap_v1_stats_proto_rawDescOnce sync.Once
+	file_beanmap_v1_stats_proto_rawDescData []byte
 )
 
-func file_beanlog_v1_stats_proto_rawDescGZIP() []byte {
-	file_beanlog_v1_stats_proto_rawDescOnce.Do(func() {
-		file_beanlog_v1_stats_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_beanlog_v1_stats_proto_rawDesc), len(file_beanlog_v1_stats_proto_rawDesc)))
+func file_beanmap_v1_stats_proto_rawDescGZIP() []byte {
+	file_beanmap_v1_stats_proto_rawDescOnce.Do(func() {
+		file_beanmap_v1_stats_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_beanmap_v1_stats_proto_rawDesc), len(file_beanmap_v1_stats_proto_rawDesc)))
 	})
-	return file_beanlog_v1_stats_proto_rawDescData
+	return file_beanmap_v1_stats_proto_rawDescData
 }
 
-var file_beanlog_v1_stats_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
-var file_beanlog_v1_stats_proto_goTypes = []any{
-	(*GetStatsRequest)(nil),  // 0: beanlog.v1.GetStatsRequest
-	(*GetStatsResponse)(nil), // 1: beanlog.v1.GetStatsResponse
-	(*BestBean)(nil),         // 2: beanlog.v1.BestBean
-	(*CountEntry)(nil),       // 3: beanlog.v1.CountEntry
+var file_beanmap_v1_stats_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
+var file_beanmap_v1_stats_proto_goTypes = []any{
+	(*GetStatsRequest)(nil),  // 0: beanmap.v1.GetStatsRequest
+	(*GetStatsResponse)(nil), // 1: beanmap.v1.GetStatsResponse
+	(*BestBean)(nil),         // 2: beanmap.v1.BestBean
+	(*CountEntry)(nil),       // 3: beanmap.v1.CountEntry
 }
-var file_beanlog_v1_stats_proto_depIdxs = []int32{
-	2, // 0: beanlog.v1.GetStatsResponse.best:type_name -> beanlog.v1.BestBean
-	3, // 1: beanlog.v1.GetStatsResponse.by_origin:type_name -> beanlog.v1.CountEntry
-	3, // 2: beanlog.v1.GetStatsResponse.by_process:type_name -> beanlog.v1.CountEntry
-	3, // 3: beanlog.v1.GetStatsResponse.by_varietal:type_name -> beanlog.v1.CountEntry
-	3, // 4: beanlog.v1.GetStatsResponse.by_month:type_name -> beanlog.v1.CountEntry
-	3, // 5: beanlog.v1.GetStatsResponse.score_dist:type_name -> beanlog.v1.CountEntry
-	0, // 6: beanlog.v1.StatsService.GetStats:input_type -> beanlog.v1.GetStatsRequest
-	1, // 7: beanlog.v1.StatsService.GetStats:output_type -> beanlog.v1.GetStatsResponse
+var file_beanmap_v1_stats_proto_depIdxs = []int32{
+	2, // 0: beanmap.v1.GetStatsResponse.best:type_name -> beanmap.v1.BestBean
+	3, // 1: beanmap.v1.GetStatsResponse.by_origin:type_name -> beanmap.v1.CountEntry
+	3, // 2: beanmap.v1.GetStatsResponse.by_process:type_name -> beanmap.v1.CountEntry
+	3, // 3: beanmap.v1.GetStatsResponse.by_varietal:type_name -> beanmap.v1.CountEntry
+	3, // 4: beanmap.v1.GetStatsResponse.by_month:type_name -> beanmap.v1.CountEntry
+	3, // 5: beanmap.v1.GetStatsResponse.score_dist:type_name -> beanmap.v1.CountEntry
+	0, // 6: beanmap.v1.StatsService.GetStats:input_type -> beanmap.v1.GetStatsRequest
+	1, // 7: beanmap.v1.StatsService.GetStats:output_type -> beanmap.v1.GetStatsResponse
 	7, // [7:8] is the sub-list for method output_type
 	6, // [6:7] is the sub-list for method input_type
 	6, // [6:6] is the sub-list for extension type_name
@@ -355,26 +355,26 @@ var file_beanlog_v1_stats_proto_depIdxs = []int32{
 	0, // [0:6] is the sub-list for field type_name
 }
 
-func init() { file_beanlog_v1_stats_proto_init() }
-func file_beanlog_v1_stats_proto_init() {
-	if File_beanlog_v1_stats_proto != nil {
+func init() { file_beanmap_v1_stats_proto_init() }
+func file_beanmap_v1_stats_proto_init() {
+	if File_beanmap_v1_stats_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_beanlog_v1_stats_proto_rawDesc), len(file_beanlog_v1_stats_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_beanmap_v1_stats_proto_rawDesc), len(file_beanmap_v1_stats_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_beanlog_v1_stats_proto_goTypes,
-		DependencyIndexes: file_beanlog_v1_stats_proto_depIdxs,
-		MessageInfos:      file_beanlog_v1_stats_proto_msgTypes,
+		GoTypes:           file_beanmap_v1_stats_proto_goTypes,
+		DependencyIndexes: file_beanmap_v1_stats_proto_depIdxs,
+		MessageInfos:      file_beanmap_v1_stats_proto_msgTypes,
 	}.Build()
-	File_beanlog_v1_stats_proto = out.File
-	file_beanlog_v1_stats_proto_goTypes = nil
-	file_beanlog_v1_stats_proto_depIdxs = nil
+	File_beanmap_v1_stats_proto = out.File
+	file_beanmap_v1_stats_proto_goTypes = nil
+	file_beanmap_v1_stats_proto_depIdxs = nil
 }

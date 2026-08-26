@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"beanlog-server/middleware"
-	"beanlog-server/models"
+	"beanmap-server/middleware"
+	"beanmap-server/models"
 
 	"github.com/gin-gonic/gin"
 )

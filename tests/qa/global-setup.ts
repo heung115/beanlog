@@ -54,12 +54,12 @@ export default async function globalSetup() {
   // never use service-role table access in this harness.
   const { error: primaryProfileError } = await primary
     .from("profiles")
-    .update({ display_name: "Beanlog QA", locale: "ko" })
+    .update({ display_name: "beanmap QA", locale: "ko" })
     .eq("id", primaryId);
   if (primaryProfileError) throw primaryProfileError;
   const { error: isolationProfileError } = await isolation
     .from("profiles")
-    .update({ display_name: "Beanlog QA Isolation", locale: "ko" })
+    .update({ display_name: "beanmap QA Isolation", locale: "ko" })
     .eq("id", isolationId);
   if (isolationProfileError) throw isolationProfileError;
 

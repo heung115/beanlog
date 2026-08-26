@@ -52,7 +52,7 @@ const values = fixtures
 
 const sql = `
 with target as (
-  select id from auth.users where email = 'beanlog-test@local.dev'
+  select id from auth.users where email = 'beanmap-test@local.dev'
 ), source_rows (
   user_id, name, roastery, bean_type, origin_country, origin_region,
   farm_producer, varietal, process_method, process_detail, roast_level,

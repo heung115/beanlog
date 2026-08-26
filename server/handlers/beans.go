@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"beanlog-server/middleware"
-	"beanlog-server/models"
+	"beanmap-server/middleware"
+	"beanmap-server/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"

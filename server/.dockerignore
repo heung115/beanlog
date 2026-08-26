@@ -1,5 +1,5 @@
 .env
 .env.*
-beanlog-server
+beanmap-server
 coverage.out
 *.log

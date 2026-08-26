@@ -34,8 +34,8 @@ export function deriveStagingRuntime({ root, gitCommonDir }) {
       id: "primary",
       isPrimary,
       runtimeRoot: path.join(resolvedRoot, ".staging"),
-      composeProject: "beanlog-staging",
-      supabaseProject: "beanlog-staging",
+      composeProject: "beanmap-staging",
+      supabaseProject: "beanmap-staging",
       ...PRIMARY_PORTS,
     };
   }
@@ -49,8 +49,8 @@ export function deriveStagingRuntime({ root, gitCommonDir }) {
     id,
     isPrimary,
     runtimeRoot: path.join(resolvedRoot, ".staging", id),
-    composeProject: `beanlog-staging-${id}`,
-    supabaseProject: `beanlog-staging-${id}`,
+    composeProject: `beanmap-staging-${id}`,
+    supabaseProject: `beanmap-staging-${id}`,
     web: 10000 + slot,
     api: 12000 + slot,
     supabaseApi: supabaseBase + 1,

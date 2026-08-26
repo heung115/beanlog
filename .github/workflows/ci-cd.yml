@@ -1,4 +1,4 @@
-name: Beanlog CI/CD
+name: beanmap CI/CD
 
 on:
   push:
@@ -13,7 +13,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: beanlog-${{ github.workflow }}-${{ github.ref }}
+  group: beanmap-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -82,8 +82,8 @@ jobs:
           set -euo pipefail
           owner="$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"
           {
-            echo "web-image=ghcr.io/${owner}/beanlog-web"
-            echo "api-image=ghcr.io/${owner}/beanlog-api"
+            echo "web-image=ghcr.io/${owner}/beanmap-web"
+            echo "api-image=ghcr.io/${owner}/beanmap-api"
             echo "tag=${GITHUB_SHA}"
           } >> "$GITHUB_OUTPUT"
 
@@ -124,8 +124,8 @@ jobs:
             NEXT_PUBLIC_SUPABASE_URL=${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
             NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
             NEXT_PUBLIC_APP_URL=${{ vars.NEXT_PUBLIC_APP_URL }}
-          cache-from: type=gha,scope=beanlog-web
-          cache-to: type=gha,mode=max,scope=beanlog-web
+          cache-from: type=gha,scope=beanmap-web
+          cache-to: type=gha,mode=max,scope=beanmap-web
 
       - name: Build and publish API image
         uses: docker/build-push-action@v6
@@ -136,8 +136,8 @@ jobs:
           tags: |
             ${{ steps.image-names.outputs.api-image }}:${{ steps.image-names.outputs.tag }}
             ${{ steps.image-names.outputs.api-image }}:latest
-          cache-from: type=gha,scope=beanlog-api
-          cache-to: type=gha,mode=max,scope=beanlog-api
+          cache-from: type=gha,scope=beanmap-api
+          cache-to: type=gha,mode=max,scope=beanmap-api
 
   deploy:
     name: Deploy to production
@@ -163,9 +163,9 @@ jobs:
             fi
           done
           install -d -m 700 "$HOME/.ssh"
-          printf '%s\n' "$DEPLOY_SSH_KEY" > "$HOME/.ssh/beanlog_deploy"
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$HOME/.ssh/beanmap_deploy"
           printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
-          chmod 600 "$HOME/.ssh/beanlog_deploy" "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/beanmap_deploy" "$HOME/.ssh/known_hosts"
 
       - name: Pull images and restart Compose services
         shell: bash
@@ -191,7 +191,7 @@ jobs:
             exit 1
           fi
           remote_path="$(printf '%q' "$DEPLOY_PATH")"
-          ssh -i "$HOME/.ssh/beanlog_deploy" \
+          ssh -i "$HOME/.ssh/beanmap_deploy" \
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \
             "$DEPLOY_USER@$DEPLOY_HOST" \

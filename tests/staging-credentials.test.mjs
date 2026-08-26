@@ -7,7 +7,7 @@ import test from "node:test";
 import { ensureQaCredentials } from "../scripts/staging-credentials.mjs";
 
 test("QA credentials are random, stable, isolated, and mode 0600", () => {
-  const runtimeRoot = fs.mkdtempSync(path.join(os.tmpdir(), "beanlog-qa-"));
+  const runtimeRoot = fs.mkdtempSync(path.join(os.tmpdir(), "beanmap-qa-"));
 
   try {
     const first = ensureQaCredentials(runtimeRoot);

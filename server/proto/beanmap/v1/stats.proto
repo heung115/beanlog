@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package beanlog.v1;
+package beanmap.v1;
 
-option go_package = "beanlog-server/gen/beanlog/v1;beanlogv1";
+option go_package = "beanmap-server/gen/beanmap/v1;beanmapv1";
 
 // StatsService는 사용자의 원두 기록 집계를 제공한다.
 // 읽기 전용이라 gRPC 학습용 첫 서비스로 적합하다.

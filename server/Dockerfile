@@ -3,7 +3,7 @@ WORKDIR /app
 COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
-RUN CGO_ENABLED=0 go build -o beanlog-server .
+RUN CGO_ENABLED=0 go build -o beanmap-server .
 
 FROM alpine:3.23@sha256:fd791d74b68913cbb027c6546007b3f0d3bc45125f797758156952bc2d6daf40
 RUN apk --no-cache upgrade && \
@@ -11,7 +11,7 @@ RUN apk --no-cache upgrade && \
     addgroup -S -g 1001 appgroup && \
     adduser -S -u 1001 -G appgroup appuser
 WORKDIR /app
-COPY --from=builder --chown=appuser:appgroup /app/beanlog-server .
+COPY --from=builder --chown=appuser:appgroup /app/beanmap-server .
 USER appuser
 EXPOSE 8080
-CMD ["./beanlog-server"]
+CMD ["./beanmap-server"]

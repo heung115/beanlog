@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Beanlog",
+    "name": "beanmap",
     "tagline": "나의 커피 원두 기록"
   },
   "nav": {
@@ -20,8 +20,8 @@
     "password": "비밀번호",
     "passwordConfirm": "비밀번호 확인",
     "displayName": "닉네임",
-    "loginTitle": "Beanlog에 오신 것을 환영합니다",
-    "signupTitle": "Beanlog 시작하기",
+    "loginTitle": "beanmap에 오신 것을 환영합니다",
+    "signupTitle": "beanmap 시작하기",
     "loginWithGoogle": "Google로 계속",
     "loginWithKakao": "카카오로 계속",
     "noAccount": "계정이 없으신가요?",

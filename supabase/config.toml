@@ -1,4 +1,4 @@
-project_id = "beanlog"
+project_id = "beanmap"
 
 [api]
 enabled = true

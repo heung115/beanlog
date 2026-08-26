@@ -3,7 +3,7 @@ package routes
 import (
 	"testing"
 
-	"beanlog-server/config"
+	"beanmap-server/config"
 )
 
 // TestSetupRegistersRoutesWithoutConflict guards against Gin panicking on

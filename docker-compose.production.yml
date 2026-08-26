@@ -1,4 +1,4 @@
-name: ${COMPOSE_PROJECT_NAME:-beanlog}
+name: ${COMPOSE_PROJECT_NAME:-beanmap}
 
 services:
   web:
@@ -9,7 +9,7 @@ services:
       NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:?set NEXT_PUBLIC_APP_URL}
       SUPABASE_SERVER_URL: ${SUPABASE_SERVER_URL:?set SUPABASE_SERVER_URL}
       GO_API_URL: http://api:8080
-      NEXT_DEPLOYMENT_ID: ${NEXT_DEPLOYMENT_ID:-beanlog}
+      NEXT_DEPLOYMENT_ID: ${NEXT_DEPLOYMENT_ID:-beanmap}
       NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${NEXT_SERVER_ACTIONS_ENCRYPTION_KEY:?set NEXT_SERVER_ACTIONS_ENCRYPTION_KEY}
     ports:
       - "127.0.0.1:${WEB_PORT:-3000}:3000"
@@ -31,7 +31,7 @@ services:
       - ALL
     restart: unless-stopped
     networks:
-      - beanlog
+      - beanmap
 
   api:
     image: ${API_IMAGE:?set API_IMAGE}
@@ -60,10 +60,10 @@ services:
       - ALL
     restart: unless-stopped
     networks:
-      - beanlog
+      - beanmap
 
 networks:
-  beanlog:
+  beanmap:
 
 secrets:
   api_database_url:

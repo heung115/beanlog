@@ -7,7 +7,7 @@ import (
 	"sort"
 	"time"
 
-	beanlogv1 "beanlog-server/gen/beanlog/v1"
+	beanmapv1 "beanmap-server/gen/beanmap/v1"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"google.golang.org/grpc/codes"
@@ -18,7 +18,7 @@ import (
 // request runs in its own transaction lowered to the authenticated role so
 // PostgreSQL RLS remains the final authorization boundary.
 type StatsServer struct {
-	beanlogv1.UnimplementedStatsServiceServer
+	beanmapv1.UnimplementedStatsServiceServer
 	pool *pgxpool.Pool
 }
 
@@ -26,7 +26,7 @@ func NewStatsServer(pool *pgxpool.Pool) *StatsServer {
 	return &StatsServer{pool: pool}
 }
 
-func (s *StatsServer) GetStats(ctx context.Context, _ *beanlogv1.GetStatsRequest) (*beanlogv1.GetStatsResponse, error) {
+func (s *StatsServer) GetStats(ctx context.Context, _ *beanmapv1.GetStatsRequest) (*beanmapv1.GetStatsResponse, error) {
 	userID, ok := UserIDFromContext(ctx)
 	if !ok {
 		return nil, status.Error(codes.Unauthenticated, "missing authenticated user")
@@ -80,7 +80,7 @@ func (s *StatsServer) GetStats(ctx context.Context, _ *beanlogv1.GetStatsRequest
 	}
 
 	if len(beanRows) == 0 {
-		return &beanlogv1.GetStatsResponse{}, nil
+		return &beanmapv1.GetStatsResponse{}, nil
 	}
 
 	total := len(beanRows)
@@ -106,10 +106,10 @@ func (s *StatsServer) GetStats(ctx context.Context, _ *beanlogv1.GetStatsRequest
 		scoreDist[fmt.Sprintf("%d", int(math.Floor(b.score)))]++
 	}
 
-	resp := &beanlogv1.GetStatsResponse{
+	resp := &beanmapv1.GetStatsResponse{
 		Total:      saturatingInt32(total),
 		AvgScore:   math.Round(sumScore/float64(total)*10) / 10,
-		Best:       &beanlogv1.BestBean{Name: best.name, Roastery: best.roastery, Score: best.score},
+		Best:       &beanmapv1.BestBean{Name: best.name, Roastery: best.roastery, Score: best.score},
 		ByOrigin:   countEntries(byOrigin, true),
 		ByProcess:  countEntries(byProcess, true),
 		ByVarietal: countEntries(byVarietal, true),
@@ -125,10 +125,10 @@ func (s *StatsServer) GetStats(ctx context.Context, _ *beanlogv1.GetStatsRequest
 	return resp, nil
 }
 
-func countEntries(m map[string]int, desc bool) []*beanlogv1.CountEntry {
-	entries := make([]*beanlogv1.CountEntry, 0, len(m))
+func countEntries(m map[string]int, desc bool) []*beanmapv1.CountEntry {
+	entries := make([]*beanmapv1.CountEntry, 0, len(m))
 	for k, v := range m {
-		entries = append(entries, &beanlogv1.CountEntry{Key: k, Count: saturatingInt32(v)})
+		entries = append(entries, &beanmapv1.CountEntry{Key: k, Count: saturatingInt32(v)})
 	}
 	if desc {
 		sort.Slice(entries, func(i, j int) bool {

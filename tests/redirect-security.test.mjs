@@ -6,7 +6,7 @@ const { resolveTrustedAppRedirect } = await import(
 );
 
 test("OAuth redirects stay on the configured application origin", () => {
-  const appUrl = "https://beanlog.example/application-path";
+  const appUrl = "https://beanmap.example/application-path";
   for (const maliciousNext of [
     "https://attacker.example/phish",
     "//attacker.example/phish",
@@ -15,19 +15,19 @@ test("OAuth redirects stay on the configured application origin", () => {
     "javascript:alert(1)",
   ]) {
     const destination = resolveTrustedAppRedirect(maliciousNext, appUrl);
-    assert.equal(destination.origin, "https://beanlog.example");
+    assert.equal(destination.origin, "https://beanmap.example");
     assert.equal(destination.pathname, "/explore");
   }
 
   const valid = resolveTrustedAppRedirect("/ko/explore?sort=recent", appUrl);
-  assert.equal(valid.href, "https://beanlog.example/ko/explore?sort=recent");
+  assert.equal(valid.href, "https://beanmap.example/ko/explore?sort=recent");
 });
 
 test("invalid configured origins fall back without reflecting credentials", () => {
   for (const configuredAppUrl of [
     "javascript:alert(1)",
     "not a URL",
-    "file:///tmp/beanlog",
+    "file:///tmp/beanmap",
   ]) {
     const destination = resolveTrustedAppRedirect(
       "/login?error=invalid_credentials",

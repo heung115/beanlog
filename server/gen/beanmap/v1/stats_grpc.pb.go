@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.2
 // - protoc             v7.34.1
-// source: beanlog/v1/stats.proto
+// source: beanmap/v1/stats.proto
 
-package beanlogv1
+package beanmapv1
 
 import (
 	context "context"
@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	StatsService_GetStats_FullMethodName = "/beanlog.v1.StatsService/GetStats"
+	StatsService_GetStats_FullMethodName = "/beanmap.v1.StatsService/GetStats"
 )
 
 // StatsServiceClient is the client API for StatsService service.
@@ -116,7 +116,7 @@ func _StatsService_GetStats_Handler(srv interface{}, ctx context.Context, dec fu
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var StatsService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "beanlog.v1.StatsService",
+	ServiceName: "beanmap.v1.StatsService",
 	HandlerType: (*StatsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -125,5 +125,5 @@ var StatsService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "beanlog/v1/stats.proto",
+	Metadata: "beanmap/v1/stats.proto",
 }

@@ -243,12 +243,12 @@ function provisionApiDatabaseRole() {
   const sql = `
 do $$
 begin
-  if not exists (select 1 from pg_roles where rolname = 'beanlog_api') then
-    create role beanlog_api login noinherit nosuperuser nocreatedb nocreaterole noreplication nobypassrls;
+  if not exists (select 1 from pg_roles where rolname = 'beanmap_api') then
+    create role beanmap_api login noinherit nosuperuser nocreatedb nocreaterole noreplication nobypassrls;
   end if;
 end;
 $$;
-alter role beanlog_api with login noinherit nosuperuser nocreatedb nocreaterole noreplication nobypassrls password '${password}';
+alter role beanmap_api with login noinherit nosuperuser nocreatedb nocreaterole noreplication nobypassrls password '${password}';
 do $$
 declare
   granted_role record;
@@ -259,17 +259,17 @@ begin
     join pg_roles role on role.oid = membership.roleid
     join pg_roles member on member.oid = membership.member
     join pg_roles grantor on grantor.oid = membership.grantor
-    where member.rolname = 'beanlog_api'
+    where member.rolname = 'beanmap_api'
   loop
     execute format(
-      'revoke %I from beanlog_api granted by %I',
+      'revoke %I from beanmap_api granted by %I',
       granted_role.rolname,
       granted_role.grantor_name
     );
   end loop;
 end;
 $$;
-grant authenticated to beanlog_api;
+grant authenticated to beanmap_api;
 `;
   const result = spawnSync(
     "docker",
@@ -296,7 +296,7 @@ grant authenticated to beanlog_api;
   if (result.status !== 0) {
     throw new Error("Failed to provision the staging API database role.");
   }
-  return `postgresql://beanlog_api:${encodeURIComponent(password)}@db:5432/postgres?sslmode=disable&application_name=beanlog-api`;
+  return `postgresql://beanmap_api:${encodeURIComponent(password)}@db:5432/postgres?sslmode=disable&application_name=beanmap-api`;
 }
 
 function writeEnvironment(status, databaseUrl) {
@@ -403,9 +403,9 @@ async function up() {
     compose(["up", "-d", "--build", "--remove-orphans", "web"]);
     compose(["up", "-d", "--build", "--force-recreate", "api"]);
   }
-  await waitFor(`http://localhost:${runtime.web}/ko/login`, "Beanlog web");
-  await waitFor(`http://localhost:${runtime.api}/health`, "Beanlog API");
-  console.log("\nBeanlog staging development environment is ready:");
+  await waitFor(`http://localhost:${runtime.web}/ko/login`, "beanmap web");
+  await waitFor(`http://localhost:${runtime.api}/health`, "beanmap API");
+  console.log("\nbeanmap staging development environment is ready:");
   console.log(`  Runtime:  ${runtime.id}`);
   console.log(`  App:      http://localhost:${runtime.web}`);
   console.log(`  API:      http://localhost:${runtime.api}/health`);
@@ -416,7 +416,7 @@ async function up() {
 async function qa() {
   const env = readEnv();
   const qaCredentials = ensureQaCredentials(runtimeRoot);
-  await waitFor(env.STAGING_APP_URL, "Beanlog web", 20_000);
+  await waitFor(env.STAGING_APP_URL, "beanmap web", 20_000);
   const result = spawnSync("npx", ["playwright", "test", ...process.argv.slice(3)], {
     cwd: root,
     stdio: "inherit",

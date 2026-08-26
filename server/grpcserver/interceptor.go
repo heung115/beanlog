@@ -4,7 +4,7 @@ import (
 	"context"
 	"strings"
 
-	"beanlog-server/middleware"
+	"beanmap-server/middleware"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"

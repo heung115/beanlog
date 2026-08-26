@@ -1,6 +1,6 @@
 # Canonical template for staging development runtimes. The primary checkout
 # keeps these values; linked worktrees render isolated IDs, ports, and URLs.
-project_id = "beanlog-staging"
+project_id = "beanmap-staging"
 
 [api]
 enabled = true

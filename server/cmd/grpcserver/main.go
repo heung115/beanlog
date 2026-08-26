@@ -1,4 +1,4 @@
-// Command grpcserver runs the gRPC face of the Beanlog API. It is a separate
+// Command grpcserver runs the gRPC face of the beanmap API. It is a separate
 // binary from the REST (Gin) server so each transport can be deployed and
 // scaled independently. Both share the same Supabase database and the same
 // JWT verification rules via middleware.TokenVerifier.
@@ -12,10 +12,10 @@ import (
 	"os/signal"
 	"syscall"
 
-	"beanlog-server/config"
-	beanlogv1 "beanlog-server/gen/beanlog/v1"
-	"beanlog-server/grpcserver"
-	"beanlog-server/middleware"
+	"beanmap-server/config"
+	beanmapv1 "beanmap-server/gen/beanmap/v1"
+	"beanmap-server/grpcserver"
+	"beanmap-server/middleware"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"google.golang.org/grpc"
@@ -66,7 +66,7 @@ func main() {
 	server := grpc.NewServer(
 		grpc.UnaryInterceptor(grpcserver.AuthUnaryInterceptor(verifier)),
 	)
-	beanlogv1.RegisterStatsServiceServer(server, grpcserver.NewStatsServer(pool))
+	beanmapv1.RegisterStatsServiceServer(server, grpcserver.NewStatsServer(pool))
 	// Reflection lets grpcurl / grpcui discover services during development.
 	// Disable it in production if you do not want the schema exposed.
 	reflection.Register(server)
@@ -89,7 +89,7 @@ func main() {
 		server.GracefulStop()
 	}()
 
-	log.Printf("Beanlog gRPC server starting on :%s", port)
+	log.Printf("beanmap gRPC server starting on :%s", port)
 	if err := server.Serve(lis); err != nil {
 		log.Fatalf("gRPC server failed: %v", err)
 	}

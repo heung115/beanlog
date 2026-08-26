@@ -13,7 +13,7 @@ import {
 
 test("ensuring an existing QA user preserves its active refresh tokens", async () => {
   const disposable = {
-    email: `beanlog-qa-session-${Date.now()}-${Math.random().toString(16).slice(2)}@local.test`,
+    email: `beanmap-qa-session-${Date.now()}-${Math.random().toString(16).slice(2)}@local.test`,
     password: randomBytes(32).toString("base64url"),
   };
   const userId = await ensureUser(disposable.email, disposable.password);
@@ -133,7 +133,7 @@ test("RLS and table privileges prevent cross-user access and direct writes", asy
 test("authenticated PostgREST writes cannot bypass bean or profile invariants", async () => {
   const suffix = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
   const disposable = {
-    email: `beanlog-qa-direct-write-${suffix}@local.test`,
+    email: `beanmap-qa-direct-write-${suffix}@local.test`,
     password: randomBytes(32).toString("base64url"),
   };
   const userId = await ensureUser(disposable.email, disposable.password);
@@ -509,14 +509,14 @@ test("Go API rejects forged JWTs and rolls back database child failures", async 
       Authorization: `Bearer ${session.access_token}`,
       "Content-Type": "application/json",
     },
-    data: { display_name: "Beanlog QA Security", locale: "en" },
+    data: { display_name: "beanmap QA Security", locale: "en" },
   });
   expect(profileUpdate.status()).toBe(200);
   const profileAfterResponse = await request.get(`${qaApiURL}/api/profile`, {
     headers: { Authorization: `Bearer ${session.access_token}` },
   });
   const profileAfter = (await profileAfterResponse.json()) as typeof profileBefore;
-  expect(profileAfter.display_name).toBe("Beanlog QA Security");
+  expect(profileAfter.display_name).toBe("beanmap QA Security");
   expect(profileAfter.locale).toBe("en");
   expect(profileAfter.email).toBe(profileBefore.email);
   expect(profileAfter.created_at).toBe(profileBefore.created_at);
@@ -527,7 +527,7 @@ test("Go API rejects forged JWTs and rolls back database child failures", async 
       "Content-Type": "application/json",
     },
     data: {
-      display_name: profileBefore.display_name ?? "Beanlog QA",
+      display_name: profileBefore.display_name ?? "beanmap QA",
       locale: profileBefore.locale,
     },
   });
@@ -551,7 +551,7 @@ test("Go API rejects forged JWTs and rolls back database child failures", async 
 test("account deletion removes only the authenticated disposable user", async () => {
   const suffix = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
   const disposable = {
-    email: `beanlog-qa-delete-${suffix}@local.test`,
+    email: `beanmap-qa-delete-${suffix}@local.test`,
     password: randomBytes(32).toString("base64url"),
   };
   const disposableId = await ensureUser(disposable.email, disposable.password);

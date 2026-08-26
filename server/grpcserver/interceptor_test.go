@@ -13,7 +13,7 @@ import (
 	"testing"
 	"time"
 
-	"beanlog-server/middleware"
+	"beanmap-server/middleware"
 
 	"github.com/golang-jwt/jwt/v5"
 	"google.golang.org/grpc"
@@ -87,8 +87,8 @@ func passthroughHandler(captured *context.Context) grpc.UnaryHandler {
 func TestAuthInterceptorRejectsMissingOrMalformedMetadata(t *testing.T) {
 	privateKey, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	jwks := startJWKS(t, &privateKey.PublicKey)
-	interceptor := AuthUnaryInterceptor(middleware.NewTokenVerifier(jwks.URL, "https://auth.beanlog.test/auth/v1"))
-	info := &grpc.UnaryServerInfo{FullMethod: "/beanlog.v1.StatsService/GetStats"}
+	interceptor := AuthUnaryInterceptor(middleware.NewTokenVerifier(jwks.URL, "https://auth.beanmap.test/auth/v1"))
+	info := &grpc.UnaryServerInfo{FullMethod: "/beanmap.v1.StatsService/GetStats"}
 
 	cases := []struct {
 		name string
@@ -110,10 +110,10 @@ func TestAuthInterceptorRejectsMissingOrMalformedMetadata(t *testing.T) {
 
 func TestAuthInterceptorValidatesTokenBoundary(t *testing.T) {
 	privateKey, _ := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
-	issuer := "https://auth.beanlog.test/auth/v1"
+	issuer := "https://auth.beanmap.test/auth/v1"
 	jwks := startJWKS(t, &privateKey.PublicKey)
 	interceptor := AuthUnaryInterceptor(middleware.NewTokenVerifier(jwks.URL, issuer))
-	info := &grpc.UnaryServerInfo{FullMethod: "/beanlog.v1.StatsService/GetStats"}
+	info := &grpc.UnaryServerInfo{FullMethod: "/beanmap.v1.StatsService/GetStats"}
 
 	tests := []struct {
 		name     string

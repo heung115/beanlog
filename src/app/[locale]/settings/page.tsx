@@ -145,7 +145,7 @@ export default function SettingsPage() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `beanlog-export-${new Date().toISOString().slice(0, 10)}.json`;
+      a.download = `beanmap-export-${new Date().toISOString().slice(0, 10)}.json`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -199,7 +199,7 @@ export default function SettingsPage() {
               name="displayName"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              placeholder={profileLoading ? tCommon("loading") : "Beanlog"}
+              placeholder={profileLoading ? tCommon("loading") : "beanmap"}
               maxLength={30}
               required
             />

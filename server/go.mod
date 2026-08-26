@@ -1,4 +1,4 @@
-module beanlog-server
+module beanmap-server
 
 go 1.26.6
 

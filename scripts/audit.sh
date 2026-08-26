@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Beanlog security/quality audit harness.
+# beanmap security/quality audit harness.
 # The persistent report never includes environment values, tokens, matched
 # secret text, database URLs, or raw scanner output.
 set -uo pipefail
@@ -33,7 +33,7 @@ STAGING_API_CONTAINER="${STAGING_COMPOSE_PROJECT}-api-1"
 STAGING_DB_CONTAINER="supabase_db_${STAGING_SUPABASE_PROJECT}"
 STAGING_SUPABASE_NETWORK="supabase_network_${STAGING_SUPABASE_PROJECT}"
 
-TMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/beanlog-audit.XXXXXX")"
+TMP_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/beanmap-audit.XXXXXX")"
 chmod 700 "$TMP_ROOT"
 cleanup() { rm -rf "$TMP_ROOT"; }
 trap cleanup EXIT INT TERM
@@ -43,7 +43,7 @@ declare -i C_CRIT=0 C_HIGH=0 C_MED=0 C_LOW=0 C_INFO=0 C_OK=0
 
 : > "$REPORT"
 chmod 600 "$REPORT"
-printf '# Beanlog Audit Report — %s\n\n' "$(date '+%Y-%m-%d %H:%M:%S %Z')" >> "$REPORT"
+printf '# beanmap Audit Report — %s\n\n' "$(date '+%Y-%m-%d %H:%M:%S %Z')" >> "$REPORT"
 printf '> Secret values and raw scanner matches are intentionally excluded.\n' >> "$REPORT"
 
 finding() {
@@ -237,7 +237,7 @@ if (cd server && GOTOOLCHAIN=go1.26.6 go vet ./...) > "$TMP_ROOT/go-vet.out" 2>&
 else
   finding "HIGH" "go/vet" "go vet failed"
 fi
-if (cd server && GOTOOLCHAIN=go1.26.6 go build -trimpath -o "$TMP_ROOT/beanlog-server" .) > "$TMP_ROOT/go-build.out" 2>&1; then
+if (cd server && GOTOOLCHAIN=go1.26.6 go build -trimpath -o "$TMP_ROOT/beanmap-server" .) > "$TMP_ROOT/go-build.out" 2>&1; then
   finding "OK" "go/build" "Go production binary built"
 else
   finding "HIGH" "go/build" "Go production build failed"
@@ -588,11 +588,11 @@ NODE
 
   API_ACTIVITY_ROLE="$(docker exec "$STAGING_DB_CONTAINER" psql -U postgres -d postgres -Atqc "
     select case
-      when count(*) > 0 and bool_and(usename = 'beanlog_api') then 'safe'
+      when count(*) > 0 and bool_and(usename = 'beanmap_api') then 'safe'
       else 'unsafe'
     end
     from pg_stat_activity
-    where application_name = 'beanlog-api';
+    where application_name = 'beanmap-api';
   " 2>/dev/null || printf 'query-failed')"
   API_ROLE_PROPERTIES="$(docker exec "$STAGING_DB_CONTAINER" psql -U supabase_admin -d postgres -Atqc "
     select not rolsuper
@@ -609,7 +609,7 @@ NODE
          where membership.member = pg_authid.oid
        )
     from pg_authid
-    where rolname = 'beanlog_api';
+    where rolname = 'beanmap_api';
   " 2>/dev/null || printf 'query-failed')"
   if [[ "$API_ACTIVITY_ROLE" == "safe" && "$API_ROLE_PROPERTIES" == "t" ]]; then
     finding "OK" "runtime/database-role" "API uses the dedicated non-superuser, non-BYPASSRLS authenticated member"
@@ -622,7 +622,7 @@ NODE
     finding "HIGH" "runtime/database-password" "Database image could not be identified for the password probe"
   elif docker run --rm --network "$STAGING_SUPABASE_NETWORK" \
     -e PGPASSWORD=postgres "$DATABASE_IMAGE" \
-    psql -h db -U beanlog_api -d postgres -Atqc 'select 1' \
+    psql -h db -U beanmap_api -d postgres -Atqc 'select 1' \
     > /dev/null 2>&1; then
     finding "CRITICAL" "runtime/database-password" "Dedicated API role accepts the shared staging postgres password"
   else

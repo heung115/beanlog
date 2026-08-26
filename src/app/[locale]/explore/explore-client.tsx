@@ -18,8 +18,8 @@ import type {
 } from "@/types/database";
 
 const PAGE_SIZE = 20;
-const VIEW_STORAGE_KEY = "beanlog:explore-view";
-const VIEW_CHANGE_EVENT = "beanlog:explore-view-change";
+const VIEW_STORAGE_KEY = "beanmap:explore-view";
+const VIEW_CHANGE_EVENT = "beanmap:explore-view-change";
 const subscribeToHydration = () => () => {};
 type ViewMode = "grid" | "list";
 let fallbackViewMode: ViewMode = "grid";
