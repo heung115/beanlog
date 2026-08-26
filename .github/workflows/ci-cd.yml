@@ -89,23 +89,13 @@ jobs:
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-          DEPLOY_SOURCE_PATH: ${{ secrets.DEPLOY_SOURCE_PATH }}
-          DEPLOY_COMPOSE_PATH: ${{ secrets.DEPLOY_COMPOSE_PATH }}
           RELEASE_ARCHIVE: beanmap-${{ github.sha }}.tar.gz
         run: |
           set -euo pipefail
-          source_path="${DEPLOY_SOURCE_PATH:-/srv/beanlog/app-src}"
-          compose_path="${DEPLOY_COMPOSE_PATH:-/srv/beanlog/app}"
-          for path_value in "$source_path" "$compose_path"; do
-            case "$path_value" in
-              /*) ;;
-              *) echo "Deployment paths must be absolute." >&2; exit 1 ;;
-            esac
-            if [[ "$path_value" == *"'"* ]]; then
-              echo "Deployment paths cannot contain a single quote." >&2
-              exit 1
-            fi
-          done
+          # These are fixed to the directories used by the deployed Oracle
+          # instance. They are intentionally not configurable from secrets.
+          source_path="/srv/beanlog/app-src"
+          compose_path="/srv/beanlog/app"
           if [ ! -s "$RELEASE_ARCHIVE" ]; then
             echo "Release archive was not created." >&2
             exit 1
