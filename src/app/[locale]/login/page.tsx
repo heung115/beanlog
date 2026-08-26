@@ -40,6 +40,16 @@ export default function LoginPage() {
             autoComplete="current-password"
           />
 
+          <label className="flex cursor-pointer items-center gap-2 text-sm text-brown-light">
+            <input
+              type="checkbox"
+              name="remember"
+              defaultChecked
+              className="h-4 w-4 rounded border-border accent-accent"
+            />
+            {t("rememberLogin")}
+          </label>
+
           {state.error && (
             <p className="text-sm text-red-600">{t("loginError")}</p>
           )}

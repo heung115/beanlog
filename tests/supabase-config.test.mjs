@@ -33,6 +33,9 @@ test("OAuth uses the public Supabase host with the shared PKCE cookie adapter", 
   assert.match(serverClient, /createPublicClient/);
   assert.match(serverClient, /process\.env\.NEXT_PUBLIC_SUPABASE_URL/);
   assert.match(serverClient, /cookieOptions: supabaseCookieOptions/);
-  assert.match(authActions, /await createPublicClient\(\)/);
+  assert.match(
+    authActions,
+    /await createPublicClient\(\{ persistSession: true \}\)/
+  );
   assert.doesNotMatch(authActions, /setAll:\s*\(\)\s*=>\s*\{\}/);
 });

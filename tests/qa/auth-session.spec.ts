@@ -6,8 +6,65 @@ import {
   qaUser,
   signIn,
 } from "./helpers";
+import { SESSION_ONLY_COOKIE_NAME } from "../../src/lib/supabase/session-persistence";
 
 const AUTH_COOKIE_CHUNK_SIZE = 3180;
+
+function isAuthCookie(name: string, storageKey: string) {
+  return name === storageKey || name.startsWith(`${storageKey}.`);
+}
+
+test("login stays signed in by default", async ({ browser }) => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await page.goto(`${qaBaseURL}/ko/login`);
+
+  const remember = page.getByRole("checkbox", { name: "로그인 상태 유지" });
+  await expect(remember).toBeChecked();
+  await page.locator('input[name="email"]').fill(qaUser.email);
+  await page.locator('input[name="password"]').fill(qaUser.password);
+  await page.locator('button[type="submit"]').click();
+  await expect(page).toHaveURL(/\/(?:ko\/)?explore$/);
+
+  const storageKey = getSupabaseCookieName(browserSupabaseUrl);
+  const authCookies = (await context.cookies(qaBaseURL)).filter(({ name }) =>
+    isAuthCookie(name, storageKey)
+  );
+  expect(authCookies.length).toBeGreaterThan(0);
+  expect(authCookies.every(({ expires }) => expires > Date.now() / 1000)).toBe(
+    true
+  );
+  await context.close();
+});
+
+test("opting out keeps authentication only for the browser session", async ({
+  browser,
+}) => {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await page.goto(`${qaBaseURL}/ko/login`);
+
+  await page.getByRole("checkbox", { name: "로그인 상태 유지" }).uncheck();
+  await page.locator('input[name="email"]').fill(qaUser.email);
+  await page.locator('input[name="password"]').fill(qaUser.password);
+  await page.locator('button[type="submit"]').click();
+  await expect(page).toHaveURL(/\/(?:ko\/)?explore$/);
+
+  const storageKey = getSupabaseCookieName(browserSupabaseUrl);
+  const cookies = await context.cookies(qaBaseURL);
+  const authCookies = cookies.filter(({ name }) =>
+    isAuthCookie(name, storageKey)
+  );
+  expect(authCookies.length).toBeGreaterThan(0);
+  expect(authCookies.every(({ expires }) => expires === -1)).toBe(true);
+  expect(
+    cookies.find(({ name }) => name === SESSION_ONLY_COOKIE_NAME)?.expires
+  ).toBe(-1);
+
+  await page.reload();
+  await expect(page).toHaveURL(/\/(?:ko\/)?explore$/);
+  await context.close();
+});
 
 function encodeAuthCookies(
   session: object,

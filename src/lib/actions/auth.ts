@@ -3,6 +3,7 @@
 import {
   createClient,
   createPublicClient,
+  setSessionPersistencePreference,
 } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -56,7 +57,8 @@ export async function signInAction(
     return { error: "Invalid credentials" };
   }
 
-  const supabase = await createClient();
+  const persistSession = formData.get("remember") === "on";
+  const supabase = await createClient({ persistSession });
 
   const { error } = await supabase.auth.signInWithPassword({
     email: credentials.data.email,
@@ -67,13 +69,14 @@ export async function signInAction(
     return { error: "Invalid credentials" };
   }
 
+  await setSessionPersistencePreference(persistSession);
   redirect("/explore");
 }
 
 export async function signInWithOAuth(provider: "google" | "kakao") {
   // The authorize URL must use the browser-accessible Supabase host, while
   // the shared server adapter persists the PKCE verifier for the callback.
-  const supabase = await createPublicClient();
+  const supabase = await createPublicClient({ persistSession: true });
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
@@ -86,6 +89,7 @@ export async function signInWithOAuth(provider: "google" | "kakao") {
     return { error: "OAuth sign-in is unavailable" };
   }
 
+  await setSessionPersistencePreference(true);
   if (data.url) {
     redirect(data.url);
   }
@@ -97,5 +101,6 @@ export async function signOut() {
   // storage adapter removes every chunk of the auth cookie even when the
   // remote session has already expired.
   await supabase.auth.signOut({ scope: "local" });
+  await setSessionPersistencePreference(true);
   redirect("/login");
 }
