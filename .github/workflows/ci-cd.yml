@@ -52,97 +52,10 @@ jobs:
       - name: Run quality gate
         run: npm run check
 
-  build-images:
-    name: Build and publish images
-    # Keep source verification green before the production Supabase values
-    # are configured. Once all three repository variables exist, main pushes
-    # publish the deployable images.
-    if: >-
-      github.event_name == 'push' && github.ref == 'refs/heads/main' &&
-      vars.NEXT_PUBLIC_SUPABASE_URL != '' &&
-      vars.NEXT_PUBLIC_SUPABASE_ANON_KEY != '' &&
-      vars.NEXT_PUBLIC_APP_URL != ''
-    needs: verify
-    runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-      packages: write
-    outputs:
-      web-image: ${{ steps.image-names.outputs.web-image }}
-      api-image: ${{ steps.image-names.outputs.api-image }}
-      tag: ${{ steps.image-names.outputs.tag }}
-    steps:
-      - name: Check out source
-        uses: actions/checkout@v4
-
-      - name: Resolve image names
-        id: image-names
-        shell: bash
-        run: |
-          set -euo pipefail
-          owner="$(printf '%s' "$GITHUB_REPOSITORY_OWNER" | tr '[:upper:]' '[:lower:]')"
-          {
-            echo "web-image=ghcr.io/${owner}/beanmap-web"
-            echo "api-image=ghcr.io/${owner}/beanmap-api"
-            echo "tag=${GITHUB_SHA}"
-          } >> "$GITHUB_OUTPUT"
-
-      - name: Validate public build variables
-        env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL }}
-        run: |
-          set -euo pipefail
-          for variable in NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_SUPABASE_ANON_KEY NEXT_PUBLIC_APP_URL; do
-            if [ -z "${!variable:-}" ]; then
-              echo "Repository variable ${variable} is required to publish the production web image." >&2
-              exit 1
-            fi
-          done
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build and publish web image
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: Dockerfile
-          push: true
-          tags: |
-            ${{ steps.image-names.outputs.web-image }}:${{ steps.image-names.outputs.tag }}
-            ${{ steps.image-names.outputs.web-image }}:latest
-          build-args: |
-            NEXT_PUBLIC_SUPABASE_URL=${{ vars.NEXT_PUBLIC_SUPABASE_URL }}
-            NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ vars.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-            NEXT_PUBLIC_APP_URL=${{ vars.NEXT_PUBLIC_APP_URL }}
-          cache-from: type=gha,scope=beanmap-web
-          cache-to: type=gha,mode=max,scope=beanmap-web
-
-      - name: Build and publish API image
-        uses: docker/build-push-action@v6
-        with:
-          context: server
-          file: server/Dockerfile
-          push: true
-          tags: |
-            ${{ steps.image-names.outputs.api-image }}:${{ steps.image-names.outputs.tag }}
-            ${{ steps.image-names.outputs.api-image }}:latest
-          cache-from: type=gha,scope=beanmap-api
-          cache-to: type=gha,mode=max,scope=beanmap-api
-
   deploy:
     name: Deploy to production
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.DEPLOY_ENABLED == 'true'
-    needs: build-images
+    needs: verify
     runs-on: ubuntu-24.04
     environment:
       name: production
@@ -167,32 +80,43 @@ jobs:
           printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
           chmod 600 "$HOME/.ssh/beanmap_deploy" "$HOME/.ssh/known_hosts"
 
-      - name: Pull images and restart Compose services
+      - name: Package the verified source
+        shell: bash
+        run: git archive --format=tar.gz --output="beanmap-${GITHUB_SHA}.tar.gz" HEAD
+
+      - name: Upload source and rebuild the deployed services
         shell: bash
         env:
           DEPLOY_HOST: ${{ secrets.DEPLOY_HOST }}
           DEPLOY_USER: ${{ secrets.DEPLOY_USER }}
-          DEPLOY_PATH: ${{ secrets.DEPLOY_PATH }}
-          WEB_IMAGE: ${{ needs.build-images.outputs.web-image }}
-          API_IMAGE: ${{ needs.build-images.outputs.api-image }}
-          IMAGE_TAG: ${{ needs.build-images.outputs.tag }}
+          DEPLOY_SOURCE_PATH: ${{ secrets.DEPLOY_SOURCE_PATH }}
+          DEPLOY_COMPOSE_PATH: ${{ secrets.DEPLOY_COMPOSE_PATH }}
+          RELEASE_ARCHIVE: beanmap-${{ github.sha }}.tar.gz
         run: |
           set -euo pipefail
-          if [ -z "$DEPLOY_PATH" ]; then
-            echo "DEPLOY_PATH is required when DEPLOY_ENABLED=true." >&2
+          source_path="${DEPLOY_SOURCE_PATH:-/srv/beanlog/app-src}"
+          compose_path="${DEPLOY_COMPOSE_PATH:-/srv/beanlog/app}"
+          for path_value in "$source_path" "$compose_path"; do
+            case "$path_value" in
+              /*) ;;
+              *) echo "Deployment paths must be absolute." >&2; exit 1 ;;
+            esac
+            if [[ "$path_value" == *"'"* ]]; then
+              echo "Deployment paths cannot contain a single quote." >&2
+              exit 1
+            fi
+          done
+          if [ ! -s "$RELEASE_ARCHIVE" ]; then
+            echo "Release archive was not created." >&2
             exit 1
           fi
-          case "$DEPLOY_PATH" in
-            /*) ;;
-            *) echo "DEPLOY_PATH must be an absolute server directory." >&2; exit 1 ;;
-          esac
-          if [[ "$DEPLOY_PATH" == *"'"* ]]; then
-            echo "DEPLOY_PATH cannot contain a single quote." >&2
-            exit 1
-          fi
-          remote_path="$(printf '%q' "$DEPLOY_PATH")"
+          remote_archive="/tmp/${RELEASE_ARCHIVE}"
+          scp -i "$HOME/.ssh/beanmap_deploy" \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            "$RELEASE_ARCHIVE" "$DEPLOY_USER@$DEPLOY_HOST:$remote_archive"
           ssh -i "$HOME/.ssh/beanmap_deploy" \
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \
             "$DEPLOY_USER@$DEPLOY_HOST" \
-            "cd $remote_path && export WEB_IMAGE='$WEB_IMAGE' API_IMAGE='$API_IMAGE' NEXT_DEPLOYMENT_ID='$IMAGE_TAG' && docker compose --env-file .env.production -f docker-compose.production.yml pull web api && docker compose --env-file .env.production -f docker-compose.production.yml up -d --no-build --remove-orphans --wait && docker compose --env-file .env.production -f docker-compose.production.yml ps"
+            "set -euo pipefail; source_path='$source_path'; compose_path='$compose_path'; archive='$remote_archive'; release_dir=\"\$(mktemp -d /tmp/beanmap-release.XXXXXX)\"; trap 'rm -rf \"\$release_dir\" \"\$archive\"' EXIT; tar -xzf \"\$archive\" -C \"\$release_dir\"; sudo mkdir -p \"\$source_path\"; sudo rsync -a --delete --exclude='.env*' --exclude='.audit-report.md' --exclude='CONTEXT.md' --exclude='.staging/' \"\$release_dir/\" \"\$source_path/\"; sudo docker compose --project-directory \"\$compose_path\" -f \"\$compose_path/docker-compose.yml\" up -d --build --remove-orphans --wait; sudo docker compose --project-directory \"\$compose_path\" -f \"\$compose_path/docker-compose.yml\" ps"
