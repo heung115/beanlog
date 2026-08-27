@@ -51,3 +51,46 @@ jobs:
 
       - name: Run quality gate
         run: npm run check
+
+  deploy:
+    name: Trigger production deployment
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: verify
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: Notify production deployer
+        shell: bash
+        env:
+          DEPLOY_WEBHOOK_SECRET: ${{ secrets.DEPLOY_WEBHOOK_SECRET }}
+          DEPLOY_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          if [ -z "${DEPLOY_WEBHOOK_SECRET:-}" ]; then
+            echo "DEPLOY_WEBHOOK_SECRET is required." >&2
+            exit 1
+          fi
+
+          payload="$(
+            jq -cn \
+              --arg repository "$GITHUB_REPOSITORY" \
+              --arg sha "$DEPLOY_SHA" \
+              '{repository: $repository, sha: $sha}'
+          )"
+          signature="$(
+            printf '%s' "$payload" \
+              | python3 -c 'import hashlib, hmac, os, sys; print("sha256=" + hmac.new(os.environ["DEPLOY_WEBHOOK_SECRET"].encode(), sys.stdin.buffer.read(), hashlib.sha256).hexdigest())'
+          )"
+
+          curl \
+            --fail \
+            --silent \
+            --show-error \
+            --retry 3 \
+            --retry-all-errors \
+            --connect-timeout 10 \
+            --max-time 30 \
+            --header 'Content-Type: application/json' \
+            --header "X-Hub-Signature-256: $signature" \
+            --data-binary "$payload" \
+            https://beanmap.site/_deploy/github
