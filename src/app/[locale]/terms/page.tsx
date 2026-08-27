@@ -7,10 +7,23 @@ import {
 } from "@/components/legal/legal-document";
 import { legal } from "@/config/legal";
 
-export const metadata: Metadata = {
-  title: "이용약관 | beanmap",
-  description: "beanmap 서비스 이용약관",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+
+  return locale === "en"
+    ? {
+        title: "Terms of Service | beanmap",
+        description: "Terms for using beanmap and its coffee journal features",
+      }
+    : {
+        title: "이용약관 | beanmap",
+        description: "beanmap 서비스 이용약관",
+      };
+}
 
 export default async function TermsPage({
   params,

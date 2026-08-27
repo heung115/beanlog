@@ -403,6 +403,23 @@ test("@mobile explore keeps the record grid to one column", async ({ page }) => 
   ).toBe(true);
 });
 
+test("wide localized pages keep the footer at the viewport bottom", async ({ page }) => {
+  await page.setViewportSize({ width: 4570, height: 2074 });
+  await page.goto("/ko/login");
+  await expect(page.getByRole("heading", { level: 1, name: "beanmap" })).toBeVisible();
+
+  const layout = await page.evaluate(() => {
+    const footer = document.querySelector("footer");
+    if (!footer) throw new Error("Missing site footer");
+    return {
+      footerBottom: footer.getBoundingClientRect().bottom,
+      viewportBottom: window.innerHeight,
+    };
+  });
+
+  expect(Math.abs(layout.viewportBottom - layout.footerBottom)).toBeLessThanOrEqual(1);
+});
+
 test("explore progressively discloses aligned filters without overflow", async ({ page }) => {
   await login(page);
 

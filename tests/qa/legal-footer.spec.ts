@@ -24,3 +24,11 @@ test("localized pages expose matching legal links", async ({ page }) => {
     footer.getByRole("link", { name: "Privacy Policy" })
   ).toHaveAttribute("href", "/en/privacy");
 });
+
+test("English legal pages expose English document titles", async ({ page }) => {
+  await page.goto("/en/privacy");
+  await expect(page).toHaveTitle("Privacy Policy | beanmap");
+
+  await page.goto("/en/terms");
+  await expect(page).toHaveTitle("Terms of Service | beanmap");
+});

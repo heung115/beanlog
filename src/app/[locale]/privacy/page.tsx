@@ -6,10 +6,23 @@ import {
 } from "@/components/legal/legal-document";
 import { legal } from "@/config/legal";
 
-export const metadata: Metadata = {
-  title: "개인정보 처리방침 | beanmap",
-  description: "beanmap 개인정보 처리방침",
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+
+  return locale === "en"
+    ? {
+        title: "Privacy Policy | beanmap",
+        description: "How beanmap processes and protects personal information",
+      }
+    : {
+        title: "개인정보 처리방침 | beanmap",
+        description: "beanmap 개인정보 처리방침",
+      };
+}
 
 export default async function PrivacyPage({
   params,
