@@ -4,10 +4,12 @@ set -euo pipefail
 
 readonly repository_url="https://github.com/heung115/beanlog.git"
 readonly workflow_runs_url="https://api.github.com/repos/heung115/beanlog/actions/workflows/ci-cd.yml/runs?branch=main&event=push&status=success&per_page=1"
+readonly actions_api_url="https://api.github.com/repos/heung115/beanlog/actions"
 readonly state_dir="/var/lib/beanmap-deploy"
 readonly repository_dir="$state_dir/repository.git"
 readonly deployed_sha_file="$state_dir/deployed-sha"
 readonly deploy_command="/usr/local/sbin/beanmap-deploy"
+readonly trigger_file="/run/beanmap-deploy-trigger/request"
 
 umask 077
 /usr/bin/install -d -m 0700 "$state_dir"
@@ -18,44 +20,84 @@ if ! /usr/bin/flock -n 9; then
 fi
 
 response_file="$(/usr/bin/mktemp "$state_dir/workflow-runs.XXXXXX.json")"
+jobs_file="$(/usr/bin/mktemp "$state_dir/workflow-jobs.XXXXXX.json")"
 state_file=""
 cleanup() {
   /usr/bin/rm -f "$response_file"
+  /usr/bin/rm -f "$jobs_file"
   if [[ -n "$state_file" ]]; then
     /usr/bin/rm -f "$state_file"
   fi
 }
 trap cleanup EXIT
 
-/usr/bin/curl \
-  --fail \
-  --silent \
-  --show-error \
-  --location \
-  --proto '=https' \
-  --tlsv1.2 \
-  --connect-timeout 10 \
-  --max-time 30 \
-  --retry 2 \
-  --retry-all-errors \
-  --header 'Accept: application/vnd.github+json' \
-  --header 'X-GitHub-Api-Version: 2022-11-28' \
-  --header 'User-Agent: beanmap-deploy-poller' \
-  --output "$response_file" \
-  "$workflow_runs_url"
+fetch_json() {
+  local url="$1"
+  local output_file="$2"
+  /usr/bin/curl \
+    --fail \
+    --silent \
+    --show-error \
+    --location \
+    --proto '=https' \
+    --tlsv1.2 \
+    --connect-timeout 10 \
+    --max-time 30 \
+    --retry 2 \
+    --retry-all-errors \
+    --header 'Accept: application/vnd.github+json' \
+    --header 'X-GitHub-Api-Version: 2022-11-28' \
+    --header 'User-Agent: beanmap-deploy-poller' \
+    --output "$output_file" \
+    "$url"
+}
 
-verified_sha="$(
-  /usr/bin/jq -r '
-    .workflow_runs[0]
-    | select(
-        .head_branch == "main"
-        and .event == "push"
-        and .status == "completed"
-        and .conclusion == "success"
-      )
-    | .head_sha
-  ' "$response_file"
-)"
+requested_sha=""
+requested_run_id=""
+if [[ -f "$trigger_file" ]]; then
+  IFS=' ' read -r requested_sha requested_run_id < "$trigger_file" || true
+  /usr/bin/rm -f "$trigger_file"
+fi
+
+if [[ -n "$requested_sha" || -n "$requested_run_id" ]]; then
+  if [[ ! "$requested_sha" =~ ^[0-9a-f]{40}$ || ! "$requested_run_id" =~ ^[1-9][0-9]*$ ]]; then
+    echo "invalid deployment trigger" >&2
+    exit 1
+  fi
+
+  fetch_json "$actions_api_url/runs/$requested_run_id" "$response_file"
+  /usr/bin/jq -e --arg sha "$requested_sha" '
+    .head_sha == $sha
+    and .head_branch == "main"
+    and .event == "push"
+    and .path == ".github/workflows/ci-cd.yml"
+    and .repository.full_name == "heung115/beanlog"
+  ' "$response_file" >/dev/null
+
+  fetch_json "$actions_api_url/runs/$requested_run_id/jobs?per_page=100" "$jobs_file"
+  /usr/bin/jq -e '
+    [.jobs[] | select(
+      .name == "Verify"
+      and .status == "completed"
+      and .conclusion == "success"
+    )] | length >= 1
+  ' "$jobs_file" >/dev/null
+  verified_sha="$requested_sha"
+else
+  fetch_json "$workflow_runs_url" "$response_file"
+  verified_sha="$(
+    /usr/bin/jq -r '
+      .workflow_runs[0]
+      | select(
+          .head_branch == "main"
+          and .event == "push"
+          and .status == "completed"
+          and .conclusion == "success"
+        )
+      | .head_sha
+    ' "$response_file"
+  )"
+fi
 
 if [[ ! "$verified_sha" =~ ^[0-9a-f]{40}$ ]]; then
   echo "no verified main commit is available" >&2

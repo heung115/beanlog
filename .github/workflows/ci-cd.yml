@@ -75,7 +75,8 @@ jobs:
             jq -cn \
               --arg repository "$GITHUB_REPOSITORY" \
               --arg sha "$DEPLOY_SHA" \
-              '{repository: $repository, sha: $sha}'
+              --argjson run_id "$GITHUB_RUN_ID" \
+              '{repository: $repository, sha: $sha, run_id: $run_id}'
           )"
           signature="$(
             printf '%s' "$payload" \

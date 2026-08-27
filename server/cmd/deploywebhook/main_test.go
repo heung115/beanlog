@@ -16,7 +16,7 @@ func TestValidWebhookWritesDeploymentTrigger(t *testing.T) {
 	t.Parallel()
 
 	secret := []byte("0123456789abcdef0123456789abcdef")
-	body := []byte(`{"repository":"heung115/beanlog","sha":"e449ae80e308cfd0b6a65a053a6aef8a63ff18c3"}`)
+	body := []byte(`{"repository":"heung115/beanlog","sha":"e449ae80e308cfd0b6a65a053a6aef8a63ff18c3","run_id":33033294037}`)
 	triggerPath := filepath.Join(t.TempDir(), "request")
 	handler := webhookHandler{secret: secret, triggerPath: triggerPath}
 
@@ -32,7 +32,7 @@ func TestValidWebhookWritesDeploymentTrigger(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if string(written) != "e449ae80e308cfd0b6a65a053a6aef8a63ff18c3\n" {
+	if string(written) != "e449ae80e308cfd0b6a65a053a6aef8a63ff18c3 33033294037\n" {
 		t.Fatalf("trigger = %q", written)
 	}
 }
@@ -40,7 +40,7 @@ func TestValidWebhookWritesDeploymentTrigger(t *testing.T) {
 func TestWebhookRejectsInvalidSignature(t *testing.T) {
 	t.Parallel()
 
-	body := []byte(`{"repository":"heung115/beanlog","sha":"e449ae80e308cfd0b6a65a053a6aef8a63ff18c3"}`)
+	body := []byte(`{"repository":"heung115/beanlog","sha":"e449ae80e308cfd0b6a65a053a6aef8a63ff18c3","run_id":33033294037}`)
 	handler := webhookHandler{
 		secret:      []byte("0123456789abcdef0123456789abcdef"),
 		triggerPath: filepath.Join(t.TempDir(), "request"),

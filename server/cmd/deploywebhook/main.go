@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
@@ -22,6 +23,7 @@ var commitPattern = regexp.MustCompile(`^[0-9a-f]{40}$`)
 type triggerPayload struct {
 	Repository string `json:"repository"`
 	SHA        string `json:"sha"`
+	RunID      uint64 `json:"run_id"`
 }
 
 type webhookHandler struct {
@@ -94,12 +96,13 @@ func (h webhookHandler) ServeHTTP(response http.ResponseWriter, request *http.Re
 		http.Error(response, "invalid payload", http.StatusBadRequest)
 		return
 	}
-	if payload.Repository != "heung115/beanlog" || !commitPattern.MatchString(payload.SHA) {
+	if payload.Repository != "heung115/beanlog" || !commitPattern.MatchString(payload.SHA) || payload.RunID == 0 {
 		http.Error(response, "invalid deployment target", http.StatusBadRequest)
 		return
 	}
 
-	if err := os.WriteFile(h.triggerPath, []byte(payload.SHA+"\n"), 0o600); err != nil {
+	trigger := fmt.Sprintf("%s %d\n", payload.SHA, payload.RunID)
+	if err := os.WriteFile(h.triggerPath, []byte(trigger), 0o600); err != nil {
 		log.Printf("write deployment trigger: %v", err)
 		http.Error(response, "trigger unavailable", http.StatusServiceUnavailable)
 		return
