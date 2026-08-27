@@ -6,6 +6,15 @@ import path from "node:path";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const fast = process.argv.includes("--fast");
+const buildVerificationEnv = {
+  ...process.env,
+  NEXT_PUBLIC_SUPABASE_URL:
+    process.env.NEXT_PUBLIC_SUPABASE_URL ?? "https://example.supabase.co",
+  NEXT_PUBLIC_SUPABASE_ANON_KEY:
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "build-verification-anon-key",
+  NEXT_PUBLIC_APP_URL:
+    process.env.NEXT_PUBLIC_APP_URL ?? "https://example.com",
+};
 
 const checks = [
   { name: "TypeScript", command: "npm", args: ["run", "typecheck"] },
@@ -32,7 +41,12 @@ const checks = [
   },
   { name: "Git whitespace", command: "git", args: ["diff", "--check"] },
   ...(!fast
-    ? [{ name: "Production build", command: "npm", args: ["run", "build"] }]
+    ? [{
+        name: "Production build",
+        command: "npm",
+        args: ["run", "build"],
+        env: buildVerificationEnv,
+      }]
     : []),
 ];
 
@@ -44,7 +58,7 @@ for (const check of checks) {
   const captureOutput = check.rejectOutput || check.warnOnOutputPattern;
   const result = spawnSync(check.command, check.args, {
     cwd: root,
-    env: process.env,
+    env: check.env ?? process.env,
     stdio: captureOutput ? "pipe" : "inherit",
     encoding: captureOutput ? "utf8" : undefined,
   });

@@ -221,7 +221,10 @@ if npm run design:lint > "$TMP_ROOT/design-lint.out" 2>&1; then
 else
   finding "MEDIUM" "build/design" "Design policy checks failed"
 fi
-if npm run build > "$TMP_ROOT/next-build.out" 2>&1; then
+if NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL:-https://example.supabase.co}" \
+  NEXT_PUBLIC_SUPABASE_ANON_KEY="${NEXT_PUBLIC_SUPABASE_ANON_KEY:-build-verification-anon-key}" \
+  NEXT_PUBLIC_APP_URL="${NEXT_PUBLIC_APP_URL:-https://example.com}" \
+  npm run build > "$TMP_ROOT/next-build.out" 2>&1; then
   finding "OK" "build/next" "Production Next.js build passed"
 else
   finding "HIGH" "build/next" "Production Next.js build failed"
