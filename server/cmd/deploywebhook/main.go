@@ -11,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -28,8 +29,9 @@ type triggerPayload struct {
 }
 
 type webhookHandler struct {
-	secret      []byte
-	triggerPath string
+	secret       []byte
+	triggerPath  string
+	triggerQueue chan<- struct{}
 }
 
 func main() {
@@ -46,7 +48,9 @@ func main() {
 		log.Fatal("webhook secret must contain at least 32 bytes")
 	}
 
-	handler := webhookHandler{secret: secret, triggerPath: triggerPath}
+	triggerQueue := make(chan struct{}, 1)
+	go runDeployWorker(triggerQueue)
+	handler := webhookHandler{secret: secret, triggerPath: triggerPath, triggerQueue: triggerQueue}
 	server := &http.Server{
 		Addr:              listenAddress,
 		Handler:           handler,
@@ -108,9 +112,30 @@ func (h webhookHandler) ServeHTTP(response http.ResponseWriter, request *http.Re
 		http.Error(response, "trigger unavailable", http.StatusServiceUnavailable)
 		return
 	}
+	select {
+	case h.triggerQueue <- struct{}{}:
+	default:
+	}
 
 	log.Printf("accepted verified deployment trigger for %.12s", payload.SHA)
 	response.WriteHeader(http.StatusAccepted)
+}
+
+func runDeployWorker(triggerQueue <-chan struct{}) {
+	for range triggerQueue {
+		for attempt := 1; attempt <= 2; attempt++ {
+			command := exec.Command(
+				"/usr/bin/systemctl",
+				"--no-ask-password",
+				"start",
+				"beanmap-deploy-poller.service",
+			)
+			output, err := command.CombinedOutput()
+			if err != nil {
+				log.Printf("start deployment poller attempt %d: %v: %s", attempt, err, strings.TrimSpace(string(output)))
+			}
+		}
+	}
 }
 
 func replaceFile(path string, content []byte) error {
