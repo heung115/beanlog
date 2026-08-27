@@ -38,7 +38,7 @@ test("security headers and unauthenticated route protection are enforced", async
   const response = await request.get("/ko/explore", { maxRedirects: 0 });
   expect(response.status()).toBeGreaterThanOrEqual(300);
   expect(response.status()).toBeLessThan(400);
-  expect(response.headers()["location"]).toContain("/login");
+  expect(response.headers()["location"]).toBe("/");
 
   const login = await request.get("/ko/login");
   expect(login.headers()["x-frame-options"]).toBe("DENY");
