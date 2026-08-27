@@ -420,6 +420,33 @@ test("wide localized pages keep the footer at the viewport bottom", async ({ pag
   expect(Math.abs(layout.viewportBottom - layout.footerBottom)).toBeLessThanOrEqual(1);
 });
 
+test("desktop empty state stays centered across the full record grid", async ({ page }) => {
+  await login(page);
+
+  await page.getByRole("searchbox").fill("__beanmap_no_matching_records__");
+  await expect(page.getByText("0개 기록")).toBeVisible();
+  const emptyHeading = page.getByRole("heading", { name: "아직 기록이 없어요" });
+  await expect(emptyHeading).toBeVisible();
+
+  const centers = await page.evaluate(() => {
+    const grid = document.querySelector<HTMLElement>('[data-testid="bean-grid"]');
+    const heading = Array.from(document.querySelectorAll("h2")).find(
+      (element) => element.textContent?.trim() === "아직 기록이 없어요"
+    );
+    const emptyState = heading?.parentElement;
+    if (!grid || !emptyState) throw new Error("Missing empty record grid state");
+
+    const gridBox = grid.getBoundingClientRect();
+    const emptyBox = emptyState.getBoundingClientRect();
+    return {
+      grid: gridBox.left + gridBox.width / 2,
+      empty: emptyBox.left + emptyBox.width / 2,
+    };
+  });
+
+  expect(Math.abs(centers.grid - centers.empty)).toBeLessThanOrEqual(1);
+});
+
 test("explore progressively discloses aligned filters without overflow", async ({ page }) => {
   await login(page);
 

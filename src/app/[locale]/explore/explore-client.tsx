@@ -154,7 +154,7 @@ function EmptyState({
   const t = useTranslations("explore");
 
   return (
-    <div className="flex flex-col items-center py-20 text-center">
+    <div className="col-span-full flex flex-col items-center py-20 text-center">
       <svg
         className="mb-6 h-14 w-14 text-brown-light/40"
         viewBox="0 0 48 48"
