@@ -37,6 +37,16 @@ for (const [name, value] of Object.entries(tokens.colors)) {
   if (!designPattern.test(design)) failures.push(`DESIGN.md is missing ${designName}: ${value}`);
 }
 
+for (const [theme, colors] of Object.entries(tokens.themeOverrides ?? {})) {
+  const selectorPattern = new RegExp(`html\\[data-beanmap-theme=["']${escapeRegExp(theme)}["']\\]`, "i");
+  if (!selectorPattern.test(css)) failures.push(`globals.css is missing the ${theme} theme selector`);
+
+  for (const [name, value] of Object.entries(colors)) {
+    const cssPattern = new RegExp(`--color-${escapeRegExp(name)}\\s*:\\s*${escapeRegExp(value)}`, "i");
+    if (!cssPattern.test(css)) failures.push(`globals.css is missing ${theme} --color-${name}: ${value}`);
+  }
+}
+
 const sourceRoot = path.join(root, "src");
 const allowedRawColorFiles = new Map([
   ["app/globals.css", "generated design-token declarations and color-mix recipes"],

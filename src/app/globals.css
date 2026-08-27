@@ -1,17 +1,17 @@
 @import "tailwindcss";
 
 @theme {
-  --color-cream: #FCFAF7;
-  --color-cream-dark: #F3EDE4;
-  --color-brown: #3E2F23;
-  --color-brown-light: #735E47;
-  --color-brown-medium: #6B5744;
-  --color-accent: #865D42;
-  --color-accent-light: #C4A882;
-  --color-border: #E8E0D5;
-  --color-border-light: #F0EBE3;
-  --color-surface: #FFFFFF;
-  --color-surface-warm: #FDFBF8;
+  --color-cream: #F3F2EF;
+  --color-cream-dark: #E9E7E2;
+  --color-brown: #242321;
+  --color-brown-light: #706B66;
+  --color-brown-medium: #57534F;
+  --color-accent: #62483A;
+  --color-accent-light: #BBAAA0;
+  --color-border: #DCD8D2;
+  --color-border-light: #E7E4DE;
+  --color-surface: #FCFBF9;
+  --color-surface-warm: #F7F5F1;
 
   --color-process-washed: #7B9EA8;
   --color-process-natural: #B85C6F;
@@ -31,6 +31,38 @@
 
   --font-display: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-body: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/*
+ * Theme selection is an operator setting, not a user preference.
+ * Set BEANMAP_THEME and restart the server; no theme control is rendered in the UI.
+ */
+html[data-beanmap-theme="cream"] {
+  --color-cream: #FCFAF7;
+  --color-cream-dark: #F3EDE4;
+  --color-brown: #3E2F23;
+  --color-brown-light: #735E47;
+  --color-brown-medium: #6B5744;
+  --color-accent: #865D42;
+  --color-accent-light: #C4A882;
+  --color-border: #E8E0D5;
+  --color-border-light: #F0EBE3;
+  --color-surface: #FFFFFF;
+  --color-surface-warm: #FDFBF8;
+}
+
+html[data-beanmap-theme="contrast"] {
+  --color-cream: #FFFFFF;
+  --color-cream-dark: #EFEFED;
+  --color-brown: #171717;
+  --color-brown-light: #67635F;
+  --color-brown-medium: #4E4A46;
+  --color-accent: #8B4B2C;
+  --color-accent-light: #C7A18D;
+  --color-border: #D8D7D5;
+  --color-border-light: #E8E7E5;
+  --color-surface: #FFFFFF;
+  --color-surface-warm: #F8F8F7;
 }
 
 * {

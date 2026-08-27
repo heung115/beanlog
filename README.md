@@ -43,6 +43,12 @@ npm run staging:qa     # 전체 QA (28개)
 npm run staging:down   # 종료
 ```
 
+전체 색상 테마는 환경값 하나로 바꿉니다. 사용자 화면에는 테마 선택 기능이 없습니다.
+
+```bash
+BEANMAP_THEME=mist     # mist | cream | contrast
+```
+
 일상 점검과 심층 감사:
 
 ```bash

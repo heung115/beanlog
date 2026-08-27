@@ -10,6 +10,7 @@ services:
       NEXT_PUBLIC_SUPABASE_URL: ${STAGING_PUBLIC_SUPABASE_URL}
       NEXT_PUBLIC_SUPABASE_ANON_KEY: ${STAGING_SUPABASE_ANON_KEY}
       NEXT_PUBLIC_APP_URL: ${STAGING_APP_URL:-http://localhost:3100}
+      BEANMAP_THEME: ${BEANMAP_THEME:-mist}
       SUPABASE_SERVER_URL: ${STAGING_INTERNAL_SUPABASE_URL:-http://kong:8000}
       # Server Actions reach the Go API by its compose service name.
       GO_API_URL: ${STAGING_GO_API_URL:-http://api:8080}
