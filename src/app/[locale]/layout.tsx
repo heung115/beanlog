@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 import { TopBar } from "@/components/layout/top-bar";
 import { BottomNav } from "@/components/layout/bottom-nav";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { Toast } from "@/components/ui/toast";
 import { getCurrentUserIdentity } from "@/lib/actions/profile";
 
@@ -29,6 +30,10 @@ export default async function LocaleLayout({
       <main className="mx-auto max-w-4xl px-4 pb-24 pt-4 md:px-6 md:pb-8">
         {children}
       </main>
+      <SiteFooter
+        locale={locale as "ko" | "en"}
+        mobileNavOffset
+      />
       <BottomNav />
       <Toast />
     </NextIntlClientProvider>

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { buttonClassName } from "@/components/ui/button";
 import { brand } from "@/config/brand";
 
@@ -155,12 +156,7 @@ export default function LandingPage() {
         </section>
       </main>
 
-      <footer className="border-t border-border bg-surface">
-        <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-6 text-xs text-brown-light md:px-6">
-          <span className="font-semibold text-brown">{brand.name}</span>
-          <span>한국어 · English</span>
-        </div>
-      </footer>
+      <SiteFooter locale="ko" wide />
     </div>
   );
 }
