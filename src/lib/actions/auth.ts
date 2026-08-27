@@ -17,10 +17,20 @@ const signInSchema = z.object({
 
 const signUpSchema = z.object({
   email: z.string().trim().email().max(320),
-  password: z.string().min(8).max(128),
+  password: z.string().min(6).max(128),
   displayName: z.string().trim().min(1).max(50),
   acceptedTerms: z.literal(true),
 });
+
+const guestDraftDestinationSchema = z.enum([
+  "/ko/beans/new?draft=1",
+  "/en/beans/new?draft=1",
+]);
+
+function resolvePostAuthPath(value: FormDataEntryValue | string | null | undefined) {
+  const parsed = guestDraftDestinationSchema.safeParse(value);
+  return parsed.success ? parsed.data : "/explore";
+}
 
 export async function signUp(
   email: string,
@@ -64,6 +74,7 @@ export async function signInAction(
   }
 
   const persistSession = formData.get("remember") === "on";
+  const nextPath = resolvePostAuthPath(formData.get("next"));
   const supabase = await createClient({ persistSession });
 
   const { error } = await supabase.auth.signInWithPassword({
@@ -76,12 +87,13 @@ export async function signInAction(
   }
 
   await setSessionPersistencePreference(persistSession);
-  redirect("/explore");
+  redirect(nextPath);
 }
 
 export async function signInWithOAuth(
   provider: "google" | "kakao",
-  acceptedTerms: boolean
+  acceptedTerms: boolean,
+  next?: string
 ) {
   if (acceptedTerms !== true) {
     return { error: "Terms must be accepted" };
@@ -90,11 +102,14 @@ export async function signInWithOAuth(
   // The authorize URL must use the browser-accessible Supabase host, while
   // the shared server adapter persists the PKCE verifier for the callback.
   const supabase = await createPublicClient({ persistSession: true });
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3100";
+  const callbackUrl = new URL("/api/auth/callback", appUrl);
+  callbackUrl.searchParams.set("next", resolvePostAuthPath(next));
 
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider,
     options: {
-      redirectTo: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3100"}/api/auth/callback`,
+      redirectTo: callbackUrl.toString(),
     },
   });
 

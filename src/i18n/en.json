@@ -47,6 +47,18 @@
     "feature3Title": "Detailed tasting",
     "feature3Desc": "Aroma, acidity, body, sweetness, aftertaste, balance — rate them all."
   },
+  "guest": {
+    "title": "Record without signing in",
+    "storageNotice": "This record is saved temporarily in this browser only. Clearing browser data will remove it.",
+    "storageError": "This browser's storage is unavailable, so the record could not be saved temporarily. Check your browser settings and try again.",
+    "temporarySave": "Save temporarily",
+    "savedTitle": "Saved temporarily",
+    "savedNotice": "Sign up or log in to save this record to your account.",
+    "draftLoaded": "Your temporary record is loaded. Saving it will keep it in your account and remove the browser copy.",
+    "signupToKeep": "Sign up to keep it",
+    "loginToKeep": "Log in to keep it",
+    "edit": "Edit"
+  },
   "beans": {
     "newTitle": "Log a bean",
     "editTitle": "Edit record",

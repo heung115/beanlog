@@ -70,7 +70,8 @@ export async function updateSession(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isAuthPage = /^\/(?:ko|en)\/(?:login|signup)\/?$/.test(pathname);
   const isLegalPage = /^\/(?:ko|en)\/(?:privacy|terms)\/?$/.test(pathname);
-  const isPublicPath = pathname === "/" || isAuthPage || isLegalPage;
+  const isGuestRecordPage = /^\/(?:ko|en)\/try\/?$/.test(pathname);
+  const isPublicPath = pathname === "/" || isAuthPage || isLegalPage || isGuestRecordPage;
 
   if (!user && !isPublicPath) {
     const url = request.nextUrl.clone();
@@ -80,7 +81,14 @@ export async function updateSession(request: NextRequest) {
 
   if (user && isAuthPage) {
     const url = request.nextUrl.clone();
-    url.pathname = "/explore";
+    const locale = pathname.split("/")[1];
+    if (request.nextUrl.searchParams.get("draft") === "1") {
+      url.pathname = `/${locale}/beans/new`;
+      url.search = "?draft=1";
+    } else {
+      url.pathname = "/explore";
+      url.search = "";
+    }
     return preserveAuthResponse(supabaseResponse, NextResponse.redirect(url));
   }
 

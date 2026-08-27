@@ -39,6 +39,106 @@ async function expectNoSeriousA11yViolations(page: Page) {
   expect(violations).toEqual([]);
 }
 
+test("public landing explains the product and uses the operator theme", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page).toHaveURL(/\/$/);
+  await expect(page.getByRole("heading", { level: 1, name: "beanmap" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: "기능" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: "이용 방법" })).toBeVisible();
+  await expect(page.getByText("개인 커피 기록장")).toHaveCount(0);
+  await expect(page.getByRole("link", { name: "로그인 없이 기록" })).toHaveAttribute(
+    "href",
+    "/ko/try"
+  );
+  await expect(page.locator("html")).toHaveAttribute(
+    "data-beanmap-theme",
+    /^(mist|cream|contrast)$/
+  );
+  const theme = await page.locator("html").getAttribute("data-beanmap-theme");
+  const expectedThemeColor =
+    theme === "cream"
+      ? designTokens.themeOverrides.cream.cream
+      : theme === "contrast"
+        ? designTokens.themeOverrides.contrast.cream
+        : designTokens.colors.cream;
+  const manifestResponse = await page.request.get("/manifest.json");
+  expect(manifestResponse.ok()).toBe(true);
+  expect(manifestResponse.headers()["content-type"]).toContain(
+    "application/manifest+json"
+  );
+  await expect(manifestResponse.json()).resolves.toMatchObject({
+    background_color: expectedThemeColor,
+    theme_color: expectedThemeColor,
+  });
+  await expect(page.getByRole("article", { name: "커피 기록 예시" })).toBeVisible();
+  await expectNoSeriousA11yViolations(page);
+});
+
+test("guest record stays in the browser and loads after login", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("link", { name: "로그인 없이 기록" }).click();
+
+  await expect(page).toHaveURL(/\/ko\/try$/);
+  await expect(page.getByRole("heading", { level: 1, name: "로그인 없이 기록하기" })).toBeVisible();
+  await expect(page.getByRole("navigation")).toHaveCount(0);
+  await expectNoSeriousA11yViolations(page);
+
+  await page.locator('input[name="name"]').fill("비로그인 임시 기록");
+  await page.locator('input[name="roastery"]').fill("임시 로스터리");
+  await page.locator('input[name="origin_country"]').fill("Ethiopia");
+  await page.locator('select[name="process_method"]').selectOption("natural");
+  await page.locator('textarea[name="note"]').fill("복숭아와 재스민");
+  await page.getByRole("button", { name: "임시 저장" }).click();
+
+  await expect(page.getByRole("article", { name: "임시 저장됨" })).toBeVisible();
+  const storedDraft = await page.evaluate(() =>
+    window.localStorage.getItem("beanmap:guest-bean-draft")
+  );
+  expect(storedDraft).toContain("비로그인 임시 기록");
+
+  await page.reload();
+  await expect(page.getByRole("article", { name: "임시 저장됨" })).toBeVisible();
+  await page.getByRole("link", { name: "로그인 후 보관" }).click();
+  await expect(page).toHaveURL(/\/ko\/login\?draft=1$/);
+
+  await page.locator('input[name="email"]').fill(qaUser.email);
+  await page.locator('input[name="password"]').fill(qaUser.password);
+  await page.locator('button[type="submit"]').click();
+
+  await expect(page).toHaveURL(/\/ko\/beans\/new\?draft=1$/);
+  await expect(page.getByText("임시 기록을 불러왔습니다.", { exact: false })).toBeVisible();
+  await expect(page.locator('input[name="name"]')).toHaveValue("비로그인 임시 기록");
+  await expect(page.locator('input[name="roastery"]')).toHaveValue("임시 로스터리");
+  await expect(page.locator('input[name="origin_country"]')).toHaveValue(/^(Ethiopia|에티오피아)$/);
+  await expect(page.locator('textarea[name="note"]')).toHaveValue("복숭아와 재스민");
+});
+
+test("guest record reports browser storage failures separately from invalid input", async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(Storage.prototype, "setItem", {
+      configurable: true,
+      value() {
+        throw new DOMException("Storage is unavailable", "QuotaExceededError");
+      },
+    });
+  });
+  await page.goto("/ko/try");
+
+  await page.locator('input[name="name"]').fill("저장소 실패 테스트");
+  await page.locator('input[name="roastery"]').fill("테스트 로스터리");
+  await page.locator('input[name="origin_country"]').fill("Ethiopia");
+  await page.locator('textarea[name="note"]').fill("유효한 필수 입력");
+  await page.getByRole("button", { name: "임시 저장" }).click();
+
+  await expect(
+    page.getByText("브라우저 저장 공간을 사용할 수 없어 임시 저장하지 못했습니다.", {
+      exact: false,
+    })
+  ).toBeVisible();
+  await expect(page.getByText("필수 항목을 입력해주세요.")).toHaveCount(0);
+});
+
 test("login uses POST, keeps credentials out of URL, and has no serious accessibility violations", async ({ page }) => {
   await page.goto("/ko/login");
   await expectNoSeriousA11yViolations(page);

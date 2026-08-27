@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,9 @@ import { brand } from "@/config/brand";
 export default function LoginPage() {
   const t = useTranslations("auth");
   const locale = useLocale();
+  const searchParams = useSearchParams();
+  const hasGuestDraft = searchParams.get("draft") === "1";
+  const nextPath = hasGuestDraft ? `/${locale}/beans/new?draft=1` : "/explore";
   const [state, formAction, pending] = useActionState(signInAction, {});
   const [socialTermsAccepted, setSocialTermsAccepted] = useState(false);
 
@@ -25,6 +29,7 @@ export default function LoginPage() {
         </div>
 
         <form action={formAction} className="flex flex-col gap-4">
+          <input type="hidden" name="next" value={nextPath} />
           <Input
             label={t("email")}
             type="email"
@@ -102,7 +107,7 @@ export default function LoginPage() {
             variant="secondary"
             className="w-full"
             disabled={!socialTermsAccepted}
-            onClick={() => signInWithOAuth("google", socialTermsAccepted)}
+            onClick={() => signInWithOAuth("google", socialTermsAccepted, nextPath)}
           >
             <GoogleIcon className="mr-2 h-4 w-4" />
             {t("loginWithGoogle")}
@@ -111,7 +116,7 @@ export default function LoginPage() {
             variant="secondary"
             className="w-full border-[#FEE500] bg-[#FEE500] text-[#191919] hover:bg-[#FEE500]/90"
             disabled={!socialTermsAccepted}
-            onClick={() => signInWithOAuth("kakao", socialTermsAccepted)}
+            onClick={() => signInWithOAuth("kakao", socialTermsAccepted, nextPath)}
           >
             <KakaoIcon className="mr-2 h-4 w-4" />
             {t("loginWithKakao")}
@@ -120,7 +125,10 @@ export default function LoginPage() {
 
         <p className="mt-8 text-center text-sm text-brown-light">
           {t("noAccount")}{" "}
-          <Link href="/signup" className="font-medium text-accent hover:underline">
+          <Link
+            href={`/${locale}/signup${hasGuestDraft ? "?draft=1" : ""}`}
+            className="font-medium text-accent hover:underline"
+          >
             {t("goSignup")}
           </Link>
         </p>

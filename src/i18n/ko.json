@@ -47,6 +47,18 @@
     "feature3Title": "상세한 평가",
     "feature3Desc": "향미, 산미, 바디, 단맛, 후미, 밸런스까지 세밀하게."
   },
+  "guest": {
+    "title": "로그인 없이 기록하기",
+    "storageNotice": "이 기록은 현재 브라우저에만 임시 저장됩니다. 브라우저 데이터를 지우면 기록도 사라집니다.",
+    "storageError": "브라우저 저장 공간을 사용할 수 없어 임시 저장하지 못했습니다. 브라우저 설정을 확인한 뒤 다시 시도해주세요.",
+    "temporarySave": "임시 저장",
+    "savedTitle": "임시 저장됨",
+    "savedNotice": "회원가입하거나 로그인하면 이 기록을 계정에 저장할 수 있습니다.",
+    "draftLoaded": "임시 기록을 불러왔습니다. 저장하면 계정에 보관되고 브라우저 임시본은 삭제됩니다.",
+    "signupToKeep": "회원가입 후 보관",
+    "loginToKeep": "로그인 후 보관",
+    "edit": "수정"
+  },
   "beans": {
     "newTitle": "원두 기록",
     "editTitle": "기록 수정",

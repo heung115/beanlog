@@ -30,6 +30,11 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
+  // The public landing page is intentionally outside locale routing.
+  if (request.nextUrl.pathname === "/") {
+    return response;
+  }
+
   return preserveAuthResponse(response, intlMiddleware(request));
 }
 

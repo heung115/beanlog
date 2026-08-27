@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Button, buttonClassName } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,9 @@ import { brand } from "@/config/brand";
 export default function SignupPage() {
   const t = useTranslations("auth");
   const locale = useLocale();
+  const searchParams = useSearchParams();
+  const hasGuestDraft = searchParams.get("draft") === "1";
+  const nextPath = hasGuestDraft ? `/${locale}/beans/new?draft=1` : undefined;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
@@ -51,7 +55,10 @@ export default function SignupPage() {
           <p className="journal-kicker mb-3">{brand.name}</p>
           <h2 className="font-display text-2xl font-bold text-brown">{t("signup")}</h2>
           <p className="mt-3 text-sm text-brown-light">{t("signupSuccess")}</p>
-          <Link href="/login" className={buttonClassName({ variant: "secondary", className: "mt-6" })}>
+          <Link
+            href={`/${locale}/login${hasGuestDraft ? "?draft=1" : ""}`}
+            className={buttonClassName({ variant: "secondary", className: "mt-6" })}
+          >
             {t("goLogin")}
           </Link>
         </div>
@@ -163,7 +170,7 @@ export default function SignupPage() {
             variant="secondary"
             className="w-full"
             disabled={!acceptedTerms}
-            onClick={() => signInWithOAuth("google", acceptedTerms)}
+            onClick={() => signInWithOAuth("google", acceptedTerms, nextPath)}
           >
             <GoogleIcon className="mr-2 h-4 w-4" />
             {t("loginWithGoogle")}
@@ -172,7 +179,7 @@ export default function SignupPage() {
             variant="secondary"
             className="w-full border-[#FEE500] bg-[#FEE500] text-[#191919] hover:bg-[#FEE500]/90"
             disabled={!acceptedTerms}
-            onClick={() => signInWithOAuth("kakao", acceptedTerms)}
+            onClick={() => signInWithOAuth("kakao", acceptedTerms, nextPath)}
           >
             <KakaoIcon className="mr-2 h-4 w-4" />
             {t("loginWithKakao")}
@@ -181,7 +188,10 @@ export default function SignupPage() {
 
         <p className="mt-8 text-center text-sm text-brown-light">
           {t("hasAccount")}{" "}
-          <Link href="/login" className="font-medium text-accent hover:underline">
+          <Link
+            href={`/${locale}/login${hasGuestDraft ? "?draft=1" : ""}`}
+            className="font-medium text-accent hover:underline"
+          >
             {t("goLogin")}
           </Link>
         </p>

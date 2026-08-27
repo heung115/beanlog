@@ -21,6 +21,10 @@ import { findCountryPreset, findRegionCoords } from "@/data/origin-presets";
 import { varietalOptions } from "@/data/varietal-presets";
 import { createBean, createBeanFromForm, updateBean } from "@/lib/actions/beans";
 import {
+  clearGuestBeanDraft,
+  loadGuestBeanDraft,
+} from "@/lib/coffee/guest-draft";
+import {
   getOriginCountries,
   getOriginEntities,
   getOriginRegions,
@@ -226,6 +230,8 @@ export function BeanForm({
   const tp = useTranslations("process");
   const tr = useTranslations("roast");
   const tc = useTranslations("common");
+  const tg = useTranslations("guest");
+  const importingGuestDraft = mode === "create" && searchParams.get("draft") === "1";
 
   const [form, setForm] = useState<BeanFormData>(() =>
     initial
@@ -239,6 +245,7 @@ export function BeanForm({
     initial ? hasDetails(beanToForm(initial)) : false
   );
   const [submitting, setSubmitting] = useState(false);
+  const [guestDraftLoaded, setGuestDraftLoaded] = useState(false);
 
   const isBlend = form.bean_type === "blend";
 
@@ -260,6 +267,19 @@ export function BeanForm({
   const countryPreset = form.origin_country
     ? findCountryPreset(form.origin_country)
     : undefined;
+
+  useEffect(() => {
+    if (!importingGuestDraft) return;
+
+    const draft = loadGuestBeanDraft();
+    if (!draft) return;
+
+    startTransition(() => {
+      setForm(draft.bean);
+      setShowDetails(hasDetails(draft.bean));
+      setGuestDraftLoaded(true);
+    });
+  }, [importingGuestDraft]);
 
   useEffect(() => {
     let active = true;
@@ -583,6 +603,7 @@ export function BeanForm({
 
       const nextRecents = saveRecentRoastery(form.roastery);
       if (nextRecents) setRecentRoasteries(nextRecents);
+      if (importingGuestDraft) clearGuestBeanDraft();
       toast.show(t("saved"));
       if (continueAdding) {
         setForm({ ...defaultForm(), roastery: form.roastery });
@@ -654,6 +675,11 @@ export function BeanForm({
       onKeyDown={handleFormKeyDown}
       className="flex flex-col gap-4"
     >
+      {guestDraftLoaded && (
+        <p className="journal-panel-quiet px-4 py-3 text-sm leading-6 text-brown-medium">
+          {tg("draftLoaded")}
+        </p>
+      )}
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="bean_type" value={form.bean_type} />
       <input type="hidden" name="place_type" value={form.place_type} />
