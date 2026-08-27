@@ -52,11 +52,19 @@ fetch_json() {
     "$url"
 }
 
+deployed_sha=""
+if [[ -f "$deployed_sha_file" ]]; then
+  IFS= read -r deployed_sha < "$deployed_sha_file"
+fi
+
 requested_sha=""
 requested_run_id=""
 if [[ -f "$trigger_file" ]]; then
   IFS=' ' read -r requested_sha requested_run_id < "$trigger_file" || true
-  /usr/bin/rm -f "$trigger_file"
+fi
+if [[ "$requested_sha" == "$deployed_sha" ]]; then
+  requested_sha=""
+  requested_run_id=""
 fi
 
 if [[ -n "$requested_sha" || -n "$requested_run_id" ]]; then
@@ -102,11 +110,6 @@ fi
 if [[ ! "$verified_sha" =~ ^[0-9a-f]{40}$ ]]; then
   echo "no verified main commit is available" >&2
   exit 1
-fi
-
-deployed_sha=""
-if [[ -f "$deployed_sha_file" ]]; then
-  IFS= read -r deployed_sha < "$deployed_sha_file"
 fi
 
 if [[ "$verified_sha" == "$deployed_sha" ]]; then
