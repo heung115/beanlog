@@ -150,6 +150,20 @@ test("login uses POST, keeps credentials out of URL, and has no serious accessib
   expect(page.url()).not.toContain("password");
 });
 
+test("signup explains that legal agreement is required", async ({ page }) => {
+  await page.goto("/ko/signup");
+  await page.locator('input[name="displayName"]').fill("가입 안내 테스트");
+  await page.locator('input[name="email"]').fill("delivered+agreement@resend.dev");
+  await page.locator('input[name="password"]').fill("signup-test-password");
+  await page.locator('input[name="passwordConfirm"]').fill("signup-test-password");
+
+  await page.getByRole("button", { name: "회원가입", exact: true }).click();
+
+  await expect(
+    page.getByText("회원가입을 계속하려면 이용약관과 개인정보 처리방침에 동의해주세요.")
+  ).toBeVisible();
+});
+
 test("legal notices are public and signup requires an explicit agreement", async ({ page }) => {
   await page.goto("/ko/privacy");
   await expect(page).toHaveURL(/\/ko\/privacy$/);

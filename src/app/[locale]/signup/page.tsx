@@ -23,10 +23,17 @@ export default function SignupPage() {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [agreementError, setAgreementError] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+    setAgreementError(false);
+
+    if (!acceptedTerms) {
+      setAgreementError(true);
+      return;
+    }
 
     if (password !== passwordConfirm) {
       setError(t("signupError"));
@@ -124,8 +131,12 @@ export default function SignupPage() {
             <input
               type="checkbox"
               checked={acceptedTerms}
-              onChange={(event) => setAcceptedTerms(event.target.checked)}
-              required
+              onChange={(event) => {
+                setAcceptedTerms(event.target.checked);
+                setAgreementError(false);
+              }}
+              aria-invalid={agreementError}
+              aria-describedby={agreementError ? "signup-agreement-error" : undefined}
               className="mt-1 h-4 w-4 shrink-0 rounded border-border accent-accent"
             />
             <span>
@@ -152,7 +163,12 @@ export default function SignupPage() {
             </span>
           </label>
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {agreementError && (
+            <p id="signup-agreement-error" role="alert" className="text-sm text-red-600">
+              {t("agreementRequired")}
+            </p>
+          )}
+          {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
 
           <Button type="submit" loading={loading} className="mt-2 w-full">
             {t("signup")}

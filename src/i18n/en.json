@@ -32,6 +32,7 @@
     "orContinueWith": "or",
     "loginError": "Login failed. Please check your email and password.",
     "signupError": "Sign up failed. Please try again.",
+    "agreementRequired": "Please agree to the Terms and Privacy Policy to continue signing up.",
     "signupSuccess": "Signed up! Please check your email.",
     "legalAgreement": "I am at least 14 years old, agree to the <terms>Terms of Service</terms>, and have reviewed the <privacy>Privacy Policy</privacy>.",
     "socialLegalAgreement": "By continuing with social sign-in, I confirm I am at least 14, agree to the <terms>Terms</terms>, and have reviewed the <privacy>Privacy Policy</privacy>."
