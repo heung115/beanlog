@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Button, buttonClassName } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { signUp, signInWithOAuth } from "@/lib/actions/auth";
 import { brand } from "@/config/brand";
@@ -12,6 +12,7 @@ import { brand } from "@/config/brand";
 export default function SignupPage() {
   const t = useTranslations("auth");
   const locale = useLocale();
+  const router = useRouter();
   const searchParams = useSearchParams();
   const hasGuestDraft = searchParams.get("draft") === "1";
   const nextPath = hasGuestDraft ? `/${locale}/beans/new?draft=1` : undefined;
@@ -20,7 +21,6 @@ export default function SignupPage() {
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [agreementError, setAgreementError] = useState(false);
@@ -46,31 +46,15 @@ export default function SignupPage() {
       if (result?.error) {
         setError(t("signupError"));
       } else {
-        setSuccess(true);
+        router.replace(
+          `/${locale}/signup/check-email${hasGuestDraft ? "?draft=1" : ""}`
+        );
       }
     } catch {
       setError(t("signupError"));
     } finally {
       setLoading(false);
     }
-  }
-
-  if (success) {
-    return (
-      <div className="flex min-h-[80vh] flex-col items-center justify-center text-center">
-        <div className="max-w-sm">
-          <p className="journal-kicker mb-3">{brand.name}</p>
-          <h2 className="font-display text-2xl font-bold text-brown">{t("signup")}</h2>
-          <p className="mt-3 text-sm text-brown-light">{t("signupSuccess")}</p>
-          <Link
-            href={`/${locale}/login${hasGuestDraft ? "?draft=1" : ""}`}
-            className={buttonClassName({ variant: "secondary", className: "mt-6" })}
-          >
-            {t("goLogin")}
-          </Link>
-        </div>
-      </div>
-    );
   }
 
   return (

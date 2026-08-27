@@ -58,7 +58,11 @@ export default function LoginPage() {
           </label>
 
           {state.error && (
-            <p className="text-sm text-red-600">{t("loginError")}</p>
+            <p role="alert" className="text-sm text-red-600">
+              {state.error === "email_not_confirmed"
+                ? t("emailNotConfirmed")
+                : t("loginError")}
+            </p>
           )}
 
           <Button type="submit" loading={pending} className="mt-2 w-full">

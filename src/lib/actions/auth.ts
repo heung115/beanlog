@@ -8,7 +8,9 @@ import {
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-export type SignInState = { error?: string };
+export type SignInState = {
+  error?: "invalid_credentials" | "email_not_confirmed";
+};
 
 const signInSchema = z.object({
   email: z.string().trim().email(),
@@ -70,7 +72,7 @@ export async function signInAction(
   });
 
   if (!credentials.success) {
-    return { error: "Invalid credentials" };
+    return { error: "invalid_credentials" };
   }
 
   const persistSession = formData.get("remember") === "on";
@@ -83,7 +85,12 @@ export async function signInAction(
   });
 
   if (error) {
-    return { error: "Invalid credentials" };
+    return {
+      error:
+        error.code === "email_not_confirmed"
+          ? "email_not_confirmed"
+          : "invalid_credentials",
+    };
   }
 
   await setSessionPersistencePreference(persistSession);

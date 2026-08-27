@@ -68,7 +68,9 @@ export async function updateSession(request: NextRequest) {
   }
 
   const { pathname } = request.nextUrl;
-  const isAuthPage = /^\/(?:ko|en)\/(?:login|signup)\/?$/.test(pathname);
+  const isAuthPage = /^\/(?:ko|en)\/(?:login|signup(?:\/check-email)?)\/?$/.test(
+    pathname
+  );
   const isLegalPage = /^\/(?:ko|en)\/(?:privacy|terms)\/?$/.test(pathname);
   const isGuestRecordPage = /^\/(?:ko|en)\/try\/?$/.test(pathname);
   const isPublicPath = pathname === "/" || isAuthPage || isLegalPage || isGuestRecordPage;
