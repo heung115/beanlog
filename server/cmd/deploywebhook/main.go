@@ -146,7 +146,7 @@ func replaceFile(path string, content []byte) error {
 	temporaryPath := temporary.Name()
 	defer os.Remove(temporaryPath)
 
-	if err := temporary.Chmod(0o600); err != nil {
+	if err := temporary.Chmod(0o640); err != nil {
 		_ = temporary.Close()
 		return err
 	}
