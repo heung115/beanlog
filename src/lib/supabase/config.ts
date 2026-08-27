@@ -8,4 +8,7 @@ if (!publicSupabaseUrl) {
 
 export const supabaseCookieOptions = {
   name: getSupabaseCookieName(publicSupabaseUrl),
+  httpOnly: true,
+  sameSite: "lax",
+  secure: process.env.NODE_ENV === "production",
 } as const;

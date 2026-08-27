@@ -43,10 +43,11 @@ export function clearAuthCookies(
 
     request.cookies.delete(cookie.name);
     response.cookies.set(cookie.name, "", {
-      httpOnly: false,
+      httpOnly: true,
       maxAge: 0,
       path: "/",
       sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
     });
   }
 }

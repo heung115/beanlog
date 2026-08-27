@@ -31,6 +31,11 @@ test("login stays signed in by default", async ({ browser }) => {
     isAuthCookie(name, storageKey)
   );
   expect(authCookies.length).toBeGreaterThan(0);
+  expect(
+    authCookies.every(
+      ({ httpOnly, sameSite }) => httpOnly && sameSite === "Lax"
+    )
+  ).toBe(true);
   expect(authCookies.every(({ expires }) => expires > Date.now() / 1000)).toBe(
     true
   );
@@ -56,6 +61,11 @@ test("opting out keeps authentication only for the browser session", async ({
     isAuthCookie(name, storageKey)
   );
   expect(authCookies.length).toBeGreaterThan(0);
+  expect(
+    authCookies.every(
+      ({ httpOnly, sameSite }) => httpOnly && sameSite === "Lax"
+    )
+  ).toBe(true);
   expect(authCookies.every(({ expires }) => expires === -1)).toBe(true);
   expect(
     cookies.find(({ name }) => name === SESSION_ONLY_COOKIE_NAME)?.expires

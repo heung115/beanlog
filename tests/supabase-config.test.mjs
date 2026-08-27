@@ -20,6 +20,20 @@ test("hosted Supabase projects keep the conventional project-ref cookie", () => 
   );
 });
 
+test("Supabase auth cookies are hardened on the server", () => {
+  const config = fs.readFileSync(
+    new URL("../src/lib/supabase/config.ts", import.meta.url),
+    "utf8"
+  );
+
+  assert.match(config, /httpOnly:\s*true/);
+  assert.match(config, /sameSite:\s*["']lax["']/);
+  assert.match(
+    config,
+    /secure:\s*process\.env\.NODE_ENV\s*===\s*["']production["']/
+  );
+});
+
 test("OAuth uses the public Supabase host with the shared PKCE cookie adapter", () => {
   const serverClient = fs.readFileSync(
     new URL("../src/lib/supabase/server.ts", import.meta.url),
