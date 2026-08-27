@@ -56,10 +56,16 @@ jobs:
     name: Deploy to production
     if: github.event_name == 'push' && github.ref == 'refs/heads/main' && vars.DEPLOY_ENABLED == 'true'
     needs: verify
-    runs-on: ubuntu-24.04
+    runs-on: [self-hosted, linux, ARM64, beanlog-deploy]
+    timeout-minutes: 20
     environment:
       name: production
     steps:
+      - name: Check out verified source
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
       - name: Prepare SSH
         shell: bash
         env:
@@ -75,10 +81,9 @@ jobs:
               exit 1
             fi
           done
-          install -d -m 700 "$HOME/.ssh"
-          printf '%s\n' "$DEPLOY_SSH_KEY" > "$HOME/.ssh/beanmap_deploy"
-          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
-          chmod 600 "$HOME/.ssh/beanmap_deploy" "$HOME/.ssh/known_hosts"
+          umask 077
+          printf '%s\n' "$DEPLOY_SSH_KEY" > "$RUNNER_TEMP/beanmap_deploy"
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > "$RUNNER_TEMP/beanmap_known_hosts"
 
       - name: Stream verified source and rebuild the deployed services
         shell: bash
@@ -89,8 +94,14 @@ jobs:
           set -euo pipefail
           # The server account has a forced command. It accepts only this
           # tar stream and cannot open a shell, tunnel, or arbitrary command.
-          git archive --format=tar.gz HEAD | ssh -T -i "$HOME/.ssh/beanmap_deploy" \
+          git archive --format=tar.gz HEAD | ssh -T -i "$RUNNER_TEMP/beanmap_deploy" \
             -o BatchMode=yes \
             -o StrictHostKeyChecking=yes \
+            -o UserKnownHostsFile="$RUNNER_TEMP/beanmap_known_hosts" \
             -o RequestTTY=no \
             "$DEPLOY_USER@$DEPLOY_HOST"
+
+      - name: Remove temporary SSH files
+        if: always()
+        shell: bash
+        run: rm -f -- "$RUNNER_TEMP/beanmap_deploy" "$RUNNER_TEMP/beanmap_known_hosts"
