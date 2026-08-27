@@ -11,6 +11,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
@@ -101,8 +102,8 @@ func (h webhookHandler) ServeHTTP(response http.ResponseWriter, request *http.Re
 		return
 	}
 
-	trigger := fmt.Sprintf("%s %d\n", payload.SHA, payload.RunID)
-	if err := os.WriteFile(h.triggerPath, []byte(trigger), 0o600); err != nil {
+	trigger := []byte(fmt.Sprintf("%s %d\n", payload.SHA, payload.RunID))
+	if err := replaceFile(h.triggerPath, trigger); err != nil {
 		log.Printf("write deployment trigger: %v", err)
 		http.Error(response, "trigger unavailable", http.StatusServiceUnavailable)
 		return
@@ -110,6 +111,32 @@ func (h webhookHandler) ServeHTTP(response http.ResponseWriter, request *http.Re
 
 	log.Printf("accepted verified deployment trigger for %.12s", payload.SHA)
 	response.WriteHeader(http.StatusAccepted)
+}
+
+func replaceFile(path string, content []byte) error {
+	temporary, err := os.CreateTemp(filepath.Dir(path), ".request-*")
+	if err != nil {
+		return err
+	}
+	temporaryPath := temporary.Name()
+	defer os.Remove(temporaryPath)
+
+	if err := temporary.Chmod(0o600); err != nil {
+		_ = temporary.Close()
+		return err
+	}
+	if _, err := temporary.Write(content); err != nil {
+		_ = temporary.Close()
+		return err
+	}
+	if err := temporary.Sync(); err != nil {
+		_ = temporary.Close()
+		return err
+	}
+	if err := temporary.Close(); err != nil {
+		return err
+	}
+	return os.Rename(temporaryPath, path)
 }
 
 func validSignature(secret, body []byte, provided string) bool {

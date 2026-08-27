@@ -35,6 +35,13 @@ func TestValidWebhookWritesDeploymentTrigger(t *testing.T) {
 	if string(written) != "e449ae80e308cfd0b6a65a053a6aef8a63ff18c3 33033294037\n" {
 		t.Fatalf("trigger = %q", written)
 	}
+	temporaryFiles, err := filepath.Glob(filepath.Join(filepath.Dir(triggerPath), ".request-*"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(temporaryFiles) != 0 {
+		t.Fatalf("temporary trigger files remain: %v", temporaryFiles)
+	}
 }
 
 func TestWebhookRejectsInvalidSignature(t *testing.T) {
