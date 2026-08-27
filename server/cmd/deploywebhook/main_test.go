@@ -18,7 +18,8 @@ func TestValidWebhookWritesDeploymentTrigger(t *testing.T) {
 	secret := []byte("0123456789abcdef0123456789abcdef")
 	body := []byte(`{"repository":"heung115/beanlog","sha":"e449ae80e308cfd0b6a65a053a6aef8a63ff18c3","run_id":33033294037}`)
 	triggerPath := filepath.Join(t.TempDir(), "request")
-	handler := webhookHandler{secret: secret, triggerPath: triggerPath}
+	triggerQueue := make(chan struct{}, 1)
+	handler := webhookHandler{secret: secret, triggerPath: triggerPath, triggerQueue: triggerQueue}
 
 	request := httptest.NewRequest(http.MethodPost, "/", bytesReader(body))
 	request.Header.Set("X-Hub-Signature-256", signatureForTest(secret, body))
@@ -41,6 +42,11 @@ func TestValidWebhookWritesDeploymentTrigger(t *testing.T) {
 	}
 	if len(temporaryFiles) != 0 {
 		t.Fatalf("temporary trigger files remain: %v", temporaryFiles)
+	}
+	select {
+	case <-triggerQueue:
+	default:
+		t.Fatal("deployment trigger was not queued")
 	}
 }
 

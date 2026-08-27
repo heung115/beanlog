@@ -1,0 +1,74 @@
+{
+	email admin@beanmap.site
+	admin unix//run/caddy/admin.sock
+	persist_config off
+	grace_period 10s
+	servers {
+		protocols h1 h2
+	}
+	log default {
+		format filter {
+			request>headers>X-Hub-Signature-256 replace REDACTED
+		}
+	}
+}
+
+(security_headers) {
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Frame-Options "DENY"
+		-Server
+	}
+}
+
+(reject_proxy_methods) {
+	@unsupported_methods method TRACE CONNECT
+	handle @unsupported_methods {
+		respond 405
+	}
+}
+
+www.beanmap.site {
+	import security_headers
+	import reject_proxy_methods
+	redir https://beanmap.site{uri} permanent
+}
+
+beanmap.site {
+	import security_headers
+	import reject_proxy_methods
+	encode zstd gzip
+	handle_path /_deploy/github {
+		@not_post not method POST
+		respond @not_post 405
+		request_body {
+			max_size 64KB
+		}
+		reverse_proxy 127.0.0.1:9087
+	}
+	handle {
+		reverse_proxy 127.0.0.1:3100
+	}
+	handle_errors 413 {
+		respond "Payload Too Large" 413
+	}
+}
+
+api.beanmap.site {
+	import security_headers
+	import reject_proxy_methods
+	encode zstd gzip
+	reverse_proxy 127.0.0.1:8000
+}
+
+:443 {
+	@unsupported_methods method TRACE CONNECT
+	handle @unsupported_methods {
+		respond 405
+	}
+	handle {
+		abort
+	}
+}
