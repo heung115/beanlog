@@ -4,14 +4,53 @@ import {
   getBeanmapThemeColor,
   resolveBeanmapTheme,
 } from "@/config/theme";
+import {
+  absoluteUrl,
+  SEO_COPY,
+  SITE_NAME,
+  SITE_ORIGIN,
+  SOCIAL_IMAGE_PATH,
+} from "@/lib/seo";
 import "./globals.css";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "beanmap",
-  description: "마신 커피의 원두 정보와 테이스팅 노트를 기록하고 취향을 확인하는 개인 커피 기록장",
+  metadataBase: new URL(SITE_ORIGIN),
+  title: "beanmap — Coffee Journal & Origin Guide",
+  description: SEO_COPY.en.landing.description,
+  applicationName: SITE_NAME,
   manifest: "/manifest.json",
+  robots: {
+    index: true,
+    follow: true,
+  },
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    title: "beanmap — Coffee Journal & Origin Guide",
+    description: SEO_COPY.en.landing.description,
+    url: absoluteUrl("/"),
+    images: [
+      {
+        url: absoluteUrl(SOCIAL_IMAGE_PATH),
+        width: 1200,
+        height: 630,
+        alt: SEO_COPY.en.imageAlt,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "beanmap — Coffee Journal & Origin Guide",
+    description: SEO_COPY.en.landing.description,
+    images: [
+      {
+        url: absoluteUrl(SOCIAL_IMAGE_PATH),
+        alt: SEO_COPY.en.imageAlt,
+      },
+    ],
+  },
 };
 
 export function generateViewport(): Viewport {
@@ -35,14 +74,21 @@ export default async function RootLayout({
   return (
     <html lang={locale} data-beanmap-theme={theme}>
       <head>
-        <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/icon-192.png" />
         <link
           rel="stylesheet"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
         />
       </head>
-      <body className="min-h-screen bg-cream">{children}</body>
+      <body className="min-h-screen bg-cream">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-sm focus:bg-brown focus:px-4 focus:py-3 focus:text-sm focus:font-semibold focus:text-cream focus:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
+          Skip to main content / 본문으로 바로가기
+        </a>
+        {children}
+      </body>
     </html>
   );
 }

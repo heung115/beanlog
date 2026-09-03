@@ -30,8 +30,13 @@ export async function proxy(request: NextRequest) {
     return response;
   }
 
-  // The public landing page is intentionally outside locale routing.
-  if (request.nextUrl.pathname === "/") {
+  // Root-level public metadata routes and the landing page are intentionally
+  // outside locale routing. In particular, Next's generated Open Graph image
+  // has no file extension, so the matcher does not exclude it automatically.
+  if (
+    request.nextUrl.pathname === "/" ||
+    request.nextUrl.pathname === "/opengraph-image"
+  ) {
     return response;
   }
 

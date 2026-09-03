@@ -4,6 +4,6 @@ import { buildLandingMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = buildLandingMetadata("ko");
 
-export default function KoreanDefaultLandingPage() {
+export default function KoreanLandingPage() {
   return <LandingPage locale="ko" />;
 }

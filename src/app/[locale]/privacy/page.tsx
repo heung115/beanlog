@@ -199,7 +199,7 @@ function EnglishPrivacy() {
       </LegalSection>
 
       <LegalSection title="6. Privacy contact">
-        <LegalContact locale="en" operatorName={legal.operatorName} contactEmail={legal.contactEmail} />
+        <LegalContact locale="en" operatorName={legal.operatorNameEn} contactEmail={legal.contactEmail} />
       </LegalSection>
 
       <LegalSection title="7. Changes">

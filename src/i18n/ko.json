@@ -10,7 +10,11 @@
     "stats": "통계",
     "settings": "설정",
     "account": "내 계정",
-    "loggedIn": "로그인됨"
+    "loggedIn": "로그인됨",
+    "publicNavigation": "공개 메뉴",
+    "language": "언어",
+    "switchToKorean": "한국어로 전환",
+    "switchToEnglish": "영어로 전환"
   },
   "auth": {
     "login": "로그인",
@@ -150,6 +154,7 @@
     "notFound": "기록을 찾을 수 없어요",
     "notFoundSub": "삭제되었거나 존재하지 않는 기록입니다.",
     "tagsAdded": "개의 태그",
+    "removeTag": "{tag} 태그 제거",
     "blendComposition": "블렌드 구성",
     "addComponent": "원두 추가",
     "componentOrigin": "산지",

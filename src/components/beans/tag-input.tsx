@@ -79,7 +79,9 @@ export function TagInput({ value, onChange }: TagInputProps) {
               <button
                 type="button"
                 onClick={() => removeTag(v.tag)}
-                aria-label={`${tagDisplayName(v.tag, locale)} 제거`}
+                aria-label={t("removeTag", {
+                  tag: tagDisplayName(v.tag, locale),
+                })}
                 className="flex h-4 w-4 items-center justify-center rounded-full text-cream/70 transition-colors hover:bg-cream/20 hover:text-cream"
               >
                 <svg width="8" height="8" viewBox="0 0 8 8" fill="none">

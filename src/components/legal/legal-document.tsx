@@ -70,20 +70,16 @@ export function LegalContact({
     <dl className="grid gap-3 border-l-2 border-accent-light pl-4 sm:grid-cols-[9rem_1fr]">
       <dt className="font-semibold text-brown">{locale === "ko" ? "담당" : "Contact"}</dt>
       <dd>{operatorName}</dd>
-      <dt className="font-semibold text-brown">{locale === "ko" ? "이메일" : "Email"}</dt>
-      <dd>
-        {contactEmail ? (
+      {contactEmail ? (
+        <>
+          <dt className="font-semibold text-brown">{locale === "ko" ? "이메일" : "Email"}</dt>
+          <dd>
           <a className="font-medium text-accent underline underline-offset-4" href={`mailto:${contactEmail}`}>
             {contactEmail}
           </a>
-        ) : (
-          <span className="font-medium text-red-700">
-            {locale === "ko"
-              ? "운영 배포 전 LEGAL_CONTACT_EMAIL 설정 필요"
-              : "Set LEGAL_CONTACT_EMAIL before production deployment"}
-          </span>
-        )}
-      </dd>
+          </dd>
+        </>
+      ) : null}
     </dl>
   );
 }

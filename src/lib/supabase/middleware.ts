@@ -10,6 +10,60 @@ import {
 
 const AUTH_RESPONSE_HEADERS = ["cache-control", "expires", "pragma"] as const;
 
+/**
+ * Returns whether a pathname can be served without an authenticated session.
+ *
+ * Keep this segment-based so paths such as `/ko/login-help` cannot inherit the
+ * access policy of `/ko/login`. Unknown, well-formed origin slugs are allowed
+ * through so the page itself can return a proper localized 404.
+ */
+export function isPublicPath(pathname: string): boolean {
+  if (pathname === "/") return true;
+
+  const path = pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
+  if (!path.startsWith("/")) return false;
+
+  const [locale, ...route] = path.slice(1).split("/");
+  if (locale !== "ko" && locale !== "en") return false;
+
+  if (route.length === 0) return true;
+
+  if (route.length === 1) {
+    return ["login", "signup", "privacy", "terms", "try", "origins"].includes(
+      route[0]
+    );
+  }
+
+  if (route.length !== 2) return false;
+  if (route[0] === "signup") return route[1] === "check-email";
+
+  return (
+    route[0] === "origins" &&
+    /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(route[1])
+  );
+}
+
+/**
+ * Returns whether a pathname belongs to the signed-in application. Unknown
+ * paths deliberately return false so Next.js can serve a real 404 instead of
+ * turning missing pages into redirects to the landing page.
+ */
+export function isProtectedPath(pathname: string): boolean {
+  if (!pathname.startsWith("/")) return false;
+
+  const path = pathname.endsWith("/") ? pathname.slice(0, -1) : pathname;
+  const segments = path.slice(1).split("/");
+  const route =
+    segments[0] === "ko" || segments[0] === "en"
+      ? segments.slice(1)
+      : segments;
+
+  return (
+    route.length > 0 &&
+    ["explore", "beans", "stats", "settings"].includes(route[0])
+  );
+}
+
 export function preserveAuthResponse(
   authResponse: NextResponse,
   response: NextResponse
@@ -71,11 +125,8 @@ export async function updateSession(request: NextRequest) {
   const isAuthPage = /^\/(?:ko|en)\/(?:login|signup(?:\/check-email)?)\/?$/.test(
     pathname
   );
-  const isLegalPage = /^\/(?:ko|en)\/(?:privacy|terms)\/?$/.test(pathname);
-  const isGuestRecordPage = /^\/(?:ko|en)\/try\/?$/.test(pathname);
-  const isPublicPath = pathname === "/" || isAuthPage || isLegalPage || isGuestRecordPage;
 
-  if (!user && !isPublicPath) {
+  if (!user && isProtectedPath(pathname)) {
     const url = request.nextUrl.clone();
     url.pathname = "/";
     url.search = "";

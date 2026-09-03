@@ -5,12 +5,15 @@ import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
-export function BottomNav() {
+export function BottomNav({ authenticated }: { authenticated: boolean }) {
   const pathname = usePathname();
   const appPathname = pathname.replace(/^\/(ko|en)(?=\/|$)/, "") || "/";
   const t = useTranslations("nav");
 
-  if (/^\/(?:login|signup(?:\/check-email)?|privacy|terms|try)\/?$/.test(appPathname)) {
+  if (
+    !authenticated ||
+    /^\/(?:login|signup(?:\/check-email)?|privacy|terms|try)\/?$/.test(appPathname)
+  ) {
     return null;
   }
 

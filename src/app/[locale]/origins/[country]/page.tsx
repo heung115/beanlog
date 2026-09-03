@@ -1,9 +1,30 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
 import {
   findCountryPresetBySlug,
+  originSlug,
 } from "@/data/origin-presets";
+import {
+  buildOriginDetailMetadata,
+  localizedUrl,
+  serializeJsonLd,
+  toSeoLocale,
+} from "@/lib/seo";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string; country: string }>;
+}): Promise<Metadata> {
+  const { locale, country } = await params;
+  const preset = findCountryPresetBySlug(country);
+
+  if (!preset) notFound();
+
+  return buildOriginDetailMetadata(locale, preset, originSlug(preset.country));
+}
 
 export default async function OriginDetailPage({
   params,
@@ -16,14 +37,67 @@ export default async function OriginDetailPage({
   if (!preset) notFound();
 
   const t = await getTranslations({ locale, namespace: "origins" });
-  const isKorean = locale === "ko";
+  const seoLocale = toSeoLocale(locale);
+  const isKorean = seoLocale === "ko";
   const countryName = isKorean ? preset.countryKo : preset.country;
   const secondaryCountryName = isKorean ? preset.country : preset.countryKo;
   const signature = isKorean ? preset.signatureKo : preset.signature;
   const flavorNotes = signature.split(",").map((note) => note.trim());
+  const canonicalSlug = originSlug(preset.country);
+  const pageUrl = localizedUrl(seoLocale, `/origins/${canonicalSlug}`);
+  const originsUrl = localizedUrl(seoLocale, "/origins");
+  const homeUrl = localizedUrl(seoLocale);
+  const pageName = isKorean
+    ? `${countryName} 커피 산지 가이드`
+    : `${countryName} Coffee Origin Guide`;
+  const pageDescription = isKorean
+    ? `${countryName} 커피의 대표 향미, 재배 고도, 주요 품종과 생산 지역을 살펴보세요.`
+    : `Explore ${countryName} coffee flavor profiles, growing elevations, key varieties, and producing regions.`;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "WebPage",
+        "@id": `${pageUrl}#webpage`,
+        url: pageUrl,
+        name: pageName,
+        description: pageDescription,
+        inLanguage: seoLocale === "ko" ? "ko-KR" : "en",
+        breadcrumb: { "@id": `${pageUrl}#breadcrumb` },
+      },
+      {
+        "@type": "BreadcrumbList",
+        "@id": `${pageUrl}#breadcrumb`,
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: isKorean ? "홈" : "Home",
+            item: homeUrl,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: isKorean ? "커피 산지 가이드" : "Coffee Origin Guide",
+            item: originsUrl,
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: countryName,
+            item: pageUrl,
+          },
+        ],
+      },
+    ],
+  };
 
   return (
     <article className="mx-auto max-w-2xl pb-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+      />
       <Link
         href={`/${locale}/origins`}
         className="group inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-brown-light transition-colors hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"

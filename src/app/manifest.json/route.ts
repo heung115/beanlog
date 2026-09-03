@@ -5,15 +5,21 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export function GET() {
+export function GET(request: Request) {
   const themeColor = getBeanmapThemeColor(resolveBeanmapTheme());
+  const locale = new URL(request.url).searchParams.get("lang") === "en" ? "en" : "ko";
+  const description =
+    locale === "en"
+      ? "A private coffee bean and tasting journal"
+      : "나만의 커피 원두와 테이스팅 기록장";
 
   return Response.json(
     {
       name: "beanmap",
       short_name: "beanmap",
-      description: "My Coffee Bean Journal",
-      start_url: "/ko/explore",
+      description,
+      lang: locale,
+      start_url: `/${locale}/explore`,
       display: "standalone",
       background_color: themeColor,
       theme_color: themeColor,
@@ -32,7 +38,7 @@ export function GET() {
     },
     {
       headers: {
-        "Cache-Control": "no-store",
+        "Cache-Control": "public, max-age=3600, stale-while-revalidate=86400",
         "Content-Type": "application/manifest+json; charset=utf-8",
       },
     }

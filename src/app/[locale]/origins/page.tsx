@@ -1,6 +1,24 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { originPresets, originSlug } from "@/data/origin-presets";
+import {
+  buildOriginIndexMetadata,
+  localizedUrl,
+  SEO_COPY,
+  serializeJsonLd,
+  toSeoLocale,
+} from "@/lib/seo";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+
+  return buildOriginIndexMetadata(locale);
+}
 
 export default async function OriginsPage({
   params,
@@ -9,10 +27,39 @@ export default async function OriginsPage({
 }) {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "origins" });
-  const isKorean = locale === "ko";
+  const seoLocale = toSeoLocale(locale);
+  const isKorean = seoLocale === "ko";
+  const copy = SEO_COPY[seoLocale].origins;
+  const collectionUrl = localizedUrl(seoLocale, "/origins");
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": `${collectionUrl}#collection`,
+    url: collectionUrl,
+    name: copy.title,
+    description: copy.description,
+    inLanguage: seoLocale === "ko" ? "ko-KR" : "en",
+    mainEntity: {
+      "@type": "ItemList",
+      numberOfItems: originPresets.length,
+      itemListElement: originPresets.map((preset, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        name: isKorean ? preset.countryKo : preset.country,
+        url: localizedUrl(
+          seoLocale,
+          `/origins/${originSlug(preset.country)}`
+        ),
+      })),
+    },
+  };
 
   return (
     <div className="pb-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
+      />
       <header className="animate-rise border-b border-border pb-7 pt-3 md:pb-9 md:pt-7">
         <p className="journal-kicker">{t("guide")}</p>
         <div className="mt-2 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">

@@ -10,6 +10,10 @@ const landing = fs.readFileSync(
   new URL("../src/app/page.tsx", import.meta.url),
   "utf8"
 );
+const landingComponent = fs.readFileSync(
+  new URL("../src/components/landing/landing-page.tsx", import.meta.url),
+  "utf8"
+);
 const localeLayout = fs.readFileSync(
   new URL("../src/app/[locale]/layout.tsx", import.meta.url),
   "utf8"
@@ -25,8 +29,18 @@ test("the shared footer exposes legal pages and the configured contact", () => {
   assert.match(footer, /Privacy Policy/);
 });
 
+test("the shared footer links to each localized home and origin guide", () => {
+  assert.ok(footer.includes('href={`/${locale}`}'));
+  assert.ok(footer.includes('href={`/${locale}/origins`}'));
+  assert.match(footer, /홈/);
+  assert.match(footer, /커피 산지/);
+  assert.match(footer, /Home/);
+  assert.match(footer, /Coffee origins/);
+});
+
 test("the landing and localized app layouts use the shared footer", () => {
-  assert.match(landing, /<SiteFooter locale="ko" wide \/>/);
+  assert.match(landing, /<LandingPage locale="ko" \/>/);
+  assert.match(landingComponent, /<SiteFooter locale=\{locale\} wide \/>/);
   assert.match(localeLayout, /<SiteFooter/);
   assert.match(localeLayout, /locale=\{locale as "ko" \| "en"\}/);
 });

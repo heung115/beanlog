@@ -43,14 +43,29 @@ test("public landing explains the product and uses the operator theme", async ({
   await page.goto("/");
 
   await expect(page).toHaveURL(/\/$/);
-  await expect(page.getByRole("heading", { level: 1, name: "beanmap" })).toBeVisible();
-  await expect(page.getByRole("heading", { level: 2, name: "기능" })).toBeVisible();
-  await expect(page.getByRole("heading", { level: 2, name: "이용 방법" })).toBeVisible();
-  await expect(page.getByText("개인 커피 기록장")).toHaveCount(0);
-  await expect(page.getByRole("link", { name: "로그인 없이 기록" })).toHaveAttribute(
+  await expect(
+    page.getByRole("heading", {
+      level: 1,
+      name: "다시 마시고 싶은 커피를 잊지 않도록.",
+    })
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 2, name: "점수 하나보다 오래 남는 커피 기록" })
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 2, name: "봉투에 적힌 산지가 궁금할 때" })
+  ).toBeVisible();
+  await expect(page.getByRole("link", { name: "기록 하나 먼저 써보기" })).toHaveAttribute(
     "href",
     "/ko/try"
   );
+  await expect(page.getByRole("link", { name: "20개 산지 모두 보기" })).toHaveAttribute(
+    "href",
+    "/ko/origins"
+  );
+  await expect(page.getByRole("article", { name: "beanmap 커피 기록 예시" })).toBeVisible();
+  const englishLink = page.getByRole("link", { name: "영어로 전환" });
+  await expect(englishLink).toHaveAttribute("href", "/en");
   await expect(page.locator("html")).toHaveAttribute(
     "data-beanmap-theme",
     /^(mist|cream|contrast)$/
@@ -71,17 +86,54 @@ test("public landing explains the product and uses the operator theme", async ({
     background_color: expectedThemeColor,
     theme_color: expectedThemeColor,
   });
-  await expect(page.getByRole("article", { name: "커피 기록 예시" })).toBeVisible();
+
+  const englishManifestResponse = await page.request.get("/manifest.json?lang=en");
+  expect(englishManifestResponse.ok()).toBe(true);
+  await expect(englishManifestResponse.json()).resolves.toMatchObject({
+    lang: "en",
+    start_url: "/en/explore",
+  });
+
   await expectNoSeriousA11yViolations(page);
+
+  await englishLink.click();
+  await expect(page).toHaveURL(/\/en$/);
+  await expect(
+    page.getByRole("heading", {
+      level: 1,
+      name: "Remember the coffees worth drinking again.",
+    })
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 2, name: "More memorable than a score alone" })
+  ).toBeVisible();
+  await expect(page.getByRole("link", { name: "Try one record" })).toHaveAttribute(
+    "href",
+    "/en/try"
+  );
+  await expect(page.getByRole("article", { name: "Sample coffee entry in beanmap" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Switch to Korean" })).toHaveAttribute(
+    "href",
+    "/ko"
+  );
 });
 
 test("guest record stays in the browser and loads after login", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("link", { name: "로그인 없이 기록" }).click();
+  await page.getByRole("link", { name: "기록 하나 먼저 써보기" }).click();
 
   await expect(page).toHaveURL(/\/ko\/try$/);
   await expect(page.getByRole("heading", { level: 1, name: "로그인 없이 기록하기" })).toBeVisible();
-  await expect(page.getByRole("navigation")).toHaveCount(0);
+  const publicNavigation = page.getByRole("navigation", { name: "공개 메뉴" });
+  await expect(publicNavigation).toBeVisible();
+  await expect(publicNavigation.getByRole("link", { name: "산지 정보" })).toHaveAttribute(
+    "href",
+    "/ko/origins"
+  );
+  await expect(publicNavigation.getByRole("link", { name: "로그인" })).toHaveAttribute(
+    "href",
+    "/ko/login"
+  );
   await expectNoSeriousA11yViolations(page);
 
   await page.locator('input[name="name"]').fill("비로그인 임시 기록");
@@ -171,7 +223,16 @@ test("legal notices are public and signup requires an explicit agreement", async
     page.getByRole("heading", { level: 1, name: "개인정보 처리방침" })
   ).toBeVisible();
   await expect(page.getByText("일본(Oracle Cloud Infrastructure 도쿄 리전)")).toBeVisible();
-  await expect(page.getByRole("navigation")).toHaveCount(0);
+  const publicNavigation = page.getByRole("navigation", { name: "공개 메뉴" });
+  await expect(publicNavigation).toBeVisible();
+  await expect(publicNavigation.getByRole("link", { name: "산지 정보" })).toHaveAttribute(
+    "href",
+    "/ko/origins"
+  );
+  await expect(publicNavigation.getByRole("link", { name: "회원가입" })).toHaveAttribute(
+    "href",
+    "/ko/signup"
+  );
   await expectNoSeriousA11yViolations(page);
 
   await page.goto("/ko/signup");

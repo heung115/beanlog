@@ -6,13 +6,17 @@ type FooterLocale = "ko" | "en";
 
 const labels = {
   ko: {
-    navigation: "법적 고지 및 문의",
+    navigation: "사이트 안내, 법적 고지 및 문의",
+    home: "홈",
+    origins: "커피 산지",
     terms: "이용약관",
     privacy: "개인정보 처리방침",
     contact: "문의",
   },
   en: {
-    navigation: "Legal and contact",
+    navigation: "Site information, legal, and contact",
+    home: "Home",
+    origins: "Coffee origins",
     terms: "Terms of Service",
     privacy: "Privacy Policy",
     contact: "Contact",
@@ -42,6 +46,12 @@ export function SiteFooter({
           aria-label={copy.navigation}
           className="flex flex-wrap items-center gap-x-4 gap-y-2"
         >
+          <Link className="transition-colors hover:text-brown" href={`/${locale}`}>
+            {copy.home}
+          </Link>
+          <Link className="transition-colors hover:text-brown" href={`/${locale}/origins`}>
+            {copy.origins}
+          </Link>
           <Link className="transition-colors hover:text-brown" href={`/${locale}/terms`}>
             {copy.terms}
           </Link>

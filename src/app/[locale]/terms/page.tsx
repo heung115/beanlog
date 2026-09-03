@@ -108,7 +108,7 @@ function EnglishTerms() {
       effectiveDate={legal.effectiveDate}
     >
       <LegalSection title="1. Scope and eligibility">
-        <p>These terms govern beanmap and related services provided by {legal.operatorName}. You must be at least 14 years old, provide accurate account information, and keep your sign-in credentials secure.</p>
+        <p>These terms govern beanmap and related services provided by {legal.operatorNameEn}. You must be at least 14 years old, provide accurate account information, and keep your sign-in credentials secure.</p>
       </LegalSection>
 
       <LegalSection title="2. Service and your content">
@@ -133,7 +133,7 @@ function EnglishTerms() {
 
       <LegalSection title="7. Governing law and contact">
         <p>Korean law governs these terms, and disputes may be brought in a court with jurisdiction under Korea’s Civil Procedure Act. If the Korean and English versions differ, the Korean version governs.</p>
-        <LegalContact locale="en" operatorName={legal.operatorName} contactEmail={legal.contactEmail} />
+        <LegalContact locale="en" operatorName={legal.operatorNameEn} contactEmail={legal.contactEmail} />
       </LegalSection>
     </LegalDocument>
   );
