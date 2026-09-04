@@ -29,39 +29,39 @@ colors:
   roast-dark: "#4A3728"
 typography:
   display-xl:
-    fontFamily: Iowan Old Style, KoPubBatang, KoPub Batang, AppleMyungjo, Batang, Georgia, serif
+    fontFamily: SUIT Variable, SUIT, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
     fontSize: 2.25rem
-    fontWeight: 700
+    fontWeight: 800
     lineHeight: 1.15
     letterSpacing: -0.02em
   display-lg:
-    fontFamily: Iowan Old Style, KoPubBatang, KoPub Batang, AppleMyungjo, Batang, Georgia, serif
+    fontFamily: SUIT Variable, SUIT, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
     fontSize: 1.875rem
-    fontWeight: 700
+    fontWeight: 800
     lineHeight: 1.2
     letterSpacing: -0.02em
   heading-md:
-    fontFamily: Iowan Old Style, KoPubBatang, KoPub Batang, AppleMyungjo, Batang, Georgia, serif
+    fontFamily: SUIT Variable, SUIT, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
     fontSize: 1.125rem
     fontWeight: 700
     lineHeight: 1.35
   body-md:
-    fontFamily: Pretendard, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
+    fontFamily: SUIT Variable, SUIT, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
     fontSize: 1rem
     fontWeight: 400
     lineHeight: 1.6
   body-sm:
-    fontFamily: Pretendard, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
+    fontFamily: SUIT Variable, SUIT, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
     fontSize: 0.875rem
     fontWeight: 400
     lineHeight: 1.5
   label-sm:
-    fontFamily: Pretendard, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
+    fontFamily: SUIT Variable, SUIT, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
     fontSize: 0.875rem
     fontWeight: 500
     lineHeight: 1.4
   caption:
-    fontFamily: Pretendard, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
+    fontFamily: SUIT Variable, SUIT, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
     fontSize: 0.75rem
     fontWeight: 500
     lineHeight: 1.4
@@ -149,7 +149,7 @@ The operator selects the palette through `BEANMAP_THEME=mist|cream|contrast`. `m
 
 ## Typography
 
-Display typography uses a restrained editorial serif stack while body and interface typography use **Pretendard** with system sans-serif fallbacks. The contrast makes coffee names and section titles feel like a field journal without sacrificing clarity in controls, metadata, notes, and charts. Data numerals use tabular figures or the monospace stack.
+Display, body, and interface typography use the self-hosted **SUIT Variable** family with system sans-serif fallbacks. Weight, scale, spacing, rules, and surface contrast create hierarchy without switching typefaces. Data numerals use tabular figures or the monospace stack.
 
 Reserve bold display type for meaningful hierarchy. A screen should usually have one dominant title; avoid making every card label look like a headline.
 

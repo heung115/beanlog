@@ -67,7 +67,7 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
           <OriginContours className="pointer-events-none absolute -right-56 -top-28 h-[42rem] w-[52rem] opacity-35 md:-right-24 md:-top-16 md:opacity-60" />
           <div className="relative mx-auto grid w-full max-w-6xl gap-12 px-4 pb-16 pt-12 md:px-6 md:pb-24 md:pt-20 lg:grid-cols-[minmax(0,1.04fr)_minmax(22rem,0.72fr)] lg:items-center lg:gap-20">
             <div>
-              <h1 className="display-title max-w-3xl text-6xl tracking-[-0.055em] text-brown md:text-8xl">
+              <h1 className="display-title max-w-3xl text-5xl tracking-[-0.05em] text-brown md:text-7xl">
                 {copy.title}
               </h1>
               <p className="mt-7 max-w-[39rem] text-base leading-7 text-brown-medium md:text-lg md:leading-8">

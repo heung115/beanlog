@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import localFont from "next/font/local";
 import { getLocale } from "next-intl/server";
 import {
   getBeanmapThemeColor,
@@ -12,6 +13,15 @@ import {
   SOCIAL_IMAGE_PATH,
 } from "@/lib/seo";
 import "./globals.css";
+
+const suit = localFont({
+  src: "../../node_modules/@sun-typeface/suit/fonts/variable/woff2/SUIT-Variable.woff2",
+  variable: "--font-suit",
+  display: "swap",
+  weight: "100 900",
+  style: "normal",
+  fallback: ["-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
+});
 
 export const dynamic = "force-dynamic";
 
@@ -75,13 +85,14 @@ export default async function RootLayout({
   const theme = resolveBeanmapTheme();
 
   return (
-    <html lang={locale} data-beanmap-theme={theme} data-scroll-behavior="smooth">
+    <html
+      lang={locale}
+      className={suit.variable}
+      data-beanmap-theme={theme}
+      data-scroll-behavior="smooth"
+    >
       <head>
         <link rel="apple-touch-icon" href="/icon-192.png" />
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
-        />
       </head>
       <body className="min-h-screen bg-cream">
         <a

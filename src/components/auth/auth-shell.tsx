@@ -11,7 +11,7 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
           <OriginContours className="absolute -bottom-20 -left-36 h-[38rem] w-[46rem] opacity-70" />
           <div className="relative">
             <p className="max-w-xs font-display text-5xl font-bold leading-[1.03] tracking-[-0.045em] text-brown">
-              beanlog
+              beanmap
             </p>
           </div>
           <dl className="relative border-t-2 border-brown bg-surface/60">

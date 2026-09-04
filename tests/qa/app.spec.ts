@@ -46,7 +46,7 @@ test("public landing explains the product and uses the operator theme", async ({
   await expect(
     page.getByRole("heading", {
       level: 1,
-      name: "beanlog",
+      name: "beanmap",
     })
   ).toBeVisible();
   await expect(
@@ -67,6 +67,26 @@ test("public landing explains the product and uses the operator theme", async ({
     "/ko/origins"
   );
   await expect(page.getByRole("article", { name: "beanmap 커피 기록 예시" })).toBeVisible();
+  const typography = await page.evaluate(async () => {
+    await document.fonts.ready;
+    const bodyPrimaryFont = getComputedStyle(document.body).fontFamily.split(",")[0]?.trim();
+    const fontPreloads = Array.from(
+      document.querySelectorAll<HTMLLinkElement>('link[rel="preload"][as="font"]')
+    ).map((link) => link.href);
+
+    return {
+      externalFontStylesheets: document.querySelectorAll(
+        'link[rel="stylesheet"][href*="cdn.jsdelivr.net"]'
+      ).length,
+      fontLoaded: Boolean(bodyPrimaryFont && document.fonts.check(`16px ${bodyPrimaryFont}`)),
+      fontPreloads,
+      origin: window.location.origin,
+    };
+  });
+  expect(typography.externalFontStylesheets).toBe(0);
+  expect(typography.fontLoaded).toBe(true);
+  expect(typography.fontPreloads.length).toBeGreaterThan(0);
+  expect(typography.fontPreloads.every((href) => href.startsWith(typography.origin))).toBe(true);
   const englishLink = page.getByRole("link", { name: "영어로 전환" });
   await expect(englishLink).toHaveAttribute("href", "/en");
   await expect(page.locator("html")).toHaveAttribute(
@@ -104,7 +124,7 @@ test("public landing explains the product and uses the operator theme", async ({
   await expect(
     page.getByRole("heading", {
       level: 1,
-      name: "beanlog",
+      name: "beanmap",
     })
   ).toBeVisible();
   await expect(
@@ -684,14 +704,15 @@ test("explore progressively discloses aligned filters without overflow", async (
   }
 });
 
-test("bean detail uses editorial display type and paper cards", async ({ page }) => {
+test("bean detail uses unified SUIT type and paper cards", async ({ page }) => {
   await login(page);
   const firstBeanCard = page.locator('[data-bean-card] h3 a[href*="/beans/"]').first();
   await firstBeanCard.click();
   await expect(page).toHaveURL(/\/beans\/(?!new(?:[/?#]|$))[^/?#]+/);
   await expect(page.getByTestId("bean-overall-score")).toBeVisible();
 
-  const appearance = await page.evaluate(() => {
+  const appearance = await page.evaluate(async () => {
+    await document.fonts.ready;
     const score = document.querySelector<HTMLElement>('[data-testid="bean-overall-score"]');
     const title = document.querySelector<HTMLElement>("main h1");
     const sections = Array.from(
@@ -700,10 +721,13 @@ test("bean detail uses editorial display type and paper cards", async ({ page })
     if (!score) throw new Error("Missing overall score section");
     if (!title) throw new Error("Missing bean title");
 
+    const bodyStyle = getComputedStyle(document.body);
     const scoreStyle = getComputedStyle(score);
+    const bodyPrimaryFont = bodyStyle.fontFamily.split(",")[0]?.trim();
     return {
-      bodyBackground: getComputedStyle(document.body).backgroundColor,
-      bodyFontFamily: getComputedStyle(document.body).fontFamily,
+      bodyBackground: bodyStyle.backgroundColor,
+      bodyFontFamily: bodyStyle.fontFamily,
+      fontLoaded: Boolean(bodyPrimaryFont && document.fonts.check(`16px ${bodyPrimaryFont}`)),
       titleFontFamily: getComputedStyle(title).fontFamily,
       sectionBackgrounds: sections.map(
         (section) => getComputedStyle(section).backgroundColor
@@ -751,7 +775,8 @@ test("bean detail uses editorial display type and paper cards", async ({ page })
   );
 
   expect(appearance.bodyBackground).toBe(expectedCanvas);
-  expect(appearance.titleFontFamily).not.toBe(appearance.bodyFontFamily);
+  expect(appearance.fontLoaded).toBe(true);
+  expect(appearance.titleFontFamily).toBe(appearance.bodyFontFamily);
   expect(new Set(appearance.sectionBackgrounds)).toEqual(
     new Set([expectedSurface])
   );

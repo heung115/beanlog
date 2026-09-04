@@ -29,8 +29,8 @@
   --radius-md: 0.125rem;
   --radius-lg: 0.125rem;
 
-  --font-display: "Iowan Old Style", "KoPubBatang", "KoPub Batang", "AppleMyungjo", "Batang", Georgia, serif;
-  --font-body: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: var(--font-suit);
+  --font-body: var(--font-suit);
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
 
@@ -212,9 +212,9 @@ input, textarea, select, button {
 
 .display-title {
   font-family: var(--font-display);
-  font-weight: 700;
-  line-height: 1.03;
-  letter-spacing: -0.045em;
+  font-weight: 800;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
   text-wrap: balance;
 }
 

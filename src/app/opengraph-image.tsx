@@ -1,4 +1,6 @@
 import { ImageResponse } from "next/og";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
 import designTokens from "@/config/design-tokens.json";
 
 export const alt = "beanmap — coffee journal and world coffee origin guide";
@@ -10,7 +12,14 @@ export const contentType = "image/png";
 
 const colors = designTokens.colors;
 
-export default function OpenGraphImage() {
+export default async function OpenGraphImage() {
+  const suitBold = await readFile(
+    join(
+      process.cwd(),
+      "node_modules/@sun-typeface/suit/fonts/static/otf/SUIT-Bold.otf"
+    )
+  );
+
   return new ImageResponse(
     (
       <div
@@ -19,7 +28,7 @@ export default function OpenGraphImage() {
           background: colors.cream,
           color: colors.brown,
           display: "flex",
-          fontFamily: "Arial, Helvetica, sans-serif",
+          fontFamily: "SUIT",
           height: "100%",
           padding: "56px",
           width: "100%",
@@ -49,7 +58,7 @@ export default function OpenGraphImage() {
                 letterSpacing: "-0.04em",
               }}
             >
-              beanmap
+              커피 원두 기록
             </span>
             <span
               style={{
@@ -60,7 +69,7 @@ export default function OpenGraphImage() {
                 textTransform: "uppercase",
               }}
             >
-              beanlog
+              20개 생산국 산지 정보
             </span>
           </div>
 
@@ -70,13 +79,13 @@ export default function OpenGraphImage() {
                 display: "flex",
                 flexDirection: "column",
                 fontSize: 67,
-                fontWeight: 800,
+                fontWeight: 700,
                 letterSpacing: "-0.055em",
                 lineHeight: 1.05,
                 maxWidth: 940,
               }}
             >
-              <span>beanlog</span>
+              <span>beanmap</span>
             </div>
             <div
               style={{
@@ -101,7 +110,7 @@ export default function OpenGraphImage() {
               paddingTop: 24,
             }}
           >
-            <span>beanmap · beanlog</span>
+            <span>한국어 · English</span>
             <span style={{ color: colors.accent, fontWeight: 700 }}>
               beanmap.site
             </span>
@@ -109,6 +118,16 @@ export default function OpenGraphImage() {
         </div>
       </div>
     ),
-    size
+    {
+      ...size,
+      fonts: [
+        {
+          name: "SUIT",
+          data: suitBold,
+          style: "normal",
+          weight: 700,
+        },
+      ],
+    }
   );
 }
