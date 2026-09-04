@@ -19,22 +19,23 @@ export function BottomNav({ authenticated }: { authenticated: boolean }) {
   }
 
   const links = [
-    { href: "/explore", label: t("explore"), icon: JournalIcon },
-    { href: "/beans/new", label: t("add"), icon: PlusIcon, primary: true },
+    { href: "/explore", label: t("explore"), icon: JournalIcon, prefetch: false },
+    { href: "/beans/new", label: t("add"), icon: PlusIcon, primary: true, prefetch: false },
     { href: "/origins", label: t("origins"), icon: OriginIcon },
-    { href: "/stats", label: t("stats"), icon: ChartIcon },
-    { href: "/settings", label: t("settings"), icon: GearIcon },
+    { href: "/stats", label: t("stats"), icon: ChartIcon, prefetch: false },
+    { href: "/settings", label: t("settings"), icon: GearIcon, prefetch: false },
   ];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 border-t-2 border-brown bg-surface/95 backdrop-blur-sm md:hidden">
       <div className="mx-auto flex max-w-md items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
-        {links.map(({ href, label, icon: Icon, primary }) => {
+        {links.map(({ href, label, icon: Icon, primary, prefetch }) => {
           const isActive = appPathname === href || appPathname.startsWith(href + "/");
           return (
             <Link
               key={href}
               href={`/${locale}${href}`}
+              prefetch={prefetch}
               aria-current={isActive ? "page" : undefined}
               className={cn(
                 "flex min-h-14 min-w-12 flex-1 flex-col items-center justify-center gap-0.5 px-1 py-2 text-[10px] font-medium transition-colors",

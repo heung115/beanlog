@@ -47,14 +47,10 @@ export default function EditBeanPage() {
 
   return (
     <div className="mx-auto max-w-4xl">
-      <header className="animate-rise mb-8 border-y-2 border-brown py-9 md:grid md:grid-cols-[1fr_13rem] md:items-end md:py-12">
-        <div>
-          <p className="journal-kicker">REVISE TASTING RECORD / 02</p>
-          <h1 className="display-title mt-3 text-5xl text-brown md:text-7xl">
+      <header className="animate-rise mb-8 border-y-2 border-brown py-9 md:py-12">
+        <h1 className="display-title text-5xl text-brown md:text-7xl">
           {t("editTitle")}
-          </h1>
-        </div>
-        <p className="folio-label mt-5 border-l-2 border-accent pl-4 md:mt-0">ARCHIVE REVISION</p>
+        </h1>
       </header>
 
       {loading ? (
@@ -67,6 +63,7 @@ export default function EditBeanPage() {
           <p className="mt-2 text-sm text-brown-light">{t("notFoundSub")}</p>
           <Link
             href={`/${locale}/explore`}
+            prefetch={false}
             className={buttonClassName({ variant: "secondary", className: "mt-6" })}
           >
             {t("back")}

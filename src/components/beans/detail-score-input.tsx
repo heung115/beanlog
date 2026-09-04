@@ -55,7 +55,7 @@ function ScoreRow({
             onClick={() => onSelect(value === n ? 0 : n)}
             className={cn(
               "h-6 w-6 rounded-full border transition-all duration-150",
-              "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
+              "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
               n <= active
                 ? hovered
                   ? "scale-110 border-accent-light bg-accent-light"

@@ -92,7 +92,7 @@ function FilterChip({ label, allLabel, value, options, onChange }: FilterChipPro
         onChange={(e) => onChange(e.target.value || undefined)}
         className={cn(
           "min-h-11 w-full cursor-pointer appearance-none rounded-sm border py-2 pl-3 pr-9 text-xs font-medium transition-colors duration-150",
-          "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40",
+          "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
           active
             ? "border-brown bg-brown text-cream"
             : "border-border bg-surface text-brown-medium hover:border-brown-light"
@@ -178,7 +178,8 @@ function EmptyState({
       ) : (
         <Link
           href={`/${locale}/beans/new`}
-          className="mt-6 inline-flex items-center justify-center rounded-sm bg-brown px-6 py-3 text-base font-medium text-cream transition-colors duration-150 hover:bg-brown-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
+          prefetch={false}
+          className="mt-6 inline-flex items-center justify-center rounded-sm bg-brown px-6 py-3 text-base font-medium text-cream transition-colors duration-150 hover:bg-brown-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {t("addFirst")}
         </Link>
@@ -458,13 +459,12 @@ export function ExploreClient({
     <div className="mx-auto w-full max-w-6xl">
       <header className="mb-7 grid border-y-2 border-brown md:grid-cols-[1fr_13rem]">
         <div className="py-9 md:py-12">
-          <p className="journal-kicker">PRIVATE ARCHIVE / INDEX</p>
-          <h1 className="display-title mt-3 text-5xl text-brown md:text-7xl">
+          <h1 className="display-title text-5xl text-brown md:text-7xl">
             {t("title")}
           </h1>
         </div>
         <div className="flex items-end justify-between border-t border-border bg-surface-warm p-5 md:block md:border-l md:border-t-0 md:p-7">
-          <p className="folio-label">RECORD COUNT</p>
+          <p className="folio-label">{t("recordCount")}</p>
           <p className="font-display text-5xl font-bold italic tabular-nums tracking-[-0.05em] text-accent md:mt-5 md:text-6xl">{total}</p>
         </div>
       </header>
@@ -505,7 +505,7 @@ export function ExploreClient({
           onClick={() => setFiltersOpen((open) => !open)}
           className={cn(
             "inline-flex min-h-12 items-center justify-center gap-2 rounded-sm border px-3 text-xs font-semibold transition-colors duration-150",
-            "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40",
+            "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
             filtersOpen
               ? "border-brown bg-brown text-cream"
               : "border-border bg-cream text-brown-medium hover:border-brown-light"
@@ -529,7 +529,7 @@ export function ExploreClient({
             onChange={(e) => handleSortChange(e.target.value)}
             className={cn(
               "min-h-12 w-full cursor-pointer appearance-none rounded-sm border border-border bg-cream py-2 pl-3 pr-9 text-xs font-semibold text-brown-medium",
-              "transition-colors duration-150 hover:border-brown-light focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+              "transition-colors duration-150 hover:border-brown-light focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             )}
           >
             <option value="newest">{t("sortNewest")}</option>
@@ -605,7 +605,7 @@ export function ExploreClient({
                 type="button"
                 aria-label={t("removeFilter", { label: item.label, value: item.valueLabel })}
                 onClick={() => removeFilter(item.key)}
-                className="inline-flex min-h-8 items-center gap-1.5 border-b border-border-light text-xs text-brown-medium transition-colors duration-150 hover:border-brown hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+                className="inline-flex min-h-8 items-center gap-1.5 border-b border-border-light text-xs text-brown-medium transition-colors duration-150 hover:border-brown hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 <span className="text-brown-light">{item.label}</span>
                 <span>{item.valueLabel}</span>
@@ -616,7 +616,7 @@ export function ExploreClient({
           <button
             type="button"
             onClick={clearFilters}
-            className="shrink-0 py-1.5 text-xs font-medium text-accent transition-colors duration-150 hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+            className="shrink-0 py-1.5 text-xs font-medium text-accent transition-colors duration-150 hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             {t("clearFilters")}
           </button>
@@ -638,7 +638,7 @@ export function ExploreClient({
             aria-pressed={viewMode === "list"}
             onClick={() => changeView("list")}
             className={cn(
-              "flex min-h-11 min-w-11 items-center justify-center text-brown-light transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/50",
+              "flex min-h-11 min-w-11 items-center justify-center text-brown-light transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent",
               viewMode === "list" && "bg-cream-dark text-brown"
             )}
           >
@@ -652,7 +652,7 @@ export function ExploreClient({
             aria-pressed={viewMode === "grid"}
             onClick={() => changeView("grid")}
             className={cn(
-              "flex min-h-11 min-w-11 items-center justify-center border-l border-border text-brown-light transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/50",
+              "flex min-h-11 min-w-11 items-center justify-center border-l border-border text-brown-light transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent",
               viewMode === "grid" && "bg-cream-dark text-brown"
             )}
           >

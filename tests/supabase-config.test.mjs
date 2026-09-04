@@ -28,10 +28,10 @@ test("Supabase auth cookies are hardened on the server", () => {
 
   assert.match(config, /httpOnly:\s*true/);
   assert.match(config, /sameSite:\s*["']lax["']/);
-  assert.match(
-    config,
-    /secure:\s*process\.env\.NODE_ENV\s*===\s*["']production["']/
-  );
+  assert.match(config, /secure:\s*shouldUseSecureCookies\(/);
+  assert.match(config, /process\.env\.NODE_ENV/);
+  assert.match(config, /process\.env\.NEXT_PUBLIC_APP_URL/);
+  assert.match(config, /process\.env\.QA_ALLOW_INSECURE_LOOPBACK_AUTH/);
 });
 
 test("OAuth uses the public Supabase host with the shared PKCE cookie adapter", () => {

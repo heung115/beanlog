@@ -10,8 +10,8 @@ export function GET(request: Request) {
   const locale = new URL(request.url).searchParams.get("lang") === "en" ? "en" : "ko";
   const description =
     locale === "en"
-      ? "A private coffee bean and tasting journal"
-      : "나만의 커피 원두와 테이스팅 기록장";
+      ? "A coffee bean journal with tasting notes and origin guides"
+      : "커피 원두와 테이스팅 노트, 산지 정보를 기록하는 서비스";
 
   return Response.json(
     {

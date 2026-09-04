@@ -29,7 +29,7 @@ export function TopBar({ user }: TopBarProps) {
         <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-3 sm:min-h-[4.5rem] sm:flex-nowrap sm:px-6 sm:py-2">
           <Link
             href={`/${locale}`}
-            className="w-fit focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+            className="w-fit focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             <BeanmapMark />
           </Link>
@@ -40,20 +40,20 @@ export function TopBar({ user }: TopBarProps) {
             <Link
               href={`/${locale}/origins`}
               aria-current={appPathname.startsWith("/origins") ? "page" : undefined}
-              className="inline-flex min-h-11 items-center rounded-sm px-1.5 text-xs font-semibold text-brown-light transition-colors hover:bg-surface hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 sm:px-2 sm:text-sm"
+              className="inline-flex min-h-11 items-center rounded-sm px-1.5 text-xs font-semibold text-brown-light transition-colors hover:bg-surface hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:px-2 sm:text-sm"
             >
               {t("origins")}
             </Link>
             <LocaleSwitcher locale={locale} />
             <Link
               href={`/${locale}/login`}
-              className="inline-flex min-h-11 items-center rounded-sm px-1.5 text-xs font-semibold text-brown-light transition-colors hover:bg-surface hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 sm:px-2 sm:text-sm"
+              className="inline-flex min-h-11 items-center whitespace-nowrap rounded-sm px-1.5 text-xs font-semibold text-brown-light transition-colors hover:bg-surface hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:px-2 sm:text-sm"
             >
               {tAuth("login")}
             </Link>
             <Link
               href={`/${locale}/signup`}
-              className={buttonClassName({ size: "sm" })}
+              className={buttonClassName({ size: "sm", className: "whitespace-nowrap" })}
             >
               {tAuth("signup")}
             </Link>
@@ -68,26 +68,31 @@ export function TopBar({ user }: TopBarProps) {
   }
 
   const links = [
-    { href: "/explore", label: t("explore") },
-    { href: "/beans/new", label: t("add") },
+    { href: "/explore", label: t("explore"), prefetch: false },
+    { href: "/beans/new", label: t("add"), prefetch: false },
     { href: "/origins", label: t("origins") },
-    { href: "/stats", label: t("stats") },
-    { href: "/settings", label: t("settings") },
+    { href: "/stats", label: t("stats"), prefetch: false },
+    { href: "/settings", label: t("settings"), prefetch: false },
   ];
 
   return (
     <header className="sticky top-0 z-40 hidden border-b border-border bg-cream/95 backdrop-blur-sm md:block">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
-        <Link href={`/${locale}/explore`} className="focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40">
+        <Link
+          href={`/${locale}/explore`}
+          prefetch={false}
+          className="focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+        >
           <BeanmapMark compact />
         </Link>
         <nav className="flex items-center gap-1">
-          {links.map(({ href, label }, index) => {
+          {links.map(({ href, label, prefetch }, index) => {
             const isActive = appPathname === href || appPathname.startsWith(href + "/");
             return (
               <Link
                 key={href}
                 href={`/${locale}${href}`}
+                prefetch={prefetch}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
                   "group relative border-b-2 border-transparent px-3 py-2 text-sm font-semibold transition-colors",
@@ -104,9 +109,10 @@ export function TopBar({ user }: TopBarProps) {
           <div className="ml-2 border-l border-border pl-3">
             <Link
               href={`/${locale}/settings`}
+              prefetch={false}
               aria-label={`${t("account")}: ${user.displayName}`}
               title={user.displayName}
-              className="flex items-center gap-2 rounded-sm border border-transparent px-1.5 py-1 transition-colors hover:border-border hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+              className="flex items-center gap-2 rounded-sm border border-transparent px-1.5 py-1 transition-colors hover:border-border hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border border-brown bg-brown font-mono text-xs font-semibold text-cream">
                 {user.displayName.slice(0, 1).toLocaleUpperCase()}

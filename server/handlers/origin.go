@@ -259,13 +259,7 @@ func (h *OriginHandler) UserSubregions(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	collect := func(table string) [][]string {
-		query := "SELECT origin_subregions FROM " + table +
-			" WHERE user_id = $1 AND origin_country = $2 AND origin_subregions <> '{}' LIMIT 200"
-		args := []interface{}{userID, country}
-		if region != "" {
-			query += " AND origin_region = $3"
-			args = append(args, region)
-		}
+		query, args := buildUserSubregionsQuery(table, userID, country, region)
 		rows, err := db.Query(ctx, query, args...)
 		if err != nil {
 			return nil
@@ -305,6 +299,18 @@ func (h *OriginHandler) UserSubregions(c *gin.Context) {
 		return strings.Join(result[i], " ") < strings.Join(result[j], " ")
 	})
 	c.JSON(http.StatusOK, result)
+}
+
+func buildUserSubregionsQuery(table, userID, country, region string) (string, []interface{}) {
+	query := "SELECT origin_subregions FROM " + table +
+		" WHERE user_id = $1 AND origin_country = $2 AND origin_subregions <> '{}'"
+	args := []interface{}{userID, country}
+	if region != "" {
+		query += " AND origin_region = $3"
+		args = append(args, region)
+	}
+	query += " LIMIT 200"
+	return query, args
 }
 
 func lowerAll(items []string) []string {

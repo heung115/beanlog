@@ -40,11 +40,10 @@ function SectionCard({
       style={{ animationDelay: `${delay}ms` }}
     >
       <h2
-        className={`mb-4 flex items-center gap-2 font-display text-lg font-bold tracking-tight ${
+        className={`mb-4 font-display text-lg font-bold tracking-tight ${
           danger ? "text-red-700" : "text-brown"
         }`}
       >
-        {danger && <span className="font-mono text-[10px] tracking-widest text-red-700">CAUTION /</span>}
         {title}
       </h2>
       {children}
@@ -186,14 +185,10 @@ export default function SettingsPage() {
       `}</style>
 
       {/* ---------- header ---------- */}
-      <header className="settings-rise border-y-2 border-brown py-9 md:grid md:grid-cols-[1fr_14rem] md:items-end md:py-12">
-        <div>
-          <p className="journal-kicker">ACCOUNT LEDGER / SETTINGS</p>
-          <h1 className="display-title mt-3 text-5xl text-brown md:text-7xl">
+      <header className="settings-rise border-y-2 border-brown py-9 md:py-12">
+        <h1 className="display-title text-5xl text-brown md:text-7xl">
           {t("title")}
-          </h1>
-        </div>
-        <p className="folio-label mt-5 border-l-2 border-accent pl-4 md:mt-0">PROFILE · DATA · ACCESS</p>
+        </h1>
       </header>
 
       {/* ---------- profile ---------- */}

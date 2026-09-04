@@ -42,6 +42,41 @@ test("login stays signed in by default", async ({ browser }) => {
   await context.close();
 });
 
+test("signed-in explore does not eagerly prefetch authenticated routes", async ({
+  browser,
+}) => {
+  const { session } = await signIn(qaUser.email, qaUser.password);
+  const context = await browser.newContext();
+  await context.addCookies(encodeAuthCookies(session).cookies);
+  const page = await context.newPage();
+  const prefetchedRoutes: string[] = [];
+
+  page.on("request", (request) => {
+    if (request.headers()["next-router-prefetch"] !== "1") return;
+    const url = new URL(request.url());
+    if (
+      url.origin === new URL(qaBaseURL).origin &&
+      /^\/(?:ko|en)\/(?:explore|beans(?:\/|$)|stats(?:\/|$)|settings(?:\/|$))/.test(
+        url.pathname
+      )
+    ) {
+      prefetchedRoutes.push(url.pathname);
+    }
+  });
+
+  await page.goto(`${qaBaseURL}/ko/explore`);
+  await expect(page).toHaveURL(/\/ko\/explore$/);
+  await expect(page.locator("[data-bean-card]").first()).toBeVisible();
+
+  // Next schedules viewport Link prefetches immediately after hydration.
+  await page.waitForTimeout(1_500);
+  expect([...new Set(prefetchedRoutes)]).toEqual([]);
+
+  await page.locator('[data-bean-card] a[href*="/beans/"]').first().click();
+  await expect(page).toHaveURL(/\/ko\/beans\/(?!new(?:[/?#]|$))[^/?#]+/);
+  await context.close();
+});
+
 test("opting out keeps authentication only for the browser session", async ({
   browser,
 }) => {

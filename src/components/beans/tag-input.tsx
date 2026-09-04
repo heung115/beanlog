@@ -143,7 +143,7 @@ export function TagInput({ value, onChange }: TagInputProps) {
                       aria-pressed={selected}
                       className={cn(
                         "rounded-sm border px-2.5 py-1 text-xs transition-all duration-150",
-                        "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
+                        "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
                         selected
                           ? "border-brown bg-brown text-cream shadow-sm"
                           : "border-border bg-surface text-brown-medium hover:border-accent hover:text-brown"

@@ -85,6 +85,15 @@ body {
   line-height: 1.6;
 }
 
+html[lang="ko"] body {
+  overflow-wrap: break-word;
+  word-break: keep-all;
+}
+
+html[lang="ko"] :where(p, h1, h2, h3, h4, dd) {
+  text-wrap: pretty;
+}
+
 body::before {
   position: fixed;
   inset: 0;

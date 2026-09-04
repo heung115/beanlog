@@ -101,7 +101,7 @@ export default async function OriginDetailPage({
       />
       <Link
         href={`/${locale}/origins`}
-        className="group inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-brown-light transition-colors hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+        className="group inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-brown-light transition-colors hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         <svg
           aria-hidden="true"
@@ -140,8 +140,7 @@ export default async function OriginDetailPage({
       >
         <div className="flex items-end justify-between gap-4 border-b-2 border-brown pb-4">
           <div>
-            <p className="journal-kicker">01 / profile</p>
-            <h2 className="mt-2 font-display text-2xl font-bold text-brown">{t("cupProfile")}</h2>
+            <h2 className="font-display text-2xl font-bold text-brown">{t("cupProfile")}</h2>
           </div>
           <p className="hidden text-xs text-brown-light sm:block">{t("cupProfileHint")}</p>
         </div>
@@ -164,8 +163,7 @@ export default async function OriginDetailPage({
         style={{ animationDelay: "100ms" }}
       >
         <div className="bg-surface-warm p-5 md:p-7">
-          <p className="journal-kicker">02 / terrain</p>
-          <h2 className="mt-2 font-display text-2xl font-bold text-brown">{t("growingConditions")}</h2>
+          <h2 className="font-display text-2xl font-bold text-brown">{t("growingConditions")}</h2>
         </div>
         <dl className="grid grid-cols-2 border-t border-border md:border-l md:border-t-0">
           <div className="p-5 md:p-7">
@@ -193,8 +191,7 @@ export default async function OriginDetailPage({
       >
         <div className="flex items-end justify-between gap-4 border-b-2 border-brown pb-4">
           <div>
-            <p className="journal-kicker">03 / regions</p>
-            <h2 className="mt-2 font-display text-2xl font-bold text-brown">{t("regions")}</h2>
+            <h2 className="font-display text-2xl font-bold text-brown">{t("regions")}</h2>
             <p className="mt-1 text-sm text-brown-light">{t("regionsHint")}</p>
           </div>
           <span className="shrink-0 text-xs tabular-nums text-brown-light">

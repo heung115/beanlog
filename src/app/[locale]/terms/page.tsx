@@ -40,7 +40,6 @@ function KoreanTerms() {
   return (
     <LegalDocument
       locale="ko"
-      eyebrow="Terms"
       title="서비스 이용약관"
       description="beanmap을 편안하게 이용하는 데 필요한 최소한의 기준을 정했습니다. 중요한 내용은 계정, 기록의 소유권, 서비스 변경과 탈퇴에 관한 사항입니다."
       effectiveDate={legal.effectiveDate}
@@ -102,7 +101,6 @@ function EnglishTerms() {
   return (
     <LegalDocument
       locale="en"
-      eyebrow="Terms"
       title="Terms of Service"
       description="These terms set the minimum rules for using beanmap, including accounts, ownership of your journal, service changes, and account deletion."
       effectiveDate={legal.effectiveDate}

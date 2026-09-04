@@ -61,8 +61,7 @@ export default function SignupPage() {
   return (
     <AuthShell>
         <div className="mb-9 border-b-2 border-brown pb-5">
-          <p className="journal-kicker">NEW ARCHIVE / 02</p>
-          <h1 className="mt-3 font-display text-4xl font-bold tracking-[-0.04em] text-brown">
+          <h1 className="font-display text-4xl font-bold tracking-[-0.04em] text-brown">
             {brand.name}
           </h1>
           <p className="mt-2 text-sm text-brown-light">{t("signupTitle")}</p>

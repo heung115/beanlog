@@ -6,6 +6,7 @@ import {
   SESSION_ONLY_COOKIE_NAME,
   SESSION_ONLY_COOKIE_VALUE,
   shouldPersistSession,
+  shouldUseSecureCookies,
 } from "./session-persistence";
 
 type ClientOptions = {
@@ -73,6 +74,10 @@ export async function setSessionPersistencePreference(
     httpOnly: true,
     path: "/",
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: shouldUseSecureCookies(
+      process.env.NODE_ENV,
+      process.env.NEXT_PUBLIC_APP_URL,
+      process.env.QA_ALLOW_INSECURE_LOOPBACK_AUTH
+    ),
   });
 }

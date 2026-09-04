@@ -47,7 +47,7 @@ test("local recovery expires every auth-cookie chunk and preserves other cookies
     },
   };
 
-  clearAuthCookies(request, response, "sb-localhost-auth-token");
+  clearAuthCookies(request, response, "sb-localhost-auth-token", false);
 
   assert.deepEqual([...requestCookies], [["theme", "dark"]]);
   assert.deepEqual(
@@ -62,5 +62,6 @@ test("local recovery expires every auth-cookie chunk and preserves other cookies
     assert.equal(cookie.value, "");
     assert.equal(cookie.options.maxAge, 0);
     assert.equal(cookie.options.path, "/");
+    assert.equal(cookie.options.secure, false);
   }
 });

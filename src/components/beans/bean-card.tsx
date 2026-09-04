@@ -41,8 +41,7 @@ export function BeanCard({ bean, view = "grid" }: BeanCardProps) {
       )}
     >
       <div className="relative z-10 flex h-full flex-1 flex-col">
-        <div className="mb-4 flex items-center justify-between border-b border-border pb-3">
-          <span className="folio-label">TASTING RECORD</span>
+        <div className="mb-4 flex items-center justify-end border-b border-border pb-3">
           <time className="folio-label" dateTime={bean.consumed_at}>
             {formatDate(bean.consumed_at, locale)}
           </time>
@@ -53,7 +52,8 @@ export function BeanCard({ bean, view = "grid" }: BeanCardProps) {
             <h3 className="line-clamp-2 font-display text-xl font-bold leading-[1.15] tracking-[-0.025em] text-brown transition-colors duration-150 group-hover:text-accent">
               <Link
                 href={`/${locale}/beans/${bean.id}`}
-                className="rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+                prefetch={false}
+                className="rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {bean.name}
               </Link>

@@ -27,6 +27,7 @@
     "qa:seed": "node scripts/seed-unspecialty-test-account.mjs",
     "staging:up": "node scripts/staging.mjs up",
     "staging:qa": "node scripts/staging.mjs qa",
+    "staging:qa:production": "node scripts/staging.mjs qa:production",
     "staging:status": "node scripts/staging.mjs status",
     "staging:logs": "node scripts/staging.mjs logs",
     "staging:down": "node scripts/staging.mjs down"

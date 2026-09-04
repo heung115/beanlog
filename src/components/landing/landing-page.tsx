@@ -27,29 +27,35 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
   };
 
   return (
-    <div className="min-h-screen overflow-hidden bg-cream">
+    <div className="min-h-screen overflow-x-clip bg-cream">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }}
       />
 
       <header className="relative z-20 border-b border-border bg-cream/95 backdrop-blur-sm">
-        <div className="mx-auto flex min-h-[4.5rem] w-full max-w-6xl items-center justify-between gap-3 px-4 py-2 md:px-6">
+        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-3 sm:min-h-[4.5rem] sm:flex-nowrap sm:px-6 sm:py-2">
           <Link
             href={`/${locale}`}
-            className="shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+            className="w-fit shrink-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
             <BeanmapMark />
           </Link>
-          <nav aria-label={copy.navigation} className="flex min-w-0 items-center justify-end gap-1 sm:gap-2">
+          <nav
+            aria-label={copy.navigation}
+            className="order-2 flex w-full items-center justify-between gap-1 border-t border-border-light pt-2 sm:order-none sm:w-auto sm:justify-end sm:border-t-0 sm:pt-0"
+          >
             <LocaleSwitcher locale={locale} />
             <Link
               href={`/${locale}/login`}
-              className="inline-flex min-h-11 items-center px-2 text-sm font-semibold text-brown-light transition-colors hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+              className="inline-flex min-h-11 items-center whitespace-nowrap rounded-sm px-2 text-sm font-semibold text-brown-light transition-colors hover:bg-surface hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               {copy.login}
             </Link>
-            <Link href={`/${locale}/signup`} className={buttonClassName({ size: "sm" })}>
+            <Link
+              href={`/${locale}/signup`}
+              className={buttonClassName({ size: "sm", className: "whitespace-nowrap" })}
+            >
               {copy.signup}
             </Link>
           </nav>
@@ -57,16 +63,11 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
       </header>
 
       <main id="main-content">
-        <section className="relative border-b border-border">
-          <OriginContours className="pointer-events-none absolute -right-56 -top-28 h-[42rem] w-[52rem] opacity-60 md:-right-24 md:-top-16" />
-          <div className="relative mx-auto grid w-full max-w-6xl gap-12 px-4 pb-16 pt-12 md:grid-cols-[minmax(0,1.04fr)_minmax(22rem,0.72fr)] md:items-center md:gap-20 md:px-6 md:pb-24 md:pt-20">
+        <section data-landing-section="hero" className="relative border-b border-border">
+          <OriginContours className="pointer-events-none absolute -right-56 -top-28 h-[42rem] w-[52rem] opacity-35 md:-right-24 md:-top-16 md:opacity-60" />
+          <div className="relative mx-auto grid w-full max-w-6xl gap-12 px-4 pb-16 pt-12 md:px-6 md:pb-24 md:pt-20 lg:grid-cols-[minmax(0,1.04fr)_minmax(22rem,0.72fr)] lg:items-center lg:gap-20">
             <div>
-              <div className="flex items-center gap-4">
-                <p className="journal-kicker">{copy.eyebrow}</p>
-                <span aria-hidden="true" className="h-px flex-1 bg-border" />
-                <span className="folio-label">EST. 2026</span>
-              </div>
-              <h1 className="display-title mt-7 max-w-3xl text-6xl tracking-[-0.055em] text-brown md:text-8xl">
+              <h1 className="display-title max-w-3xl text-6xl tracking-[-0.055em] text-brown md:text-8xl">
                 {copy.title}
               </h1>
               <p className="mt-7 max-w-[39rem] text-base leading-7 text-brown-medium md:text-lg md:leading-8">
@@ -83,13 +84,12 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
               </div>
             </div>
 
-            <div className="relative mx-auto w-full max-w-[28rem] md:mx-0 md:justify-self-end">
+            <div className="relative mx-auto w-full max-w-[28rem] lg:mx-0 lg:justify-self-end">
               <div aria-hidden="true" className="absolute -inset-x-3 -bottom-3 top-4 rotate-[1.8deg] border border-border bg-surface-warm" />
               <article className="paper-sheet relative p-5 md:p-7" aria-label={copy.example.ariaLabel}>
                 <div className="flex items-start justify-between gap-6 border-b-2 border-brown pb-4">
                   <div>
                     <p className="journal-kicker">{copy.example.label}</p>
-                    <p className="folio-label mt-1">ARCHIVE / 001</p>
                   </div>
                   <time dateTime="2026-08-12" className="folio-label">{copy.example.date}</time>
                 </div>
@@ -124,23 +124,9 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
               </article>
             </div>
           </div>
-
-          <dl className="relative mx-auto grid w-full max-w-6xl border-t-2 border-brown px-4 md:grid-cols-3 md:px-6">
-            {copy.quickFacts.map(([term, description], index) => (
-              <div key={term} className="grid grid-cols-[3rem_1fr] gap-3 border-b border-border py-5 last:border-b-0 md:border-b-0 md:border-r md:px-5 md:first:pl-0 md:last:border-r-0 md:last:pr-0">
-                <dt className="font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-accent">
-                  {String(index + 1).padStart(2, "0")}<span className="sr-only"> {term}</span>
-                </dt>
-                <dd>
-                  <span className="block text-sm font-bold text-brown">{term}</span>
-                  <span className="mt-1 block text-xs leading-5 text-brown-medium">{description}</span>
-                </dd>
-              </div>
-            ))}
-          </dl>
         </section>
 
-        <section className="bg-surface">
+        <section data-landing-section="features" className="bg-surface">
           <div className="mx-auto w-full max-w-6xl px-4 py-16 md:px-6 md:py-24">
             <div className="grid gap-5 md:grid-cols-[minmax(0,0.8fr)_minmax(20rem,0.42fr)] md:items-end md:gap-20">
               <div>
@@ -162,7 +148,7 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
           </div>
         </section>
 
-        <section className="relative border-y border-border bg-surface-warm">
+        <section data-landing-section="origins" className="relative border-y border-border bg-surface-warm">
           <OriginContours className="pointer-events-none absolute -left-52 bottom-[-10rem] h-[40rem] w-[50rem] rotate-180 opacity-35" />
           <div className="relative mx-auto grid w-full max-w-6xl gap-12 px-4 py-16 md:grid-cols-[minmax(19rem,0.6fr)_minmax(0,1fr)] md:gap-20 md:px-6 md:py-24">
             <div className="md:sticky md:top-28 md:self-start">
@@ -182,7 +168,7 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
                   <li key={origin.country} className="ledger-row">
                     <Link
                       href={`/${locale}/origins/${originSlug(origin.country)}`}
-                      className="group grid min-h-36 grid-cols-[3.25rem_1fr_auto] items-center gap-3 py-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+                      className="group grid min-h-36 grid-cols-[3.25rem_1fr_auto] items-center gap-3 py-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                       aria-label={`${countryName}: ${copy.origins.viewCountry}`}
                     >
                       <span className="font-display text-3xl italic text-accent">{String(index + 1).padStart(2, "0")}</span>
@@ -195,12 +181,11 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
                   </li>
                 );
               })}
-              <li className="py-4 text-right"><span className="folio-label">FIELD NOTES / 20 ORIGINS</span></li>
             </ol>
           </div>
         </section>
 
-        <section className="mx-auto w-full max-w-6xl px-4 py-16 md:px-6 md:py-24">
+        <section data-landing-section="steps" className="mx-auto w-full max-w-6xl px-4 py-16 md:px-6 md:py-24">
           <div className="grid gap-8 md:grid-cols-[18rem_1fr] md:gap-20">
             <div>
               <p className="journal-kicker">{copy.steps.eyebrow}</p>
@@ -209,7 +194,9 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
             <ol className="border-t-2 border-brown">
               {copy.steps.items.map(([title, description], index) => (
                 <li key={title} className="ledger-row grid gap-3 py-6 md:grid-cols-[4rem_13rem_1fr] md:items-baseline md:gap-6">
-                  <span className="folio-label">STEP {String(index + 1).padStart(2, "0")}</span>
+                  <span className="folio-label">
+                    {isKorean ? "단계" : "STEP"} {String(index + 1).padStart(2, "0")}
+                  </span>
                   <h3 className="font-display text-xl font-bold text-brown">{title}</h3>
                   <p className="text-sm leading-6 text-brown-medium">{description}</p>
                 </li>
@@ -218,7 +205,7 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
           </div>
         </section>
 
-        <section className="mx-auto w-full max-w-6xl px-4 py-16 md:px-6 md:py-24">
+        <section data-landing-section="faq" className="mx-auto w-full max-w-6xl px-4 py-16 md:px-6 md:py-24">
           <div className="grid gap-10 md:grid-cols-[18rem_1fr] md:gap-20">
             <div>
               <p className="journal-kicker">{copy.faq.eyebrow}</p>

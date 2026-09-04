@@ -194,7 +194,7 @@ function Segmented<T extends string>({
           onClick={() => onChange(option.value)}
           className={cn(
             "min-h-11 rounded-sm border px-3 py-2 text-sm font-semibold transition-all duration-150",
-            "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
+            "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
             value === option.value
               ? "border-brown bg-brown text-cream shadow-[2px_2px_0_var(--color-accent-light)]"
               : "border-transparent text-brown-light hover:border-border hover:text-brown"
@@ -687,7 +687,7 @@ export function BeanForm({
       {/* ── Quick section ─────────────────────────────── */}
       <section className="paper-sheet paper-sheet-feature animate-rise p-5 md:p-8">
         <div className="mb-7 flex items-center justify-between border-b-2 border-brown pb-4">
-          <p className="journal-kicker">FIELD NOTE / ESSENTIALS</p>
+          <p className="journal-kicker">{t("basicInfo")}</p>
           <span className="font-display text-3xl italic text-accent">01</span>
         </div>
         <div className="flex flex-col gap-5">
@@ -924,7 +924,7 @@ export function BeanForm({
         {/* Roast / place */}
         <div className="mt-8 flex flex-col gap-5 border-t-2 border-brown pt-6">
           <div className="flex items-center justify-between">
-            <p className="journal-kicker">ROAST &amp; PLACE</p>
+            <p className="journal-kicker">{t("roastAndPlace")}</p>
             <span className="font-display text-2xl italic text-accent">02</span>
           </div>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
@@ -992,7 +992,7 @@ export function BeanForm({
         {/* Score + note */}
         <div className="mt-8 flex flex-col gap-6 border-t-2 border-brown pt-6">
           <div className="flex items-center justify-between">
-            <p className="journal-kicker">CUP IMPRESSION</p>
+            <p className="journal-kicker">{t("evaluation")}</p>
             <span className="font-display text-2xl italic text-accent">03</span>
           </div>
           <ScoreSlider

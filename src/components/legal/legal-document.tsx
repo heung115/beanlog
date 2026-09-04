@@ -2,14 +2,12 @@ import Link from "next/link";
 
 export function LegalDocument({
   locale,
-  eyebrow,
   title,
   description,
   effectiveDate,
   children,
 }: {
   locale: "ko" | "en";
-  eyebrow: string;
   title: string;
   description: string;
   effectiveDate: string;
@@ -18,16 +16,15 @@ export function LegalDocument({
   return (
     <article className="mx-auto max-w-5xl pb-12 pt-4 md:pb-16 md:pt-8">
       <Link
-        href={`/${locale}/login`}
-        className="inline-flex min-h-11 items-center text-sm font-medium text-brown-light transition-colors hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+        href={`/${locale}`}
+        className="inline-flex min-h-11 items-center text-sm font-medium text-brown-light transition-colors hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
-        ← {locale === "ko" ? "로그인으로" : "Back to login"}
+        ← {locale === "ko" ? "홈으로" : "Back to home"}
       </Link>
 
       <header className="mt-5 border-y-2 border-brown py-10 md:grid md:grid-cols-[1fr_15rem] md:items-end md:py-14">
         <div>
-        <p className="journal-kicker uppercase tracking-[0.14em]">{eyebrow}</p>
-        <h1 className="display-title mt-3 text-5xl text-brown md:text-7xl">
+        <h1 className="display-title text-5xl text-brown md:text-7xl">
           {title}
         </h1>
         <p className="mt-4 max-w-2xl text-sm leading-7 text-brown-light">{description}</p>

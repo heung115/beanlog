@@ -124,6 +124,72 @@ test("public landing explains the product and uses the operator theme", async ({
   );
 });
 
+test("@mobile landing stays readable at 320px", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 700 });
+  await page.goto("/ko");
+
+  const navigation = page.getByRole("navigation", { name: "언어 및 계정" });
+  const loginLink = navigation.getByRole("link", { name: "로그인" });
+  const signupLink = navigation.getByRole("link", { name: "회원가입" });
+  await expect(loginLink).toBeVisible();
+  await expect(signupLink).toBeVisible();
+
+  const layout = await page.evaluate(() => {
+    const login = document.querySelector<HTMLElement>('header a[href="/ko/login"]');
+    const signup = document.querySelector<HTMLElement>('header a[href="/ko/signup"]');
+    const title = document.querySelector<HTMLElement>("h1");
+    if (!login || !signup || !title) throw new Error("Missing landing header controls");
+
+    const textLineCount = (element: HTMLElement) => {
+      const range = document.createRange();
+      range.selectNodeContents(element);
+      return range.getClientRects().length;
+    };
+
+    return {
+      documentOverflow:
+        document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      loginLines: textLineCount(login),
+      signupLines: textLineCount(signup),
+      titleFontSize: Number.parseFloat(getComputedStyle(title).fontSize),
+      titleRight: title.getBoundingClientRect().right,
+      viewportWidth: window.innerWidth,
+      wordBreak: getComputedStyle(document.body).wordBreak,
+      sections: Array.from(
+        document.querySelectorAll<HTMLElement>("[data-landing-section]")
+      ).map((section) => section.dataset.landingSection),
+    };
+  });
+
+  expect(layout.documentOverflow).toBeLessThanOrEqual(1);
+  expect(layout.loginLines).toBe(1);
+  expect(layout.signupLines).toBe(1);
+  expect(layout.titleFontSize).toBeLessThanOrEqual(60);
+  expect(layout.titleRight).toBeLessThanOrEqual(layout.viewportWidth);
+  expect(layout.wordBreak).toBe("keep-all");
+  expect(layout.sections).toEqual(["hero", "features", "origins", "steps", "faq"]);
+  await expect(page.getByText("EST. 2026")).toHaveCount(0);
+  await expect(page.getByText("ARCHIVE / 001")).toHaveCount(0);
+
+  await page.setViewportSize({ width: 768, height: 900 });
+  const tabletLayout = await page.evaluate(() => {
+    const title = document.querySelector<HTMLElement>("h1");
+    if (!title) throw new Error("Missing landing title");
+    const range = document.createRange();
+    range.selectNodeContents(title);
+    return {
+      documentOverflow:
+        document.documentElement.scrollWidth - document.documentElement.clientWidth,
+      titleLines: range.getClientRects().length,
+      titleRight: title.getBoundingClientRect().right,
+      viewportWidth: window.innerWidth,
+    };
+  });
+  expect(tabletLayout.documentOverflow).toBeLessThanOrEqual(1);
+  expect(tabletLayout.titleLines).toBe(1);
+  expect(tabletLayout.titleRight).toBeLessThanOrEqual(tabletLayout.viewportWidth);
+});
+
 test("guest record stays in the browser and loads after login", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("link", { name: "비회원으로 기록하기" }).click();
@@ -287,6 +353,15 @@ test("search handles PostgREST punctuation as plain text and recovers", async ({
 });
 
 test("origin hub opens flavor and regional guidance without card shortcuts", async ({ page }) => {
+  const prefetchedOriginDetails: string[] = [];
+  page.on("request", (request) => {
+    if (request.headers()["next-router-prefetch"] !== "1") return;
+    const url = new URL(request.url());
+    if (/^\/ko\/origins\/[^/]+$/.test(url.pathname)) {
+      prefetchedOriginDetails.push(url.pathname);
+    }
+  });
+
   await login(page);
   await page.getByRole("searchbox").fill("#12 에티오피아");
   await expect(page.getByText("1개 기록")).toBeVisible();
@@ -299,6 +374,11 @@ test("origin hub opens flavor and regional guidance without card shortcuts", asy
   await expect(page).toHaveURL(/\/ko\/origins$/);
   await expect(page.getByRole("heading", { level: 1, name: "커피 산지 정보" })).toBeVisible();
   await expect(page.getByText("20개 산지")).toBeVisible();
+
+  // A hub with 20 links must not turn viewport prefetching into 20
+  // authenticated layout and middleware requests before the user clicks.
+  await page.waitForTimeout(1_000);
+  expect([...new Set(prefetchedOriginDetails)]).toEqual([]);
 
   const originGuideLink = page.getByRole("link", {
     name: "에티오피아 자세히 보기",
@@ -752,7 +832,9 @@ test("@mobile bean detail keeps cup-note order without horizontal overflow", asy
   await login(page);
   await page.getByRole("searchbox").fill("#11 브라질");
   const beanCard = page.locator("[data-bean-card]").filter({ hasText: "#11 브라질" });
+  await expect(beanCard).toBeVisible();
   await beanCard.locator('a[href*="/beans/"]').click();
+  await expect(page).toHaveURL(/\/ko\/beans\/[^/]+$/);
 
   await expect(page.getByTestId("bean-cup-notes")).toContainText("초콜릿");
   const followsExpectedOrder = await page.evaluate(() => {

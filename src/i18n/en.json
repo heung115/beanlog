@@ -1,7 +1,6 @@
 {
   "app": {
-    "name": "beanmap",
-    "tagline": "My Coffee Bean Journal"
+    "name": "beanmap"
   },
   "nav": {
     "explore": "Journal",
@@ -49,17 +48,6 @@
     "legalAgreement": "I am at least 14 years old, agree to the <terms>Terms of Service</terms>, and have reviewed the <privacy>Privacy Policy</privacy>.",
     "socialLegalAgreement": "By continuing with social sign-in, I confirm I am at least 14, agree to the <terms>Terms</terms>, and have reviewed the <privacy>Privacy Policy</privacy>."
   },
-  "landing": {
-    "hero": "Remember every cup",
-    "heroSub": "Log bean details, rate your brews, and explore your coffee journey by origin, process, and more.",
-    "start": "Get started",
-    "feature1Title": "Quick logging",
-    "feature1Desc": "Five seconds is all it takes. Name, origin, score — done.",
-    "feature2Title": "Your coffee map",
-    "feature2Desc": "See which origins and processes you love at a glance.",
-    "feature3Title": "Detailed tasting",
-    "feature3Desc": "Aroma, acidity, body, sweetness, aftertaste, balance — rate them all."
-  },
   "guest": {
     "title": "Record without signing in",
     "storageNotice": "This record is saved temporarily in this browser only. Clearing browser data will remove it.",
@@ -75,6 +63,10 @@
   "beans": {
     "newTitle": "Log a bean",
     "editTitle": "Edit record",
+    "basicInfo": "Basic info",
+    "roastAndPlace": "Roast and place",
+    "evaluation": "Rating",
+    "classification": "Classification",
     "name": "Coffee name",
     "namePlaceholder": "e.g. Ethiopia Yirgacheffe G1 Gesha Natural",
     "roastery": "Roastery",
@@ -179,6 +171,7 @@
   },
   "explore": {
     "title": "beanlog",
+    "recordCount": "Record count",
     "empty": "No records yet",
     "emptySub": "Log your first coffee",
     "addFirst": "Add first record",
@@ -204,7 +197,7 @@
     "loadMore": "Load more"
   },
   "origins": {
-    "guide": "COFFEE ORIGIN GUIDE",
+    "guide": "Origin guide",
     "indexTitle": "Coffee origins",
     "indexIntro": "Compare typical flavors and growing regions, then explore any origin in detail.",
     "indexCount": "{count} origins",

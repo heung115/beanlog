@@ -4,12 +4,10 @@ interface LandingCopy {
   navigation: string;
   login: string;
   signup: string;
-  eyebrow: string;
   title: string;
   description: string;
   primaryAction: string;
   secondaryAction: string;
-  quickFacts: readonly (readonly [string, string])[];
   example: {
     label: string;
     ariaLabel: string;
@@ -48,20 +46,14 @@ interface LandingCopy {
 
 export const landingCopy: Record<LandingLocale, LandingCopy> = {
   ko: {
-    navigation: "첫 화면",
+    navigation: "언어 및 계정",
     login: "로그인",
     signup: "회원가입",
-    eyebrow: "커피 기록",
     title: "beanlog",
     description:
       "beanmap은 로스터리·산지·품종·가공 방식·테이스팅 노트·점수를 한곳에 남기고, 필요할 때 다시 찾는 커피 원두 기록장입니다.",
     primaryAction: "비회원으로 기록하기",
     secondaryAction: "회원가입",
-    quickFacts: [
-      ["기록", "원두 정보 · 마신 날짜 · 점수 · 테이스팅 노트"],
-      ["검색", "커피 · 로스터리 · 산지 · 메모"],
-      ["통계", "산지 · 가공 방식 · 품종 · 월별 기록"],
-    ],
     example: {
       label: "기록 예시",
       ariaLabel: "beanmap 커피 기록 예시",
@@ -139,20 +131,14 @@ export const landingCopy: Record<LandingLocale, LandingCopy> = {
     },
   },
   en: {
-    navigation: "Home",
+    navigation: "Language and account",
     login: "Log in",
     signup: "Sign up",
-    eyebrow: "Coffee records",
     title: "beanlog",
     description:
       "beanmap is a coffee bean journal for saving roasters, origins, varieties, processing methods, tasting notes, and scores—then finding them when you need them.",
     primaryAction: "Record without an account",
     secondaryAction: "Sign up",
-    quickFacts: [
-      ["Record", "Bean details · brew date · scores · tasting notes"],
-      ["Search", "Coffee · roaster · origin · note"],
-      ["Stats", "Origin · process · variety · monthly records"],
-    ],
     example: {
       label: "Sample entry",
       ariaLabel: "Sample coffee entry in beanmap",

@@ -36,7 +36,8 @@ function isAuthCookie(name: string, storageKey: string) {
 export function clearAuthCookies(
   request: NextRequest,
   response: NextResponse,
-  storageKey: string
+  storageKey: string,
+  secure: boolean
 ) {
   for (const cookie of request.cookies.getAll()) {
     if (!isAuthCookie(cookie.name, storageKey)) continue;
@@ -47,7 +48,7 @@ export function clearAuthCookies(
       maxAge: 0,
       path: "/",
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
+      secure,
     });
   }
 }

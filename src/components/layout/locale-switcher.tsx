@@ -67,7 +67,7 @@ export function LocaleSwitcher({
             aria-label={labels[locale]}
             aria-current={isCurrent ? "page" : undefined}
             className={cn(
-              "inline-flex min-h-9 items-center rounded-sm px-1.5 text-xs font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 sm:px-2",
+              "inline-flex min-h-9 items-center rounded-sm px-1.5 text-xs font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:px-2",
               isCurrent
                 ? "bg-brown text-cream"
                 : "text-brown-light hover:bg-cream-dark hover:text-brown"

@@ -39,7 +39,6 @@ function KoreanPrivacy() {
   return (
     <LegalDocument
       locale="ko"
-      eyebrow="Privacy"
       title="개인정보 처리방침"
       description="beanmap은 커피 기록 서비스를 제공하는 데 필요한 정보만 처리합니다. 광고나 행동 추적을 위한 쿠키는 사용하지 않습니다."
       effectiveDate={legal.effectiveDate}
@@ -169,7 +168,6 @@ function EnglishPrivacy() {
   return (
     <LegalDocument
       locale="en"
-      eyebrow="Privacy"
       title="Privacy Policy"
       description="beanmap processes only the information needed to provide your coffee journal. We do not use advertising or behavioral-tracking cookies."
       effectiveDate={legal.effectiveDate}

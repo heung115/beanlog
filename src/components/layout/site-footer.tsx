@@ -41,7 +41,7 @@ export function SiteFooter({
           wide ? "max-w-6xl" : "max-w-6xl"
         } ${mobileNavOffset ? "pb-24 md:pb-6" : ""}`}
       >
-        <span className="font-mono font-semibold uppercase tracking-[0.08em] text-brown">© {brand.name} · private tasting archive</span>
+        <span className="font-mono font-semibold uppercase tracking-[0.08em] text-brown">© {brand.name}</span>
         <nav
           aria-label={copy.navigation}
           className="flex flex-wrap items-center gap-x-4 gap-y-2"

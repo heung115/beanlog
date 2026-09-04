@@ -151,6 +151,7 @@ export default function BeanDetailPage() {
           <p className="mt-2 text-sm text-brown-light">{t("notFoundSub")}</p>
           <Link
             href={`/${locale}/explore`}
+            prefetch={false}
             className={buttonClassName({ variant: "secondary", className: "mt-6" })}
           >
             {t("back")}
@@ -207,6 +208,7 @@ export default function BeanDetailPage() {
       <div className="animate-rise mb-6 flex items-center justify-between gap-3">
         <Link
           href={`/${locale}/explore`}
+          prefetch={false}
           className="group inline-flex items-center gap-1.5 text-sm font-medium text-brown-light transition-colors hover:text-brown"
         >
           <svg
@@ -273,12 +275,11 @@ export default function BeanDetailPage() {
       {/* Header */}
       <header className="animate-rise mb-7 grid border-y-2 border-brown md:grid-cols-[1fr_15rem]" style={{ animationDelay: "40ms" }}>
         <div className="py-8 md:py-11 md:pr-10">
-          <p className="journal-kicker">TASTING RECORD / ARCHIVE</p>
-          <h1 className="display-title mt-3 text-5xl text-brown md:text-7xl">{bean.name}</h1>
+          <h1 className="display-title text-5xl text-brown md:text-7xl">{bean.name}</h1>
           <p className="mt-3 text-sm font-semibold uppercase tracking-[0.06em] text-brown-light">{bean.roastery}</p>
         </div>
         <div className="border-t border-border bg-surface-warm p-5 md:border-l md:border-t-0 md:p-7">
-          <p className="folio-label">CLASSIFICATION</p>
+          <p className="folio-label">{t("classification")}</p>
           <p className="mt-4 text-sm font-semibold leading-6 text-brown-medium">
           {[
             bean.bean_type === "blend" ? t("blend") : null,
@@ -406,7 +407,7 @@ export default function BeanDetailPage() {
             <Link
               data-testid="origin-detail-guide-link"
               href={`/${locale}/origins/${originSlug(countryPreset.country)}`}
-              className="mt-4 flex min-h-10 w-full items-center justify-between gap-3 rounded-sm border border-border bg-surface-warm px-3 text-xs font-semibold text-accent transition-colors hover:border-accent hover:bg-cream-dark hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+              className="mt-4 flex min-h-10 w-full items-center justify-between gap-3 rounded-sm border border-border bg-surface-warm px-3 text-xs font-semibold text-accent transition-colors hover:border-accent hover:bg-cream-dark hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               <span className="inline-flex items-center gap-2">
                 <svg
@@ -478,7 +479,7 @@ export default function BeanDetailPage() {
             </div>
             <Link
               href={`/${locale}/origins/${originSlug(countryPreset.country)}`}
-              className="inline-flex min-h-9 shrink-0 items-center gap-1 self-start rounded-sm border border-border px-3 text-xs font-medium text-accent transition-colors hover:border-accent hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+              className="inline-flex min-h-9 shrink-0 items-center gap-1 self-start rounded-sm border border-border px-3 text-xs font-medium text-accent transition-colors hover:border-accent hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               {t("viewOriginGuide", { country: countryName })}
               <svg

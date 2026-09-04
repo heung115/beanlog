@@ -75,7 +75,7 @@ export default async function RootLayout({
   const theme = resolveBeanmapTheme();
 
   return (
-    <html lang={locale} data-beanmap-theme={theme}>
+    <html lang={locale} data-beanmap-theme={theme} data-scroll-behavior="smooth">
       <head>
         <link rel="apple-touch-icon" href="/icon-192.png" />
         <link

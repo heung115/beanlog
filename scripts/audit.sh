@@ -379,9 +379,9 @@ fi
 section "5. Runtime and container isolation"
 
 if [[ "$RUNTIME" -eq 1 ]]; then
-  WEB_CODE="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --max-time 10 "http://127.0.0.1:${STAGING_WEB_PORT}/ko/login" 2>/dev/null || printf '000')"
+  WEB_CODE="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --max-time 10 "http://127.0.0.1:${STAGING_WEB_PORT}/api/health" 2>/dev/null || printf '000')"
   API_CODE="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' --max-time 10 "http://127.0.0.1:${STAGING_API_PORT}/health" 2>/dev/null || printf '000')"
-  [[ "$WEB_CODE" == "200" ]] && finding "OK" "runtime/web" "Staging web responds on loopback" || finding "HIGH" "runtime/web" "Staging web health failed (HTTP $WEB_CODE)"
+  [[ "$WEB_CODE" == "204" ]] && finding "OK" "runtime/web" "Staging web responds on loopback" || finding "HIGH" "runtime/web" "Staging web health failed (HTTP $WEB_CODE)"
   [[ "$API_CODE" == "200" ]] && finding "OK" "runtime/api" "Staging API health responds on loopback" || finding "HIGH" "runtime/api" "Staging API health failed (HTTP $API_CODE)"
 
   curl --silent --show-error --dump-header "$TMP_ROOT/headers.txt" --output /dev/null --max-time 10 "http://127.0.0.1:${STAGING_WEB_PORT}/ko/login" 2>/dev/null || true

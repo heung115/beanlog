@@ -10,13 +10,12 @@ export default function NotFound() {
         <OriginContours className="pointer-events-none absolute -right-40 -top-40 h-[38rem] w-[46rem] opacity-55" />
         <div className="relative p-7 md:p-14">
           <BeanmapMark />
-          <p className="journal-kicker mt-16">ARCHIVE ERROR / 404</p>
-          <h1 className="display-title mt-4 max-w-xl text-5xl text-brown md:text-7xl">
-            이 페이지는 기록에서 찾을 수 없어요.
+          <h1 className="display-title mt-16 max-w-xl text-5xl text-brown md:text-7xl">
+            페이지를 찾을 수 없습니다.
           </h1>
           <p className="mt-5 max-w-lg text-sm leading-7 text-brown-medium">
-            주소를 다시 확인하거나 beanmap 첫 화면으로 돌아가 주세요.<br />
-            This page is not part of the archive. Check the address or return home.
+            주소를 확인하거나 beanmap 홈으로 돌아가 주세요.<br />
+            Check the address or return to the beanmap home page.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link href="/ko" className={buttonClassName({ size: "lg" })}>한국어 홈</Link>

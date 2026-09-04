@@ -118,7 +118,12 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (isUnrecoverableRefreshError(authError)) {
-    clearAuthCookies(request, supabaseResponse, supabaseCookieOptions.name);
+    clearAuthCookies(
+      request,
+      supabaseResponse,
+      supabaseCookieOptions.name,
+      supabaseCookieOptions.secure
+    );
   }
 
   const { pathname } = request.nextUrl;

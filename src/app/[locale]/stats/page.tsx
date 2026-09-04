@@ -194,6 +194,7 @@ export default function StatsPage() {
         </p>
         <Link
           href={`/${locale}/beans/new`}
+          prefetch={false}
           className="pressable mt-8 inline-flex items-center gap-2 rounded-sm border border-brown bg-brown px-6 py-3 text-sm font-semibold text-cream shadow-[3px_3px_0_var(--color-accent-light)] hover:bg-accent"
         >
           {tExplore("addFirst")}
@@ -248,8 +249,7 @@ export default function StatsPage() {
       {/* ---------- header ---------- */}
       <header className="stats-rise grid border-y-2 border-brown md:grid-cols-[1fr_14rem]">
         <div className="py-9 md:py-12">
-          <p className="journal-kicker">TASTE REPORT / ARCHIVE</p>
-          <h1 className="display-title mt-3 text-5xl text-brown md:text-7xl">
+          <h1 className="display-title text-5xl text-brown md:text-7xl">
             {t("title")}
           </h1>
         </div>

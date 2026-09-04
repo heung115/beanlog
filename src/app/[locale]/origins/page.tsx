@@ -98,7 +98,7 @@ export default async function OriginsPage({ params }: { params: Promise<{ locale
         <ol className="mx-auto flex max-w-6xl overflow-x-auto py-1">
           {originGroups.map((group, index) => (
             <li key={group.id} className="shrink-0">
-              <a href={`#${group.id}`} className="inline-flex min-h-11 items-center gap-2 px-3 text-xs font-semibold text-brown-light transition-colors first:pl-0 hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 md:px-5">
+              <a href={`#${group.id}`} className="inline-flex min-h-11 items-center gap-2 px-3 text-xs font-semibold text-brown-light transition-colors first:pl-0 hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent md:px-5">
                 <span className="font-mono text-[10px] font-normal text-accent">{String(index + 1).padStart(2, "0")}</span>
                 {isKorean ? group.label.ko : group.label.en}
               </a>
@@ -132,8 +132,9 @@ export default async function OriginsPage({ params }: { params: Promise<{ locale
                     <li key={preset.country} className="ledger-row">
                       <Link
                         href={`/${locale}/origins/${originSlug(preset.country)}`}
+                        prefetch={false}
                         aria-label={t("viewCountry", { country: countryName })}
-                        className="group -mx-2 grid min-h-28 grid-cols-[2.25rem_minmax(0,1fr)_auto] gap-x-3 px-2 py-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 md:min-h-32 md:grid-cols-[2.5rem_minmax(9rem,0.56fr)_minmax(13rem,1fr)_7rem_2rem] md:items-center md:gap-x-6 md:py-6"
+                        className="group -mx-2 grid min-h-28 grid-cols-[2.25rem_minmax(0,1fr)_auto] gap-x-3 px-2 py-5 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent md:min-h-32 md:grid-cols-[2.5rem_minmax(9rem,0.56fr)_minmax(13rem,1fr)_7rem_2rem] md:items-center md:gap-x-6 md:py-6"
                       >
                         <span className="folio-label pt-1 md:pt-0">{String(itemIndex + 1).padStart(2, "0")}</span>
                         <span>

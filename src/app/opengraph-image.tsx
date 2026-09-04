@@ -60,7 +60,7 @@ export default function OpenGraphImage() {
                 textTransform: "uppercase",
               }}
             >
-              Coffee, mapped by taste
+              beanlog
             </span>
           </div>
 
@@ -76,8 +76,7 @@ export default function OpenGraphImage() {
                 maxWidth: 940,
               }}
             >
-              <span>Remember every cup.</span>
-              <span>Explore where coffee grows.</span>
+              <span>beanlog</span>
             </div>
             <div
               style={{
@@ -102,7 +101,7 @@ export default function OpenGraphImage() {
               paddingTop: 24,
             }}
           >
-            <span>Coffee journal · Tasting notes · Origin guide</span>
+            <span>beanmap · beanlog</span>
             <span style={{ color: colors.accent, fontWeight: 700 }}>
               beanmap.site
             </span>

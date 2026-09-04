@@ -5,10 +5,21 @@ import http from "node:http";
 import path from "node:path";
 import process from "node:process";
 import {
+  assertProductionQaNodeVersion,
+  deriveProductionQaConfig,
   deriveStagingRuntime,
+  productionQaBuildArguments,
   renderSupabaseConfig,
 } from "./staging-runtime.mjs";
 import { ensureQaCredentials } from "./staging-credentials.mjs";
+import { waitForHttpStatus } from "./http-readiness.mjs";
+import { reserveLoopbackPort } from "./port-reservation.mjs";
+import {
+  signalSpawnedProcess,
+  spawnOwnedProcess,
+  stopSpawnedProcess,
+  waitForSpawnedProcess,
+} from "./spawned-process.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const gitCommonDirOutput = execFileSync(
@@ -342,18 +353,13 @@ function readStoredDatabaseUrl() {
   }
 }
 
-async function waitFor(url, label, timeoutMs = 120_000) {
-  const deadline = Date.now() + timeoutMs;
-  while (Date.now() < deadline) {
-    try {
-      const response = await fetch(url, { redirect: "manual" });
-      if (response.status > 0 && response.status < 500) return;
-    } catch {
-      // Container may still be starting.
-    }
-    await new Promise((resolve) => setTimeout(resolve, 2_000));
-  }
-  throw new Error(`${label} did not become ready within ${timeoutMs / 1000}s`);
+async function waitFor(url, label, timeoutMs = 120_000, expectedStatus, signal) {
+  return waitForHttpStatus(url, {
+    label,
+    timeoutMs,
+    expectedStatus,
+    signal,
+  });
 }
 
 function readEnv() {
@@ -367,6 +373,55 @@ function readEnv() {
         return [line.slice(0, separator), line.slice(separator + 1)];
       })
   );
+}
+
+function qaEnvironment(env, qaCredentials, baseURL) {
+  return {
+    ...process.env,
+    QA_EXTERNAL_SERVER: "1",
+    QA_BASE_URL: baseURL,
+    QA_API_URL: `http://localhost:${env.STAGING_API_PORT}`,
+    QA_SUPABASE_URL: env.STAGING_PUBLIC_SUPABASE_URL,
+    QA_PUBLIC_SUPABASE_URL: env.STAGING_PUBLIC_SUPABASE_URL,
+    QA_SUPABASE_ANON_KEY: env.STAGING_SUPABASE_ANON_KEY,
+    QA_SUPABASE_SERVICE_ROLE_KEY: env.STAGING_SUPABASE_SERVICE_ROLE_KEY,
+    QA_PRIMARY_EMAIL: qaCredentials.primary.email,
+    QA_PRIMARY_PASSWORD: qaCredentials.primary.password,
+    QA_ISOLATION_EMAIL: qaCredentials.isolation.email,
+    QA_ISOLATION_PASSWORD: qaCredentials.isolation.password,
+  };
+}
+
+function prepareStandaloneRuntime() {
+  const standaloneRoot = path.join(root, ".next", "standalone");
+  const serverEntry = path.join(standaloneRoot, "server.js");
+  if (!fs.existsSync(serverEntry)) {
+    throw new Error("Next.js did not produce the expected standalone server.");
+  }
+
+  const publicTarget = path.join(standaloneRoot, "public");
+  const staticTarget = path.join(standaloneRoot, ".next", "static");
+  fs.rmSync(publicTarget, { recursive: true, force: true });
+  fs.rmSync(staticTarget, { recursive: true, force: true });
+  fs.cpSync(path.join(root, "public"), publicTarget, { recursive: true });
+  fs.mkdirSync(path.dirname(staticTarget), { recursive: true });
+  fs.cpSync(path.join(root, ".next", "static"), staticTarget, { recursive: true });
+
+  return { serverEntry, standaloneRoot };
+}
+
+async function runCleanupSteps(steps) {
+  const errors = [];
+  for (const step of steps) {
+    try {
+      await step();
+    } catch (error) {
+      errors.push(error);
+    }
+  }
+  if (errors.length > 0) {
+    throw new AggregateError(errors, "Production QA cleanup failed");
+  }
 }
 
 async function up() {
@@ -403,8 +458,18 @@ async function up() {
     compose(["up", "-d", "--build", "--remove-orphans", "web"]);
     compose(["up", "-d", "--build", "--force-recreate", "api"]);
   }
-  await waitFor(`http://localhost:${runtime.web}/ko/login`, "beanmap web");
-  await waitFor(`http://localhost:${runtime.api}/health`, "beanmap API");
+  await waitFor(
+    `http://localhost:${runtime.web}/api/health`,
+    "beanmap web",
+    120_000,
+    204
+  );
+  await waitFor(
+    `http://localhost:${runtime.api}/health`,
+    "beanmap API",
+    120_000,
+    200
+  );
   console.log("\nbeanmap staging development environment is ready:");
   console.log(`  Runtime:  ${runtime.id}`);
   console.log(`  App:      http://localhost:${runtime.web}`);
@@ -416,26 +481,177 @@ async function up() {
 async function qa() {
   const env = readEnv();
   const qaCredentials = ensureQaCredentials(runtimeRoot);
-  await waitFor(env.STAGING_APP_URL, "beanmap web", 20_000);
-  const result = spawnSync("npx", ["playwright", "test", ...process.argv.slice(3)], {
-    cwd: root,
-    stdio: "inherit",
-    env: {
-      ...process.env,
-      QA_EXTERNAL_SERVER: "1",
-      QA_BASE_URL: env.STAGING_APP_URL,
-      QA_API_URL: `http://localhost:${env.STAGING_API_PORT}`,
-      QA_SUPABASE_URL: env.STAGING_PUBLIC_SUPABASE_URL,
-      QA_PUBLIC_SUPABASE_URL: env.STAGING_PUBLIC_SUPABASE_URL,
-      QA_SUPABASE_ANON_KEY: env.STAGING_SUPABASE_ANON_KEY,
-      QA_SUPABASE_SERVICE_ROLE_KEY: env.STAGING_SUPABASE_SERVICE_ROLE_KEY,
-      QA_PRIMARY_EMAIL: qaCredentials.primary.email,
-      QA_PRIMARY_PASSWORD: qaCredentials.primary.password,
-      QA_ISOLATION_EMAIL: qaCredentials.isolation.email,
-      QA_ISOLATION_PASSWORD: qaCredentials.isolation.password,
-    },
-  });
+  const qaLock = await reserveLoopbackPort(runtime.qaLock, "QA runtime lock");
+  let result;
+  try {
+    await waitFor(
+      `${env.STAGING_APP_URL}/api/health`,
+      "beanmap web",
+      20_000,
+      204
+    );
+    result = spawnSync("npx", ["playwright", "test", ...process.argv.slice(3)], {
+      cwd: root,
+      stdio: "inherit",
+      env: qaEnvironment(env, qaCredentials, env.STAGING_APP_URL),
+    });
+  } finally {
+    await qaLock.release();
+  }
   if (result.status !== 0) process.exit(result.status ?? 1);
+}
+
+async function qaProduction() {
+  assertProductionQaNodeVersion(process.versions.node);
+  const env = readEnv();
+  const qaCredentials = ensureQaCredentials(runtimeRoot);
+  const production = deriveProductionQaConfig({
+    runtime,
+    stagingEnv: env,
+    serverActionsEncryptionKey: randomBytes(32).toString("base64"),
+    baseEnv: process.env,
+  });
+  const nextCli = path.join(root, "node_modules", "next", "dist", "bin", "next");
+  const playwrightCli = path.join(root, "node_modules", "@playwright", "test", "cli.js");
+  const buildArguments = productionQaBuildArguments({
+    nextCli,
+    root,
+    nodeModulesRealPath: fs.realpathSync(path.join(root, "node_modules")),
+  });
+  const interruption = new AbortController();
+  let qaLock;
+  let appPortReservation;
+  let buildProcess;
+  let productionServer;
+  let qaProcess;
+  let qaResult;
+  let interruptedSignal;
+  const handleSignal = (signal) => {
+    if (interruptedSignal) return;
+    interruptedSignal = signal;
+    interruption.abort(new Error(`Production QA received ${signal}`));
+    for (const [ownedProcess, childSignal] of [
+      [qaProcess, signal],
+      [productionServer, "SIGTERM"],
+      [buildProcess, signal],
+    ]) {
+      try {
+        signalSpawnedProcess(ownedProcess, childSignal);
+      } catch {
+        // The bounded cleanup below retries and reports failures.
+      }
+    }
+  };
+  const handleSigint = () => handleSignal("SIGINT");
+  const handleSigterm = () => handleSignal("SIGTERM");
+  process.once("SIGINT", handleSigint);
+  process.once("SIGTERM", handleSigterm);
+
+  try {
+    qaLock = await reserveLoopbackPort(runtime.qaLock, "QA runtime lock");
+    appPortReservation = await reserveLoopbackPort(
+      runtime.productionQaWeb,
+      "Production QA app"
+    );
+    await waitFor(
+      `http://localhost:${env.STAGING_API_PORT}/health`,
+      "beanmap staging API",
+      20_000,
+      200,
+      interruption.signal
+    );
+    await waitFor(
+      `${env.STAGING_PUBLIC_SUPABASE_URL}/auth/v1/health`,
+      "beanmap staging Supabase Auth",
+      20_000,
+      200,
+      interruption.signal
+    );
+
+    console.log(`\nBuilding production QA app for ${production.appUrl}...`);
+    buildProcess = spawnOwnedProcess(
+      process.execPath,
+      buildArguments,
+      {
+        cwd: root,
+        env: production.processEnv,
+        stdio: ["ignore", "inherit", "inherit"],
+      }
+    );
+    const buildResult = await waitForSpawnedProcess(buildProcess);
+    if (buildResult.code !== 0) {
+      throw new Error(
+        `Production QA build failed (${buildResult.signal ?? buildResult.code ?? "unknown"}).`
+      );
+    }
+    await stopSpawnedProcess(buildProcess);
+    buildProcess = undefined;
+
+    const { serverEntry, standaloneRoot } = prepareStandaloneRuntime();
+    await appPortReservation.release();
+    appPortReservation = undefined;
+    productionServer = spawnOwnedProcess(
+      process.execPath,
+      [serverEntry],
+      {
+        cwd: standaloneRoot,
+        env: production.processEnv,
+        stdio: ["ignore", "inherit", "inherit"],
+      }
+    );
+    const serverExit = waitForSpawnedProcess(productionServer).then(({ code, signal }) => {
+      throw new Error(
+        `Production QA server exited before the test run completed (${signal ?? code ?? "unknown"}).`
+      );
+    });
+    await Promise.race([
+      waitFor(
+        `${production.appUrl}/api/health`,
+        "beanmap production QA web",
+        120_000,
+        204,
+        interruption.signal
+      ),
+      serverExit,
+    ]);
+    console.log(`Production QA app is ready at ${production.appUrl}`);
+
+    qaProcess = spawnOwnedProcess(
+      process.execPath,
+      [playwrightCli, "test", ...process.argv.slice(3)],
+      {
+        cwd: root,
+        stdio: "inherit",
+        env: qaEnvironment(env, qaCredentials, production.appUrl),
+      }
+    );
+    qaResult = await Promise.race([
+      waitForSpawnedProcess(qaProcess),
+      serverExit,
+    ]);
+  } catch (error) {
+    if (!interruptedSignal) throw error;
+  } finally {
+    interruption.abort(new Error("Production QA cleanup"));
+    try {
+      await runCleanupSteps([
+        () => stopSpawnedProcess(qaProcess),
+        () => stopSpawnedProcess(productionServer),
+        () => stopSpawnedProcess(buildProcess),
+        () => appPortReservation?.release(),
+        () => qaLock?.release(),
+      ]);
+    } finally {
+      process.off("SIGINT", handleSigint);
+      process.off("SIGTERM", handleSigterm);
+    }
+  }
+
+  if (interruptedSignal) {
+    process.exitCode = interruptedSignal === "SIGINT" ? 130 : 143;
+    return;
+  }
+  if (qaResult?.code !== 0) process.exitCode = qaResult?.code ?? 1;
 }
 
 function down() {
@@ -451,7 +667,7 @@ function status() {
   if (fs.existsSync(envFile)) compose(["ps"]);
   if (fs.existsSync(path.join(runtimeSupabase, "config.toml"))) {
     const checks = [
-      ["App", `http://localhost:${runtime.web}/ko/login`],
+      ["App", `http://localhost:${runtime.web}/api/health`],
       ["API", `http://localhost:${runtime.api}/health`],
       ["Supabase", `http://localhost:${runtime.supabaseApi}/auth/v1/health`],
     ];
@@ -470,6 +686,9 @@ switch (command) {
   case "qa":
     await qa();
     break;
+  case "qa:production":
+    await qaProduction();
+    break;
   case "down":
     down();
     break;
@@ -484,5 +703,5 @@ switch (command) {
     console.log("Staging Supabase ports are bound to 127.0.0.1 only.");
     break;
   default:
-    console.log("Usage: node scripts/staging.mjs <up|qa|status|logs|down|harden>");
+    console.log("Usage: node scripts/staging.mjs <up|qa|qa:production|status|logs|down|harden>");
 }
