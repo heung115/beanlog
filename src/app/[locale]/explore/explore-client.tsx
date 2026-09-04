@@ -457,13 +457,13 @@ export function ExploreClient({
 
   return (
     <div className="mx-auto w-full max-w-6xl">
-      <header className="mb-7 grid border-y-2 border-brown md:grid-cols-[1fr_13rem]">
+      <header className="mb-7 grid border-y border-border-light md:grid-cols-[1fr_13rem]">
         <div className="py-9 md:py-12">
           <h1 className="display-title text-5xl text-brown md:text-7xl">
             {t("title")}
           </h1>
         </div>
-        <div className="flex items-end justify-between border-t border-border bg-surface-warm p-5 md:block md:border-l md:border-t-0 md:p-7">
+        <div className="flex items-end justify-between border-t border-border-light bg-surface-warm p-5 md:block md:border-l md:border-t-0 md:p-7">
           <p className="folio-label">{t("recordCount")}</p>
           <p className="font-display text-5xl font-bold italic tabular-nums tracking-[-0.05em] text-accent md:mt-5 md:text-6xl">{total}</p>
         </div>
@@ -548,7 +548,7 @@ export function ExploreClient({
       </div>
 
       {filtersOpen && (
-        <div id="explore-filter-panel" className="mt-4 border-y-2 border-brown bg-surface-warm py-4">
+        <div id="explore-filter-panel" className="mt-4 border-y border-border-light bg-surface-warm py-4">
           <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
             <FilterChip
               label={t("allOrigins")}
@@ -623,7 +623,7 @@ export function ExploreClient({
         </div>
       )}
 
-      <div className="mt-8 flex items-center justify-between border-b-2 border-brown pb-3">
+      <div className="mt-8 flex items-center justify-between border-b border-border-light pb-3">
         <p className="folio-label">
           {loading ? t("results", { count: 0 }) : t("results", { count: total })}
         </p>

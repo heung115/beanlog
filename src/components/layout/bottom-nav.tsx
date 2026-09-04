@@ -27,7 +27,7 @@ export function BottomNav({ authenticated }: { authenticated: boolean }) {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t-2 border-brown bg-surface/95 backdrop-blur-sm md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border-light bg-surface/95 backdrop-blur-sm md:hidden">
       <div className="mx-auto flex max-w-md items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
         {links.map(({ href, label, icon: Icon, primary, prefetch }) => {
           const isActive = appPathname === href || appPathname.startsWith(href + "/");

@@ -163,7 +163,7 @@ Desktop navigation lives in the top bar. Mobile navigation stays fixed at the bo
 
 ## Elevation & Depth
 
-Depth comes primarily from tonal surfaces, borders, and a stronger top or left rule. Strong ink rules are reserved for isolated content emphasis; never use them as full-width footer boundaries or to frame authentication screens. Default content panels are flat. One offset paper shadow may identify an important sheet, form, or toolbar; floating navigation and transient overlays may use a shallow neutral shadow.
+Depth comes primarily from tonal surfaces, borders, and a stronger top or left rule. Strong ink rules are reserved for short, isolated content emphasis. Full-width page and application-chrome boundaries use at most a one-pixel `border-light` rule; never use strong ink to frame authentication screens. Default content panels are flat. One offset paper shadow may identify an important sheet, form, or toolbar; floating navigation and transient overlays may use a shallow neutral shadow.
 
 Use `journal-panel` for ordinary contained content, `journal-panel-feature` for one emphasized area, and `journal-panel-quiet` for subordinate information. Avoid stacking framed panels inside framed panels.
 

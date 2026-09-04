@@ -1,9 +1,11 @@
+import { LEGAL_EFFECTIVE_DATE } from "@/config/legal-version";
+
 const configuredOperatorName = process.env.LEGAL_OPERATOR_NAME?.trim();
 const configuredOperatorNameEn = process.env.LEGAL_OPERATOR_NAME_EN?.trim();
 const configuredContactEmail = process.env.LEGAL_CONTACT_EMAIL?.trim();
 
 export const legal = {
-  effectiveDate: "2026-08-26",
+  effectiveDate: LEGAL_EFFECTIVE_DATE,
   operatorName: configuredOperatorName || "beanmap 운영팀",
   operatorNameEn: configuredOperatorNameEn || configuredOperatorName || "beanmap team",
   contactEmail: configuredContactEmail || "",

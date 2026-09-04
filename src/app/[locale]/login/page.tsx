@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { signInAction, signInWithOAuth } from "@/lib/actions/auth";
 import { AuthShell } from "@/components/auth/auth-shell";
+import { useSocialAuthConsent } from "@/components/auth/use-social-auth-consent";
 
 export default function LoginPage() {
   const t = useTranslations("auth");
@@ -23,7 +24,7 @@ export default function LoginPage() {
     ? `/${locale}/beans/new?draft=1`
     : safeRequestedNext ?? `/${locale}/explore`;
   const [state, formAction, pending] = useActionState(signInAction, {});
-  const [socialTermsAccepted, setSocialTermsAccepted] = useState(false);
+  const [socialTermsAccepted, setSocialTermsAccepted] = useSocialAuthConsent();
 
   return (
     <AuthShell>

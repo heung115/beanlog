@@ -2,6 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 import axe from "axe-core";
 import { qaBaseURL, qaUser } from "./helpers";
 import designTokens from "../../src/config/design-tokens.json" with { type: "json" };
+import { LEGAL_EFFECTIVE_DATE } from "../../src/config/legal-version";
 
 async function login(page: Page) {
   await page.goto("/ko/login");
@@ -292,6 +293,97 @@ test("login uses POST, keeps credentials out of URL, and has no serious accessib
   await expect(page).toHaveURL(/\/(?:ko\/)?explore$/);
   expect(page.url()).not.toContain(encodeURIComponent(qaUser.email));
   expect(page.url()).not.toContain("password");
+});
+
+test("login stays visually quiet and restores only an explicit social agreement", async ({ page }) => {
+  await page.goto("/ko/login");
+
+  await expect(page.getByText("산지 국가", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("프로세싱", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("테이스팅 노트", { exact: true })).toHaveCount(0);
+
+  const agreement = page.getByRole("checkbox", { name: /소셜 로그인으로 계속하면/ });
+  await expect(agreement).not.toBeChecked();
+  await expect(page.getByRole("button", { name: "Google로 계속" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "카카오로 계속" })).toBeDisabled();
+
+  await agreement.check();
+  const storedAgreement = await page.evaluate(() =>
+    window.localStorage.getItem("beanmap:social-auth-consent")
+  );
+  expect(JSON.parse(storedAgreement ?? "null")).toMatchObject({
+    version: 1,
+    legalVersion: LEGAL_EFFECTIVE_DATE,
+    accepted: true,
+  });
+
+  await page.reload();
+  await expect(agreement).toBeChecked();
+  await expect(page.getByRole("button", { name: "Google로 계속" })).toBeEnabled();
+  await expect(page.getByRole("button", { name: "카카오로 계속" })).toBeEnabled();
+
+  await agreement.uncheck();
+  await expect
+    .poll(() =>
+      page.evaluate(() => window.localStorage.getItem("beanmap:social-auth-consent"))
+    )
+    .toBeNull();
+  await page.reload();
+  await expect(agreement).not.toBeChecked();
+
+  await page.evaluate(
+    ({ key, acceptedAt }) => {
+      window.localStorage.setItem(
+        key,
+        JSON.stringify({
+          version: 1,
+          legalVersion: "outdated",
+          accepted: true,
+          acceptedAt,
+        })
+      );
+    },
+    {
+      key: "beanmap:social-auth-consent",
+      acceptedAt: new Date().toISOString(),
+    }
+  );
+  await page.reload();
+  await expect(agreement).not.toBeChecked();
+  await expect(page.getByRole("button", { name: "Google로 계속" })).toBeDisabled();
+  await expect(page.getByRole("button", { name: "카카오로 계속" })).toBeDisabled();
+});
+
+test("authenticated journal uses quiet full-width dividers", async ({ page }) => {
+  await login(page);
+
+  const pageHeading = page.getByRole("heading", { level: 1, name: "beanmap" });
+  const pageHeader = pageHeading.locator("xpath=ancestor::header");
+  const resultLabel = page.locator("p.folio-label").filter({ hasText: /개 기록$/ }).last();
+  const resultDivider = resultLabel.locator("..");
+
+  await page.getByRole("button", { name: "필터" }).click();
+  const filterPanel = page.locator("#explore-filter-panel");
+
+  for (const boundary of [pageHeader, resultDivider, filterPanel]) {
+    const widths = await boundary.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return [style.borderTopWidth, style.borderBottomWidth].map(Number.parseFloat);
+    });
+    expect(Math.max(...widths)).toBeLessThanOrEqual(1);
+  }
+});
+
+test("@mobile authenticated navigation uses a quiet boundary", async ({ page }) => {
+  await login(page);
+
+  const bottomNavigation = page.locator("nav.fixed.bottom-0");
+  await expect(bottomNavigation).toBeVisible();
+  expect(
+    await bottomNavigation.evaluate((element) =>
+      Number.parseFloat(getComputedStyle(element).borderTopWidth)
+    )
+  ).toBeLessThanOrEqual(1);
 });
 
 test("signup explains that legal agreement is required", async ({ page }) => {
