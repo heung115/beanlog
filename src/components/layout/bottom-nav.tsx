@@ -27,7 +27,7 @@ export function BottomNav({ authenticated }: { authenticated: boolean }) {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border-light bg-surface/95 backdrop-blur-sm md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-surface/95 shadow-[0_-0.35rem_1.25rem_color-mix(in_srgb,var(--color-brown)_6%,transparent)] backdrop-blur-sm md:hidden">
       <div className="mx-auto flex max-w-md items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
         {links.map(({ href, label, icon: Icon, primary, prefetch }) => {
           const isActive = appPathname === href || appPathname.startsWith(href + "/");
@@ -47,7 +47,7 @@ export function BottomNav({ authenticated }: { authenticated: boolean }) {
               )}
             >
               {primary ? (
-                <span className="-mt-4 flex h-9 w-9 items-center justify-center rounded-sm border border-brown bg-brown text-cream shadow-[3px_3px_0_var(--color-accent-light)]">
+                <span className="-mt-4 flex h-9 w-9 items-center justify-center rounded-md bg-brown text-cream shadow-[0_0.3rem_0.8rem_color-mix(in_srgb,var(--color-brown)_16%,transparent)]">
                   <Icon className="h-4 w-4" />
                 </span>
               ) : (

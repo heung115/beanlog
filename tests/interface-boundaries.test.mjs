@@ -119,3 +119,23 @@ test("shared CSS primitives do not draw thick primary-brown borders or bars", ()
     ".page-rule must not render a thick primary-brown bar"
   );
 });
+
+test("interface class lists do not recreate borders with hard offset shadows", () => {
+  const violations = [];
+
+  for (const file of walk(sourceRoot).filter((entry) => entry.endsWith(".tsx"))) {
+    const source = fs.readFileSync(file, "utf8");
+
+    for (const match of source.matchAll(/shadow-\[(\d+(?:\.\d+)?)px_\1px_0_[^\]]+\]/g)) {
+      if (Number(match[1]) < 2) continue;
+      const line = source.slice(0, match.index).split("\n").length;
+      violations.push(`${path.relative(root, file)}:${line} (${match[0]})`);
+    }
+  }
+
+  assert.deepEqual(
+    violations,
+    [],
+    `Hard offset shadows read as heavy borders and must stay out of the interface:\n${violations.join("\n")}`
+  );
+});

@@ -77,8 +77,9 @@ spacing:
   page-gutter-desktop: 1.5rem
   content-max-width: 72rem
 rounded:
-  sm: 0.125rem
-  md: 0.125rem
+  sm: 0.25rem
+  md: 0.375rem
+  lg: 0.5rem
   full: 9999px
 components:
   button-primary:
@@ -104,7 +105,7 @@ components:
   journal-panel:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.primary}"
-    rounded: "{rounded.md}"
+    rounded: "{rounded.lg}"
     padding: 1.25rem
   badge:
     backgroundColor: "{colors.neutral-strong}"
@@ -139,7 +140,7 @@ The default palette uses uncoated-paper neutrals with espresso ink and a restrai
 - **Secondary (`#6F665E`)** is for captions and metadata that must remain readable but visually quiet.
 - **Accent (`#8A4B2B`)** is a dry terracotta used for focus, selection, map marks, links, and score emphasis. It is not a general decorative fill.
 - **Neutral (`#F4F0E8`)** is the paper canvas; **surface (`#FCFAF5`)** and **surface warm (`#EEE6DA`)** create shallow folio layers.
-- Borders (`#D4CABC`, `#E5DDD2`) create hierarchy before shadows are introduced.
+- Whitespace and tonal surfaces establish hierarchy first. Borders (`#D4CABC`, `#E5DDD2`) are quiet fallback separators when spacing or surface tone alone is not enough.
 - Process and roast colors communicate coffee-domain categories only. Never reuse them as generic status colors. On pale category fills, use espresso-brown text rather than the category hue so compact labels meet WCAG AA.
 - Error red is reserved for destructive actions and validation failures.
 
@@ -165,7 +166,7 @@ Desktop navigation lives in the top bar. Mobile navigation stays fixed at the bo
 
 ## Elevation & Depth
 
-Depth comes primarily from tonal surfaces, whitespace, and quiet neutral borders. Structural boundaries must never use a two-pixel-or-thicker primary-ink rule; page and application-chrome boundaries use at most a one-pixel neutral rule. Never use strong ink to frame authentication screens. Default content panels are flat. One offset paper shadow may identify an important sheet, form, or toolbar; floating navigation and transient overlays may use a shallow neutral shadow.
+Depth comes primarily from tonal surfaces and whitespace. Add a quiet neutral border only when those cues do not provide enough separation. Structural boundaries must never use a two-pixel-or-thicker primary-ink rule; page and application-chrome boundaries use at most a one-pixel light-neutral rule, and page headers should remain borderless whenever spacing and surface tone can define them. Never use strong ink to frame authentication screens. Default content panels are flat and borderless. One restrained shadow may identify an important sheet, form, or toolbar; floating navigation and transient overlays may use a shallow neutral shadow. Ordinary cards must not combine a complete outline with a shadow.
 
 Use `journal-panel` for ordinary contained content, `journal-panel-feature` for one emphasized area, and `journal-panel-quiet` for subordinate information. A feature panel may differ through surface tone, spacing, or a restrained neutral shadow, never a thick dark edge. Avoid stacking framed panels inside framed panels.
 
@@ -173,17 +174,17 @@ Motion is restrained. The standard entrance is a short rise-and-fade of roughly 
 
 ## Shapes
 
-The shape language is restrained and editorial rather than playful. Content panels, controls, labels, and inset regions use a near-square 2px radius. Hierarchy should come from spacing, type, rules, and tonal surfaces instead of soft card silhouettes.
+The shape language is restrained and editorial rather than playful. Use a subtle radius hierarchy: 4px for compact badges and tags, 6px for controls, and 8px for content panels and sheets. Hierarchy should come from spacing, type, and tonal surfaces instead of prominent outlines or oversized soft card silhouettes.
 
 Pills are not a default container. Reserve circles for controls whose meaning or mechanics are inherently circular, such as avatars, slider thumbs, chart points, and loading indicators. Domain charts and icons should use simple strokes and geometric shapes that match the existing navigation icons.
 
 ## Components
 
-- **Buttons:** Primary buttons use the espresso fill with cream text. Secondary buttons use the surface tone with a quiet neutral border. Ghost buttons are for low-priority actions. Only destructive actions use red.
-- **Inputs:** Inputs use the surface token, a one-pixel neutral border, 2px radius, and accent focus treatment. Labels remain outside the control. Placeholder text must be visibly subordinate but legible.
-- **Journal panels:** Use the surface token for standard panels and the quieter surface token for subordinate content. Prefer borders and spacing to drop shadows.
+- **Buttons:** Buttons use the 6px control radius. Primary buttons use the espresso fill with cream text. Secondary buttons use the surface tone with a quiet neutral border. Ghost buttons are for low-priority actions. Only destructive actions use red.
+- **Inputs:** Inputs use the surface token, a one-pixel neutral border, 6px radius, and accent focus treatment. Labels remain outside the control. Placeholder text must be visibly subordinate but legible.
+- **Journal panels:** Use the surface token and an 8px radius for standard panels, and the quieter surface token for subordinate content. Prefer whitespace and tonal surfaces; add a light-neutral hairline only when separation would otherwise be unclear.
 - **Bean cards:** Lead with bean name and score, then roastery and origin. Process, roast, and type are supporting metadata. Notes and tasting tags must not overpower identity and score.
-- **Badges and filter controls:** Badges describe data and use compact, near-square labels; filters change a query and use the same low rectangular control language as other inputs. An active filter uses the primary fill. Category colors must keep consistent meanings across lists, detail pages, forms, and charts.
+- **Badges and filter controls:** Badges describe data and use compact 4px corners. Compact filter chips use the same 4px radius, while full-size form controls use the 6px control radius. An active filter uses the primary fill. Category colors must keep consistent meanings across lists, detail pages, forms, and charts.
 - **Charts:** Use the coffee-brown sequence for neutral series and domain category colors for process data. Labels and tooltips use the same typography and surface rules as the rest of the application.
 - **Navigation:** The active destination is indicated through text color and a quiet tonal background, not a dark underline or framed card. The mobile add action may be visually elevated because it is the central workflow.
 - **Footer:** Treat the footer as quiet application chrome. Separate it with surface tone and spacing rather than an upper rule; never use primary ink or a thick line across the viewport.
@@ -199,6 +200,7 @@ Pills are not a default container. Reserve circles for controls whose meaning or
 - Don't introduce raw hex colors in components when a semantic token already exists.
 - Don't use process or roast colors as generic success, warning, or error indicators.
 - Don't add gradients, glassmorphism, heavy shadows, emoji icons, or oversized rounded cards.
-- Don't make every section a card; whitespace, typography, and dividers should carry most of the hierarchy.
+- Don't make every section a card; whitespace, typography, and tonal surfaces should carry most of the hierarchy.
+- Don't combine a complete outline and a shadow on an ordinary card.
 - Don't use a two-pixel-or-thicker primary-brown border or bar as a page, panel, list, form, or section boundary.
 - Don't change a canonical token in only `DESIGN.md` or only CSS. Update both sources in the same change and run `npm run design:lint`.

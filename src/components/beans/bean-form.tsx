@@ -183,7 +183,7 @@ function Segmented<T extends string>({
     <div
       role="radiogroup"
       aria-label={ariaLabel}
-      className="grid auto-cols-fr grid-flow-col gap-1 rounded-sm border border-border bg-cream-dark/60 p-1"
+      className="grid auto-cols-fr grid-flow-col gap-1 rounded-md bg-cream-dark/60 p-1"
     >
       {options.map((option) => (
         <button
@@ -193,11 +193,11 @@ function Segmented<T extends string>({
           aria-checked={value === option.value}
           onClick={() => onChange(option.value)}
           className={cn(
-            "min-h-11 rounded-sm border px-3 py-2 text-sm font-semibold transition-all duration-150",
+            "min-h-11 rounded-sm border border-transparent px-3 py-2 text-sm font-semibold transition-all duration-150",
             "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
             value === option.value
-              ? "border-brown bg-brown text-cream shadow-[2px_2px_0_var(--color-accent-light)]"
-              : "border-transparent text-brown-light hover:border-border hover:text-brown"
+              ? "bg-brown text-cream"
+              : "text-brown-light hover:bg-surface hover:text-brown"
           )}
         >
           {option.label}
@@ -686,7 +686,7 @@ export function BeanForm({
       <input type="hidden" name="overall_score" value={form.overall_score} />
       {/* ── Quick section ─────────────────────────────── */}
       <section className="paper-sheet paper-sheet-feature animate-rise p-5 md:p-8">
-        <div className="mb-7 flex items-center justify-between border-b border-border-light pb-4">
+        <div className="mb-7 flex items-center justify-between">
           <p className="journal-kicker">{t("basicInfo")}</p>
           <span className="font-display text-3xl text-accent">01</span>
         </div>
@@ -730,7 +730,7 @@ export function BeanForm({
               autoComplete="off"
             />
             {roasteryOpen && roasterySuggestions.length > 0 && (
-              <ul className="absolute z-20 mt-1 w-full overflow-hidden rounded-md border border-border bg-surface shadow-lg">
+              <ul className="absolute z-20 mt-1 w-full overflow-hidden rounded-md border border-border-light bg-surface shadow-lg">
                 {roasterySuggestions.map((r) => (
                   <li key={r}>
                     <button
@@ -775,7 +775,7 @@ export function BeanForm({
 
         {/* Origin — 산지 → 생산자 → 품종 → 가공 정보 순 */}
         {!isBlend && (
-          <div className="mt-6 flex flex-col gap-4 border-t border-border-light pt-6">
+          <div className="mt-8 flex flex-col gap-4">
             <h2 className="font-display text-2xl font-bold tracking-[-0.025em] text-brown">
               {t("originInfo")}
             </h2>
@@ -922,7 +922,7 @@ export function BeanForm({
         )}
 
         {/* Roast / place */}
-        <div className="mt-8 flex flex-col gap-5 border-t border-border-light pt-6">
+        <div className="mt-9 flex flex-col gap-5">
           <div className="flex items-center justify-between">
             <p className="journal-kicker">{t("roastAndPlace")}</p>
             <span className="font-display text-2xl text-accent">02</span>
@@ -990,7 +990,7 @@ export function BeanForm({
         </div>
 
         {/* Score + note */}
-        <div className="mt-8 flex flex-col gap-6 border-t border-border-light pt-6">
+        <div className="mt-9 flex flex-col gap-6">
           <div className="flex items-center justify-between">
             <p className="journal-kicker">{t("evaluation")}</p>
             <span className="font-display text-2xl text-accent">03</span>
@@ -1019,10 +1019,10 @@ export function BeanForm({
         aria-expanded={showDetails}
         aria-controls="bean-detail-fields"
         className={cn(
-          "animate-rise flex min-h-14 items-center justify-between gap-2 rounded-sm border-y border-border-light px-4 py-3.5",
+          "animate-rise flex min-h-14 items-center justify-between gap-2 rounded-lg bg-surface-warm px-4 py-3.5",
           "text-sm font-semibold text-brown transition-all duration-200",
-          "hover:bg-surface-warm",
-          showDetails && "bg-surface-warm"
+          "hover:bg-cream-dark/70",
+          showDetails && "bg-cream-dark/70"
         )}
         style={{ animationDelay: "60ms" }}
       >
@@ -1051,7 +1051,7 @@ export function BeanForm({
       {showDetails && (
         <section
           id="bean-detail-fields"
-          className="paper-sheet animate-rise border-t-[3px] border-t-accent p-5 md:p-8"
+          className="paper-sheet animate-rise p-5 md:p-8"
         >
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <Input
@@ -1075,19 +1075,19 @@ export function BeanForm({
             </div>
 
             {/* Tasting tags */}
-            <div className="mt-7 flex flex-col gap-3 border-t border-border-light pt-6">
+            <div className="mt-8 flex flex-col gap-3">
               <SectionLabel>{t("tastingNotes")}</SectionLabel>
               <TagInput value={form.tags ?? []} onChange={handleTagsChange} />
             </div>
 
             {/* Detail scores */}
-            <div className="mt-7 flex flex-col gap-3 border-t border-border-light pt-6">
+            <div className="mt-8 flex flex-col gap-3">
               <SectionLabel>{t("detailedScores")}</SectionLabel>
               <DetailScoreInput scores={detailScores} onChange={setDetailScore} />
             </div>
 
             {/* Purchase info */}
-            <div className="mt-7 flex flex-col gap-5 border-t border-border-light pt-6">
+            <div className="mt-8 flex flex-col gap-5">
               <SectionLabel>{t("purchaseInfo")}</SectionLabel>
               <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                 <Select
@@ -1162,7 +1162,7 @@ export function BeanForm({
 
       {/* ── Submit ────────────────────────────────────── */}
       <div
-        className="animate-rise flex flex-col-reverse gap-3 border-t border-border-light bg-cream py-5 sm:flex-row sm:justify-end"
+        className="animate-rise flex flex-col-reverse gap-3 bg-cream py-5 sm:flex-row sm:justify-end"
         style={{ animationDelay: "120ms" }}
       >
         <Button

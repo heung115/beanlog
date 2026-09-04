@@ -102,13 +102,13 @@ export function SubregionInput({
         onChange={(e) => updateText(e.target.value)}
         placeholder={placeholder}
         className={cn(
-          "w-full rounded-sm border border-border bg-surface px-3 py-2 text-xs text-brown placeholder:text-brown-light/40",
+          "w-full rounded-md border border-border-light bg-surface px-3 py-2 text-xs text-brown placeholder:text-brown-light/40",
           "transition-colors duration-150 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/30",
           inputClassName
         )}
       />
       {filteredSuggestions.length > 0 && (
-        <div className="absolute left-0 right-0 top-full z-20 mt-1 overflow-hidden rounded-sm border border-border bg-surface py-1 shadow-lg">
+        <div className="absolute left-0 right-0 top-full z-20 mt-1 overflow-hidden rounded-md border border-border-light bg-surface py-1 shadow-lg">
           {filteredSuggestions.slice(0, 5).map((suggestion) => (
             <button
               key={suggestion}

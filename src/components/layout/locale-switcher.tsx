@@ -51,7 +51,7 @@ export function LocaleSwitcher({
       role="group"
       aria-label={labels.group}
       className={cn(
-        "inline-flex min-h-11 items-center rounded-sm border border-border bg-surface p-0.5",
+        "inline-flex min-h-11 items-center rounded-md bg-surface-warm p-0.5",
         className
       )}
     >

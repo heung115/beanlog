@@ -72,7 +72,7 @@ export default async function OriginsPage({ params }: { params: Promise<{ locale
     <div className="pb-10 md:pb-16">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
 
-      <header className="animate-rise relative overflow-hidden border-y border-border-light md:grid md:min-h-[24rem] md:grid-cols-[minmax(0,1fr)_18rem]">
+      <header className="animate-rise relative overflow-hidden rounded-lg bg-surface/55 md:grid md:min-h-[24rem] md:grid-cols-[minmax(0,1fr)_18rem]">
         <OriginContours className="pointer-events-none absolute -right-36 -top-28 h-[36rem] w-[44rem] opacity-55" />
         <div className="relative py-12 md:flex md:flex-col md:justify-between md:py-14 md:pr-14">
           <div>
@@ -87,14 +87,14 @@ export default async function OriginsPage({ params }: { params: Promise<{ locale
             <p className="folio-label">{t("indexCount", { count: originPresets.length })}</p>
             <p className="mt-4 font-display text-6xl font-bold tabular-nums tracking-[-0.06em] text-brown">{originPresets.length}</p>
           </div>
-          <div className="border-l border-border p-6 md:border-l-0 md:border-t md:p-8">
+          <div className="border-l border-border-light p-6 md:border-l-0 md:border-t md:p-8">
             <p className="folio-label">{isKorean ? "탐색 권역" : "Regions"}</p>
             <p className="mt-4 font-display text-6xl font-bold tabular-nums tracking-[-0.06em] text-accent">{originGroups.length}</p>
           </div>
         </aside>
       </header>
 
-      <nav aria-label={isKorean ? "산지 권역 바로가기" : "Jump to an origin region"} className="-mx-4 border-b border-border bg-cream/95 px-4 backdrop-blur-sm md:sticky md:top-[4.45rem] md:z-30 md:-mx-6 md:px-6">
+      <nav aria-label={isKorean ? "산지 권역 바로가기" : "Jump to an origin region"} className="-mx-4 border-b border-border-light bg-cream/95 px-4 backdrop-blur-sm md:sticky md:top-[4.45rem] md:z-30 md:-mx-6 md:px-6">
         <ol className="mx-auto flex max-w-6xl overflow-x-auto py-1">
           {originGroups.map((group, index) => (
             <li key={group.id} className="shrink-0">
@@ -113,7 +113,7 @@ export default async function OriginsPage({ params }: { params: Promise<{ locale
 
           return (
             <section id={group.id} key={group.id} aria-labelledby={`${group.id}-title`} className="scroll-mt-44 md:grid md:grid-cols-[12rem_minmax(0,1fr)] md:gap-12">
-              <header className="mb-5 flex items-end justify-between border-b border-border pb-4 md:mb-0 md:block md:border-b-0 md:pb-0">
+              <header className="mb-5 flex items-end justify-between pb-4 md:mb-0 md:block md:pb-0">
                 <div>
                   <p className="font-display text-4xl leading-none text-accent/75">{String(groupIndex + 1).padStart(2, "0")}</p>
                   <h2 id={`${group.id}-title`} className="mt-3 font-display text-2xl font-bold tracking-[-0.03em] text-brown">{isKorean ? group.label.ko : group.label.en}</h2>
@@ -121,7 +121,7 @@ export default async function OriginsPage({ params }: { params: Promise<{ locale
                 <p className="folio-label md:mt-4">{isKorean ? `${presets.length}개 산지` : `${presets.length} origins`}</p>
               </header>
 
-              <ol className="border-t border-border-light">
+              <ol>
                 {presets.map((preset, itemIndex) => {
                   const countryName = isKorean ? preset.countryKo : preset.country;
                   const secondaryName = isKorean ? preset.country : preset.countryKo;
@@ -157,7 +157,7 @@ export default async function OriginsPage({ params }: { params: Promise<{ locale
         })}
       </div>
 
-      <p className="mt-14 border-t border-border pt-5 text-xs leading-relaxed text-brown-light md:mt-20">{t("disclaimer")}</p>
+      <p className="mt-14 pt-5 text-xs leading-relaxed text-brown-light md:mt-20">{t("disclaimer")}</p>
     </div>
   );
 }

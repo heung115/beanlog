@@ -19,6 +19,7 @@ import {
 } from "recharts";
 import { getBeanStats } from "@/lib/actions/beans";
 import { ScoreDisplay } from "@/components/ui/score-display";
+import { buttonClassName } from "@/components/ui/button";
 import { chartColors } from "@/config/chart-colors";
 
 interface BeanStats {
@@ -75,7 +76,7 @@ function ChartTooltip({
   const item = payload[0];
   const name = (item.payload?.label as string) ?? item.name ?? label ?? "";
   return (
-    <div className="rounded-sm border border-border bg-surface-warm px-3 py-2 shadow-[2px_2px_0_var(--color-cream-dark)]">
+    <div className="rounded-md border border-border-light bg-surface-warm px-3 py-2 shadow-[0_0.25rem_0.75rem_color-mix(in_srgb,var(--color-brown)_8%,transparent)]">
       <p className="text-[11px] font-medium text-brown-light">{name}</p>
       <p className="font-display text-base font-bold text-brown">
         {item.value}
@@ -87,7 +88,7 @@ function ChartTooltip({
 
 function SectionHeading({ index, title }: { index: string; title: string }) {
   return (
-    <div className="mb-4 flex items-baseline gap-4 border-b border-border-light pb-3">
+    <div className="mb-4 flex items-baseline gap-4 pb-3">
       <span className="font-display text-2xl font-semibold text-accent">{index}</span>
       <h2 className="font-display text-xl font-bold tracking-[-0.02em] text-brown">{title}</h2>
     </div>
@@ -107,7 +108,7 @@ function ChartCard({
 }) {
   return (
     <div
-      className={`stats-rise ${emphasis ? "paper-sheet paper-sheet-feature" : "journal-panel"} p-5 transition-all duration-200 hover:border-accent ${className}`}
+      className={`stats-rise ${emphasis ? "paper-sheet paper-sheet-feature" : "journal-panel"} p-5 ${className}`}
       style={{ animationDelay: `${delay}ms` }}
     >
       {children}
@@ -161,11 +162,11 @@ export default function StatsPage() {
         <div className="h-16 w-56 animate-pulse rounded-md bg-cream-dark" />
         <div className="grid gap-3 sm:grid-cols-3">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="h-28 animate-pulse rounded-lg border border-border bg-surface" />
+            <div key={i} className="h-28 animate-pulse rounded-lg bg-surface" />
           ))}
         </div>
-        <div className="h-64 animate-pulse rounded-lg border border-border bg-surface" />
-        <div className="h-64 animate-pulse rounded-lg border border-border bg-surface" />
+        <div className="h-64 animate-pulse rounded-lg bg-surface" />
+        <div className="h-64 animate-pulse rounded-lg bg-surface" />
       </div>
     );
   }
@@ -195,7 +196,7 @@ export default function StatsPage() {
         <Link
           href={`/${locale}/beans/new`}
           prefetch={false}
-          className="pressable mt-8 inline-flex items-center gap-2 rounded-sm border border-brown bg-brown px-6 py-3 text-sm font-semibold text-cream shadow-[3px_3px_0_var(--color-accent-light)] hover:bg-accent"
+          className={buttonClassName({ size: "lg", className: "mt-8 gap-2" })}
         >
           {tExplore("addFirst")}
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
@@ -247,13 +248,13 @@ export default function StatsPage() {
       `}</style>
 
       {/* ---------- header ---------- */}
-      <header className="stats-rise grid border-y border-border-light md:grid-cols-[1fr_14rem]">
+      <header className="stats-rise grid overflow-hidden rounded-lg bg-surface/55 md:grid-cols-[1fr_14rem]">
         <div className="py-9 md:py-12">
           <h1 className="display-title text-5xl text-brown md:text-7xl">
             {t("title")}
           </h1>
         </div>
-        <div className="border-t border-border bg-surface-warm p-5 md:border-l md:border-t-0 md:p-7">
+        <div className="border-t border-border-light bg-surface-warm p-5 md:border-l md:border-t-0 md:p-7">
           <p className="folio-label">
             {tExplore("results", { count: stats.total })}
           </p>
@@ -262,8 +263,8 @@ export default function StatsPage() {
       </header>
 
       {/* ---------- summary cards ---------- */}
-      <section className="stats-rise grid border-y border-border-light sm:grid-cols-3" style={{ animationDelay: "60ms" }}>
-        <div className="p-5 sm:border-r sm:border-border md:p-7">
+      <section className="stats-rise grid overflow-hidden rounded-lg bg-surface sm:grid-cols-3" style={{ animationDelay: "60ms" }}>
+        <div className="p-5 sm:border-r sm:border-border-light md:p-7">
           <p className="text-xs font-medium text-brown-light">
             {t("totalBeans")}
           </p>
@@ -272,7 +273,7 @@ export default function StatsPage() {
             <span className="ml-1.5 text-sm font-normal text-brown-light">{cupsSuffix}</span>
           </p>
         </div>
-        <div className="border-t border-border p-5 sm:border-r sm:border-t-0 md:p-7">
+        <div className="border-t border-border-light p-5 sm:border-r sm:border-t-0 md:p-7">
           <p className="text-xs font-medium text-brown-light">
             {t("avgScore")}
           </p>
@@ -280,7 +281,7 @@ export default function StatsPage() {
             <ScoreDisplay score={stats.avgScore} size="lg" />
           </div>
         </div>
-        <div className="border-t border-border p-5 sm:border-t-0 md:p-7">
+        <div className="border-t border-border-light p-5 sm:border-t-0 md:p-7">
           <p className="text-xs font-medium text-brown-light">
             {t("bestBean")}
           </p>
@@ -298,7 +299,7 @@ export default function StatsPage() {
       <section className="stats-rise" style={{ animationDelay: "240ms" }}>
         <SectionHeading index="01" title={t("myTaste")} />
         <div className="grid gap-3 sm:grid-cols-2">
-          <div className="border-l-2 border-accent bg-surface-warm p-5">
+          <div className="rounded-lg border-l border-accent-light bg-surface-warm p-5">
             <p className="text-xs font-medium text-brown-light">
               {t("topOrigin")}
             </p>
@@ -308,7 +309,7 @@ export default function StatsPage() {
               {cupsSuffix}
             </p>
           </div>
-          <div className="border-l-2 border-accent bg-surface-warm p-5">
+          <div className="rounded-lg border-l border-accent-light bg-surface-warm p-5">
             <p className="text-xs font-medium text-brown-light">
               {t("topProcess")}
             </p>

@@ -80,14 +80,14 @@ export function GuestRecordForm() {
   if (saved) {
     return (
       <article className="paper-sheet paper-sheet-feature p-5 md:p-8" aria-label={t("savedTitle")}>
-        <div className="flex items-center justify-between border-b border-border-light pb-4">
+        <div className="flex items-center justify-between">
           <h2 className="font-display text-2xl font-bold text-brown">{t("savedTitle")}</h2>
           <time className="folio-label" dateTime={form.consumed_at}>
             {form.consumed_at.replaceAll("-", ". ")}
           </time>
         </div>
 
-        <div className="border-b border-border py-6">
+        <div className="py-6">
           <p className="text-xs text-brown-light">{form.roastery}</p>
           <h3 className="mt-2 font-display text-2xl font-bold tracking-[-0.025em] text-brown">
             {form.name}
@@ -97,7 +97,7 @@ export function GuestRecordForm() {
           </p>
         </div>
 
-        <div className="flex items-end justify-between gap-6 border-b border-border py-5">
+        <div className="flex items-end justify-between gap-6 py-5">
           <div>
             <p className="text-xs text-brown-light">{tb("note")}</p>
             <p className="mt-2 text-sm leading-6 text-brown">{form.note}</p>
@@ -140,7 +140,7 @@ export function GuestRecordForm() {
       </p>
 
       <section className="paper-sheet paper-sheet-feature p-5 md:p-8">
-        <div className="mb-7 flex items-center justify-between border-b border-border-light pb-4">
+        <div className="mb-7 flex items-center justify-between">
           <p className="journal-kicker">{tb("basicInfo")}</p>
           <span className="font-display text-3xl text-accent">01</span>
         </div>
@@ -172,7 +172,7 @@ export function GuestRecordForm() {
             maxLength={100}
             required
           />
-          <div className="grid gap-5 border-t border-border pt-5 sm:grid-cols-2">
+          <div className="grid gap-5 sm:grid-cols-2">
             <Select
               label={`${tb("processMethod")} *`}
               name="process_method"
@@ -206,7 +206,7 @@ export function GuestRecordForm() {
             onChange={(event) => set("consumed_at", event.target.value)}
             required
           />
-          <div className="mt-2 border-t border-border-light pt-6">
+          <div className="mt-8">
             <div className="mb-5 flex items-center justify-between">
               <p className="journal-kicker">{tb("evaluation")}</p>
               <span className="font-display text-2xl text-accent">02</span>

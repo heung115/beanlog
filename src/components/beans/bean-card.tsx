@@ -36,12 +36,12 @@ export function BeanCard({ bean, view = "grid" }: BeanCardProps) {
       data-testid="bean-card"
       data-view={view}
       className={cn(
-        "journal-panel pressable group relative flex flex-col overflow-hidden px-5 py-4 hover:border-t-accent hover:bg-surface-warm hover:shadow-[4px_4px_0_var(--color-cream-dark)] md:px-5 md:py-5",
+        "journal-panel pressable group relative flex flex-col overflow-hidden px-5 py-4 hover:bg-surface-warm md:px-5 md:py-5",
         view === "grid" ? "min-h-60" : "min-h-0"
       )}
     >
       <div className="relative z-10 flex h-full flex-1 flex-col">
-        <div className="mb-4 flex items-center justify-end border-b border-border pb-3">
+        <div className="mb-3 flex items-center justify-end">
           <time className="folio-label" dateTime={bean.consumed_at}>
             {formatDate(bean.consumed_at, locale)}
           </time>
@@ -69,7 +69,7 @@ export function BeanCard({ bean, view = "grid" }: BeanCardProps) {
 
         <p
           data-testid="bean-card-metadata"
-          className="mt-4 border-l-2 border-accent pl-3 font-mono text-[10px] font-semibold uppercase tracking-[0.04em] text-brown-medium"
+          className="mt-4 border-l border-accent-light pl-3 font-mono text-[10px] font-semibold uppercase tracking-[0.04em] text-brown-medium"
         >
           {[
             tProcess(bean.process_method),
@@ -92,7 +92,7 @@ export function BeanCard({ bean, view = "grid" }: BeanCardProps) {
             {visibleTags.map((tag) => (
               <span
                 key={tag.id}
-                className="rounded-sm border border-border px-2 py-0.5 text-[11px] font-medium text-brown-medium"
+                className="rounded-sm bg-cream-dark/60 px-2 py-0.5 text-[11px] font-medium text-brown-medium"
               >
                 {tagDisplayName(tag.tag, locale)}
               </span>
@@ -106,7 +106,7 @@ export function BeanCard({ bean, view = "grid" }: BeanCardProps) {
         {/* Place + date */}
         <div
           className={cn(
-            "flex items-center justify-between border-t border-border-light pt-3",
+            "flex items-center justify-between pt-4",
             view === "grid" ? "mt-auto" : "mt-5"
           )}
         >

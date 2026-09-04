@@ -305,7 +305,7 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
         </div>
         <span
           className={cn(
-            "rounded-full px-2.5 py-0.5 font-semibold tabular-nums transition-colors",
+            "rounded-sm px-2.5 py-0.5 font-semibold tabular-nums transition-colors",
             isComplete
               ? "bg-green-100 text-green-700"
               : total > 100
@@ -324,7 +324,7 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
           return (
             <div
               key={i}
-              className="animate-rise relative flex items-start gap-2 rounded-md border border-border bg-cream-dark/40 p-2.5 focus-within:z-10"
+              className="animate-rise relative flex items-start gap-2 rounded-md border border-border-light bg-cream-dark/40 p-2.5 focus-within:z-10"
               style={{ animationDelay: `${i * 40}ms` }}
             >
             <span className="mt-2.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-brown/10 text-[11px] font-bold text-brown">
@@ -498,8 +498,8 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
         type="button"
         onClick={addComponent}
         className={cn(
-          "flex items-center justify-center gap-1.5 rounded-md border border-dashed border-border py-2.5",
-          "text-sm font-medium text-brown-light transition-all hover:border-accent hover:bg-surface hover:text-brown"
+          "flex items-center justify-center gap-1.5 rounded-md border border-dashed border-border-light py-2.5",
+          "text-sm font-medium text-brown-light transition-all hover:border-border hover:bg-surface hover:text-brown"
         )}
       >
         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">

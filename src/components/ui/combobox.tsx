@@ -264,7 +264,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
             }}
             onKeyDown={handleKeyDown}
             className={cn(
-              "w-full rounded-sm border border-border bg-surface px-3 py-2.5 pr-9 text-sm text-brown placeholder:text-brown-light/40",
+              "w-full rounded-md border border-border-light bg-surface px-3 py-2.5 pr-9 text-sm text-brown placeholder:text-brown-light/40",
               "focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/30",
               "transition-colors duration-150",
               inputClassName
@@ -317,7 +317,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
               id={listId}
               role="listbox"
               aria-label={ariaLabel ?? label}
-              className="absolute z-20 mt-1 max-h-60 w-full min-w-72 overflow-y-auto rounded-sm border border-border bg-surface py-1 shadow-lg"
+              className="absolute z-20 mt-1 max-h-60 w-full min-w-72 overflow-y-auto rounded-md border border-border-light bg-surface py-1 shadow-lg"
             >
               {filtered.map((option, i) => (
                 <li

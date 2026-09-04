@@ -39,7 +39,7 @@ export default async function CheckEmailPage({
     <section className="flex min-h-[80vh] items-center justify-center py-10 text-center">
       <div className="w-full max-w-md">
         <p className="journal-kicker mb-4">{brand.name}</p>
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full border border-border bg-surface text-brown">
+        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-surface-warm text-brown">
           <MailIcon className="h-6 w-6" />
         </div>
 
@@ -50,7 +50,7 @@ export default async function CheckEmailPage({
           {t("checkEmailDescription")}
         </p>
 
-        <ol className="mt-8 border-y border-border py-5 text-left text-sm leading-6 text-brown-light">
+        <ol className="mt-8 rounded-lg bg-surface-warm p-5 text-left text-sm leading-6 text-brown-light">
           <li className="flex gap-3">
             <span className="font-semibold text-brown">1</span>
             <span>{t("checkEmailStepInbox")}</span>

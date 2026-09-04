@@ -32,10 +32,10 @@ function SectionCard({
     <section
       className={`settings-rise ${
         plain
-          ? "border-t border-border-light px-1 pt-6"
+          ? "px-1 pt-6"
           : feature
             ? "paper-sheet paper-sheet-feature p-5 md:p-7"
-            : "border-l-2 border-accent bg-surface-warm p-5 md:p-7"
+            : "rounded-lg border-l border-accent-light bg-surface-warm p-5 md:p-7"
       } ${danger ? "border-red-200 bg-red-50/30" : ""}`}
       style={{ animationDelay: `${delay}ms` }}
     >
@@ -185,7 +185,7 @@ export default function SettingsPage() {
       `}</style>
 
       {/* ---------- header ---------- */}
-      <header className="settings-rise border-y border-border-light py-9 md:py-12">
+      <header className="settings-rise py-9 md:py-12">
         <h1 className="display-title text-5xl text-brown md:text-7xl">
           {t("title")}
         </h1>
@@ -216,7 +216,7 @@ export default function SettingsPage() {
         <div
           role="radiogroup"
           aria-label={t("language")}
-          className="inline-flex rounded-sm border border-border bg-cream p-1"
+          className="inline-flex rounded-md bg-cream-dark/60 p-1"
         >
           {locales.map((l) => {
             const active = l.value === locale;
@@ -227,10 +227,10 @@ export default function SettingsPage() {
                 role="radio"
                 aria-checked={active}
                 onClick={() => switchLocale(l.value)}
-                className={`min-h-11 rounded-sm border px-5 py-2 text-sm font-semibold transition-all duration-150 ${
+                className={`min-h-11 rounded-sm border border-transparent px-5 py-2 text-sm font-semibold transition-all duration-150 ${
                   active
-                    ? "border-brown bg-brown text-cream shadow-[2px_2px_0_var(--color-accent-light)]"
-                    : "border-transparent text-brown-light hover:border-border hover:text-brown"
+                    ? "bg-brown text-cream"
+                    : "text-brown-light hover:bg-surface hover:text-brown"
                 }`}
               >
                 {l.label}
@@ -263,14 +263,14 @@ export default function SettingsPage() {
         <div className="grid gap-2 sm:grid-cols-2">
           <Link
             href={`/${locale}/terms`}
-            className="flex min-h-11 items-center gap-2.5 border-b border-border-light px-1 py-2 text-sm font-medium text-brown transition-colors hover:border-accent hover:text-accent"
+            className="flex min-h-11 items-center gap-2.5 rounded-md px-2 py-2 text-sm font-medium text-brown transition-colors hover:bg-surface-warm hover:text-accent"
           >
             <Icon path={ICONS.document} className="h-4 w-4 text-accent" />
             {t("terms")}
           </Link>
           <Link
             href={`/${locale}/privacy`}
-            className="flex min-h-11 items-center gap-2.5 border-b border-border-light px-1 py-2 text-sm font-medium text-brown transition-colors hover:border-accent hover:text-accent"
+            className="flex min-h-11 items-center gap-2.5 rounded-md px-2 py-2 text-sm font-medium text-brown transition-colors hover:bg-surface-warm hover:text-accent"
           >
             <Icon path={ICONS.document} className="h-4 w-4 text-accent" />
             {t("privacy")}
@@ -310,7 +310,7 @@ export default function SettingsPage() {
           onClick={() => !deleting && setConfirmOpen(false)}
         >
           <div
-            className="settings-rise paper-sheet w-full max-w-sm border-t-[3px] border-t-red-700 p-6"
+            className="settings-rise paper-sheet w-full max-w-sm p-6"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"

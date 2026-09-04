@@ -521,6 +521,11 @@ test("origin hub opens flavor and regional guidance without card shortcuts", asy
   await expect(page.getByRole("heading", { level: 1, name: "에티오피아" })).toBeVisible();
   await expect(page.getByText("화사한 꽃향", { exact: true })).toBeVisible();
   await expect(page.getByText("예가체프", { exact: true })).toBeVisible();
+  const regionDivider = await page
+    .getByText("예가체프", { exact: true })
+    .locator("xpath=ancestor::li")
+    .evaluate((element) => getComputedStyle(element).borderRightWidth);
+  expect(regionDivider).toBe("0px");
 
   await page.goto("/ko/explore");
   await page.getByRole("searchbox").fill("#12 에티오피아");
@@ -614,17 +619,21 @@ test("coffee card metadata uses the readable secondary text token", async ({ pag
   await expectNoSeriousA11yViolations(page);
 });
 
-test("explore uses restrained corners for cards and filters", async ({ page }) => {
+test("explore uses a subtle corner hierarchy for cards and filters", async ({ page }) => {
   await login(page);
   await page.getByRole("button", { name: "필터" }).click();
 
   const firstCard = page.locator("[data-bean-card]").first();
-  const radii = await Promise.all([
+  const controlRadii = await Promise.all([
     page.getByRole("searchbox").evaluate((element) => getComputedStyle(element).borderRadius),
     page.locator('select[aria-label="산지"]').evaluate((element) => getComputedStyle(element).borderRadius),
-    firstCard.evaluate((element) => getComputedStyle(element).borderRadius),
   ]);
-  expect(new Set(radii)).toEqual(new Set(["2px"]));
+  const cardRadius = await firstCard.evaluate(
+    (element) => getComputedStyle(element).borderRadius
+  );
+
+  expect(new Set(controlRadii)).toEqual(new Set(["6px"]));
+  expect(cardRadius).toBe("8px");
 });
 
 test("explore switches between grid and list views and restores the choice", async ({ page }) => {
@@ -806,8 +815,11 @@ test("explore progressively discloses aligned filters without overflow", async (
     Math.max(...layout.rects.map((rect) => rect.width)) -
       Math.min(...layout.rects.map((rect) => rect.width))
   ).toBeLessThanOrEqual(1);
-  expect(layout.rects[0].left).toBeCloseTo(layout.panel.left, 0);
-  expect(layout.rects[2].right).toBeCloseTo(layout.panel.right, 0);
+  const leftInset = layout.rects[0].left - layout.panel.left;
+  const rightInset = layout.panel.right - layout.rects[2].right;
+  expect(leftInset).toBeGreaterThanOrEqual(0);
+  expect(leftInset).toBeLessThanOrEqual(20);
+  expect(leftInset).toBeCloseTo(rightInset, 0);
 
   for (const rowStart of [0, 3]) {
     for (let index = rowStart + 1; index < rowStart + 3; index += 1) {
@@ -903,10 +915,13 @@ test("Korean bean detail uses SUIT type and quiet paper cards", async ({ page })
   expect(new Set(appearance.sectionBackgrounds)).toEqual(
     new Set([expectedSurface])
   );
-  expect(new Set(appearance.sectionRadii)).toEqual(new Set(["2px"]));
-  expect(Number.parseFloat(appearance.scoreBorderTopWidth)).toBeLessThanOrEqual(1);
-  expect(appearance.scoreBorderTopColor).toBe(expectedBorderLight);
-  expect(appearance.scoreBorderTopColor).not.toBe(expectedBrown);
+  expect(new Set(appearance.sectionRadii)).toEqual(new Set(["8px"]));
+  const scoreBorderTopWidth = Number.parseFloat(appearance.scoreBorderTopWidth);
+  expect([0, 1]).toContain(scoreBorderTopWidth);
+  if (scoreBorderTopWidth > 0) {
+    expect(appearance.scoreBorderTopColor).toBe(expectedBorderLight);
+    expect(appearance.scoreBorderTopColor).not.toBe(expectedBrown);
+  }
   await expectNoSeriousA11yViolations(page);
 });
 

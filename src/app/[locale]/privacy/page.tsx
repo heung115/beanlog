@@ -52,7 +52,7 @@ function KoreanPrivacy() {
         >
           <table className="w-full min-w-[40rem] border-collapse text-left">
             <thead>
-              <tr className="border-y border-border text-brown">
+              <tr className="border-y border-border-light bg-surface-warm/60 text-brown">
                 <th className="px-3 py-3 font-semibold">구분</th>
                 <th className="px-3 py-3 font-semibold">항목</th>
                 <th className="px-3 py-3 font-semibold">목적</th>
@@ -98,7 +98,7 @@ function KoreanPrivacy() {
 
       <LegalSection title="4. 처리 위탁과 국외 이전">
         <p>서비스 서버와 데이터베이스 운영을 위해 다음과 같이 클라우드 인프라를 이용합니다.</p>
-        <dl className="grid gap-x-5 gap-y-2 border-y border-border py-4 sm:grid-cols-[10rem_1fr]">
+        <dl className="grid gap-x-5 gap-y-2 rounded-lg bg-surface-warm p-4 sm:grid-cols-[10rem_1fr]">
           <dt className="font-semibold text-brown">이전받는 자</dt>
           <dd>
             Oracle Corporation 및 그 계열사 (

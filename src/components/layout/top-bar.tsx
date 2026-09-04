@@ -35,7 +35,7 @@ export function TopBar({ user }: TopBarProps) {
           </Link>
           <nav
             aria-label={t("publicNavigation")}
-            className="order-2 flex w-full items-center justify-between gap-1 border-t border-border-light pt-2 sm:order-none sm:w-auto sm:justify-end sm:border-t-0 sm:pt-0"
+            className="order-2 flex w-full items-center justify-between gap-1 pt-2 sm:order-none sm:w-auto sm:justify-end sm:pt-0"
           >
             <Link
               href={`/${locale}/origins`}
@@ -106,15 +106,15 @@ export function TopBar({ user }: TopBarProps) {
               </Link>
             );
           })}
-          <div className="ml-2 border-l border-border-light pl-3">
+          <div className="ml-3">
             <Link
               href={`/${locale}/settings`}
               prefetch={false}
               aria-label={`${t("account")}: ${user.displayName}`}
               title={user.displayName}
-              className="flex items-center gap-2 rounded-sm border border-transparent px-1.5 py-1 transition-colors hover:border-border hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="flex items-center gap-2 rounded-md px-1.5 py-1 transition-colors hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border border-brown bg-brown font-mono text-xs font-semibold text-cream">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-brown font-mono text-xs font-semibold text-cream">
                 {user.displayName.slice(0, 1).toLocaleUpperCase()}
               </span>
               <span className="flex min-w-0 max-w-28 flex-col leading-tight">

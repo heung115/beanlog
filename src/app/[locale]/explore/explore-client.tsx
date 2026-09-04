@@ -91,11 +91,11 @@ function FilterChip({ label, allLabel, value, options, onChange }: FilterChipPro
         value={value ?? ""}
         onChange={(e) => onChange(e.target.value || undefined)}
         className={cn(
-          "min-h-11 w-full cursor-pointer appearance-none rounded-sm border py-2 pl-3 pr-9 text-xs font-medium transition-colors duration-150",
+          "min-h-11 w-full cursor-pointer appearance-none rounded-md border py-2 pl-3 pr-9 text-xs font-medium transition-colors duration-150",
           "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
           active
-            ? "border-brown bg-brown text-cream"
-            : "border-border bg-surface text-brown-medium hover:border-brown-light"
+            ? "border-transparent bg-brown text-cream"
+            : "border-border-light bg-surface text-brown-medium hover:border-border"
         )}
       >
         <option value="">{allLabel}</option>
@@ -122,7 +122,7 @@ function FilterChip({ label, allLabel, value, options, onChange }: FilterChipPro
 
 function SkeletonCard() {
   return (
-    <div className="animate-pulse rounded-sm border border-border bg-surface p-5">
+    <div className="animate-pulse rounded-lg border border-border-light bg-surface p-5">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <div className="h-5 w-2/3 rounded bg-cream-dark" />
@@ -179,7 +179,7 @@ function EmptyState({
         <Link
           href={`/${locale}/beans/new`}
           prefetch={false}
-          className="mt-6 inline-flex items-center justify-center rounded-sm bg-brown px-6 py-3 text-base font-medium text-cream transition-colors duration-150 hover:bg-brown-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="mt-6 inline-flex items-center justify-center rounded-md bg-brown px-6 py-3 text-base font-medium text-cream transition-colors duration-150 hover:bg-brown-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {t("addFirst")}
         </Link>
@@ -457,7 +457,7 @@ export function ExploreClient({
 
   return (
     <div className="mx-auto w-full max-w-6xl">
-      <header className="mb-7 grid border-y border-border-light md:grid-cols-[1fr_13rem]">
+      <header className="mb-7 grid overflow-hidden rounded-lg bg-surface/55 md:grid-cols-[1fr_13rem]">
         <div className="py-9 md:py-12">
           <h1 className="display-title text-5xl text-brown md:text-7xl">
             {t("title")}
@@ -491,7 +491,7 @@ export function ExploreClient({
             placeholder={t("searchPlaceholder")}
             aria-label={t("search")}
             className={cn(
-              "min-h-12 w-full rounded-sm border border-border bg-cream py-2.5 pl-10 pr-3 text-sm text-brown",
+              "min-h-12 w-full rounded-md border border-border-light bg-cream py-2.5 pl-10 pr-3 text-sm text-brown",
               "placeholder:text-brown-light/60 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15",
               "transition-colors duration-150 disabled:cursor-wait disabled:opacity-70"
             )}
@@ -504,11 +504,11 @@ export function ExploreClient({
           aria-controls="explore-filter-panel"
           onClick={() => setFiltersOpen((open) => !open)}
           className={cn(
-            "inline-flex min-h-12 items-center justify-center gap-2 rounded-sm border px-3 text-xs font-semibold transition-colors duration-150",
+            "inline-flex min-h-12 items-center justify-center gap-2 rounded-md border px-3 text-xs font-semibold transition-colors duration-150",
             "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
             filtersOpen
-              ? "border-brown bg-brown text-cream"
-              : "border-border bg-cream text-brown-medium hover:border-brown-light"
+              ? "border-transparent bg-brown text-cream"
+              : "border-border-light bg-cream text-brown-medium hover:border-border"
           )}
         >
           <svg aria-hidden="true" className="h-4 w-4" viewBox="0 0 16 16" fill="none">
@@ -528,8 +528,8 @@ export function ExploreClient({
             value={sortValue}
             onChange={(e) => handleSortChange(e.target.value)}
             className={cn(
-              "min-h-12 w-full cursor-pointer appearance-none rounded-sm border border-border bg-cream py-2 pl-3 pr-9 text-xs font-semibold text-brown-medium",
-              "transition-colors duration-150 hover:border-brown-light focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              "min-h-12 w-full cursor-pointer appearance-none rounded-md border border-border-light bg-cream py-2 pl-3 pr-9 text-xs font-semibold text-brown-medium",
+              "transition-colors duration-150 hover:border-border focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             )}
           >
             <option value="newest">{t("sortNewest")}</option>
@@ -548,7 +548,7 @@ export function ExploreClient({
       </div>
 
       {filtersOpen && (
-        <div id="explore-filter-panel" className="mt-4 border-y border-border-light bg-surface-warm py-4">
+        <div id="explore-filter-panel" className="mt-4 rounded-lg bg-surface-warm p-4">
           <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
             <FilterChip
               label={t("allOrigins")}
@@ -605,7 +605,7 @@ export function ExploreClient({
                 type="button"
                 aria-label={t("removeFilter", { label: item.label, value: item.valueLabel })}
                 onClick={() => removeFilter(item.key)}
-                className="inline-flex min-h-8 items-center gap-1.5 border-b border-border-light text-xs text-brown-medium transition-colors duration-150 hover:border-brown hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="inline-flex min-h-8 items-center gap-1.5 rounded-md bg-surface-warm px-2.5 text-xs text-brown-medium transition-colors duration-150 hover:bg-cream-dark hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 <span className="text-brown-light">{item.label}</span>
                 <span>{item.valueLabel}</span>
@@ -623,12 +623,12 @@ export function ExploreClient({
         </div>
       )}
 
-      <div className="mt-8 flex items-center justify-between border-b border-border-light pb-3">
+      <div className="mt-8 flex items-center justify-between pb-3">
         <p className="folio-label">
           {loading ? t("results", { count: 0 }) : t("results", { count: total })}
         </p>
         <div
-          className="hidden items-center border border-border bg-surface md:flex"
+          className="hidden items-center overflow-hidden rounded-md border border-border-light bg-surface md:flex"
           role="group"
           aria-label={t("viewMode")}
         >
@@ -652,7 +652,7 @@ export function ExploreClient({
             aria-pressed={viewMode === "grid"}
             onClick={() => changeView("grid")}
             className={cn(
-              "flex min-h-11 min-w-11 items-center justify-center border-l border-border text-brown-light transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent",
+              "flex min-h-11 min-w-11 items-center justify-center border-l border-border-light text-brown-light transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent",
               viewMode === "grid" && "bg-cream-dark text-brown"
             )}
           >

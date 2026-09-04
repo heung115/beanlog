@@ -47,7 +47,7 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
           </Link>
           <nav
             aria-label={copy.navigation}
-            className="order-2 flex w-full items-center justify-between gap-1 border-t border-border-light pt-2 sm:order-none sm:w-auto sm:justify-end sm:border-t-0 sm:pt-0"
+            className="order-2 flex w-full items-center justify-between gap-1 pt-2 sm:order-none sm:w-auto sm:justify-end sm:pt-0"
           >
             <LocaleSwitcher locale={locale} />
             <Link
@@ -67,7 +67,7 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
       </header>
 
       <main id="main-content">
-        <section data-landing-section="hero" className="relative border-b border-border-light">
+        <section data-landing-section="hero" className="relative">
           <OriginContours className="pointer-events-none absolute -right-56 -top-28 h-[42rem] w-[52rem] opacity-35 md:-right-24 md:-top-16 md:opacity-60" />
           <div className="relative mx-auto grid w-full max-w-6xl gap-12 px-4 pb-16 pt-12 md:px-6 md:pb-24 md:pt-20 lg:grid-cols-[minmax(0,1.04fr)_minmax(22rem,0.72fr)] lg:items-center lg:gap-20">
             <div>
@@ -89,7 +89,7 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
             </div>
 
             <div className="relative mx-auto w-full max-w-[28rem] lg:mx-0 lg:justify-self-end">
-              <div aria-hidden="true" className="absolute -inset-x-3 -bottom-3 top-4 rotate-[1.8deg] border border-border bg-surface-warm" />
+              <div aria-hidden="true" className="absolute -inset-x-3 -bottom-3 top-4 rotate-[1.8deg] rounded-lg bg-surface-warm" />
               <article className="paper-sheet relative p-5 md:p-7" aria-label={copy.example.ariaLabel}>
                 <div className="flex items-start justify-between gap-6 border-b border-border-light pb-4">
                   <div>
@@ -137,10 +137,10 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
                 <p className="journal-kicker">{copy.features.eyebrow}</p>
                 <h2 className="display-title mt-4 max-w-3xl text-4xl text-brown md:text-6xl">{copy.features.title}</h2>
               </div>
-              <p className="border-l-2 border-accent pl-5 text-sm leading-7 text-brown-medium">{copy.features.intro}</p>
+              <p className="border-l border-accent-light pl-5 text-sm leading-7 text-brown-medium">{copy.features.intro}</p>
             </div>
 
-            <ol className="mt-12 border-t border-border-light">
+            <ol className="mt-12">
               {copy.features.items.map(([term, description], index) => (
                 <li key={term} className="ledger-row group grid gap-3 py-6 md:grid-cols-[5rem_minmax(15rem,0.55fr)_minmax(0,0.8fr)] md:items-baseline md:gap-8 md:py-7">
                   <span className="font-display text-3xl text-accent/80">{String(index + 1).padStart(2, "0")}</span>
@@ -152,7 +152,7 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
           </div>
         </section>
 
-        <section data-landing-section="origins" className="relative border-y border-border-light bg-surface-warm">
+        <section data-landing-section="origins" className="relative bg-surface-warm">
           <OriginContours className="pointer-events-none absolute -left-52 bottom-[-10rem] h-[40rem] w-[50rem] rotate-180 opacity-35" />
           <div className="relative mx-auto grid w-full max-w-6xl gap-12 px-4 py-16 md:grid-cols-[minmax(19rem,0.6fr)_minmax(0,1fr)] md:gap-20 md:px-6 md:py-24">
             <div className="md:sticky md:top-28 md:self-start">
@@ -164,7 +164,7 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
               </Link>
             </div>
 
-            <ol className="border-t border-border-light bg-surface/55 px-4 md:px-6">
+            <ol className="rounded-lg bg-surface/55 px-4 md:px-6">
               {featuredOrigins.map((origin, index) => {
                 const countryName = isKorean ? origin.countryKo : origin.country;
                 const signature = isKorean ? origin.signatureKo : origin.signature;
@@ -195,7 +195,7 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
               <p className="journal-kicker">{copy.steps.eyebrow}</p>
               <h2 className="display-title mt-4 text-4xl text-brown md:text-5xl">{copy.steps.title}</h2>
             </div>
-            <ol className="border-t border-border-light">
+            <ol>
               {copy.steps.items.map(([title, description], index) => (
                 <li key={title} className="ledger-row grid gap-3 py-6 md:grid-cols-[4rem_13rem_1fr] md:items-baseline md:gap-6">
                   <span className="folio-label">
@@ -215,7 +215,7 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
               <p className="journal-kicker">{copy.faq.eyebrow}</p>
               <h2 className="display-title mt-4 text-4xl text-brown md:text-5xl">{copy.faq.title}</h2>
             </div>
-            <ol className="border-t border-border-light">
+            <ol>
               {copy.faq.items.map(([question, answer], index) => (
                 <li key={question} className="ledger-row grid gap-3 py-6 md:grid-cols-[3rem_minmax(12rem,0.7fr)_minmax(0,1fr)] md:gap-6">
                   <span className="folio-label">Q{String(index + 1).padStart(2, "0")}</span>

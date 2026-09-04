@@ -73,10 +73,10 @@ function DetailSkeleton() {
   return (
     <div className="flex animate-pulse flex-col gap-4">
       <div className="h-8 w-40 rounded bg-border-light" />
-      <div className="h-32 rounded-lg border border-border bg-surface" />
+      <div className="h-32 rounded-lg bg-surface" />
       <div className="grid gap-4 md:grid-cols-2">
-        <div className="h-48 rounded-lg border border-border bg-surface" />
-        <div className="h-48 rounded-lg border border-border bg-surface" />
+        <div className="h-48 rounded-lg bg-surface" />
+        <div className="h-48 rounded-lg bg-surface" />
       </div>
     </div>
   );
@@ -273,12 +273,12 @@ export default function BeanDetailPage() {
       </div>
 
       {/* Header */}
-      <header className="animate-rise mb-7 grid border-y border-border-light md:grid-cols-[1fr_15rem]" style={{ animationDelay: "40ms" }}>
+      <header className="animate-rise mb-7 grid overflow-hidden rounded-lg bg-surface md:grid-cols-[1fr_15rem]" style={{ animationDelay: "40ms" }}>
         <div className="py-8 md:py-11 md:pr-10">
           <h1 className="display-title text-5xl text-brown md:text-7xl">{bean.name}</h1>
           <p className="mt-3 text-sm font-semibold uppercase tracking-[0.06em] text-brown-light">{bean.roastery}</p>
         </div>
-        <div className="border-t border-border bg-surface-warm p-5 md:border-l md:border-t-0 md:p-7">
+        <div className="border-t border-border-light bg-surface-warm p-5 md:border-l md:border-t-0 md:p-7">
           <p className="folio-label">{t("classification")}</p>
           <p className="mt-4 text-sm font-semibold leading-6 text-brown-medium">
           {[
@@ -289,7 +289,7 @@ export default function BeanDetailPage() {
             .filter(Boolean)
             .join(" · ")}
           </p>
-          <p className="mt-5 flex items-center gap-2 border-t border-border pt-4 text-xs text-brown-light">
+          <p className="mt-5 flex items-center gap-2 border-t border-border-light pt-4 text-xs text-brown-light">
           <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
             <rect
               x="1"
@@ -332,7 +332,7 @@ export default function BeanDetailPage() {
             {tags.map((tag) => (
               <span
                 key={tag.id}
-                className="rounded-sm border border-border bg-transparent px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.04em] text-brown-medium"
+                className="rounded-sm bg-cream-dark/60 px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.04em] text-brown-medium"
               >
                 {tagDisplayName(tag.tag, locale)}
               </span>
@@ -407,7 +407,7 @@ export default function BeanDetailPage() {
             <Link
               data-testid="origin-detail-guide-link"
               href={`/${locale}/origins/${originSlug(countryPreset.country)}`}
-              className="mt-4 flex min-h-10 w-full items-center justify-between gap-3 rounded-sm border border-border bg-surface-warm px-3 text-xs font-semibold text-accent transition-colors hover:border-accent hover:bg-cream-dark hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="mt-4 flex min-h-10 w-full items-center justify-between gap-3 rounded-md border border-border-light bg-surface-warm px-3 text-xs font-semibold text-accent transition-colors hover:border-border hover:bg-cream-dark hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               <span className="inline-flex items-center gap-2">
                 <svg
@@ -467,7 +467,7 @@ export default function BeanDetailPage() {
       {countryPreset && (
         <Card
           delay={220}
-          className="mt-4 border-t border-border-light"
+          className="mt-4"
           testId="origin-flavor-guide"
         >
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -479,7 +479,7 @@ export default function BeanDetailPage() {
             </div>
             <Link
               href={`/${locale}/origins/${originSlug(countryPreset.country)}`}
-              className="inline-flex min-h-9 shrink-0 items-center gap-1 self-start rounded-sm border border-border px-3 text-xs font-medium text-accent transition-colors hover:border-accent hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className="inline-flex min-h-9 shrink-0 items-center gap-1 self-start rounded-md border border-border-light px-3 text-xs font-medium text-accent transition-colors hover:border-border hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               {t("viewOriginGuide", { country: countryName })}
               <svg
@@ -502,7 +502,7 @@ export default function BeanDetailPage() {
           <p className="mt-5 font-display text-xl font-semibold leading-relaxed text-brown md:text-2xl">
             {locale === "ko" ? countryPreset.signatureKo : countryPreset.signature}
           </p>
-          <div className="mt-5 border-t border-border-light pt-4">
+          <div className="mt-5">
             <p className="text-xs font-medium text-brown-light">
               {t("originRegion")}
             </p>

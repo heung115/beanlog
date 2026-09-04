@@ -11,7 +11,7 @@ export default function GuestRecordPage() {
 
   return (
     <div className="mx-auto max-w-4xl py-4 md:py-8">
-      <header className="relative mb-8 overflow-hidden border-y border-border-light bg-surface-warm px-5 py-8 md:px-8 md:py-10">
+      <header className="relative mb-8 overflow-hidden rounded-lg bg-surface-warm px-5 py-8 md:px-8 md:py-10">
         <Link href="/" aria-label={brand.name} className="inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-accent">
           <BeanmapMark compact />
         </Link>

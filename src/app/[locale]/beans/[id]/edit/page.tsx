@@ -12,8 +12,8 @@ import type { BeanWithTags } from "@/types/database";
 function FormSkeleton() {
   return (
     <div className="flex animate-pulse flex-col gap-4">
-      <div className="h-72 rounded-lg border border-border bg-surface" />
-      <div className="h-12 rounded-lg border border-dashed border-border" />
+      <div className="h-72 rounded-lg bg-surface" />
+      <div className="h-12 rounded-lg border border-dashed border-border-light" />
       <div className="h-14 rounded-lg" />
     </div>
   );
@@ -47,7 +47,7 @@ export default function EditBeanPage() {
 
   return (
     <div className="mx-auto max-w-4xl">
-      <header className="animate-rise mb-8 border-y border-border-light py-9 md:py-12">
+      <header className="animate-rise mb-8 py-9 md:py-12">
         <h1 className="display-title text-5xl text-brown md:text-7xl">
           {t("editTitle")}
         </h1>

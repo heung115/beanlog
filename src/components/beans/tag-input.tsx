@@ -69,7 +69,7 @@ export function TagInput({ value, onChange }: TagInputProps) {
     <div className="flex flex-col gap-4">
       {/* Selected tags */}
       {value.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2 rounded-sm border border-border-light bg-cream-dark/60 p-3">
+        <div className="flex flex-wrap items-center gap-2 rounded-md bg-cream-dark/60 p-3">
           {value.map((v) => (
             <span
               key={v.tag}
@@ -115,7 +115,7 @@ export function TagInput({ value, onChange }: TagInputProps) {
         }}
         placeholder={t("tastingNotesPlaceholder")}
         className={cn(
-          "min-h-12 w-full rounded-sm border border-border bg-surface px-3.5 py-2.5 text-sm text-brown placeholder:text-brown-light/60",
+          "min-h-12 w-full rounded-md border border-border-light bg-surface px-3.5 py-2.5 text-sm text-brown placeholder:text-brown-light/60",
           "transition-colors duration-150 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15"
         )}
       />
@@ -145,8 +145,8 @@ export function TagInput({ value, onChange }: TagInputProps) {
                         "rounded-sm border px-2.5 py-1 text-xs transition-all duration-150",
                         "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
                         selected
-                          ? "border-brown bg-brown text-cream shadow-sm"
-                          : "border-border bg-surface text-brown-medium hover:border-accent hover:text-brown"
+                          ? "border-transparent bg-brown text-cream"
+                          : "border-border-light bg-surface text-brown-medium hover:border-border hover:text-brown"
                       )}
                     >
                       {presetLabel(preset, locale)}
