@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { getBeans } from "@/lib/actions/beans";
 import { BeanCard } from "@/components/beans/bean-card";
 import { Button } from "@/components/ui/button";
+import { EmptyJournalGuide } from "@/components/beans/empty-journal-guide";
+import { PageIntro } from "@/components/layout/page-intro";
 import { cn } from "@/lib/utils";
 import { splitVarietals } from "@/lib/coffee/varietals";
 import { originPresets } from "@/data/origin-presets";
@@ -154,40 +155,34 @@ function EmptyState({
   const t = useTranslations("explore");
   const locale = useLocale();
 
+  if (!hasFilters) {
+    return (
+      <EmptyJournalGuide
+        testId="explore-empty-state"
+        eyebrow={t("emptyEyebrow")}
+        title={t("emptyTitle")}
+        description={t("emptyDescription")}
+        actionLabel={t("addFirst")}
+        href={`/${locale}/beans/new`}
+        steps={[
+          { title: t("emptyStepBean"), description: t("emptyStepBeanDescription") },
+          { title: t("emptyStepTaste"), description: t("emptyStepTasteDescription") },
+          { title: t("emptyStepInsight"), description: t("emptyStepInsightDescription") },
+        ]}
+      />
+    );
+  }
+
   return (
     <div
       data-testid="explore-empty-state"
-      className="col-span-full flex flex-col items-center px-6 py-12 text-center md:py-14"
+      className="col-span-full flex flex-col items-center px-6 py-10 text-center md:py-12"
     >
-      <svg
-        aria-hidden="true"
-        className="mb-4 h-10 w-10 text-brown-light/35"
-        viewBox="0 0 48 48"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M8 20h26v10a10 10 0 01-10 10H18a10 10 0 01-10-10V20z" />
-        <path d="M34 22h3a5 5 0 010 10h-3" />
-        <path d="M16 14c0-2 2-2 2-4M22 14c0-2 2-2 2-4M28 14c0-2 2-2 2-4" />
-      </svg>
-      <h2 className="text-lg font-semibold tracking-[-0.015em] text-brown">{t("empty")}</h2>
-      <p className="mt-1.5 text-sm text-brown-light">{t("emptySub")}</p>
-      {hasFilters ? (
-        <Button variant="secondary" size="md" className="mt-6" onClick={onClear}>
-          {t("clearFilters")}
-        </Button>
-      ) : (
-        <Link
-          href={`/${locale}/beans/new`}
-          prefetch={false}
-          className="mt-5 inline-flex min-h-11 items-center justify-center rounded-md bg-brown px-5 py-2.5 text-sm font-semibold text-cream transition-colors duration-150 hover:bg-brown-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-        >
-          {t("addFirst")}
-        </Link>
-      )}
+      <h2 className="text-lg font-semibold tracking-[-0.015em] text-brown">{t("noMatches")}</h2>
+      <p className="mt-1.5 max-w-sm text-sm leading-6 text-brown-light">{t("noMatchesSub")}</p>
+      <Button variant="secondary" size="md" className="mt-6" onClick={onClear}>
+        {t("clearFilters")}
+      </Button>
     </div>
   );
 }
@@ -497,16 +492,22 @@ export function ExploreClient({
   };
 
   const pageHeader = (
-    <header data-testid="explore-header" className="mb-6 pt-2 md:mb-7 md:pt-3">
-      <h1 className="text-2xl font-semibold leading-tight tracking-[-0.025em] text-brown md:text-3xl">
-        {t("title")}
-      </h1>
-    </header>
+    <PageIntro
+      eyebrow={t("eyebrow")}
+      title={t("title")}
+      description={t("description")}
+      testId="explore-header"
+      meta={(
+        <p role="status" aria-live="polite" className="folio-label">
+          {t("results", { count: total })}
+        </p>
+      )}
+    />
   );
 
   if (!hasJournalEntries && !loadError && !loading) {
     return (
-      <div className="mx-auto w-full max-w-4xl">
+      <div className="mx-auto w-full max-w-5xl">
         {pageHeader}
         <div data-testid="bean-grid" data-view={viewMode} className="grid grid-cols-1">
           <EmptyState hasFilters={false} onClear={clearFilters} />
@@ -517,7 +518,7 @@ export function ExploreClient({
 
   if (!hasJournalEntries && loadError) {
     return (
-      <div className="mx-auto w-full max-w-4xl">
+      <div className="mx-auto w-full max-w-5xl">
         {pageHeader}
         <div className="grid grid-cols-1">
           <LoadErrorState onRetry={() => setRetryKey((key) => key + 1)} />
@@ -527,11 +528,11 @@ export function ExploreClient({
   }
 
   return (
-    <div className="mx-auto w-full max-w-4xl">
+    <div className="mx-auto w-full max-w-5xl">
       {pageHeader}
       <div
         data-testid="explore-toolbar"
-        className="grid grid-cols-2 gap-2 md:grid-cols-[minmax(0,1fr)_auto_auto]"
+        className="mt-8 grid grid-cols-2 gap-2 md:grid-cols-[minmax(0,1fr)_auto_auto]"
       >
         <div className="relative col-span-2 md:col-span-1">
           <svg
@@ -703,15 +704,8 @@ export function ExploreClient({
         </div>
       )}
 
-      <div data-testid="explore-results" className="mt-6 flex items-center justify-between">
-        <p
-          role="status"
-          aria-live="polite"
-          className="text-xs font-medium tabular-nums text-brown-light"
-        >
-          {t("results", { count: total })}
-        </p>
-        {beans.length > 0 && (
+      {beans.length > 0 && (
+        <div data-testid="explore-results" className="mt-6 flex items-center justify-end">
           <div className="hidden items-center gap-1 md:flex" role="group" aria-label={t("viewMode")}>
             <button
               type="button"
@@ -745,8 +739,8 @@ export function ExploreClient({
               </svg>
             </button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       <div
         data-testid="bean-grid"

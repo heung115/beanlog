@@ -6,6 +6,12 @@ import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { buttonClassName } from "@/components/ui/button";
 import { BeanmapMark } from "@/components/brand/beanmap-mark";
+import {
+  getAppPathname,
+  isNavigationItemActive,
+  navigationAriaCurrent,
+  type PrimaryNavigationHref,
+} from "./navigation-state";
 import { LocaleSwitcher } from "./locale-switcher";
 
 interface TopBarProps {
@@ -15,7 +21,7 @@ interface TopBarProps {
 export function TopBar({ user }: TopBarProps) {
   const pathname = usePathname();
   const locale = useLocale() as "ko" | "en";
-  const appPathname = pathname.replace(/^\/(ko|en)(?=\/|$)/, "") || "/";
+  const appPathname = getAppPathname(pathname);
   const t = useTranslations("nav");
   const tAuth = useTranslations("auth");
 
@@ -39,10 +45,24 @@ export function TopBar({ user }: TopBarProps) {
           >
             <Link
               href={`/${locale}/origins`}
-              aria-current={appPathname.startsWith("/origins") ? "page" : undefined}
-              className="inline-flex min-h-11 items-center rounded-sm px-1.5 text-xs font-semibold text-brown-light transition-colors hover:bg-surface hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:px-2 sm:text-sm"
+              aria-current={navigationAriaCurrent(appPathname, "/origins")}
+              className={cn(
+                "relative inline-flex min-h-11 items-center px-1.5 text-xs font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:px-2 sm:text-sm",
+                isNavigationItemActive(appPathname, "/origins")
+                  ? "text-brown"
+                  : "text-brown-light hover:text-brown"
+              )}
             >
               {t("origins")}
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "absolute inset-x-2 bottom-0 h-px origin-center bg-accent transition-transform duration-200",
+                  isNavigationItemActive(appPathname, "/origins")
+                    ? "scale-x-100"
+                    : "scale-x-0"
+                )}
+              />
             </Link>
             <LocaleSwitcher locale={locale} />
             <Link
@@ -73,7 +93,11 @@ export function TopBar({ user }: TopBarProps) {
     { href: "/origins", label: t("origins") },
     { href: "/stats", label: t("stats"), prefetch: false },
     { href: "/settings", label: t("settings"), prefetch: false },
-  ];
+  ] satisfies Array<{
+    href: PrimaryNavigationHref;
+    label: string;
+    prefetch?: false;
+  }>;
 
   return (
     <header className="sticky top-0 z-40 hidden bg-cream/95 backdrop-blur-sm md:block">
@@ -87,22 +111,37 @@ export function TopBar({ user }: TopBarProps) {
         </Link>
         <nav className="flex items-center gap-1">
           {links.map(({ href, label, prefetch }, index) => {
-            const isActive = appPathname === href || appPathname.startsWith(href + "/");
+            const isActive = isNavigationItemActive(appPathname, href);
             return (
               <Link
                 key={href}
                 href={`/${locale}${href}`}
                 prefetch={prefetch}
-                aria-current={isActive ? "page" : undefined}
+                aria-current={navigationAriaCurrent(appPathname, href)}
                 className={cn(
-                  "group relative rounded-sm px-3 py-2 text-sm font-semibold transition-colors",
+                  "group relative px-3 py-2 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
                   isActive
-                    ? "bg-surface-warm text-brown"
-                    : "text-brown-light hover:bg-surface/80 hover:text-brown"
+                    ? "text-brown"
+                    : "text-brown-light hover:text-brown"
                 )}
               >
-                <span aria-hidden="true" className="mr-1 font-mono text-[10px] font-semibold text-brown-light">{String(index + 1).padStart(2, "0")}</span>
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    "mr-1 font-mono text-[10px] font-semibold transition-colors",
+                    isActive ? "text-accent" : "text-brown-light group-hover:text-accent"
+                  )}
+                >
+                  {String(index + 1).padStart(2, "0")}
+                </span>
                 {label}
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    "absolute inset-x-3 bottom-0 h-px origin-center bg-accent transition-transform duration-200",
+                    isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-50"
+                  )}
+                />
               </Link>
             );
           })}

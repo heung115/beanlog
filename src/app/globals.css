@@ -31,6 +31,7 @@
 
   --font-display: var(--font-suit);
   --font-body: var(--font-suit);
+  --font-data: var(--font-suit);
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
 
@@ -171,11 +172,10 @@ input, textarea, select, button {
 /* Editorial primitives: reserve the framed surface for content that needs focus. */
 .journal-kicker {
   color: var(--color-accent);
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
 }
 
 .journal-section-title {
@@ -203,11 +203,52 @@ input, textarea, select, button {
 
 .folio-label {
   color: var(--color-brown-light);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.035em;
+}
+
+html[lang="en"] .journal-kicker,
+html[lang="en"] .folio-label,
+[data-locale="en"] .journal-kicker,
+[data-locale="en"] .folio-label {
   font-family: var(--font-mono);
   font-size: 0.6875rem;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.08em;
+  font-weight: 600;
+  letter-spacing: 0.09em;
   text-transform: uppercase;
+}
+
+.app-page-title {
+  color: var(--color-brown);
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 1.65rem + 0.45vw, 2rem);
+  font-weight: 660;
+  line-height: 1.13;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.app-page-deck {
+  max-width: 42rem;
+  color: var(--color-brown-medium);
+  font-size: clamp(0.9375rem, 0.9rem + 0.15vw, 1rem);
+  line-height: 1.7;
+  text-wrap: pretty;
+}
+
+html[lang="en"] .app-page-title,
+[data-locale="en"] .app-page-title {
+  font-weight: 600;
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+}
+
+.data-value {
+  font-family: var(--font-data);
+  font-variant-numeric: tabular-nums;
 }
 
 .display-title {
@@ -216,6 +257,11 @@ input, textarea, select, button {
   line-height: 1.08;
   letter-spacing: -0.04em;
   text-wrap: balance;
+}
+
+html[lang="en"] .display-title,
+[data-locale="en"] .display-title {
+  font-weight: 600;
 }
 
 .paper-sheet {

@@ -104,7 +104,7 @@ export function GuestRecordForm() {
           </div>
           <div className="shrink-0 text-right">
             <p className="text-xs text-brown-light">{tb("overallScore")}</p>
-            <p className="mt-1 font-display text-3xl font-bold tabular-nums text-accent">
+            <p className="data-value mt-1 text-3xl font-bold text-accent">
               {form.overall_score}
             </p>
           </div>

@@ -60,13 +60,16 @@ test("bean cards do not prefetch every protected detail route in view", () => {
 
 test("protected and high-density links avoid auth prefetch fan-out without losing public hrefs", () => {
   assertPrefetchDisabled(
-    linkOpenings(source("src/app/[locale]/explore/explore-client.tsx")),
-    "explore empty-state link"
+    linkOpenings(source("src/components/beans/empty-journal-guide.tsx")),
+    "shared empty-journal action"
   );
-  assertPrefetchDisabled(
-    linkOpenings(source("src/app/[locale]/stats/page.tsx")),
-    "stats empty-state link"
-  );
+
+  const explore = source("src/app/[locale]/explore/explore-client.tsx");
+  const stats = source("src/app/[locale]/stats/page.tsx");
+  for (const [page, label] of [[explore, "explore"], [stats, "stats"]]) {
+    assert.match(page, /<EmptyJournalGuide\b[\s\S]*?href=\{`\/\$\{locale\}\/beans\/new`\}/);
+    assert.ok(page.includes("EmptyJournalGuide"), `${label} should use the shared empty guide`);
+  }
   assertPrefetchDisabled(
     linkOpenings(source("src/app/[locale]/beans/[id]/edit/page.tsx")),
     "edit not-found link"

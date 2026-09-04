@@ -150,7 +150,7 @@ The operator selects the palette through `BEANMAP_THEME=mist|cream|contrast`. `m
 
 ## Typography
 
-Body and interface typography use the self-hosted **SUIT Variable** family with system sans-serif fallbacks. Korean display typography also uses SUIT. English display typography restores the earlier editorial stack, preferring **Iowan Old Style**, then **Georgia**, with the self-hosted SUIT family as a readable fallback. Data numerals use tabular figures or the monospace stack.
+Body and interface typography use the self-hosted **SUIT Variable** family with system sans-serif fallbacks. Korean display typography, labels, and kickers also use SUIT. English display titles restore the earlier editorial stack, preferring **Iowan Old Style**, then **Georgia**, with the self-hosted SUIT family as a readable fallback; English kickers may use the monospace stack. Data numerals use SUIT with tabular figures, not display type.
 
 Reserve bold display type for meaningful hierarchy. A screen should usually have one dominant title; avoid making every card label look like a headline.
 
@@ -161,6 +161,8 @@ Keep scores, totals, dates, and numbered steps upright. Do not synthesize italic
 beanmap is mobile-first. The shared editorial canvas is capped at `72rem`, with a `1rem` mobile gutter and a `1.5rem` desktop gutter. Detail and form content use narrower reading widths when that improves focus.
 
 Spacing follows a 4px base rhythm, with 8px, 12px, 16px, 24px, 32px, and 48px as the preferred steps. Use smaller steps inside a component and larger steps between conceptual sections. Do not compensate for unclear hierarchy by wrapping every group in another card.
+
+Primary application pages share one editorial introduction hierarchy: eyebrow, title, deck, then optional metadata. Keep this introduction unframed, with no card surface, border, or shadow; spacing and type establish its hierarchy.
 
 Desktop navigation lives in the top bar. Mobile navigation stays fixed at the bottom and must preserve safe-area padding. Primary actions and important state must remain reachable and understandable at narrow widths.
 
@@ -186,7 +188,7 @@ Pills are not a default container. Reserve circles for controls whose meaning or
 - **Bean cards:** Lead with bean name and score, then roastery and origin. Process, roast, and type are supporting metadata. Notes and tasting tags must not overpower identity and score.
 - **Badges and filter controls:** Badges describe data and use compact 4px corners. Compact filter chips use the same 4px radius, while full-size form controls use the 6px control radius. An active filter uses the primary fill. Category colors must keep consistent meanings across lists, detail pages, forms, and charts.
 - **Charts:** Use the coffee-brown sequence for neutral series and domain category colors for process data. Labels and tooltips use the same typography and surface rules as the rest of the application.
-- **Navigation:** The active destination is indicated through text color and a quiet tonal background, not a dark underline or framed card. The mobile add action may be visually elevated because it is the central workflow.
+- **Navigation:** The active destination is indicated through text color, an accent step number, and a short one-pixel underline, without a card-like fill or frame. The mobile add action may be visually elevated because it is the central workflow.
 - **Footer:** Treat the footer as quiet application chrome. Separate it with surface tone and spacing rather than an upper rule; never use primary ink or a thick line across the viewport.
 - **Empty and loading states:** Use quiet line illustrations, concise copy, and one clear next action. Skeletons should reproduce the real content structure without decorative animation beyond a subtle pulse.
 

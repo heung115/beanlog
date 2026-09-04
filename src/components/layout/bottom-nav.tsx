@@ -4,11 +4,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
+import {
+  getAppPathname,
+  isNavigationItemActive,
+  navigationAriaCurrent,
+  type PrimaryNavigationHref,
+} from "./navigation-state";
 
 export function BottomNav({ authenticated }: { authenticated: boolean }) {
   const pathname = usePathname();
   const locale = useLocale();
-  const appPathname = pathname.replace(/^\/(ko|en)(?=\/|$)/, "") || "/";
+  const appPathname = getAppPathname(pathname);
   const t = useTranslations("nav");
 
   if (
@@ -24,21 +30,27 @@ export function BottomNav({ authenticated }: { authenticated: boolean }) {
     { href: "/origins", label: t("origins"), icon: OriginIcon },
     { href: "/stats", label: t("stats"), icon: ChartIcon, prefetch: false },
     { href: "/settings", label: t("settings"), icon: GearIcon, prefetch: false },
-  ];
+  ] satisfies Array<{
+    href: PrimaryNavigationHref;
+    label: string;
+    icon: typeof JournalIcon;
+    primary?: boolean;
+    prefetch?: false;
+  }>;
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 bg-surface/95 shadow-[0_-0.35rem_1.25rem_color-mix(in_srgb,var(--color-brown)_6%,transparent)] backdrop-blur-sm md:hidden">
       <div className="mx-auto flex max-w-md items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
         {links.map(({ href, label, icon: Icon, primary, prefetch }) => {
-          const isActive = appPathname === href || appPathname.startsWith(href + "/");
+          const isActive = isNavigationItemActive(appPathname, href);
           return (
             <Link
               key={href}
               href={`/${locale}${href}`}
               prefetch={prefetch}
-              aria-current={isActive ? "page" : undefined}
+              aria-current={navigationAriaCurrent(appPathname, href)}
               className={cn(
-                "flex min-h-14 min-w-12 flex-1 flex-col items-center justify-center gap-0.5 px-1 py-2 text-[10px] font-medium transition-colors",
+                "relative flex min-h-14 min-w-12 flex-1 flex-col items-center justify-center gap-0.5 px-1 py-2 text-[10px] font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent",
                 primary
                   ? "text-brown"
                   : isActive
@@ -54,6 +66,13 @@ export function BottomNav({ authenticated }: { authenticated: boolean }) {
                 <Icon className={cn("h-5 w-5", isActive && "text-brown")} />
               )}
               <span>{label}</span>
+              <span
+                aria-hidden="true"
+                className={cn(
+                  "absolute bottom-1 h-px w-5 origin-center bg-accent transition-transform duration-200",
+                  isActive ? "scale-x-100" : "scale-x-0"
+                )}
+              />
             </Link>
           );
         })}

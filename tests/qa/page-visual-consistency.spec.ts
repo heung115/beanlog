@@ -12,7 +12,7 @@ async function login(page: Page, user = qaUser) {
 
 async function expectCompactHeader(
   heading: Locator,
-  { maxFontSize = 32, maxHeight = 180 }: { maxFontSize?: number; maxHeight?: number } = {}
+  { maxFontSize = 34, maxHeight = 180 }: { maxFontSize?: number; maxHeight?: number } = {}
 ) {
   await expect(heading).toBeVisible();
   const metrics = await heading.evaluate((element) => {
@@ -69,22 +69,47 @@ test("all primary application tabs use the same compact unframed hierarchy", asy
   await login(page);
 
   const routes = [
-    ["/ko/explore", "커피 기록", 80],
-    ["/ko/beans/new", "원두 기록", 80],
-    ["/ko/origins", "커피 산지 정보", 180],
-    ["/ko/stats", "커피 통계", 80],
-    ["/ko/settings", "설정", 80],
+    ["/ko/explore", "커피 기록", "explore-header", true],
+    ["/ko/beans/new", "원두 기록", "bean-form-header", false],
+    ["/ko/origins", "커피 산지 정보", "origin-index-header", true],
+    ["/ko/stats", "커피 통계", "stats-header", true],
+    ["/ko/settings", "설정", "settings-header", false],
   ] as const;
+  const headingLeftEdges: number[] = [];
 
-  for (const [route, title, maxHeight] of routes) {
+  for (const [route, title, headerTestId, hasMeta] of routes) {
     await page.goto(route);
     const heading = page.getByRole("heading", { level: 1, name: title });
-    await expectCompactHeader(heading, { maxHeight });
+    const header = page.getByTestId(headerTestId);
+    await expectCompactHeader(heading, { maxHeight: 180 });
+    await expect(header.locator(".journal-kicker")).toHaveCount(1);
+    await expect(header.locator("h1.app-page-title")).toHaveCount(1);
+    await expect(header.locator(".app-page-deck")).toHaveCount(1);
+    await expect(header.locator(".folio-label")).toHaveCount(hasMeta ? 1 : 0);
+    headingLeftEdges.push(
+      await heading.evaluate((element) => element.getBoundingClientRect().left)
+    );
     await expectNoHorizontalOverflow(page);
     await expect(
-      heading.locator("xpath=ancestor::header").locator('[class*="text-6xl"], [class*="text-7xl"], [class*="text-8xl"]')
+      header.locator('[class*="text-6xl"], [class*="text-7xl"], [class*="text-8xl"]')
     ).toHaveCount(0);
+
+    const activeNavigationLink = page.locator(
+      'header nav:visible a[aria-current="page"]'
+    );
+    await expect(activeNavigationLink).toHaveCount(1);
+    const activeAppearance = await activeNavigationLink.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return {
+        background: style.backgroundColor,
+        boxShadow: style.boxShadow,
+      };
+    });
+    expect(activeAppearance.background).toBe("rgba(0, 0, 0, 0)");
+    expect(activeAppearance.boxShadow).toBe("none");
   }
+
+  expect(Math.max(...headingLeftEdges) - Math.min(...headingLeftEdges)).toBeLessThanOrEqual(2);
 
   await page.goto("/ko/stats");
   await expect(page.getByTestId("stats-summary")).toBeVisible();
@@ -149,7 +174,7 @@ test("record detail and edit pages avoid split heroes and repeated elevation", a
 
   await page.goto(`${href}/edit`);
   await expectCompactHeader(page.getByRole("heading", { level: 1, name: "기록 수정" }), {
-    maxHeight: 80,
+    maxHeight: 180,
   });
   await expectNoHorizontalOverflow(page);
 });
@@ -221,7 +246,7 @@ test("@mobile empty stats keeps its first action above navigation", async ({ pag
   await page.goto("/ko/stats");
 
   await expectCompactHeader(page.getByRole("heading", { level: 1, name: "커피 통계" }), {
-    maxHeight: 80,
+    maxHeight: 180,
   });
   const action = page.getByRole("link", { name: "첫 기록 추가" });
   await expect(action).toBeVisible();

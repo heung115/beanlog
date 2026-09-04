@@ -121,7 +121,7 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
                   </div>
                   <div className="border-l border-border-light pl-5 text-right">
                     <p className="folio-label">{copy.example.scoreLabel}</p>
-                    <p className="mt-1 font-display text-5xl font-bold tabular-nums leading-none tracking-[-0.06em] text-accent">4.6</p>
+                    <p className="data-value mt-1 text-5xl font-bold leading-none tracking-[-0.045em] text-accent">4.6</p>
                     <p className="folio-label mt-1">/ 5.0</p>
                   </div>
                 </div>

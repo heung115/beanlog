@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
+import { PageIntro } from "@/components/layout/page-intro";
 import { originPresets, originSlug } from "@/data/origin-presets";
 import {
   buildOriginIndexMetadata,
@@ -71,22 +72,17 @@ export default async function OriginsPage({ params }: { params: Promise<{ locale
     <div className="mx-auto max-w-5xl pb-10 md:pb-16">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
 
-      <header data-testid="origin-index-header" className="animate-rise pt-3 md:pt-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <p className="journal-kicker">{t("guide")}</p>
-            <h1 className="mt-2 text-2xl font-semibold tracking-[-0.025em] text-brown md:text-3xl">
-              {t("indexTitle")}
-            </h1>
-            <p className="mt-2 max-w-2xl text-sm leading-6 text-brown-medium md:text-base md:leading-7">
-              {t("indexIntro")}
-            </p>
-          </div>
-          <p className="shrink-0 pb-1 text-xs tabular-nums text-brown-light">
+      <PageIntro
+        testId="origin-index-header"
+        eyebrow={t("guide")}
+        title={t("indexTitle")}
+        description={t("indexIntro")}
+        meta={(
+          <p className="folio-label">
             {t("indexCount", { count: originPresets.length })}
           </p>
-        </div>
-      </header>
+        )}
+      />
 
       <nav aria-label={isKorean ? "산지 권역 바로가기" : "Jump to an origin region"} className="-mx-4 mt-5 bg-cream/95 px-4 backdrop-blur-sm md:sticky md:top-[4.45rem] md:z-30 md:-mx-6 md:px-6">
         <ol className="mx-auto flex max-w-5xl overflow-x-auto py-1">

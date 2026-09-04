@@ -19,7 +19,7 @@ export function ScoreSlider({ value, onChange, label }: ScoreSliderProps) {
         <div className="flex shrink-0 items-baseline gap-1">
           <span
             key={value}
-            className="animate-rise inline-block min-w-[3ch] text-center font-display text-5xl font-bold tabular-nums text-brown"
+            className="data-value animate-rise inline-block min-w-[3ch] text-center text-5xl font-bold tracking-[-0.035em] text-brown"
           >
             {value % 1 === 0 ? value : value.toFixed(1)}
           </span>

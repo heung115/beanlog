@@ -406,11 +406,11 @@ test("authenticated journal uses a compact unframed workspace", async ({ page })
     height: element.getBoundingClientRect().height,
     background: getComputedStyle(element).backgroundColor,
   }));
-  expect(headerMetrics.height).toBeLessThan(80);
+  expect(headerMetrics.height).toBeLessThan(180);
   expect(headerMetrics.background).toBe("rgba(0, 0, 0, 0)");
   expect(
     await pageHeading.evaluate((element) => Number.parseFloat(getComputedStyle(element).fontSize))
-  ).toBeLessThanOrEqual(32);
+  ).toBeLessThanOrEqual(34);
 });
 
 test("an empty journal shows one focused first-record action", async ({ page }) => {
@@ -423,7 +423,43 @@ test("an empty journal shows one focused first-record action", async ({ page }) 
   await expect(page.getByRole("button", { name: "필터" })).toHaveCount(0);
   await expect(page.getByRole("combobox", { name: "정렬" })).toHaveCount(0);
   await expect(page.getByRole("group", { name: "보기 방식" })).toHaveCount(0);
-  await expect(page.getByText("0개 기록", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("0개 기록", { exact: true })).toHaveCount(1);
+
+  const emptyGuide = page.getByTestId("explore-empty-state");
+  await expect(
+    emptyGuide.getByRole("heading", { level: 2, name: "오늘의 한 잔부터 시작해보세요" })
+  ).toBeVisible();
+  await expect(emptyGuide.locator(":scope > ol > li")).toHaveCount(3);
+  await expect(emptyGuide.locator(":scope > ol > li h3")).toHaveText([
+    "원두 정보",
+    "맛의 인상",
+    "취향의 흐름",
+  ]);
+
+  const guideLayout = await emptyGuide.evaluate((element) => {
+    const style = getComputedStyle(element);
+    const [introduction, ledger] = Array.from(element.children);
+    if (!introduction || !ledger) throw new Error("Missing empty journal guide columns");
+
+    return {
+      columns: style.gridTemplateColumns.split(" ").filter(Boolean).length,
+      background: style.backgroundColor,
+      boxShadow: style.boxShadow,
+      borders: [
+        style.borderTopWidth,
+        style.borderRightWidth,
+        style.borderBottomWidth,
+        style.borderLeftWidth,
+      ].map(Number.parseFloat),
+      introductionRight: introduction.getBoundingClientRect().right,
+      ledgerLeft: ledger.getBoundingClientRect().left,
+    };
+  });
+  expect(guideLayout.columns).toBe(2);
+  expect(guideLayout.background).toBe("rgba(0, 0, 0, 0)");
+  expect(guideLayout.boxShadow).toBe("none");
+  expect(Math.max(...guideLayout.borders)).toBe(0);
+  expect(guideLayout.introductionRight).toBeLessThan(guideLayout.ledgerLeft);
 
   const layout = await page.evaluate(() => {
     const action = document.querySelector<HTMLElement>(
@@ -476,6 +512,18 @@ test("@mobile authenticated navigation uses a quiet boundary", async ({ page }) 
       Number.parseFloat(getComputedStyle(element).borderTopWidth)
     )
   ).toBeLessThanOrEqual(1);
+
+  const activeNavigationLink = bottomNavigation.locator('a[aria-current="page"]');
+  await expect(activeNavigationLink).toHaveCount(1);
+  const activeAppearance = await activeNavigationLink.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      background: style.backgroundColor,
+      boxShadow: style.boxShadow,
+    };
+  });
+  expect(activeAppearance.background).toBe("rgba(0, 0, 0, 0)");
+  expect(activeAppearance.boxShadow).toBe("none");
 });
 
 test("settings keeps account deletion visually quiet until confirmation", async ({ page }) => {
@@ -829,20 +877,19 @@ test("wide localized pages keep the footer at the viewport bottom", async ({ pag
   expect(Math.abs(layout.viewportBottom - layout.footerBottom)).toBeLessThanOrEqual(1);
 });
 
-test("desktop empty state stays centered across the full record grid", async ({ page }) => {
+test("desktop filtered no-results state stays centered across the full record grid", async ({ page }) => {
   await login(page);
 
   await page.getByRole("searchbox").fill("__beanmap_no_matching_records__");
   await expect(page.getByText("0개 기록")).toBeVisible();
-  const emptyHeading = page.getByRole("heading", { name: "아직 기록이 없어요" });
+  const emptyHeading = page.getByRole("heading", { name: "조건에 맞는 기록이 없어요" });
   await expect(emptyHeading).toBeVisible();
 
   const centers = await page.evaluate(() => {
     const grid = document.querySelector<HTMLElement>('[data-testid="bean-grid"]');
-    const heading = Array.from(document.querySelectorAll("h2")).find(
-      (element) => element.textContent?.trim() === "아직 기록이 없어요"
+    const emptyState = document.querySelector<HTMLElement>(
+      '[data-testid="explore-empty-state"]'
     );
-    const emptyState = heading?.parentElement;
     if (!grid || !emptyState) throw new Error("Missing empty record grid state");
 
     const gridBox = grid.getBoundingClientRect();

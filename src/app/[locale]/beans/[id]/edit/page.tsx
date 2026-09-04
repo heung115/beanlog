@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { BeanForm } from "@/components/beans/bean-form";
+import { PageIntro } from "@/components/layout/page-intro";
 import { buttonClassName } from "@/components/ui/button";
 import { getBeanById } from "@/lib/actions/beans";
 import type { BeanWithTags } from "@/types/database";
@@ -46,32 +47,33 @@ export default function EditBeanPage() {
   }, [params.id]);
 
   return (
-    <div className="mx-auto max-w-4xl">
-      <header data-testid="bean-form-header" className="animate-rise mb-6 pt-2 md:mb-7 md:pt-3">
-        <h1 className="text-2xl font-semibold leading-tight tracking-[-0.025em] text-brown md:text-3xl">
-          {t("editTitle")}
-        </h1>
-      </header>
+    <div className="mx-auto max-w-5xl">
+      <PageIntro
+        testId="bean-form-header"
+        eyebrow={t("editEyebrow")}
+        title={t("editTitle")}
+        description={t("editDescription")}
+      />
 
-      {loading ? (
-        <FormSkeleton />
-      ) : !bean ? (
-        <div className="paper-sheet animate-rise px-6 py-16 text-center">
-          <p className="font-display text-xl font-bold text-brown">
-            {t("notFound")}
-          </p>
-          <p className="mt-2 text-sm text-brown-light">{t("notFoundSub")}</p>
-          <Link
-            href={`/${locale}/explore`}
-            prefetch={false}
-            className={buttonClassName({ variant: "secondary", className: "mt-6" })}
-          >
-            {t("back")}
-          </Link>
-        </div>
-      ) : (
-        <BeanForm key={bean.id} mode="edit" initial={bean} />
-      )}
+      <div className="mt-8 max-w-4xl md:mt-10">
+        {loading ? (
+          <FormSkeleton />
+        ) : !bean ? (
+          <div className="paper-sheet animate-rise px-6 py-16 text-center">
+            <p className="text-xl font-semibold text-brown">{t("notFound")}</p>
+            <p className="mt-2 text-sm text-brown-light">{t("notFoundSub")}</p>
+            <Link
+              href={`/${locale}/explore`}
+              prefetch={false}
+              className={buttonClassName({ variant: "secondary", className: "mt-6" })}
+            >
+              {t("back")}
+            </Link>
+          </div>
+        ) : (
+          <BeanForm key={bean.id} mode="edit" initial={bean} />
+        )}
+      </div>
     </div>
   );
 }

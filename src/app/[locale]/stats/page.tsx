@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import {
   Bar,
@@ -18,8 +17,9 @@ import {
   YAxis,
 } from "recharts";
 import { getBeanStats } from "@/lib/actions/beans";
+import { EmptyJournalGuide } from "@/components/beans/empty-journal-guide";
+import { PageIntro } from "@/components/layout/page-intro";
 import { ScoreDisplay } from "@/components/ui/score-display";
-import { buttonClassName } from "@/components/ui/button";
 import { OriginMapSection } from "@/components/stats/origin-map-section";
 import { chartColors } from "@/config/chart-colors";
 import type { BeanStats } from "@/types/stats";
@@ -67,7 +67,7 @@ function ChartTooltip({
   return (
     <div className="rounded-md border border-border-light bg-surface-warm px-3 py-2 shadow-[0_0.25rem_0.75rem_color-mix(in_srgb,var(--color-brown)_8%,transparent)]">
       <p className="text-[11px] font-medium text-brown-light">{name}</p>
-      <p className="font-display text-base font-bold text-brown">
+      <p className="data-value text-base font-bold text-brown">
         {item.value}
         <span className="ml-1 text-[10px] font-normal text-brown-light">{suffix}</span>
       </p>
@@ -97,16 +97,6 @@ function ChartCard({
     <div className={`journal-panel min-w-0 p-5 ${className}`}>
       {children}
     </div>
-  );
-}
-
-function PageHeading({ title }: { title: string }) {
-  return (
-    <header data-testid="stats-header" className="animate-rise">
-      <h1 className="text-2xl font-semibold tracking-[-0.025em] text-brown md:text-3xl">
-        {title}
-      </h1>
-    </header>
   );
 }
 
@@ -148,11 +138,27 @@ export default function StatsPage() {
   const processLabel = (method: string) =>
     tProcess.has(method as "washed") ? tProcess(method as "washed") : method;
 
+  const pageIntro = (recordCount?: number) => (
+    <PageIntro
+      eyebrow={t("eyebrow")}
+      title={t("title")}
+      description={t("description")}
+      testId="stats-header"
+      meta={(
+        <p role="status" aria-live="polite" className="folio-label">
+          {recordCount === undefined
+            ? tCommon("loading")
+            : t("recordBasis", { count: recordCount })}
+        </p>
+      )}
+    />
+  );
+
   /* ---------- loading skeleton ---------- */
   if (loading) {
     return (
       <div className="mx-auto max-w-5xl space-y-8">
-        <PageHeading title={t("title")} />
+        {pageIntro()}
         <div className="grid gap-3 sm:grid-cols-3">
           {[0, 1, 2].map((i) => (
             <div key={i} className="h-24 animate-pulse rounded-md bg-surface/55" />
@@ -166,54 +172,30 @@ export default function StatsPage() {
   /* ---------- empty state ---------- */
   if (!stats || stats.total === 0) {
     return (
-      <div className="mx-auto max-w-5xl space-y-8">
-        <PageHeading title={t("title")} />
-        <section className="animate-rise flex flex-col items-center py-10 text-center md:py-14">
-          <svg
-            width="40"
-            height="40"
-            viewBox="0 0 56 56"
-            fill="none"
-            className="mb-5 text-accent-light"
-            aria-hidden="true"
-          >
-            <path
-              d="M10 22h30v14a10 10 0 0 1-10 10H20a10 10 0 0 1-10-10V22Z"
-              stroke="currentColor"
-              strokeWidth="2"
-            />
-            <path d="M40 26h4a6 6 0 0 1 0 12h-4" stroke="currentColor" strokeWidth="2" />
-            <path
-              d="M20 8c-2 3 2 4 0 8M28 8c-2 3 2 4 0 8"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-          </svg>
-          <h2 className="text-lg font-semibold text-brown">{t("noData")}</h2>
-          <p className="mt-2 max-w-sm text-sm leading-relaxed text-brown-light">
-            {t("emptySub")}
-          </p>
-          <Link
-            href={`/${locale}/beans/new`}
-            prefetch={false}
-            className={buttonClassName({ size: "sm", className: "mt-6 gap-2" })}
-          >
-            {t("addFirst")}
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              aria-hidden="true"
-            >
-              <path d="M5 12h14M13 6l6 6-6 6" />
-            </svg>
-          </Link>
-        </section>
+      <div className="mx-auto max-w-5xl">
+        {pageIntro(0)}
+        <EmptyJournalGuide
+          testId="stats-empty-state"
+          eyebrow={t("emptyEyebrow")}
+          title={t("emptyTitle")}
+          description={t("emptyDescription")}
+          actionLabel={t("addFirst")}
+          href={`/${locale}/beans/new`}
+          steps={[
+            {
+              title: t("emptyStepMap"),
+              description: t("emptyStepMapDescription"),
+            },
+            {
+              title: t("emptyStepTaste"),
+              description: t("emptyStepTasteDescription"),
+            },
+            {
+              title: t("emptyStepRhythm"),
+              description: t("emptyStepRhythmDescription"),
+            },
+          ]}
+        />
       </div>
     );
   }
@@ -255,7 +237,7 @@ export default function StatsPage() {
 
   return (
     <div className="mx-auto max-w-5xl space-y-10">
-      <PageHeading title={t("title")} />
+      {pageIntro(stats.total)}
 
       {/* ---------- summary cards ---------- */}
       <section
@@ -267,7 +249,7 @@ export default function StatsPage() {
           <p className="text-xs font-medium text-brown-light">
             {t("totalBeans")}
           </p>
-          <p className="mt-2 text-3xl font-semibold tabular-nums tracking-[-0.03em] text-brown">
+          <p className="data-value mt-2 text-3xl font-semibold tabular-nums tracking-[-0.03em] text-brown">
             {stats.total}
             <span className="ml-1.5 text-sm font-normal text-brown-light">{cupsSuffix}</span>
           </p>
@@ -363,7 +345,7 @@ export default function StatsPage() {
                 </PieChart>
               </ResponsiveContainer>
               <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-                <span className="font-display text-3xl font-bold tabular-nums text-brown">
+                <span className="data-value text-3xl font-bold tabular-nums text-brown">
                   {stats.total}
                 </span>
                 <span className="text-[10px] text-brown-light">{cupsSuffix}</span>
