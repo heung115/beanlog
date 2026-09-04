@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -16,14 +16,12 @@ type Locale = "ko" | "en";
 function SectionCard({
   title,
   children,
-  danger = false,
   delay = 0,
   feature = false,
   plain = false,
 }: {
   title: string;
   children: React.ReactNode;
-  danger?: boolean;
   delay?: number;
   feature?: boolean;
   plain?: boolean;
@@ -35,15 +33,11 @@ function SectionCard({
           ? "px-1 pt-6"
           : feature
             ? "paper-sheet paper-sheet-feature p-5 md:p-7"
-            : "rounded-lg border-l border-accent-light bg-surface-warm p-5 md:p-7"
-      } ${danger ? "border-red-200 bg-red-50/30" : ""}`}
+            : "paper-sheet p-5 md:p-7"
+      }`}
       style={{ animationDelay: `${delay}ms` }}
     >
-      <h2
-        className={`mb-4 font-display text-lg font-bold tracking-tight ${
-          danger ? "text-red-700" : "text-brown"
-        }`}
-      >
+      <h2 className="mb-4 font-display text-lg font-bold tracking-tight text-brown">
         {title}
       </h2>
       {children}
@@ -72,7 +66,6 @@ const ICONS = {
   download: "M12 4v11m0 0 4.5-4.5M12 15l-4.5-4.5M4 19h16",
   document: "M7 3h7l4 4v14H7V3Zm7 0v5h5M10 12h5m-5 4h5",
   logout: "M14 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-2M9 12h11m0 0-3-3m3 3-3 3",
-  trash: "M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2m3 0-.8 12.1a2 2 0 0 1-2 1.9H8.8a2 2 0 0 1-2-1.9L6 7m4 4v6m4-6v6",
 };
 
 export default function SettingsPage() {
@@ -90,6 +83,9 @@ export default function SettingsPage() {
   const [exporting, setExporting] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const deleteTriggerRef = useRef<HTMLButtonElement>(null);
+  const deleteDialogRef = useRef<HTMLDialogElement>(null);
+  const cancelDeleteRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -105,6 +101,29 @@ export default function SettingsPage() {
       mounted = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (!confirmOpen) return;
+
+    const dialog = deleteDialogRef.current;
+    if (!dialog) return;
+
+    const trigger = deleteTriggerRef.current;
+    const previousOverflow = document.body.style.overflow;
+    if (!dialog.open) dialog.showModal();
+    const focusFrame = window.requestAnimationFrame(() => {
+      cancelDeleteRef.current?.focus();
+    });
+
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      document.body.style.overflow = previousOverflow;
+      if (dialog.open) dialog.close();
+      window.requestAnimationFrame(() => trigger?.focus());
+    };
+  }, [confirmOpen]);
 
   async function handleSaveProfile(e: React.FormEvent) {
     e.preventDefault();
@@ -286,62 +305,78 @@ export default function SettingsPage() {
         </Button>
       </SectionCard>
 
-      {/* ---------- danger zone ---------- */}
-      <SectionCard title={t("dangerZone")} danger delay={360}>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="flex items-start gap-2.5 text-sm leading-relaxed text-brown-light">
-            <Icon path={ICONS.trash} className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
-            {t("deleteAccountDesc")}
-          </p>
+      {/* ---------- account deletion ---------- */}
+      <section
+        data-account-deletion
+        className="settings-rise px-1 pt-6"
+        style={{ animationDelay: "360ms" }}
+      >
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h2 className="text-sm font-semibold text-brown">{t("deleteAccount")}</h2>
+            <p className="mt-1 text-sm leading-6 text-brown-light">
+              {t("deleteAccountDesc")}
+            </p>
+          </div>
           <Button
-            variant="danger"
+            ref={deleteTriggerRef}
+            variant="ghost"
             onClick={() => setConfirmOpen(true)}
-            className="sm:shrink-0"
+            className="self-start sm:shrink-0"
           >
             {t("deleteAccount")}
           </Button>
         </div>
-      </SectionCard>
+      </section>
 
       {/* ---------- delete confirmation dialog ---------- */}
       {confirmOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-brown/40 p-4 backdrop-blur-[2px] sm:items-center"
-          onClick={() => !deleting && setConfirmOpen(false)}
+        <dialog
+          ref={deleteDialogRef}
+          aria-labelledby="delete-account-title"
+          aria-describedby="delete-account-description"
+          onCancel={(event) => {
+            event.preventDefault();
+            if (!deleting) setConfirmOpen(false);
+          }}
+          onClick={(event) => {
+            if (event.target !== event.currentTarget || deleting) return;
+            const rect = event.currentTarget.getBoundingClientRect();
+            const inside =
+              event.clientX >= rect.left &&
+              event.clientX <= rect.right &&
+              event.clientY >= rect.top &&
+              event.clientY <= rect.bottom;
+            if (!inside) setConfirmOpen(false);
+          }}
+          className="settings-rise paper-sheet m-auto hidden w-[calc(100%_-_2rem)] max-w-sm border-0 p-6 text-brown shadow-[0_0.75rem_2rem_color-mix(in_srgb,var(--color-brown)_10%,transparent)] backdrop:bg-brown/35 backdrop:backdrop-blur-[2px] open:block"
         >
-          <div
-            className="settings-rise paper-sheet w-full max-w-sm p-6"
-            onClick={(e) => e.stopPropagation()}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="delete-account-title"
+          <h3
+            id="delete-account-title"
+            className="font-display text-xl font-bold text-brown"
           >
-            <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-sm border border-red-200 bg-red-50 text-red-700">
-              <Icon path={ICONS.trash} className="h-5 w-5" />
-            </div>
-            <h3
-              id="delete-account-title"
-              className="text-center font-display text-xl font-bold text-brown"
+            {t("deleteAccount")}
+          </h3>
+          <p
+            id="delete-account-description"
+            className="mt-2 text-sm leading-relaxed text-brown-light"
+          >
+            {t("deleteAccountConfirm")}
+          </p>
+          <div className="mt-6 flex justify-end gap-3">
+            <Button
+              ref={cancelDeleteRef}
+              variant="ghost"
+              onClick={() => setConfirmOpen(false)}
+              disabled={deleting}
             >
-              {t("deleteAccount")}
-            </h3>
-            <p className="mt-2 text-center text-sm leading-relaxed text-brown-light">
-              {t("deleteAccountConfirm")}
-            </p>
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <Button
-                variant="secondary"
-                onClick={() => setConfirmOpen(false)}
-                disabled={deleting}
-              >
-                {tCommon("cancel")}
-              </Button>
-              <Button variant="danger" onClick={handleDeleteAccount} loading={deleting}>
-                {tCommon("confirm")}
-              </Button>
-            </div>
+              {tCommon("cancel")}
+            </Button>
+            <Button variant="danger" onClick={handleDeleteAccount} loading={deleting}>
+              {tCommon("confirm")}
+            </Button>
           </div>
-        </div>
+        </dialog>
       )}
     </div>
   );

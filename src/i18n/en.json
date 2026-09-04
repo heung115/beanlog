@@ -256,7 +256,6 @@
     "exportDesc": "Download all records as a JSON file",
     "export": "Export",
     "exporting": "Exporting...",
-    "dangerZone": "Danger zone",
     "deleteAccount": "Delete account",
     "deleteAccountDesc": "All records will be permanently deleted",
     "deleteAccountConfirm": "Are you sure? All data will be deleted.",

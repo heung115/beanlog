@@ -406,6 +406,41 @@ test("@mobile authenticated navigation uses a quiet boundary", async ({ page }) 
   ).toBeLessThanOrEqual(1);
 });
 
+test("settings keeps account deletion visually quiet until confirmation", async ({ page }) => {
+  await login(page);
+  await page.goto("/ko/settings");
+
+  await expect(page.getByText("위험 구역")).toHaveCount(0);
+  await expect(page.getByText("모든 기록이 영구적으로 삭제됩니다")).toBeVisible();
+
+  const deleteButton = page.getByRole("button", { name: "회원 탈퇴" });
+  await expect(deleteButton).toBeVisible();
+  const deletionSection = page.locator("[data-account-deletion]");
+  const borderWidths = await deletionSection.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return [style.borderTopWidth, style.borderRightWidth, style.borderBottomWidth, style.borderLeftWidth]
+      .map(Number.parseFloat);
+  });
+  expect(Math.max(...borderWidths)).toBe(0);
+  await deleteButton.click();
+
+  const dialog = page.getByRole("dialog", { name: "회원 탈퇴" });
+  await expect(dialog).toBeVisible();
+  const cancelButton = dialog.getByRole("button", { name: "취소" });
+  const confirmButton = dialog.getByRole("button", { name: "확인" });
+  await expect(confirmButton).toBeVisible();
+  await expect(cancelButton).toBeFocused();
+  await page.keyboard.press("Shift+Tab");
+  await expect(confirmButton).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(cancelButton).toBeFocused();
+  await expectNoSeriousA11yViolations(page);
+  await page.keyboard.press("Escape");
+  await expect(dialog).toBeHidden();
+  await expect(deleteButton).toBeFocused();
+  await expectNoSeriousA11yViolations(page);
+});
+
 test("signup explains that legal agreement is required", async ({ page }) => {
   await page.goto("/ko/signup");
   await page.locator('input[name="displayName"]').fill("가입 안내 테스트");
