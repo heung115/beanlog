@@ -18,6 +18,31 @@ async function mapScale(map: Locator) {
   return Number(match[1]);
 }
 
+async function waitForScrollToSettle(page: Page) {
+  await page.evaluate(async () => {
+    let previousY = window.scrollY;
+    let stableFrames = 0;
+
+    for (let frame = 0; frame < 120 && stableFrames < 6; frame += 1) {
+      await new Promise<void>((resolve) => {
+        window.requestAnimationFrame(() => resolve());
+      });
+      const currentY = window.scrollY;
+      stableFrames = Math.abs(currentY - previousY) < 0.5 ? stableFrames + 1 : 0;
+      previousY = currentY;
+    }
+  });
+}
+
+async function hoverMap(page: Page, map: Locator) {
+  await map.evaluate((element) => {
+    element.scrollIntoView({ behavior: "instant", block: "center" });
+  });
+  await waitForScrollToSettle(page);
+  await map.hover();
+  await waitForScrollToSettle(page);
+}
+
 test("stats origin map stays legible, searchable, and smoothly zoomable", async ({
   page,
 }) => {
@@ -42,15 +67,7 @@ test("stats origin map stays legible, searchable, and smoothly zoomable", async 
     expect(box?.height).toBeGreaterThanOrEqual(44);
   }
 
-  await map.evaluate((element) => {
-    window.scrollTo(
-      0,
-      window.scrollY + element.getBoundingClientRect().top - 96
-    );
-  });
-  const box = await map.boundingBox();
-  if (!box) throw new Error("Missing origin map bounds");
-  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await hoverMap(page, map);
 
   const initialScroll = await page.evaluate(() => window.scrollY);
   const initialScale = await mapScale(map);
@@ -60,12 +77,7 @@ test("stats origin map stays legible, searchable, and smoothly zoomable", async 
   );
   expect(await mapScale(map)).toBeCloseTo(initialScale, 4);
 
-  await map.evaluate((element) => {
-    window.scrollTo(
-      0,
-      window.scrollY + element.getBoundingClientRect().top - 96
-    );
-  });
+  await hoverMap(page, map);
   const zoomScroll = await page.evaluate(() => window.scrollY);
   const beforeZoom = await mapScale(map);
   await page.keyboard.down("Control");
