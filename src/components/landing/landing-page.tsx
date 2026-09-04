@@ -66,7 +66,7 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
                 <span aria-hidden="true" className="h-px flex-1 bg-border" />
                 <span className="folio-label">EST. 2026</span>
               </div>
-              <h1 className="display-title mt-7 max-w-3xl text-[clamp(3.2rem,8vw,6.8rem)] text-brown">
+              <h1 className="display-title mt-7 max-w-3xl text-7xl tracking-[-0.065em] text-brown md:text-9xl">
                 {copy.title}
               </h1>
               <p className="mt-7 max-w-[39rem] text-base leading-7 text-brown-medium md:text-lg md:leading-8">

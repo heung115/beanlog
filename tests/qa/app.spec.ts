@@ -46,7 +46,7 @@ test("public landing explains the product and uses the operator theme", async ({
   await expect(
     page.getByRole("heading", {
       level: 1,
-      name: "다시 마시고 싶은 커피를 잊지 않도록.",
+      name: "beanlog",
     })
   ).toBeVisible();
   await expect(
@@ -101,7 +101,7 @@ test("public landing explains the product and uses the operator theme", async ({
   await expect(
     page.getByRole("heading", {
       level: 1,
-      name: "Remember the coffees worth drinking again.",
+      name: "beanlog",
     })
   ).toBeVisible();
   await expect(

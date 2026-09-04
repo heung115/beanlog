@@ -178,7 +178,7 @@
     "dark": "강배전"
   },
   "explore": {
-    "title": "나의 커피 기록",
+    "title": "beanlog",
     "empty": "아직 기록이 없어요",
     "emptySub": "첫 커피를 기록해보세요",
     "addFirst": "첫 기록 추가",

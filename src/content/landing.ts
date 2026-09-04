@@ -57,7 +57,7 @@ export const landingCopy: Record<LandingLocale, LandingCopy> = {
     login: "로그인",
     signup: "회원가입",
     eyebrow: "개인 커피 테이스팅 저널",
-    title: "다시 마시고 싶은 커피를 잊지 않도록.",
+    title: "beanlog",
     description:
       "beanmap은 로스터리·산지·품종·가공 방식·테이스팅 노트·점수를 한곳에 남기고, 필요할 때 다시 찾는 커피 원두 기록장입니다.",
     primaryAction: "기록 하나 먼저 써보기",
@@ -154,7 +154,7 @@ export const landingCopy: Record<LandingLocale, LandingCopy> = {
     login: "Log in",
     signup: "Sign up",
     eyebrow: "A private coffee tasting journal",
-    title: "Remember the coffees worth drinking again.",
+    title: "beanlog",
     description:
       "beanmap is a coffee bean journal for saving roasters, origins, varieties, processing methods, tasting notes, and scores—then finding them when you need them.",
     primaryAction: "Try one record",
