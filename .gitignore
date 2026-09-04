@@ -50,5 +50,6 @@ CONTEXT.md
 
 # personal / local-only docs (not part of the repo)
 /AGENTS.md
+/.agents/
 /docs/
 docs/TROUBLESHOOTING.md
