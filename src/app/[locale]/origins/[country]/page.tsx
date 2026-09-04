@@ -122,7 +122,7 @@ export default async function OriginDetailPage({
         {t("indexTitle")}
       </Link>
 
-      <header className="animate-rise relative mt-2 overflow-hidden border-y-2 border-brown px-5 py-10 md:grid md:min-h-80 md:grid-cols-[1fr_18rem] md:items-end md:px-8 md:py-12">
+      <header className="animate-rise relative mt-2 overflow-hidden border-y border-border-light px-5 py-10 md:grid md:min-h-80 md:grid-cols-[1fr_18rem] md:items-end md:px-8 md:py-12">
         <OriginContours className="pointer-events-none absolute -right-36 -top-36 h-[34rem] w-[42rem] opacity-55" />
         <div className="relative">
           <p className="journal-kicker">{t("guide")}</p>
@@ -138,7 +138,7 @@ export default async function OriginDetailPage({
         className="paper-sheet animate-rise mt-10 p-5 md:p-8"
         style={{ animationDelay: "60ms" }}
       >
-        <div className="flex items-end justify-between gap-4 border-b-2 border-brown pb-4">
+        <div className="flex items-end justify-between gap-4 border-b border-border-light pb-4">
           <div>
             <h2 className="font-display text-2xl font-bold text-brown">{t("cupProfile")}</h2>
           </div>
@@ -159,7 +159,7 @@ export default async function OriginDetailPage({
       </section>
 
       <section
-        className="animate-rise mt-10 grid border-y-2 border-brown md:grid-cols-[14rem_1fr]"
+        className="animate-rise mt-10 grid border-y border-border-light md:grid-cols-[14rem_1fr]"
         style={{ animationDelay: "100ms" }}
       >
         <div className="bg-surface-warm p-5 md:p-7">
@@ -189,7 +189,7 @@ export default async function OriginDetailPage({
         className="animate-rise mt-9"
         style={{ animationDelay: "140ms" }}
       >
-        <div className="flex items-end justify-between gap-4 border-b-2 border-brown pb-4">
+        <div className="flex items-end justify-between gap-4 border-b border-border-light pb-4">
           <div>
             <h2 className="font-display text-2xl font-bold text-brown">{t("regions")}</h2>
             <p className="mt-1 text-sm text-brown-light">{t("regionsHint")}</p>

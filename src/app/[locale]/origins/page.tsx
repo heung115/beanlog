@@ -72,7 +72,7 @@ export default async function OriginsPage({ params }: { params: Promise<{ locale
     <div className="pb-10 md:pb-16">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
 
-      <header className="animate-rise relative overflow-hidden border-y-2 border-brown md:grid md:min-h-[24rem] md:grid-cols-[minmax(0,1fr)_18rem]">
+      <header className="animate-rise relative overflow-hidden border-y border-border-light md:grid md:min-h-[24rem] md:grid-cols-[minmax(0,1fr)_18rem]">
         <OriginContours className="pointer-events-none absolute -right-36 -top-28 h-[36rem] w-[44rem] opacity-55" />
         <div className="relative py-12 md:flex md:flex-col md:justify-between md:py-14 md:pr-14">
           <div>
@@ -82,7 +82,7 @@ export default async function OriginsPage({ params }: { params: Promise<{ locale
           <p className="mt-8 max-w-xl text-sm leading-7 text-brown-medium md:text-base">{t("indexIntro")}</p>
         </div>
 
-        <aside className="relative grid grid-cols-2 border-t border-brown bg-surface/65 md:block md:border-l md:border-t-0">
+        <aside className="relative grid grid-cols-2 border-t border-border-light bg-surface/65 md:block md:border-l md:border-t-0">
           <div className="p-6 md:p-8">
             <p className="folio-label">{t("indexCount", { count: originPresets.length })}</p>
             <p className="mt-4 font-display text-6xl font-bold tabular-nums tracking-[-0.06em] text-brown">{originPresets.length}</p>
@@ -121,7 +121,7 @@ export default async function OriginsPage({ params }: { params: Promise<{ locale
                 <p className="folio-label md:mt-4">{isKorean ? `${presets.length}개 산지` : `${presets.length} origins`}</p>
               </header>
 
-              <ol className="border-t-2 border-brown">
+              <ol className="border-t border-border-light">
                 {presets.map((preset, itemIndex) => {
                   const countryName = isKorean ? preset.countryKo : preset.country;
                   const secondaryName = isKorean ? preset.country : preset.countryKo;

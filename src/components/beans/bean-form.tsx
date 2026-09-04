@@ -686,7 +686,7 @@ export function BeanForm({
       <input type="hidden" name="overall_score" value={form.overall_score} />
       {/* ── Quick section ─────────────────────────────── */}
       <section className="paper-sheet paper-sheet-feature animate-rise p-5 md:p-8">
-        <div className="mb-7 flex items-center justify-between border-b-2 border-brown pb-4">
+        <div className="mb-7 flex items-center justify-between border-b border-border-light pb-4">
           <p className="journal-kicker">{t("basicInfo")}</p>
           <span className="font-display text-3xl text-accent">01</span>
         </div>
@@ -922,7 +922,7 @@ export function BeanForm({
         )}
 
         {/* Roast / place */}
-        <div className="mt-8 flex flex-col gap-5 border-t-2 border-brown pt-6">
+        <div className="mt-8 flex flex-col gap-5 border-t border-border-light pt-6">
           <div className="flex items-center justify-between">
             <p className="journal-kicker">{t("roastAndPlace")}</p>
             <span className="font-display text-2xl text-accent">02</span>
@@ -990,7 +990,7 @@ export function BeanForm({
         </div>
 
         {/* Score + note */}
-        <div className="mt-8 flex flex-col gap-6 border-t-2 border-brown pt-6">
+        <div className="mt-8 flex flex-col gap-6 border-t border-border-light pt-6">
           <div className="flex items-center justify-between">
             <p className="journal-kicker">{t("evaluation")}</p>
             <span className="font-display text-2xl text-accent">03</span>
@@ -1019,7 +1019,7 @@ export function BeanForm({
         aria-expanded={showDetails}
         aria-controls="bean-detail-fields"
         className={cn(
-          "animate-rise flex min-h-14 items-center justify-between gap-2 rounded-sm border-y-2 border-brown px-4 py-3.5",
+          "animate-rise flex min-h-14 items-center justify-between gap-2 rounded-sm border-y border-border-light px-4 py-3.5",
           "text-sm font-semibold text-brown transition-all duration-200",
           "hover:bg-surface-warm",
           showDetails && "bg-surface-warm"
@@ -1162,7 +1162,7 @@ export function BeanForm({
 
       {/* ── Submit ────────────────────────────────────── */}
       <div
-        className="animate-rise flex flex-col-reverse gap-3 border-t-2 border-brown bg-cream py-5 sm:flex-row sm:justify-end"
+        className="animate-rise flex flex-col-reverse gap-3 border-t border-border-light bg-cream py-5 sm:flex-row sm:justify-end"
         style={{ animationDelay: "120ms" }}
       >
         <Button

@@ -36,7 +36,7 @@ export function BeanCard({ bean, view = "grid" }: BeanCardProps) {
       data-testid="bean-card"
       data-view={view}
       className={cn(
-        "journal-panel pressable group relative flex flex-col overflow-hidden border-t-[3px] border-t-brown px-5 py-4 hover:border-t-accent hover:bg-surface-warm hover:shadow-[4px_4px_0_var(--color-cream-dark)] md:px-5 md:py-5",
+        "journal-panel pressable group relative flex flex-col overflow-hidden px-5 py-4 hover:border-t-accent hover:bg-surface-warm hover:shadow-[4px_4px_0_var(--color-cream-dark)] md:px-5 md:py-5",
         view === "grid" ? "min-h-60" : "min-h-0"
       )}
     >

@@ -6,7 +6,7 @@ import { buttonClassName } from "@/components/ui/button";
 export default function NotFound() {
   return (
     <main id="main-content" className="flex min-h-screen items-center bg-cream px-4 py-12">
-      <section className="relative mx-auto grid w-full max-w-5xl overflow-hidden border-y-2 border-brown bg-surface md:grid-cols-[1fr_18rem] md:border-x">
+      <section className="relative mx-auto grid w-full max-w-5xl overflow-hidden border-y border-border-light bg-surface md:grid-cols-[1fr_18rem] md:border-x">
         <OriginContours className="pointer-events-none absolute -right-40 -top-40 h-[38rem] w-[46rem] opacity-55" />
         <div className="relative p-7 md:p-14">
           <BeanmapMark />

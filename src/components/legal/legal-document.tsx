@@ -22,7 +22,7 @@ export function LegalDocument({
         ← {locale === "ko" ? "홈으로" : "Back to home"}
       </Link>
 
-      <header className="mt-5 border-y-2 border-brown py-10 md:grid md:grid-cols-[1fr_15rem] md:items-end md:py-14">
+      <header className="mt-5 border-y border-border-light py-10 md:grid md:grid-cols-[1fr_15rem] md:items-end md:py-14">
         <div>
         <h1 className="display-title text-5xl text-brown md:text-7xl">
           {title}
@@ -49,7 +49,7 @@ export function LegalSection({
   children: React.ReactNode;
 }) {
   return (
-    <section className="grid border-t border-border py-8 md:grid-cols-[15rem_1fr] md:gap-10 md:py-10">
+    <section className="grid border-t border-border-light py-8 md:grid-cols-[15rem_1fr] md:gap-10 md:py-10">
       <h2 className="font-display text-xl font-bold tracking-[-0.02em] text-brown md:text-2xl">{title}</h2>
       <div className="min-w-0 mt-4 space-y-3 text-brown-light md:mt-0">{children}</div>
     </section>

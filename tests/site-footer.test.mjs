@@ -38,13 +38,10 @@ test("the shared footer links to each localized home and origin guide", () => {
   assert.match(footer, /Coffee origins/);
 });
 
-test("the shared footer keeps a quiet page boundary", () => {
-  assert.match(
-    footer,
-    /<footer className="border-t border-border-light bg-surface/
-  );
-  assert.doesNotMatch(footer, /<footer className="[^"]*\bborder-t-2\b/);
-  assert.doesNotMatch(footer, /<footer className="[^"]*\bborder-brown\b/);
+test("the shared footer separates itself without an upper rule", () => {
+  const classes = footer.match(/<footer className="([^"]+)"/)?.[1] ?? "";
+  assert.match(classes, /(?:^|\s)bg-surface(?:\s|$)/);
+  assert.doesNotMatch(classes, /(?:^|\s)border(?:-[^\s]+)?(?:\s|$)/);
 });
 
 test("the landing and localized app layouts use the shared footer", () => {

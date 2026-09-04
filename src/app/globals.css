@@ -34,6 +34,15 @@
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
 
+html[lang="en"] {
+  --font-display: "Iowan Old Style", Georgia, var(--font-suit), serif;
+}
+
+/* Keep locale typography correct during client-side language switches. */
+[data-locale="en"] {
+  --font-display: "Iowan Old Style", Georgia, var(--font-suit), serif;
+}
+
 /*
  * Theme selection is an operator setting, not a user preference.
  * Set BEANMAP_THEME and restart the server; no theme control is rendered in the UI.
@@ -146,11 +155,6 @@ input, textarea, select, button {
   animation: rise 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-@keyframes rule-draw {
-  from { transform: scaleX(0); }
-  to { transform: scaleX(1); }
-}
-
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -182,17 +186,16 @@ input, textarea, select, button {
 }
 
 .journal-panel {
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-light);
   border-radius: var(--radius-sm);
   background: var(--color-surface);
 }
 
 .journal-panel-feature {
-  border: 1px solid var(--color-border);
-  border-top: 3px solid var(--color-brown);
+  border: 1px solid var(--color-border-light);
   border-radius: var(--radius-sm);
   background: var(--color-surface);
-  box-shadow: 0.35rem 0.35rem 0 var(--color-cream-dark);
+  box-shadow: 0 0.5rem 1.5rem color-mix(in srgb, var(--color-brown) 6%, transparent);
 }
 
 .journal-panel-quiet {
@@ -218,26 +221,15 @@ input, textarea, select, button {
   text-wrap: balance;
 }
 
-.page-rule {
-  height: 3px;
-  background: var(--color-brown);
-  transform-origin: left;
-  animation: rule-draw 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
 .paper-sheet {
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-light);
   border-radius: var(--radius-sm);
   background: var(--color-surface);
-  box-shadow: 0.45rem 0.45rem 0 var(--color-cream-dark);
-}
-
-.paper-sheet.paper-sheet-feature {
-  border-top: 3px solid var(--color-brown);
+  box-shadow: 0 0.5rem 1.5rem color-mix(in srgb, var(--color-brown) 6%, transparent);
 }
 
 .ledger-row {
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border-light);
   transition: background-color 180ms ease, transform 180ms ease;
 }
 

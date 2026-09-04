@@ -273,7 +273,7 @@ export default function BeanDetailPage() {
       </div>
 
       {/* Header */}
-      <header className="animate-rise mb-7 grid border-y-2 border-brown md:grid-cols-[1fr_15rem]" style={{ animationDelay: "40ms" }}>
+      <header className="animate-rise mb-7 grid border-y border-border-light md:grid-cols-[1fr_15rem]" style={{ animationDelay: "40ms" }}>
         <div className="py-8 md:py-11 md:pr-10">
           <h1 className="display-title text-5xl text-brown md:text-7xl">{bean.name}</h1>
           <p className="mt-3 text-sm font-semibold uppercase tracking-[0.06em] text-brown-light">{bean.roastery}</p>
@@ -467,7 +467,7 @@ export default function BeanDetailPage() {
       {countryPreset && (
         <Card
           delay={220}
-          className="mt-4 border-t-2 border-t-brown"
+          className="mt-4 border-t border-border-light"
           testId="origin-flavor-guide"
         >
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">

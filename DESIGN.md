@@ -90,7 +90,7 @@ components:
   button-primary-hover:
     backgroundColor: "{colors.primary-soft}"
   button-secondary:
-    backgroundColor: transparent
+    backgroundColor: "{colors.surface}"
     textColor: "{colors.primary}"
     typography: "{typography.label-sm}"
     rounded: "{rounded.md}"
@@ -134,7 +134,7 @@ The source of truth for implementation is this document together with the Tailwi
 
 The default palette uses uncoated-paper neutrals with espresso ink and a restrained terracotta accent. It should feel like a well-kept tasting folio rather than a dashboard or a nostalgic coffee-shop theme.
 
-- **Primary (`#211D19`)** is espresso ink. Use it for core text, primary actions, active navigation, and the strongest rules.
+- **Primary (`#211D19`)** is espresso ink. Use it for core text, primary actions, and active navigation, not structural rules.
 - **Primary soft (`#4F4842`)** supports secondary text and primary hover states.
 - **Secondary (`#6F665E`)** is for captions and metadata that must remain readable but visually quiet.
 - **Accent (`#8A4B2B`)** is a dry terracotta used for focus, selection, map marks, links, and score emphasis. It is not a general decorative fill.
@@ -149,11 +149,11 @@ The operator selects the palette through `BEANMAP_THEME=mist|cream|contrast`. `m
 
 ## Typography
 
-Display, body, and interface typography use the self-hosted **SUIT Variable** family with system sans-serif fallbacks. Weight, scale, spacing, rules, and surface contrast create hierarchy without switching typefaces. Data numerals use tabular figures or the monospace stack.
+Body and interface typography use the self-hosted **SUIT Variable** family with system sans-serif fallbacks. Korean display typography also uses SUIT. English display typography restores the earlier editorial stack, preferring **Iowan Old Style**, then **Georgia**, with the self-hosted SUIT family as a readable fallback. Data numerals use tabular figures or the monospace stack.
 
 Reserve bold display type for meaningful hierarchy. A screen should usually have one dominant title; avoid making every card label look like a headline.
 
-Keep scores, totals, dates, and numbered steps upright. Do not synthesize italic or oblique text from the normal SUIT face; italics require an intentionally loaded italic face and a rare editorial purpose.
+Keep scores, totals, dates, and numbered steps upright. Do not synthesize italic or oblique text from the normal SUIT face; italics require an intentionally loaded italic face and a rare editorial purpose. The English serif exception is for display hierarchy, not controls, metadata, or repeated interface data.
 
 ## Layout
 
@@ -165,9 +165,9 @@ Desktop navigation lives in the top bar. Mobile navigation stays fixed at the bo
 
 ## Elevation & Depth
 
-Depth comes primarily from tonal surfaces, borders, and a stronger top or left rule. Strong ink rules are reserved for short, isolated content emphasis. Full-width page and application-chrome boundaries use at most a one-pixel `border-light` rule; never use strong ink to frame authentication screens. Default content panels are flat. One offset paper shadow may identify an important sheet, form, or toolbar; floating navigation and transient overlays may use a shallow neutral shadow.
+Depth comes primarily from tonal surfaces, whitespace, and quiet neutral borders. Structural boundaries must never use a two-pixel-or-thicker primary-ink rule; page and application-chrome boundaries use at most a one-pixel neutral rule. Never use strong ink to frame authentication screens. Default content panels are flat. One offset paper shadow may identify an important sheet, form, or toolbar; floating navigation and transient overlays may use a shallow neutral shadow.
 
-Use `journal-panel` for ordinary contained content, `journal-panel-feature` for one emphasized area, and `journal-panel-quiet` for subordinate information. Avoid stacking framed panels inside framed panels.
+Use `journal-panel` for ordinary contained content, `journal-panel-feature` for one emphasized area, and `journal-panel-quiet` for subordinate information. A feature panel may differ through surface tone, spacing, or a restrained neutral shadow, never a thick dark edge. Avoid stacking framed panels inside framed panels.
 
 Motion is restrained. The standard entrance is a short rise-and-fade of roughly 450ms with a decelerating curve. Interaction feedback should be approximately 150–200ms. Motion must never delay data entry or obscure loading state.
 
@@ -179,14 +179,14 @@ Pills are not a default container. Reserve circles for controls whose meaning or
 
 ## Components
 
-- **Buttons:** Primary buttons use the espresso fill with cream text. Secondary buttons are transparent with a visible border. Ghost buttons are for low-priority actions. Only destructive actions use red.
+- **Buttons:** Primary buttons use the espresso fill with cream text. Secondary buttons use the surface tone with a quiet neutral border. Ghost buttons are for low-priority actions. Only destructive actions use red.
 - **Inputs:** Inputs use the surface token, a one-pixel neutral border, 2px radius, and accent focus treatment. Labels remain outside the control. Placeholder text must be visibly subordinate but legible.
 - **Journal panels:** Use the surface token for standard panels and the quieter surface token for subordinate content. Prefer borders and spacing to drop shadows.
 - **Bean cards:** Lead with bean name and score, then roastery and origin. Process, roast, and type are supporting metadata. Notes and tasting tags must not overpower identity and score.
 - **Badges and filter controls:** Badges describe data and use compact, near-square labels; filters change a query and use the same low rectangular control language as other inputs. An active filter uses the primary fill. Category colors must keep consistent meanings across lists, detail pages, forms, and charts.
 - **Charts:** Use the coffee-brown sequence for neutral series and domain category colors for process data. Labels and tooltips use the same typography and surface rules as the rest of the application.
-- **Navigation:** The active destination is indicated through color and a rule, not a filled card. The mobile add action may be visually elevated because it is the central workflow.
-- **Footer:** Treat the footer as quiet application chrome. Separate it with its surface tone and at most a one-pixel `border-light` rule; never use the primary ink or a two-pixel rule across the viewport.
+- **Navigation:** The active destination is indicated through text color and a quiet tonal background, not a dark underline or framed card. The mobile add action may be visually elevated because it is the central workflow.
+- **Footer:** Treat the footer as quiet application chrome. Separate it with surface tone and spacing rather than an upper rule; never use primary ink or a thick line across the viewport.
 - **Empty and loading states:** Use quiet line illustrations, concise copy, and one clear next action. Skeletons should reproduce the real content structure without decorative animation beyond a subtle pulse.
 
 ## Do's and Don'ts
@@ -200,4 +200,5 @@ Pills are not a default container. Reserve circles for controls whose meaning or
 - Don't use process or roast colors as generic success, warning, or error indicators.
 - Don't add gradients, glassmorphism, heavy shadows, emoji icons, or oversized rounded cards.
 - Don't make every section a card; whitespace, typography, and dividers should carry most of the hierarchy.
+- Don't use a two-pixel-or-thicker primary-brown border or bar as a page, panel, list, form, or section boundary.
 - Don't change a canonical token in only `DESIGN.md` or only CSS. Update both sources in the same change and run `npm run design:lint`.

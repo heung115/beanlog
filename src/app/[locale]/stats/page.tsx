@@ -87,7 +87,7 @@ function ChartTooltip({
 
 function SectionHeading({ index, title }: { index: string; title: string }) {
   return (
-    <div className="mb-4 flex items-baseline gap-4 border-b-2 border-brown pb-3">
+    <div className="mb-4 flex items-baseline gap-4 border-b border-border-light pb-3">
       <span className="font-display text-2xl font-semibold text-accent">{index}</span>
       <h2 className="font-display text-xl font-bold tracking-[-0.02em] text-brown">{title}</h2>
     </div>
@@ -247,7 +247,7 @@ export default function StatsPage() {
       `}</style>
 
       {/* ---------- header ---------- */}
-      <header className="stats-rise grid border-y-2 border-brown md:grid-cols-[1fr_14rem]">
+      <header className="stats-rise grid border-y border-border-light md:grid-cols-[1fr_14rem]">
         <div className="py-9 md:py-12">
           <h1 className="display-title text-5xl text-brown md:text-7xl">
             {t("title")}
@@ -262,7 +262,7 @@ export default function StatsPage() {
       </header>
 
       {/* ---------- summary cards ---------- */}
-      <section className="stats-rise grid border-y-2 border-brown sm:grid-cols-3" style={{ animationDelay: "60ms" }}>
+      <section className="stats-rise grid border-y border-border-light sm:grid-cols-3" style={{ animationDelay: "60ms" }}>
         <div className="p-5 sm:border-r sm:border-border md:p-7">
           <p className="text-xs font-medium text-brown-light">
             {t("totalBeans")}

@@ -25,7 +25,7 @@ export function TopBar({ user }: TopBarProps) {
 
   if (!user) {
     return (
-      <header className="sticky top-0 z-40 border-b border-border bg-cream/95 backdrop-blur-sm">
+      <header className="sticky top-0 z-40 bg-cream/95 backdrop-blur-sm">
         <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-3 sm:min-h-[4.5rem] sm:flex-nowrap sm:px-6 sm:py-2">
           <Link
             href={`/${locale}`}
@@ -76,7 +76,7 @@ export function TopBar({ user }: TopBarProps) {
   ];
 
   return (
-    <header className="sticky top-0 z-40 hidden border-b border-border bg-cream/95 backdrop-blur-sm md:block">
+    <header className="sticky top-0 z-40 hidden bg-cream/95 backdrop-blur-sm md:block">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
         <Link
           href={`/${locale}/explore`}
@@ -95,10 +95,10 @@ export function TopBar({ user }: TopBarProps) {
                 prefetch={prefetch}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "group relative border-b-2 border-transparent px-3 py-2 text-sm font-semibold transition-colors",
+                  "group relative rounded-sm px-3 py-2 text-sm font-semibold transition-colors",
                   isActive
-                    ? "border-brown text-brown"
-                    : "text-brown-light hover:border-accent-light hover:text-brown"
+                    ? "bg-surface-warm text-brown"
+                    : "text-brown-light hover:bg-surface/80 hover:text-brown"
                 )}
               >
                 <span aria-hidden="true" className="mr-1 font-mono text-[10px] font-semibold text-brown-light">{String(index + 1).padStart(2, "0")}</span>
@@ -106,7 +106,7 @@ export function TopBar({ user }: TopBarProps) {
               </Link>
             );
           })}
-          <div className="ml-2 border-l border-border pl-3">
+          <div className="ml-2 border-l border-border-light pl-3">
             <Link
               href={`/${locale}/settings`}
               prefetch={false}

@@ -23,7 +23,7 @@ export function buttonClassName({
     "pressable inline-flex items-center justify-center rounded-sm font-semibold tracking-[-0.01em] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-cream disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none disabled:hover:translate-y-0",
     {
       "border border-brown bg-brown text-cream shadow-[3px_3px_0_var(--color-accent-light)] hover:bg-accent hover:shadow-[4px_4px_0_var(--color-accent-light)]": variant === "primary",
-      "border border-brown bg-transparent text-brown shadow-[2px_2px_0_var(--color-cream-dark)] hover:bg-surface": variant === "secondary",
+      "border border-border-light bg-surface text-brown hover:bg-surface-warm": variant === "secondary",
       "bg-transparent text-brown-light hover:bg-surface hover:text-brown": variant === "ghost",
       "border border-red-800 bg-red-800 text-white shadow-[3px_3px_0_var(--color-accent-light)] hover:bg-red-900": variant === "danger",
     },

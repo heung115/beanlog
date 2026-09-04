@@ -185,7 +185,7 @@ export default function SettingsPage() {
       `}</style>
 
       {/* ---------- header ---------- */}
-      <header className="settings-rise border-y-2 border-brown py-9 md:py-12">
+      <header className="settings-rise border-y border-border-light py-9 md:py-12">
         <h1 className="display-title text-5xl text-brown md:text-7xl">
           {t("title")}
         </h1>

@@ -35,7 +35,7 @@ export function SiteFooter({
   const copy = labels[locale];
 
   return (
-    <footer className="border-t border-border-light bg-surface text-xs text-brown-light">
+    <footer className="bg-surface text-xs text-brown-light">
       <div
         className={`mx-auto flex w-full flex-col gap-3 px-4 py-6 sm:flex-row sm:items-center sm:justify-between md:px-6 ${
           wide ? "max-w-6xl" : "max-w-6xl"

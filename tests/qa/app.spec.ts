@@ -70,7 +70,10 @@ test("public landing explains the product and uses the operator theme", async ({
   await expect(page.getByRole("article", { name: "beanmap 커피 기록 예시" })).toBeVisible();
   const typography = await page.evaluate(async () => {
     await document.fonts.ready;
-    const bodyPrimaryFont = getComputedStyle(document.body).fontFamily.split(",")[0]?.trim();
+    const title = document.querySelector<HTMLElement>("main h1");
+    if (!title) throw new Error("Missing landing title");
+    const bodyFontFamily = getComputedStyle(document.body).fontFamily;
+    const bodyPrimaryFont = bodyFontFamily.split(",")[0]?.trim();
     const fontPreloads = Array.from(
       document.querySelectorAll<HTMLLinkElement>('link[rel="preload"][as="font"]')
     ).map((link) => link.href);
@@ -79,13 +82,16 @@ test("public landing explains the product and uses the operator theme", async ({
       externalFontStylesheets: document.querySelectorAll(
         'link[rel="stylesheet"][href*="cdn.jsdelivr.net"]'
       ).length,
+      bodyFontFamily,
       fontLoaded: Boolean(bodyPrimaryFont && document.fonts.check(`16px ${bodyPrimaryFont}`)),
       fontPreloads,
       origin: window.location.origin,
+      titleFontFamily: getComputedStyle(title).fontFamily,
     };
   });
   expect(typography.externalFontStylesheets).toBe(0);
   expect(typography.fontLoaded).toBe(true);
+  expect(typography.titleFontFamily).toBe(typography.bodyFontFamily);
   expect(typography.fontPreloads.length).toBeGreaterThan(0);
   expect(typography.fontPreloads.every((href) => href.startsWith(typography.origin))).toBe(true);
   const englishLink = page.getByRole("link", { name: "영어로 전환" });
@@ -143,6 +149,20 @@ test("public landing explains the product and uses the operator theme", async ({
     "href",
     "/ko"
   );
+  const englishTypography = await page.evaluate(() => {
+    const title = document.querySelector<HTMLElement>("main h1");
+    if (!title) throw new Error("Missing English landing title");
+    return {
+      bodyFontFamily: getComputedStyle(document.body).fontFamily,
+      titleFontFamily: getComputedStyle(title).fontFamily,
+    };
+  });
+  const englishBodyPrimary = englishTypography.bodyFontFamily.split(",")[0]?.trim();
+  if (!englishBodyPrimary) throw new Error("Missing English body font family");
+  expect(englishTypography.titleFontFamily).not.toBe(englishTypography.bodyFontFamily);
+  expect(englishTypography.titleFontFamily).toContain("Iowan Old Style");
+  expect(englishTypography.titleFontFamily).toContain("Georgia");
+  expect(englishTypography.titleFontFamily).toContain(englishBodyPrimary);
 });
 
 test("@mobile landing stays readable at 320px", async ({ page }) => {
@@ -679,7 +699,7 @@ test("@mobile explore keeps the record grid to one column", async ({ page }) => 
 test("wide localized pages keep the footer at the viewport bottom", async ({ page }) => {
   await page.setViewportSize({ width: 4570, height: 2074 });
   await page.goto("/ko/login");
-  await expect(page.getByRole("heading", { level: 1, name: "beanmap" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "로그인" })).toBeVisible();
 
   const layout = await page.evaluate(() => {
     const footer = document.querySelector("footer");
@@ -796,7 +816,7 @@ test("explore progressively discloses aligned filters without overflow", async (
   }
 });
 
-test("bean detail uses unified SUIT type and paper cards", async ({ page }) => {
+test("Korean bean detail uses SUIT type and quiet paper cards", async ({ page }) => {
   await login(page);
   const firstBeanCard = page.locator('[data-bean-card] h3 a[href*="/beans/"]').first();
   await firstBeanCard.click();
@@ -865,6 +885,17 @@ test("bean detail uses unified SUIT type and paper cards", async ({ page }) => {
     },
     designTokens.colors.brown
   );
+  const expectedBorderLight = await page.evaluate(
+    (token) => {
+      const probe = document.createElement("span");
+      probe.style.borderTop = `1px solid ${token}`;
+      document.body.appendChild(probe);
+      const computed = getComputedStyle(probe).borderTopColor;
+      probe.remove();
+      return computed;
+    },
+    designTokens.colors["border-light"]
+  );
 
   expect(appearance.bodyBackground).toBe(expectedCanvas);
   expect(appearance.fontLoaded).toBe(true);
@@ -873,8 +904,9 @@ test("bean detail uses unified SUIT type and paper cards", async ({ page }) => {
     new Set([expectedSurface])
   );
   expect(new Set(appearance.sectionRadii)).toEqual(new Set(["2px"]));
-  expect(appearance.scoreBorderTopWidth).toBe("3px");
-  expect(appearance.scoreBorderTopColor).toBe(expectedBrown);
+  expect(Number.parseFloat(appearance.scoreBorderTopWidth)).toBeLessThanOrEqual(1);
+  expect(appearance.scoreBorderTopColor).toBe(expectedBorderLight);
+  expect(appearance.scoreBorderTopColor).not.toBe(expectedBrown);
   await expectNoSeriousA11yViolations(page);
 });
 

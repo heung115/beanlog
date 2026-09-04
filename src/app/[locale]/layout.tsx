@@ -42,7 +42,7 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider messages={messages}>
-      <div className="flex min-h-dvh flex-col">
+      <div lang={locale} data-locale={locale} className="flex min-h-dvh flex-col">
         <TopBar user={user} />
         <main
           id="main-content"
