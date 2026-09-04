@@ -163,7 +163,7 @@ Desktop navigation lives in the top bar. Mobile navigation stays fixed at the bo
 
 ## Elevation & Depth
 
-Depth comes primarily from tonal surfaces, borders, and a stronger top or left rule. Default content panels are flat. One offset paper shadow may identify an important sheet, form, or toolbar; floating navigation and transient overlays may use a shallow neutral shadow.
+Depth comes primarily from tonal surfaces, borders, and a stronger top or left rule. Strong ink rules are reserved for isolated content emphasis; never use them as full-width footer boundaries or to frame authentication screens. Default content panels are flat. One offset paper shadow may identify an important sheet, form, or toolbar; floating navigation and transient overlays may use a shallow neutral shadow.
 
 Use `journal-panel` for ordinary contained content, `journal-panel-feature` for one emphasized area, and `journal-panel-quiet` for subordinate information. Avoid stacking framed panels inside framed panels.
 
@@ -184,6 +184,7 @@ Pills are not a default container. Reserve circles for controls whose meaning or
 - **Badges and filter controls:** Badges describe data and use compact, near-square labels; filters change a query and use the same low rectangular control language as other inputs. An active filter uses the primary fill. Category colors must keep consistent meanings across lists, detail pages, forms, and charts.
 - **Charts:** Use the coffee-brown sequence for neutral series and domain category colors for process data. Labels and tooltips use the same typography and surface rules as the rest of the application.
 - **Navigation:** The active destination is indicated through color and a rule, not a filled card. The mobile add action may be visually elevated because it is the central workflow.
+- **Footer:** Treat the footer as quiet application chrome. Separate it with its surface tone and at most a one-pixel `border-light` rule; never use the primary ink or a two-pixel rule across the viewport.
 - **Empty and loading states:** Use quiet line illustrations, concise copy, and one clear next action. Skeletons should reproduce the real content structure without decorative animation beyond a subtle pulse.
 
 ## Do's and Don'ts
