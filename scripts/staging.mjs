@@ -389,6 +389,8 @@ function qaEnvironment(env, qaCredentials, baseURL) {
     QA_PRIMARY_PASSWORD: qaCredentials.primary.password,
     QA_ISOLATION_EMAIL: qaCredentials.isolation.email,
     QA_ISOLATION_PASSWORD: qaCredentials.isolation.password,
+    QA_EMPTY_EMAIL: qaCredentials.empty.email,
+    QA_EMPTY_PASSWORD: qaCredentials.empty.password,
   };
 }
 

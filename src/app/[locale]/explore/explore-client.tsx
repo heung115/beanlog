@@ -122,7 +122,7 @@ function FilterChip({ label, allLabel, value, options, onChange }: FilterChipPro
 
 function SkeletonCard() {
   return (
-    <div className="animate-pulse rounded-lg border border-border-light bg-surface p-5">
+    <div className="animate-pulse rounded-lg bg-surface p-5">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0 flex-1">
           <div className="h-5 w-2/3 rounded bg-cream-dark" />
@@ -155,9 +155,13 @@ function EmptyState({
   const locale = useLocale();
 
   return (
-    <div className="col-span-full flex flex-col items-center py-20 text-center">
+    <div
+      data-testid="explore-empty-state"
+      className="col-span-full flex flex-col items-center px-6 py-12 text-center md:py-14"
+    >
       <svg
-        className="mb-6 h-14 w-14 text-brown-light/40"
+        aria-hidden="true"
+        className="mb-4 h-10 w-10 text-brown-light/35"
         viewBox="0 0 48 48"
         fill="none"
         stroke="currentColor"
@@ -169,7 +173,7 @@ function EmptyState({
         <path d="M34 22h3a5 5 0 010 10h-3" />
         <path d="M16 14c0-2 2-2 2-4M22 14c0-2 2-2 2-4M28 14c0-2 2-2 2-4" />
       </svg>
-      <h2 className="font-display text-xl font-bold text-brown">{t("empty")}</h2>
+      <h2 className="text-lg font-semibold tracking-[-0.015em] text-brown">{t("empty")}</h2>
       <p className="mt-1.5 text-sm text-brown-light">{t("emptySub")}</p>
       {hasFilters ? (
         <Button variant="secondary" size="md" className="mt-6" onClick={onClear}>
@@ -179,7 +183,7 @@ function EmptyState({
         <Link
           href={`/${locale}/beans/new`}
           prefetch={false}
-          className="mt-6 inline-flex items-center justify-center rounded-md bg-brown px-6 py-3 text-base font-medium text-cream transition-colors duration-150 hover:bg-brown-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+          className="mt-5 inline-flex min-h-11 items-center justify-center rounded-md bg-brown px-5 py-2.5 text-sm font-semibold text-cream transition-colors duration-150 hover:bg-brown-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
         >
           {t("addFirst")}
         </Link>
@@ -188,10 +192,33 @@ function EmptyState({
   );
 }
 
+function LoadErrorState({ onRetry }: { onRetry: () => void }) {
+  const t = useTranslations("explore");
+
+  return (
+    <div
+      role="alert"
+      data-testid="explore-load-error"
+      className="col-span-full flex flex-col items-center px-6 py-12 text-center md:py-14"
+    >
+      <p className="text-base font-semibold text-brown">{t("loadError")}</p>
+      <p className="mt-1.5 text-sm text-brown-light">{t("loadErrorSub")}</p>
+      <button
+        type="button"
+        onClick={onRetry}
+        className="mt-5 min-h-11 rounded-md bg-brown px-5 py-2.5 text-sm font-semibold text-cream transition-colors duration-150 hover:bg-brown-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+      >
+        {t("retry")}
+      </button>
+    </div>
+  );
+}
+
 export function ExploreClient({
   initialBeans,
   initialTotal,
   initialFilterOptions,
+  initialLoadError,
 }: {
   initialBeans: BeanWithTags[];
   initialTotal: number;
@@ -200,6 +227,7 @@ export function ExploreClient({
     roasteries: string[];
     varietals: string[];
   };
+  initialLoadError: boolean;
 }) {
   const t = useTranslations("explore");
   const tBeans = useTranslations("beans");
@@ -218,6 +246,11 @@ export function ExploreClient({
   const [total, setTotal] = useState(initialTotal);
   const [loading, setLoading] = useState(false);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [loadError, setLoadError] = useState(initialLoadError);
+  const [retryKey, setRetryKey] = useState(0);
+  const [hasJournalEntries, setHasJournalEntries] = useState(
+    initialTotal > 0 || initialBeans.length > 0
+  );
   const viewMode = useSyncExternalStore(
     subscribeToViewMode,
     getStoredViewMode,
@@ -233,7 +266,7 @@ export function ExploreClient({
     roasteries: string[];
     varietals: string[];
   }>(initialFilterOptions);
-  const initialFetch = useRef(true);
+  const initialFetch = useRef(!initialLoadError);
   const appliedSearch = useRef<string | undefined>(undefined);
 
   const changeView = (nextView: ViewMode) => storeViewMode(nextView);
@@ -279,9 +312,18 @@ export function ExploreClient({
       const res = await getBeans({ ...filters, page, limit: PAGE_SIZE });
       if (cancelled) return;
 
+      if (res.error) {
+        setLoadError(true);
+        setLoading(false);
+        setLoadingMore(false);
+        return;
+      }
+
       const fetched = (res.beans ?? []) as BeanWithTags[];
+      setLoadError(false);
       setBeans((prev) => (page === 0 ? fetched : [...prev, ...fetched]));
       setTotal(res.count);
+      if (res.count > 0 || fetched.length > 0) setHasJournalEntries(true);
 
       // Grow filter option pool from everything we've seen
       setOptionPool((prev) => {
@@ -310,7 +352,7 @@ export function ExploreClient({
     return () => {
       cancelled = true;
     };
-  }, [filters, page]);
+  }, [filters, page, retryKey]);
 
   const updateFilter = <K extends keyof BeanFilters>(key: K, value: BeanFilters[K]) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
@@ -326,7 +368,6 @@ export function ExploreClient({
       filters.roast_level ||
       filters.search
   );
-
   const clearFilters = () => {
     setSearchInput("");
     setFilters((prev) => ({
@@ -455,23 +496,46 @@ export function ExploreClient({
     }
   };
 
-  return (
-    <div className="mx-auto w-full max-w-6xl">
-      <header className="mb-7 grid overflow-hidden rounded-lg bg-surface/55 md:grid-cols-[1fr_13rem]">
-        <div className="py-9 md:py-12">
-          <h1 className="display-title text-5xl text-brown md:text-7xl">
-            {t("title")}
-          </h1>
-        </div>
-        <div className="flex items-end justify-between border-t border-border-light bg-surface-warm p-5 md:block md:border-l md:border-t-0 md:p-7">
-          <p className="folio-label">{t("recordCount")}</p>
-          <p className="font-display text-5xl font-bold tabular-nums tracking-[-0.05em] text-accent md:mt-5 md:text-6xl">{total}</p>
-        </div>
-      </header>
+  const pageHeader = (
+    <header data-testid="explore-header" className="mb-6 pt-2 md:mb-7 md:pt-3">
+      <h1 className="text-2xl font-semibold leading-tight tracking-[-0.025em] text-brown md:text-3xl">
+        {t("title")}
+      </h1>
+    </header>
+  );
 
-      <div className="paper-sheet grid grid-cols-2 gap-2 p-3 md:grid-cols-[minmax(0,1fr)_auto_auto] md:p-4">
+  if (!hasJournalEntries && !loadError && !loading) {
+    return (
+      <div className="mx-auto w-full max-w-4xl">
+        {pageHeader}
+        <div data-testid="bean-grid" data-view={viewMode} className="grid grid-cols-1">
+          <EmptyState hasFilters={false} onClear={clearFilters} />
+        </div>
+      </div>
+    );
+  }
+
+  if (!hasJournalEntries && loadError) {
+    return (
+      <div className="mx-auto w-full max-w-4xl">
+        {pageHeader}
+        <div className="grid grid-cols-1">
+          <LoadErrorState onRetry={() => setRetryKey((key) => key + 1)} />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto w-full max-w-4xl">
+      {pageHeader}
+      <div
+        data-testid="explore-toolbar"
+        className="grid grid-cols-2 gap-2 md:grid-cols-[minmax(0,1fr)_auto_auto]"
+      >
         <div className="relative col-span-2 md:col-span-1">
           <svg
+            aria-hidden="true"
             className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-brown-light/50"
             viewBox="0 0 24 24"
             fill="none"
@@ -491,7 +555,7 @@ export function ExploreClient({
             placeholder={t("searchPlaceholder")}
             aria-label={t("search")}
             className={cn(
-              "min-h-12 w-full rounded-md border border-border-light bg-cream py-2.5 pl-10 pr-3 text-sm text-brown",
+              "min-h-11 w-full rounded-md border border-border-light bg-surface py-2.5 pl-10 pr-3 text-sm text-brown",
               "placeholder:text-brown-light/60 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15",
               "transition-colors duration-150 disabled:cursor-wait disabled:opacity-70"
             )}
@@ -504,11 +568,11 @@ export function ExploreClient({
           aria-controls="explore-filter-panel"
           onClick={() => setFiltersOpen((open) => !open)}
           className={cn(
-            "inline-flex min-h-12 items-center justify-center gap-2 rounded-md border px-3 text-xs font-semibold transition-colors duration-150",
+            "inline-flex min-h-11 items-center justify-center gap-2 rounded-md border px-3 text-xs font-semibold transition-colors duration-150",
             "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
             filtersOpen
               ? "border-transparent bg-brown text-cream"
-              : "border-border-light bg-cream text-brown-medium hover:border-border"
+              : "border-border-light bg-surface text-brown-medium hover:bg-surface-warm"
           )}
         >
           <svg aria-hidden="true" className="h-4 w-4" viewBox="0 0 16 16" fill="none">
@@ -528,8 +592,8 @@ export function ExploreClient({
             value={sortValue}
             onChange={(e) => handleSortChange(e.target.value)}
             className={cn(
-              "min-h-12 w-full cursor-pointer appearance-none rounded-md border border-border-light bg-cream py-2 pl-3 pr-9 text-xs font-semibold text-brown-medium",
-              "transition-colors duration-150 hover:border-border focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              "min-h-11 w-full cursor-pointer appearance-none rounded-md border border-border-light bg-surface py-2 pl-3 pr-9 text-xs font-semibold text-brown-medium",
+              "transition-colors duration-150 hover:bg-surface-warm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             )}
           >
             <option value="newest">{t("sortNewest")}</option>
@@ -623,54 +687,73 @@ export function ExploreClient({
         </div>
       )}
 
-      <div className="mt-8 flex items-center justify-between pb-3">
-        <p className="folio-label">
-          {loading ? t("results", { count: 0 }) : t("results", { count: total })}
-        </p>
+      {loadError && (
         <div
-          className="hidden items-center overflow-hidden rounded-md border border-border-light bg-surface md:flex"
-          role="group"
-          aria-label={t("viewMode")}
+          role="alert"
+          className="mt-4 flex min-h-11 items-center justify-between gap-4 rounded-md bg-surface-warm px-3 py-2 text-sm text-brown-medium"
         >
+          <span>{t("loadError")}</span>
           <button
             type="button"
-            aria-label={t("listView")}
-            aria-pressed={viewMode === "list"}
-            onClick={() => changeView("list")}
-            className={cn(
-              "flex min-h-11 min-w-11 items-center justify-center text-brown-light transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent",
-              viewMode === "list" && "bg-cream-dark text-brown"
-            )}
+            onClick={() => setRetryKey((key) => key + 1)}
+            className="min-h-11 shrink-0 rounded-md px-3 font-semibold text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
           >
-            <svg aria-hidden="true" width="17" height="17" viewBox="0 0 17 17" fill="none">
-              <path d="M2 4h13M2 8.5h13M2 13h13" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-            </svg>
-          </button>
-          <button
-            type="button"
-            aria-label={t("gridView")}
-            aria-pressed={viewMode === "grid"}
-            onClick={() => changeView("grid")}
-            className={cn(
-              "flex min-h-11 min-w-11 items-center justify-center border-l border-border-light text-brown-light transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent",
-              viewMode === "grid" && "bg-cream-dark text-brown"
-            )}
-          >
-            <svg aria-hidden="true" width="17" height="17" viewBox="0 0 17 17" fill="none">
-              <rect x="2" y="2" width="5" height="5" stroke="currentColor" strokeWidth="1.3" />
-              <rect x="10" y="2" width="5" height="5" stroke="currentColor" strokeWidth="1.3" />
-              <rect x="2" y="10" width="5" height="5" stroke="currentColor" strokeWidth="1.3" />
-              <rect x="10" y="10" width="5" height="5" stroke="currentColor" strokeWidth="1.3" />
-            </svg>
+            {t("retry")}
           </button>
         </div>
+      )}
+
+      <div data-testid="explore-results" className="mt-6 flex items-center justify-between">
+        <p
+          role="status"
+          aria-live="polite"
+          className="text-xs font-medium tabular-nums text-brown-light"
+        >
+          {t("results", { count: total })}
+        </p>
+        {beans.length > 0 && (
+          <div className="hidden items-center gap-1 md:flex" role="group" aria-label={t("viewMode")}>
+            <button
+              type="button"
+              aria-label={t("listView")}
+              aria-pressed={viewMode === "list"}
+              onClick={() => changeView("list")}
+              className={cn(
+                "flex min-h-11 min-w-11 items-center justify-center rounded-md text-brown-light transition-colors hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent",
+                viewMode === "list" && "bg-surface-warm text-brown"
+              )}
+            >
+              <svg aria-hidden="true" width="17" height="17" viewBox="0 0 17 17" fill="none">
+                <path d="M2 4h13M2 8.5h13M2 13h13" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+              </svg>
+            </button>
+            <button
+              type="button"
+              aria-label={t("gridView")}
+              aria-pressed={viewMode === "grid"}
+              onClick={() => changeView("grid")}
+              className={cn(
+                "flex min-h-11 min-w-11 items-center justify-center rounded-md text-brown-light transition-colors hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent",
+                viewMode === "grid" && "bg-surface-warm text-brown"
+              )}
+            >
+              <svg aria-hidden="true" width="17" height="17" viewBox="0 0 17 17" fill="none">
+                <rect x="2" y="2" width="5" height="5" stroke="currentColor" strokeWidth="1.3" />
+                <rect x="10" y="2" width="5" height="5" stroke="currentColor" strokeWidth="1.3" />
+                <rect x="2" y="10" width="5" height="5" stroke="currentColor" strokeWidth="1.3" />
+                <rect x="10" y="10" width="5" height="5" stroke="currentColor" strokeWidth="1.3" />
+              </svg>
+            </button>
+          </div>
+        )}
       </div>
 
       <div
         data-testid="bean-grid"
         data-view={viewMode}
+        aria-busy={loading}
         className={cn(
-          "mt-4 grid grid-cols-1 gap-4",
+          "mt-3 grid grid-cols-1 gap-4",
           viewMode === "grid" && "md:grid-cols-2 md:gap-5"
         )}
       >

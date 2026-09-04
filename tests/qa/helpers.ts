@@ -68,6 +68,19 @@ export const qaOtherUser = {
     process.env.QA_ISOLATION_PASSWORD ?? storedQaCredentials.isolation.password,
 };
 
+export const qaEmptyUser = {
+  email: process.env.QA_EMPTY_EMAIL ?? storedQaCredentials.empty.email,
+  password: process.env.QA_EMPTY_PASSWORD ?? storedQaCredentials.empty.password,
+};
+
+if (
+  !qaEmptyUser.email.startsWith("beanmap-qa-empty-") ||
+  !qaEmptyUser.email.endsWith("@local.test") ||
+  qaEmptyUser.password.length < 24
+) {
+  throw new Error("The empty-state QA account must use dedicated generated credentials.");
+}
+
 export async function ensureUser(email: string, password: string) {
   const { data: listed, error: listError } = await admin.auth.admin.listUsers({ perPage: 1000 });
   if (listError) throw listError;

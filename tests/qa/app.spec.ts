@@ -1,13 +1,13 @@
 import { expect, test, type Page } from "@playwright/test";
 import axe from "axe-core";
-import { qaBaseURL, qaUser } from "./helpers";
+import { qaBaseURL, qaEmptyUser, qaUser } from "./helpers";
 import designTokens from "../../src/config/design-tokens.json" with { type: "json" };
 import { LEGAL_EFFECTIVE_DATE } from "../../src/config/legal-version";
 
-async function login(page: Page) {
+async function login(page: Page, user = qaUser) {
   await page.goto("/ko/login");
-  await page.locator('input[name="email"]').fill(qaUser.email);
-  await page.locator('input[name="password"]').fill(qaUser.password);
+  await page.locator('input[name="email"]').fill(user.email);
+  await page.locator('input[name="password"]').fill(user.password);
   await page.locator('button[type="submit"]').click();
   await expect(page).toHaveURL(/\/(?:ko\/)?explore$/);
 }
@@ -374,24 +374,96 @@ test("login stays visually quiet and restores only an explicit social agreement"
   await expect(page.getByRole("button", { name: "카카오로 계속" })).toBeDisabled();
 });
 
-test("authenticated journal uses quiet full-width dividers", async ({ page }) => {
+test("authenticated journal uses a compact unframed workspace", async ({ page }) => {
   await login(page);
 
-  const pageHeading = page.getByRole("heading", { level: 1, name: "beanmap" });
+  const pageHeading = page.getByRole("heading", { level: 1, name: "커피 기록" });
   const pageHeader = pageHeading.locator("xpath=ancestor::header");
-  const resultLabel = page.locator("p.folio-label").filter({ hasText: /개 기록$/ }).last();
-  const resultDivider = resultLabel.locator("..");
+  const resultRow = page.getByTestId("explore-results");
+  const toolbar = page.getByTestId("explore-toolbar");
 
   await page.getByRole("button", { name: "필터" }).click();
   const filterPanel = page.locator("#explore-filter-panel");
 
-  for (const boundary of [pageHeader, resultDivider, filterPanel]) {
-    const widths = await boundary.evaluate((element) => {
+  for (const boundary of [pageHeader, resultRow, toolbar, filterPanel]) {
+    const style = await boundary.evaluate((element) => {
       const style = getComputedStyle(element);
-      return [style.borderTopWidth, style.borderBottomWidth].map(Number.parseFloat);
+      return {
+        borderWidths: [
+          style.borderTopWidth,
+          style.borderRightWidth,
+          style.borderBottomWidth,
+          style.borderLeftWidth,
+        ].map(Number.parseFloat),
+        boxShadow: style.boxShadow,
+      };
     });
-    expect(Math.max(...widths)).toBeLessThanOrEqual(1);
+    expect(Math.max(...style.borderWidths)).toBeLessThanOrEqual(1);
+    expect(style.boxShadow).toBe("none");
   }
+
+  const headerMetrics = await pageHeader.evaluate((element) => ({
+    height: element.getBoundingClientRect().height,
+    background: getComputedStyle(element).backgroundColor,
+  }));
+  expect(headerMetrics.height).toBeLessThan(80);
+  expect(headerMetrics.background).toBe("rgba(0, 0, 0, 0)");
+  expect(
+    await pageHeading.evaluate((element) => Number.parseFloat(getComputedStyle(element).fontSize))
+  ).toBeLessThanOrEqual(32);
+});
+
+test("an empty journal shows one focused first-record action", async ({ page }) => {
+  await login(page, qaEmptyUser);
+
+  await expect(page.getByRole("heading", { level: 1, name: "커피 기록" })).toBeVisible();
+  await expect(page.getByTestId("explore-empty-state")).toBeVisible();
+  await expect(page.getByRole("link", { name: "첫 기록 추가" })).toBeVisible();
+  await expect(page.getByRole("searchbox")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "필터" })).toHaveCount(0);
+  await expect(page.getByRole("combobox", { name: "정렬" })).toHaveCount(0);
+  await expect(page.getByRole("group", { name: "보기 방식" })).toHaveCount(0);
+  await expect(page.getByText("0개 기록", { exact: true })).toHaveCount(0);
+
+  const layout = await page.evaluate(() => {
+    const action = document.querySelector<HTMLElement>(
+      '[data-testid="explore-empty-state"] a[href$="/beans/new"]'
+    );
+    if (!action) throw new Error("Missing first-record action");
+    return {
+      actionBottom: action.getBoundingClientRect().bottom,
+      viewportHeight: window.innerHeight,
+      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    };
+  });
+  expect(layout.actionBottom).toBeLessThan(layout.viewportHeight);
+  expect(layout.overflow).toBe(0);
+  await expectNoSeriousA11yViolations(page);
+});
+
+test("@mobile an empty journal keeps its first action above navigation", async ({ page }) => {
+  await login(page, qaEmptyUser);
+
+  const action = page.getByRole("link", { name: "첫 기록 추가" });
+  const navigation = page.locator("nav.fixed.bottom-0");
+  await expect(action).toBeVisible();
+  await expect(navigation).toBeVisible();
+
+  const layout = await page.evaluate(() => {
+    const firstAction = document.querySelector<HTMLElement>(
+      '[data-testid="explore-empty-state"] a[href$="/beans/new"]'
+    );
+    const bottomNavigation = document.querySelector<HTMLElement>("nav.fixed.bottom-0");
+    if (!firstAction || !bottomNavigation) throw new Error("Missing mobile first-record layout");
+    return {
+      actionBottom: firstAction.getBoundingClientRect().bottom,
+      navigationTop: bottomNavigation.getBoundingClientRect().top,
+      overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+    };
+  });
+  expect(layout.actionBottom).toBeLessThan(layout.navigationTop);
+  expect(layout.overflow).toBe(0);
+  await expect(page.getByRole("searchbox")).toHaveCount(0);
 });
 
 test("@mobile authenticated navigation uses a quiet boundary", async ({ page }) => {
@@ -1109,9 +1181,9 @@ test("@mobile filters and navigation provide comfortable touch targets", async (
   await expect(page.locator("#explore-filter-panel")).toHaveCount(0);
   await filterToggle.click();
 
-  const heights = await page.locator("main select, main button[aria-controls], body > nav a").evaluateAll((elements) =>
-    elements.map((element) => element.getBoundingClientRect().height)
-  );
+  const heights = await page
+    .locator("main select, main button[aria-controls], nav.fixed.bottom-0 a")
+    .evaluateAll((elements) => elements.map((element) => element.getBoundingClientRect().height));
   const widths = await page.evaluate(() => {
     const search = document.querySelector<HTMLElement>('main input[type="search"]');
     const filterButton = document.querySelector<HTMLElement>(

@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { ensureUser, qaOtherUser, qaUser, signIn } from "./helpers";
+import { ensureUser, qaEmptyUser, qaOtherUser, qaUser, signIn } from "./helpers";
 
 type Fixture = {
   name: string;
@@ -47,8 +47,10 @@ async function createBean(
 export default async function globalSetup() {
   const primaryId = await ensureUser(qaUser.email, qaUser.password);
   const isolationId = await ensureUser(qaOtherUser.email, qaOtherUser.password);
+  const emptyId = await ensureUser(qaEmptyUser.email, qaEmptyUser.password);
   const { client: primary } = await signIn(qaUser.email, qaUser.password);
   const { client: isolation } = await signIn(qaOtherUser.email, qaOtherUser.password);
+  const { client: empty } = await signIn(qaEmptyUser.email, qaEmptyUser.password);
 
   // handle_new_user creates profiles. Update only the caller-owned display fields;
   // never use service-role table access in this harness.
@@ -62,16 +64,22 @@ export default async function globalSetup() {
     .update({ display_name: "beanmap QA Isolation", locale: "ko" })
     .eq("id", isolationId);
   if (isolationProfileError) throw isolationProfileError;
+  const { error: emptyProfileError } = await empty
+    .from("profiles")
+    .update({ display_name: "beanmap QA Empty", locale: "ko" })
+    .eq("id", emptyId);
+  if (emptyProfileError) throw emptyProfileError;
 
   const fixturePath = path.join(process.cwd(), "tests/fixtures/unspecialty-july-2026.json");
   const fixtures = JSON.parse(await fs.readFile(fixturePath, "utf8")) as Fixture[];
   const sourceNote = "[QA:unspecialty-775] 언스페셜티 7월 월픽 상품 정보 기반 테스트 등록";
 
   // These accounts are dedicated to the automated harness. Clear every row,
-  // including a partially-written row left by an older broken API build, so
-  // each run starts from an exact and reproducible 30-record boundary.
+  // including partially-written rows left by an older broken API build, so
+  // the primary fixtures are exact and the first-run account stays empty.
   await deleteAllBeans(primary, primaryId);
   await deleteAllBeans(isolation, isolationId);
+  await deleteAllBeans(empty, emptyId);
 
   const rows = fixtures.map((fixture, index) => ({
     ...fixture,

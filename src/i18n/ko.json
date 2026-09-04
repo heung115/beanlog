@@ -170,11 +170,13 @@
     "dark": "강배전"
   },
   "explore": {
-    "title": "beanmap",
-    "recordCount": "기록 수",
+    "title": "커피 기록",
     "empty": "아직 기록이 없어요",
     "emptySub": "첫 커피를 기록해보세요",
     "addFirst": "첫 기록 추가",
+    "loadError": "기록을 불러오지 못했어요",
+    "loadErrorSub": "잠시 후 다시 시도해주세요",
+    "retry": "다시 시도",
     "search": "검색",
     "searchPlaceholder": "원두, 로스터리, 메모 검색...",
     "filters": "필터",

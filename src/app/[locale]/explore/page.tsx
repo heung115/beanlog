@@ -20,6 +20,7 @@ export default async function ExplorePage() {
       initialBeans={(result.beans ?? []) as BeanWithTags[]}
       initialTotal={result.count}
       initialFilterOptions={filterOptions}
+      initialLoadError={Boolean(result.error)}
     />
   );
 }

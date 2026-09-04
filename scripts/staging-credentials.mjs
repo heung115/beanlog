@@ -9,7 +9,7 @@ function credentialFile(runtimeRoot) {
 }
 
 function validateCredentials(value) {
-  for (const account of [value?.primary, value?.isolation]) {
+  for (const account of [value?.primary, value?.isolation, value?.empty]) {
     if (
       typeof account?.email !== "string" ||
       !account.email.endsWith("@local.test") ||
@@ -23,7 +23,19 @@ function validateCredentials(value) {
 }
 
 function readCredentials(file) {
-  return validateCredentials(JSON.parse(fs.readFileSync(file, "utf8")));
+  const value = JSON.parse(fs.readFileSync(file, "utf8"));
+  for (const account of [value?.primary, value?.isolation]) {
+    if (
+      typeof account?.email !== "string" ||
+      !account.email.endsWith("@local.test") ||
+      typeof account?.password !== "string" ||
+      account.password.length < 24
+    ) {
+      throw new Error("Staging QA credentials are invalid.");
+    }
+  }
+  if (value.empty) validateCredentials(value);
+  return value;
 }
 
 function newAccount(label) {
@@ -39,9 +51,16 @@ export function ensureQaCredentials(runtimeRoot) {
   fs.mkdirSync(runtimeRoot, { recursive: true });
 
   try {
-    const credentials = readCredentials(file);
+    let credentials = readCredentials(file);
+    if (!credentials.empty) {
+      credentials = { ...credentials, empty: newAccount("empty") };
+      fs.writeFileSync(file, `${JSON.stringify(credentials)}\n`, {
+        encoding: "utf8",
+        mode: 0o600,
+      });
+    }
     fs.chmodSync(file, 0o600);
-    return credentials;
+    return validateCredentials(credentials);
   } catch (error) {
     if (error?.code !== "ENOENT") throw error;
   }
@@ -49,6 +68,7 @@ export function ensureQaCredentials(runtimeRoot) {
   const credentials = {
     primary: newAccount("primary"),
     isolation: newAccount("isolation"),
+    empty: newAccount("empty"),
   };
 
   try {
@@ -59,7 +79,7 @@ export function ensureQaCredentials(runtimeRoot) {
     });
   } catch (error) {
     if (error?.code !== "EEXIST") throw error;
-    return readCredentials(file);
+    return ensureQaCredentials(runtimeRoot);
   }
 
   fs.chmodSync(file, 0o600);

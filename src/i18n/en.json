@@ -170,11 +170,13 @@
     "dark": "Dark"
   },
   "explore": {
-    "title": "beanmap",
-    "recordCount": "Record count",
+    "title": "Coffee journal",
     "empty": "No records yet",
     "emptySub": "Log your first coffee",
     "addFirst": "Add first record",
+    "loadError": "Could not load your records",
+    "loadErrorSub": "Please try again in a moment",
+    "retry": "Retry",
     "search": "Search",
     "searchPlaceholder": "Search beans, roasteries, notes...",
     "filters": "Filters",

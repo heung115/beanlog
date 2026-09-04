@@ -256,7 +256,7 @@ export async function getBeans(filters?: {
     });
     return { beans: result.beans, count: result.count };
   } catch {
-    return { beans: [], count: 0 };
+    return { beans: [], count: 0, error: "Unable to load beans" };
   }
 }
 
