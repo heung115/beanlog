@@ -186,6 +186,29 @@ export default function SettingsPage() {
     }
   }
 
+  function handleDeleteDialogKeyDown(
+    event: React.KeyboardEvent<HTMLDialogElement>
+  ) {
+    if (event.key !== "Tab") return;
+
+    const controls = Array.from(
+      event.currentTarget.querySelectorAll<HTMLButtonElement>(
+        "button:not([disabled])"
+      )
+    );
+    const first = controls[0];
+    const last = controls.at(-1);
+    if (!first || !last) return;
+
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  }
+
   const locales: { value: Locale; label: string }[] = [
     { value: "ko", label: t("korean") },
     { value: "en", label: t("english") },
@@ -335,6 +358,7 @@ export default function SettingsPage() {
           ref={deleteDialogRef}
           aria-labelledby="delete-account-title"
           aria-describedby="delete-account-description"
+          onKeyDown={handleDeleteDialogKeyDown}
           onCancel={(event) => {
             event.preventDefault();
             if (!deleting) setConfirmOpen(false);
