@@ -81,9 +81,9 @@ function setMarkerSelection(svg: SVGSVGElement, selectedCountry: string | null) 
       marker.setAttribute("fill-opacity", selected ? "1" : "0.88");
       marker.setAttribute(
         "stroke",
-        selected ? "var(--color-brown)" : "var(--color-surface)"
+        selected ? "var(--color-accent-light)" : "var(--color-surface)"
       );
-      marker.setAttribute("stroke-width", selected ? "3" : "1.5");
+      marker.setAttribute("stroke-width", selected ? "2.25" : "1.5");
     });
 }
 
@@ -642,7 +642,7 @@ export function OriginMap({
             aria-label={labels.zoomOut}
             title={labels.zoomOut}
             onClick={() => zoomApiRef.current?.changeBy(1 / ZOOM_STEP)}
-            className="grid size-11 place-items-center rounded-sm border border-border bg-surface text-xl leading-none text-brown shadow-sm transition-colors hover:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 disabled:cursor-default disabled:opacity-45"
+            className="grid size-11 place-items-center rounded-md border border-border-light bg-surface text-xl leading-none text-brown transition-colors hover:bg-cream-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 disabled:cursor-default disabled:opacity-45"
           >
             −
           </button>
@@ -652,7 +652,7 @@ export function OriginMap({
             aria-label={labels.zoomIn}
             title={labels.zoomIn}
             onClick={() => zoomApiRef.current?.changeBy(ZOOM_STEP)}
-            className="grid size-11 place-items-center rounded-sm border border-border bg-surface text-xl leading-none text-brown shadow-sm transition-colors hover:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 disabled:cursor-default disabled:opacity-45"
+            className="grid size-11 place-items-center rounded-md border border-border-light bg-surface text-xl leading-none text-brown transition-colors hover:bg-cream-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 disabled:cursor-default disabled:opacity-45"
           >
             +
           </button>
@@ -663,7 +663,7 @@ export function OriginMap({
           hidden
           aria-label={labels.reset}
           onClick={() => zoomApiRef.current?.reset()}
-          className="min-h-11 rounded-sm border border-border bg-surface px-3 text-xs font-medium text-brown shadow-sm transition-colors hover:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
+          className="min-h-11 rounded-md border border-border-light bg-surface px-3 text-xs font-medium text-brown transition-colors hover:bg-cream-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
         >
           {labels.reset}
         </button>
@@ -671,7 +671,7 @@ export function OriginMap({
 
       <p
         id={hintId}
-        className="pointer-events-none absolute bottom-3 left-1/2 hidden -translate-x-1/2 rounded-sm border border-border bg-surface/95 px-2.5 py-1.5 text-[11px] text-brown-light opacity-0 shadow-sm transition-opacity md:block md:group-hover:opacity-100 md:group-focus-within:opacity-100"
+        className="pointer-events-none absolute bottom-3 left-1/2 hidden -translate-x-1/2 rounded-md bg-surface/95 px-2.5 py-1.5 text-[11px] text-brown-light opacity-0 shadow-[0_0.25rem_0.75rem_color-mix(in_srgb,var(--color-brown)_8%,transparent)] transition-opacity md:block md:group-hover:opacity-100 md:group-focus-within:opacity-100"
       >
         {labels.modifierHint}
       </p>

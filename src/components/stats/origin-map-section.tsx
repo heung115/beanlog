@@ -45,7 +45,6 @@ export function OriginMapSection({ entries }: OriginMapSectionProps) {
         <h2 className="font-display text-lg font-bold tracking-tight text-brown">
           {t("originMapTitle")}
         </h2>
-        <div className="h-px min-w-3 flex-1 bg-border-light" />
         <button
           ref={triggerRef}
           type="button"
@@ -53,8 +52,8 @@ export function OriginMapSection({ entries }: OriginMapSectionProps) {
           aria-expanded={inspectorOpen}
           onClick={showOriginList}
           className={cn(
-            "inline-flex min-h-11 shrink-0 items-center border-b border-transparent text-sm font-medium text-brown-light",
-            "transition-colors duration-150 hover:border-accent hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+            "ml-auto inline-flex min-h-11 shrink-0 items-center rounded-md px-2 text-sm font-medium text-brown-light",
+            "transition-colors duration-150 hover:bg-surface-warm hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
           )}
         >
           {t("findOrigin")}

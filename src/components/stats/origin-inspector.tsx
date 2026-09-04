@@ -135,11 +135,11 @@ export function OriginInspector({
       onClick={handleBackdropClick}
       className={cn(
         "fixed inset-x-0 bottom-0 top-auto m-0 hidden h-[min(70dvh,36rem)] max-h-[70dvh] w-full max-w-none flex-col overflow-hidden",
-        "rounded-t-sm border border-b-0 border-border bg-surface p-0 text-brown shadow-lg backdrop:bg-brown/30 open:flex",
-        "md:inset-y-0 md:left-auto md:right-0 md:h-dvh md:max-h-dvh md:w-80 md:max-w-80 md:rounded-none md:border-y-0 md:border-r-0"
+        "rounded-t-lg bg-surface p-0 text-brown shadow-[0_0_1.5rem_color-mix(in_srgb,var(--color-brown)_8%,transparent)] backdrop:bg-brown/30 open:flex",
+        "md:inset-y-0 md:left-auto md:right-0 md:h-dvh md:max-h-dvh md:w-80 md:max-w-80 md:rounded-l-lg md:rounded-r-none"
       )}
     >
-      <header className="flex min-h-14 shrink-0 items-center justify-between gap-3 border-b border-border px-4">
+      <header className="flex min-h-14 shrink-0 items-center justify-between gap-3 px-4">
         <div className="flex min-w-0 items-center gap-2">
           {view === "detail" && (
             <button
@@ -170,7 +170,7 @@ export function OriginInspector({
 
       {view === "list" ? (
         <div className="flex min-h-0 flex-1 flex-col">
-          <div className="shrink-0 border-b border-border-light p-3">
+          <div className="shrink-0 p-3">
             <input
               ref={searchRef}
               type="search"
@@ -180,7 +180,7 @@ export function OriginInspector({
               aria-label={t("searchOrigin")}
               autoComplete="off"
               className={cn(
-                "min-h-11 w-full rounded-sm border border-border bg-surface-warm px-3 py-2.5 text-sm text-brown",
+                "min-h-11 w-full rounded-md border border-border-light bg-surface-warm px-3 py-2.5 text-sm text-brown",
                 "placeholder:text-brown-light/50 transition-colors duration-150 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/30"
               )}
             />
@@ -190,7 +190,7 @@ export function OriginInspector({
             {locatedEntries.length > 0 && (
               <ul
                 aria-label={t("originListLabel")}
-                className="divide-y divide-border-light"
+                className="space-y-0.5 px-2 py-1"
               >
                 {locatedEntries.map((entry) => {
                   const name = countryName(entry, locale, t("unmappedOrigin"));
@@ -202,7 +202,7 @@ export function OriginInspector({
                         aria-current={selected ? "true" : undefined}
                         onClick={() => onSelect(entry)}
                         className={cn(
-                          "grid min-h-11 w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-2.5 text-left",
+                          "grid min-h-11 w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-md px-2 py-2.5 text-left",
                           "text-sm transition-colors duration-150 hover:bg-cream-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/50",
                           selected && "bg-cream-dark"
                         )}
@@ -220,11 +220,11 @@ export function OriginInspector({
               <section aria-labelledby={`${titleId}-unmapped`}>
                 <h4
                   id={`${titleId}-unmapped`}
-                  className="border-y border-border-light px-4 pb-2 pt-4 text-xs font-medium text-brown-light"
+                  className="px-4 pb-2 pt-5 text-xs font-medium text-brown-light"
                 >
                   {t("unmappedOrigin")}
                 </h4>
-                <ul className="divide-y divide-border-light">
+                <ul className="space-y-0.5 px-2 pb-1">
                   {unlocatedEntries.map((entry) => {
                     const name = countryName(entry, locale, t("unmappedOrigin"));
                     const selected = selectedEntry?.nameEn === entry.nameEn;
@@ -235,7 +235,7 @@ export function OriginInspector({
                           aria-current={selected ? "true" : undefined}
                           onClick={() => onSelect(entry)}
                           className={cn(
-                            "grid min-h-11 w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-2.5 text-left",
+                            "grid min-h-11 w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-md px-2 py-2.5 text-left",
                             "text-sm transition-colors duration-150 hover:bg-cream-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-accent/50",
                             selected && "bg-cream-dark"
                           )}
@@ -263,11 +263,11 @@ export function OriginInspector({
             {t("subregions")}
           </p>
           {selectedEntry && selectedEntry.regions.length > 0 ? (
-            <ul className="divide-y divide-border-light border-t border-border-light">
+            <ul className="space-y-0.5 px-2 py-1">
               {selectedEntry.regions.map((region) => (
                 <li
                   key={`${region.regionId ?? "region"}:${region.name}`}
-                  className="grid min-h-11 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-2.5"
+                  className="grid min-h-11 grid-cols-[minmax(0,1fr)_auto] items-center gap-3 rounded-md px-2 py-2.5"
                 >
                   <span className="truncate text-sm font-medium text-brown">
                     {regionName(region, locale, t("regionUnspecified"))}
@@ -279,7 +279,7 @@ export function OriginInspector({
               ))}
             </ul>
           ) : (
-            <p className="border-t border-border-light px-4 py-6 text-sm text-brown-light">
+            <p className="px-4 py-6 text-sm text-brown-light">
               {t("noSubregionData")}
             </p>
           )}
