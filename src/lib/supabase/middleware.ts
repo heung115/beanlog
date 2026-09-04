@@ -128,8 +128,11 @@ export async function updateSession(request: NextRequest) {
 
   if (!user && isProtectedPath(pathname)) {
     const url = request.nextUrl.clone();
-    url.pathname = "/";
+    const locale = pathname.split("/")[1] === "en" ? "en" : "ko";
+    const returnPath = `${pathname}${request.nextUrl.search}`;
+    url.pathname = `/${locale}/login`;
     url.search = "";
+    url.searchParams.set("next", returnPath);
     return preserveAuthResponse(supabaseResponse, NextResponse.redirect(url));
   }
 
@@ -140,7 +143,7 @@ export async function updateSession(request: NextRequest) {
       url.pathname = `/${locale}/beans/new`;
       url.search = "?draft=1";
     } else {
-      url.pathname = "/explore";
+      url.pathname = `/${locale}/explore`;
       url.search = "";
     }
     return preserveAuthResponse(supabaseResponse, NextResponse.redirect(url));

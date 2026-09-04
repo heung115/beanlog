@@ -51,7 +51,7 @@ export const SEO_COPY = {
     origins: {
       title: "Coffee Origin Guide: 20 Producing Countries | beanmap",
       description:
-        "Explore the flavor profiles, growing elevations, varieties, and key regions of coffee from Ethiopia, Colombia, Kenya, and 17 more countries.",
+        "Explore flavor profiles, growing elevations, varieties, and key regions across 20 coffee-producing countries, including Ethiopia, Colombia, and Kenya.",
       keywords: [
         "coffee origin guide",
         "coffee producing countries",

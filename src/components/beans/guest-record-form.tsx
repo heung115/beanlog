@@ -79,10 +79,13 @@ export function GuestRecordForm() {
 
   if (saved) {
     return (
-      <article className="journal-panel-feature bg-surface p-5 md:p-7" aria-label={t("savedTitle")}>
-        <div className="flex items-center justify-between border-b border-border pb-4">
-          <h2 className="font-display text-lg font-bold text-brown">{t("savedTitle")}</h2>
-          <time className="text-xs text-brown-light" dateTime={form.consumed_at}>
+      <article className="paper-sheet paper-sheet-feature p-5 md:p-8" aria-label={t("savedTitle")}>
+        <div className="flex items-center justify-between border-b-2 border-brown pb-4">
+          <div>
+            <p className="journal-kicker">BROWSER DRAFT / 001</p>
+            <h2 className="mt-2 font-display text-2xl font-bold text-brown">{t("savedTitle")}</h2>
+          </div>
+          <time className="folio-label" dateTime={form.consumed_at}>
             {form.consumed_at.replaceAll("-", ". ")}
           </time>
         </div>
@@ -139,7 +142,11 @@ export function GuestRecordForm() {
         {t("storageNotice")}
       </p>
 
-      <section className="journal-panel-feature bg-surface p-5 md:p-6">
+      <section className="paper-sheet paper-sheet-feature p-5 md:p-8">
+        <div className="mb-7 flex items-center justify-between border-b-2 border-brown pb-4">
+          <p className="journal-kicker">FIRST FIELD NOTE / ESSENTIALS</p>
+          <span className="font-display text-3xl italic text-accent">01</span>
+        </div>
         <div className="flex flex-col gap-5">
           <Input
             label={`${tb("name")} *`}
@@ -168,7 +175,7 @@ export function GuestRecordForm() {
             maxLength={100}
             required
           />
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className="grid gap-5 border-t border-border pt-5 sm:grid-cols-2">
             <Select
               label={`${tb("processMethod")} *`}
               name="process_method"
@@ -202,21 +209,29 @@ export function GuestRecordForm() {
             onChange={(event) => set("consumed_at", event.target.value)}
             required
           />
-          <ScoreSlider
-            label={`${tb("overallScore")} *`}
-            value={form.overall_score}
-            onChange={(value) => set("overall_score", value)}
-          />
-          <Textarea
-            label={`${tb("note")} *`}
-            name="note"
-            value={form.note}
-            onChange={(event) => set("note", event.target.value)}
-            placeholder={tb("notePlaceholder")}
-            maxLength={2000}
-            rows={4}
-            required
-          />
+          <div className="mt-2 border-t-2 border-brown pt-6">
+            <div className="mb-5 flex items-center justify-between">
+              <p className="journal-kicker">CUP IMPRESSION</p>
+              <span className="font-display text-2xl italic text-accent">02</span>
+            </div>
+            <div className="flex flex-col gap-5">
+              <ScoreSlider
+                label={`${tb("overallScore")} *`}
+                value={form.overall_score}
+                onChange={(value) => set("overall_score", value)}
+              />
+              <Textarea
+                label={`${tb("note")} *`}
+                name="note"
+                value={form.note}
+                onChange={(event) => set("note", event.target.value)}
+                placeholder={tb("notePlaceholder")}
+                maxLength={2000}
+                rows={4}
+                required
+              />
+            </div>
+          </div>
         </div>
       </section>
 

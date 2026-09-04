@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 
 export function BottomNav({ authenticated }: { authenticated: boolean }) {
   const pathname = usePathname();
+  const locale = useLocale();
   const appPathname = pathname.replace(/^\/(ko|en)(?=\/|$)/, "") || "/";
   const t = useTranslations("nav");
 
@@ -26,26 +27,26 @@ export function BottomNav({ authenticated }: { authenticated: boolean }) {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-surface/95 backdrop-blur-sm md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t-2 border-brown bg-surface/95 backdrop-blur-sm md:hidden">
       <div className="mx-auto flex max-w-md items-center justify-around px-2 pb-[env(safe-area-inset-bottom)]">
         {links.map(({ href, label, icon: Icon, primary }) => {
           const isActive = appPathname === href || appPathname.startsWith(href + "/");
           return (
             <Link
               key={href}
-              href={href}
+              href={`/${locale}${href}`}
               aria-current={isActive ? "page" : undefined}
               className={cn(
                 "flex min-h-14 min-w-12 flex-1 flex-col items-center justify-center gap-0.5 px-1 py-2 text-[10px] font-medium transition-colors",
                 primary
-                  ? "text-accent"
+                  ? "text-brown"
                   : isActive
                     ? "text-brown"
                     : "text-brown-light hover:text-brown"
               )}
             >
               {primary ? (
-                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-brown text-cream -mt-4 shadow-md">
+                <span className="-mt-4 flex h-9 w-9 items-center justify-center rounded-sm border border-brown bg-brown text-cream shadow-[3px_3px_0_var(--color-accent-light)]">
                   <Icon className="h-4 w-4" />
                 </span>
               ) : (

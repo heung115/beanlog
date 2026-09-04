@@ -3,17 +3,17 @@ version: alpha
 name: beanmap Coffee Journal
 description: A restrained, editorial design system for a private coffee tasting journal.
 colors:
-  primary: "#242321"
-  primary-soft: "#57534F"
-  secondary: "#706B66"
-  accent: "#62483A"
-  accent-soft: "#BBAAA0"
-  neutral: "#F3F2EF"
-  neutral-strong: "#E9E7E2"
-  surface: "#FCFBF9"
-  surface-warm: "#F7F5F1"
-  border: "#DCD8D2"
-  border-light: "#E7E4DE"
+  primary: "#211D19"
+  primary-soft: "#4F4842"
+  secondary: "#6F665E"
+  accent: "#8A4B2B"
+  accent-soft: "#C7A68F"
+  neutral: "#F4F0E8"
+  neutral-strong: "#E8E0D4"
+  surface: "#FCFAF5"
+  surface-warm: "#EEE6DA"
+  border: "#D4CABC"
+  border-light: "#E5DDD2"
   on-primary: "#FFFFFF"
   error: "#B91C1C"
   on-error: "#FFFFFF"
@@ -29,19 +29,19 @@ colors:
   roast-dark: "#4A3728"
 typography:
   display-xl:
-    fontFamily: Pretendard, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
+    fontFamily: Iowan Old Style, KoPubBatang, KoPub Batang, AppleMyungjo, Batang, Georgia, serif
     fontSize: 2.25rem
     fontWeight: 700
     lineHeight: 1.15
     letterSpacing: -0.02em
   display-lg:
-    fontFamily: Pretendard, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
+    fontFamily: Iowan Old Style, KoPubBatang, KoPub Batang, AppleMyungjo, Batang, Georgia, serif
     fontSize: 1.875rem
     fontWeight: 700
     lineHeight: 1.2
     letterSpacing: -0.02em
   heading-md:
-    fontFamily: Pretendard, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif
+    fontFamily: Iowan Old Style, KoPubBatang, KoPub Batang, AppleMyungjo, Batang, Georgia, serif
     fontSize: 1.125rem
     fontWeight: 700
     lineHeight: 1.35
@@ -75,7 +75,7 @@ spacing:
   section: 3rem
   page-gutter-mobile: 1rem
   page-gutter-desktop: 1.5rem
-  content-max-width: 56rem
+  content-max-width: 72rem
 rounded:
   sm: 0.125rem
   md: 0.125rem
@@ -132,14 +132,14 @@ The source of truth for implementation is this document together with the Tailwi
 
 ## Colors
 
-The default palette uses lightly warm gray neutrals with coffee brown reserved for interaction and emphasis. It should feel warmer than a blue-gray interface without turning the whole application cream or sepia.
+The default palette uses uncoated-paper neutrals with espresso ink and a restrained terracotta accent. It should feel like a well-kept tasting folio rather than a dashboard or a nostalgic coffee-shop theme.
 
-- **Primary (`#242321`)** is charcoal ink. Use it for core text, primary actions, active navigation, and the strongest rules.
-- **Primary soft (`#57534F`)** supports secondary text and primary hover states.
-- **Secondary (`#706B66`)** is for captions and metadata that must remain readable but visually quiet.
-- **Accent (`#62483A`)** is the restrained coffee reference for focus, selection, and links. It is not a general decorative fill.
-- **Neutral (`#F3F2EF`)** is the warm-gray canvas; **surface (`#FCFBF9`)** and **surface warm (`#F7F5F1`)** create shallow tonal layers.
-- Borders (`#DCD8D2`, `#E7E4DE`) create hierarchy before shadows are introduced.
+- **Primary (`#211D19`)** is espresso ink. Use it for core text, primary actions, active navigation, and the strongest rules.
+- **Primary soft (`#4F4842`)** supports secondary text and primary hover states.
+- **Secondary (`#6F665E`)** is for captions and metadata that must remain readable but visually quiet.
+- **Accent (`#8A4B2B`)** is a dry terracotta used for focus, selection, map marks, links, and score emphasis. It is not a general decorative fill.
+- **Neutral (`#F4F0E8`)** is the paper canvas; **surface (`#FCFAF5`)** and **surface warm (`#EEE6DA`)** create shallow folio layers.
+- Borders (`#D4CABC`, `#E5DDD2`) create hierarchy before shadows are introduced.
 - Process and roast colors communicate coffee-domain categories only. Never reuse them as generic status colors. On pale category fills, use espresso-brown text rather than the category hue so compact labels meet WCAG AA.
 - Error red is reserved for destructive actions and validation failures.
 
@@ -149,13 +149,13 @@ The operator selects the palette through `BEANMAP_THEME=mist|cream|contrast`. `m
 
 ## Typography
 
-All display, body, and interface typography uses **Pretendard**, with system sans-serif fallbacks. This keeps Korean, Latin text, and numerals visually consistent across bean names, scores, controls, metadata, notes, and charts. Hierarchy comes from size, weight, spacing, and tabular numerals rather than mixing type families.
+Display typography uses a restrained editorial serif stack while body and interface typography use **Pretendard** with system sans-serif fallbacks. The contrast makes coffee names and section titles feel like a field journal without sacrificing clarity in controls, metadata, notes, and charts. Data numerals use tabular figures or the monospace stack.
 
 Reserve bold display type for meaningful hierarchy. A screen should usually have one dominant title; avoid making every card label look like a headline.
 
 ## Layout
 
-beanmap is mobile-first. The main application column is capped at `56rem`, with a `1rem` mobile gutter and a `1.5rem` desktop gutter. Detail and form content may use a narrower reading width when that improves focus.
+beanmap is mobile-first. The shared editorial canvas is capped at `72rem`, with a `1rem` mobile gutter and a `1.5rem` desktop gutter. Detail and form content use narrower reading widths when that improves focus.
 
 Spacing follows a 4px base rhythm, with 8px, 12px, 16px, 24px, 32px, and 48px as the preferred steps. Use smaller steps inside a component and larger steps between conceptual sections. Do not compensate for unclear hierarchy by wrapping every group in another card.
 
@@ -163,7 +163,7 @@ Desktop navigation lives in the top bar. Mobile navigation stays fixed at the bo
 
 ## Elevation & Depth
 
-Depth comes primarily from tonal surfaces, borders, and a stronger top or left rule. Default content panels are flat. Shadows are allowed only for floating navigation, transient overlays, tooltips, or a subtle hover cue; they must remain neutral, low-opacity, and shallow.
+Depth comes primarily from tonal surfaces, borders, and a stronger top or left rule. Default content panels are flat. One offset paper shadow may identify an important sheet, form, or toolbar; floating navigation and transient overlays may use a shallow neutral shadow.
 
 Use `journal-panel` for ordinary contained content, `journal-panel-feature` for one emphasized area, and `journal-panel-quiet` for subordinate information. Avoid stacking framed panels inside framed panels.
 
@@ -177,7 +177,7 @@ Pills are not a default container. Reserve circles for controls whose meaning or
 
 ## Components
 
-- **Buttons:** Primary buttons use charcoal ink on the current canvas. Secondary buttons are transparent with a visible border. Ghost buttons are for low-priority actions. Only destructive actions use red.
+- **Buttons:** Primary buttons use the espresso fill with cream text. Secondary buttons are transparent with a visible border. Ghost buttons are for low-priority actions. Only destructive actions use red.
 - **Inputs:** Inputs use the surface token, a one-pixel neutral border, 2px radius, and accent focus treatment. Labels remain outside the control. Placeholder text must be visibly subordinate but legible.
 - **Journal panels:** Use the surface token for standard panels and the quieter surface token for subordinate content. Prefer borders and spacing to drop shadows.
 - **Bean cards:** Lead with bean name and score, then roastery and origin. Process, roast, and type are supporting metadata. Notes and tasting tags must not overpower identity and score.

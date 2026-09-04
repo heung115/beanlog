@@ -53,7 +53,7 @@ function Card({
     <section
       data-detail-section
       data-testid={testId}
-      className={cn("journal-panel animate-rise p-5 md:p-6", className)}
+      className={cn("paper-sheet paper-sheet-feature animate-rise p-5 md:p-7", className)}
       style={delay ? { animationDelay: `${delay}ms` } : undefined}
     >
       {children}
@@ -63,7 +63,7 @@ function Card({
 
 function Overline({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="journal-section-title">
+    <h2 className="font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-accent">
       {children}
     </h2>
   );
@@ -144,7 +144,7 @@ export default function BeanDetailPage() {
   if (!bean) {
     return (
       <div className="mx-auto max-w-2xl">
-        <div className="animate-rise rounded-lg border border-border bg-surface px-6 py-16 text-center">
+        <div className="paper-sheet animate-rise px-6 py-16 text-center">
           <p className="font-display text-xl font-bold text-brown">
             {t("notFound")}
           </p>
@@ -202,7 +202,7 @@ export default function BeanDetailPage() {
     : null;
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="mx-auto max-w-4xl">
       {/* Toolbar */}
       <div className="animate-rise mb-6 flex items-center justify-between gap-3">
         <Link
@@ -228,7 +228,7 @@ export default function BeanDetailPage() {
         </Link>
 
         {confirming ? (
-          <div className="flex items-center gap-2 rounded-md border border-red-200 bg-red-50 py-1.5 pl-3 pr-1.5">
+          <div className="flex items-center gap-2 rounded-sm border border-red-200 bg-red-50 py-1.5 pl-3 pr-1.5">
             <span className="text-xs font-medium text-red-800">
               {t("deleteConfirm")}
             </span>
@@ -271,12 +271,15 @@ export default function BeanDetailPage() {
       </div>
 
       {/* Header */}
-      <header className="animate-rise mb-6" style={{ animationDelay: "40ms" }}>
-        <h1 className="font-display text-3xl font-bold leading-tight tracking-tight text-brown md:text-4xl">
-          {bean.name}
-        </h1>
-        <p className="mt-1.5 text-base text-brown-light">{bean.roastery}</p>
-        <p className="mt-3 text-sm font-medium text-brown-medium">
+      <header className="animate-rise mb-7 grid border-y-2 border-brown md:grid-cols-[1fr_15rem]" style={{ animationDelay: "40ms" }}>
+        <div className="py-8 md:py-11 md:pr-10">
+          <p className="journal-kicker">TASTING RECORD / ARCHIVE</p>
+          <h1 className="display-title mt-3 text-5xl text-brown md:text-7xl">{bean.name}</h1>
+          <p className="mt-3 text-sm font-semibold uppercase tracking-[0.06em] text-brown-light">{bean.roastery}</p>
+        </div>
+        <div className="border-t border-border bg-surface-warm p-5 md:border-l md:border-t-0 md:p-7">
+          <p className="folio-label">CLASSIFICATION</p>
+          <p className="mt-4 text-sm font-semibold leading-6 text-brown-medium">
           {[
             bean.bean_type === "blend" ? t("blend") : null,
             tp(bean.process_method),
@@ -284,8 +287,8 @@ export default function BeanDetailPage() {
           ]
             .filter(Boolean)
             .join(" · ")}
-        </p>
-        <p className="mt-3 flex items-center gap-2 text-sm text-brown-light">
+          </p>
+          <p className="mt-5 flex items-center gap-2 border-t border-border pt-4 text-xs text-brown-light">
           <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
             <rect
               x="1"
@@ -303,7 +306,8 @@ export default function BeanDetailPage() {
           {bean.place_type === "cafe"
             ? bean.cafe_name || t("cafe")
             : t("home")}
-        </p>
+          </p>
+        </div>
       </header>
 
       {/* Score + note */}
@@ -327,7 +331,7 @@ export default function BeanDetailPage() {
             {tags.map((tag) => (
               <span
                 key={tag.id}
-                className="rounded-sm border border-border bg-cream-dark/60 px-2.5 py-1 text-xs font-medium text-brown-medium"
+                className="rounded-sm border border-border bg-transparent px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.04em] text-brown-medium"
               >
                 {tagDisplayName(tag.tag, locale)}
               </span>
@@ -543,9 +547,9 @@ export default function BeanDetailPage() {
                           {c.percentage}%
                         </span>
                       </div>
-                      <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-cream-dark">
+                      <div className="mt-1 h-1.5 w-full overflow-hidden bg-cream-dark">
                         <div
-                          className="h-full rounded-full bg-accent transition-all duration-500"
+                          className="h-full bg-accent transition-all duration-500"
                           style={{ width: `${c.percentage}%` }}
                         />
                       </div>

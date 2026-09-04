@@ -16,7 +16,7 @@ export function LegalDocument({
   children: React.ReactNode;
 }) {
   return (
-    <article className="mx-auto max-w-3xl pb-12 pt-4 md:pb-16 md:pt-8">
+    <article className="mx-auto max-w-5xl pb-12 pt-4 md:pb-16 md:pt-8">
       <Link
         href={`/${locale}/login`}
         className="inline-flex min-h-11 items-center text-sm font-medium text-brown-light transition-colors hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
@@ -24,18 +24,20 @@ export function LegalDocument({
         ← {locale === "ko" ? "로그인으로" : "Back to login"}
       </Link>
 
-      <header className="mt-7 border-b border-border pb-8">
+      <header className="mt-5 border-y-2 border-brown py-10 md:grid md:grid-cols-[1fr_15rem] md:items-end md:py-14">
+        <div>
         <p className="journal-kicker uppercase tracking-[0.14em]">{eyebrow}</p>
-        <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-brown md:text-4xl">
+        <h1 className="display-title mt-3 text-5xl text-brown md:text-7xl">
           {title}
         </h1>
         <p className="mt-4 max-w-2xl text-sm leading-7 text-brown-light">{description}</p>
-        <p className="mt-4 text-xs text-brown-light">
+        </div>
+        <p className="folio-label mt-6 border-l-2 border-accent pl-4 md:mt-0">
           {locale === "ko" ? "시행일" : "Effective"}: {effectiveDate}
         </p>
       </header>
 
-      <div className="legal-copy mt-9 space-y-10 text-sm leading-7 text-brown">
+      <div className="legal-copy mt-12 text-sm leading-7 text-brown">
         {children}
       </div>
     </article>
@@ -50,9 +52,9 @@ export function LegalSection({
   children: React.ReactNode;
 }) {
   return (
-    <section>
-      <h2 className="font-display text-xl font-bold tracking-tight text-brown">{title}</h2>
-      <div className="mt-3 space-y-3 text-brown-light">{children}</div>
+    <section className="grid border-t border-border py-8 md:grid-cols-[15rem_1fr] md:gap-10 md:py-10">
+      <h2 className="font-display text-xl font-bold tracking-[-0.02em] text-brown md:text-2xl">{title}</h2>
+      <div className="min-w-0 mt-4 space-y-3 text-brown-light md:mt-0">{children}</div>
     </section>
   );
 }

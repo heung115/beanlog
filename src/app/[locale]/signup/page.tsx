@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { signUp, signInWithOAuth } from "@/lib/actions/auth";
 import { brand } from "@/config/brand";
+import { AuthShell } from "@/components/auth/auth-shell";
 
 export default function SignupPage() {
   const t = useTranslations("auth");
@@ -58,10 +59,10 @@ export default function SignupPage() {
   }
 
   return (
-    <div className="flex min-h-[80vh] flex-col items-center justify-center">
-      <div className="w-full max-w-sm">
-        <div className="mb-10 text-center">
-          <h1 className="font-display text-3xl font-bold text-brown tracking-tight">
+    <AuthShell>
+        <div className="mb-9 border-b-2 border-brown pb-5">
+          <p className="journal-kicker">NEW ARCHIVE / 02</p>
+          <h1 className="mt-3 font-display text-4xl font-bold tracking-[-0.04em] text-brown">
             {brand.name}
           </h1>
           <p className="mt-2 text-sm text-brown-light">{t("signupTitle")}</p>
@@ -195,8 +196,7 @@ export default function SignupPage() {
             {t("goLogin")}
           </Link>
         </p>
-      </div>
-    </div>
+    </AuthShell>
   );
 }
 

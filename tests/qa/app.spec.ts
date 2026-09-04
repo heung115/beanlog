@@ -239,7 +239,7 @@ test("legal notices are public and signup requires an explicit agreement", async
   const agreement = page.getByRole("checkbox", { name: /만 14세 이상이며/ });
   await expect(agreement).not.toBeChecked();
   await expect(page.getByRole("button", { name: "Google로 계속" })).toBeDisabled();
-  await expect(page.getByRole("link", { name: "이용약관" })).toHaveAttribute(
+  await expect(page.locator("main").getByRole("link", { name: "이용약관" })).toHaveAttribute(
     "href",
     "/ko/terms"
   );
@@ -598,7 +598,7 @@ test("explore progressively discloses aligned filters without overflow", async (
   }
 });
 
-test("bean detail uses white cards without a dark overall-score top rule", async ({ page }) => {
+test("bean detail uses editorial display type and paper cards", async ({ page }) => {
   await login(page);
   const firstBeanCard = page.locator('[data-bean-card] h3 a[href*="/beans/"]').first();
   await firstBeanCard.click();
@@ -652,7 +652,7 @@ test("bean detail uses white cards without a dark overall-score top rule", async
     },
     designTokens.colors.surface
   );
-  const expectedBorder = await page.evaluate(
+  const expectedBrown = await page.evaluate(
     (token) => {
       const probe = document.createElement("span");
       probe.style.borderTop = `1px solid ${token}`;
@@ -661,17 +661,17 @@ test("bean detail uses white cards without a dark overall-score top rule", async
       probe.remove();
       return computed;
     },
-    designTokens.colors.border
+    designTokens.colors.brown
   );
 
   expect(appearance.bodyBackground).toBe(expectedCanvas);
-  expect(appearance.titleFontFamily).toBe(appearance.bodyFontFamily);
+  expect(appearance.titleFontFamily).not.toBe(appearance.bodyFontFamily);
   expect(new Set(appearance.sectionBackgrounds)).toEqual(
     new Set([expectedSurface])
   );
   expect(new Set(appearance.sectionRadii)).toEqual(new Set(["2px"]));
-  expect(appearance.scoreBorderTopWidth).toBe("1px");
-  expect(appearance.scoreBorderTopColor).toBe(expectedBorder);
+  expect(appearance.scoreBorderTopWidth).toBe("3px");
+  expect(appearance.scoreBorderTopColor).toBe(expectedBrown);
   await expectNoSeriousA11yViolations(page);
 });
 

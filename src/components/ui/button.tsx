@@ -20,12 +20,12 @@ export function buttonClassName({
   className?: string;
 } = {}) {
   return cn(
-    "inline-flex items-center justify-center rounded-sm font-medium transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50 disabled:cursor-not-allowed disabled:opacity-50",
+    "pressable inline-flex items-center justify-center rounded-sm font-semibold tracking-[-0.01em] focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/55 focus-visible:ring-offset-2 focus-visible:ring-offset-cream disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none disabled:hover:translate-y-0",
     {
-      "bg-brown text-cream hover:bg-brown-medium": variant === "primary",
-      "bg-transparent border border-border text-brown hover:bg-cream-dark": variant === "secondary",
-      "bg-transparent text-brown-light hover:text-brown hover:bg-cream-dark": variant === "ghost",
-      "bg-red-700 text-white hover:bg-red-800": variant === "danger",
+      "border border-brown bg-brown text-cream shadow-[3px_3px_0_var(--color-accent-light)] hover:bg-accent hover:shadow-[4px_4px_0_var(--color-accent-light)]": variant === "primary",
+      "border border-brown bg-transparent text-brown shadow-[2px_2px_0_var(--color-cream-dark)] hover:bg-surface": variant === "secondary",
+      "bg-transparent text-brown-light hover:bg-surface hover:text-brown": variant === "ghost",
+      "border border-red-800 bg-red-800 text-white shadow-[3px_3px_0_var(--color-accent-light)] hover:bg-red-900": variant === "danger",
     },
     {
       "min-h-11 text-sm px-3 py-1.5": size === "sm",
@@ -45,9 +45,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         className={buttonClassName({ variant, size, className })}
         {...props}
       >
-        {loading && (
-          <span className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-        )}
+        {loading && <span aria-hidden="true" className="mr-2 font-mono text-xs tracking-widest">···</span>}
         {children}
       </button>
     );

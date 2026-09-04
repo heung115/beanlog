@@ -152,6 +152,7 @@ function EmptyState({
   onClear: () => void;
 }) {
   const t = useTranslations("explore");
+  const locale = useLocale();
 
   return (
     <div className="col-span-full flex flex-col items-center py-20 text-center">
@@ -176,7 +177,7 @@ function EmptyState({
         </Button>
       ) : (
         <Link
-          href="/beans/new"
+          href={`/${locale}/beans/new`}
           className="mt-6 inline-flex items-center justify-center rounded-sm bg-brown px-6 py-3 text-base font-medium text-cream transition-colors duration-150 hover:bg-brown-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
         >
           {t("addFirst")}
@@ -454,16 +455,21 @@ export function ExploreClient({
   };
 
   return (
-    <div className="mx-auto w-full max-w-4xl">
-      {/* Title */}
-      <header className="pb-7 pt-4 md:pb-8 md:pt-8">
-        <h1 className="font-display text-3xl font-bold tracking-tight text-brown md:text-4xl">
-          {t("title")}
-        </h1>
+    <div className="mx-auto w-full max-w-6xl">
+      <header className="mb-7 grid border-y-2 border-brown md:grid-cols-[1fr_13rem]">
+        <div className="py-9 md:py-12">
+          <p className="journal-kicker">PRIVATE ARCHIVE / INDEX</p>
+          <h1 className="display-title mt-3 text-5xl text-brown md:text-7xl">
+            {t("title")}
+          </h1>
+        </div>
+        <div className="flex items-end justify-between border-t border-border bg-surface-warm p-5 md:block md:border-l md:border-t-0 md:p-7">
+          <p className="folio-label">RECORD COUNT</p>
+          <p className="font-display text-5xl font-bold italic tabular-nums tracking-[-0.05em] text-accent md:mt-5 md:text-6xl">{total}</p>
+        </div>
       </header>
 
-      {/* Keep the default toolbar small; detailed criteria open only when needed. */}
-      <div className="grid grid-cols-2 gap-2 md:grid-cols-[minmax(0,1fr)_auto_auto]">
+      <div className="paper-sheet grid grid-cols-2 gap-2 p-3 md:grid-cols-[minmax(0,1fr)_auto_auto] md:p-4">
         <div className="relative col-span-2 md:col-span-1">
           <svg
             className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-brown-light/50"
@@ -485,8 +491,8 @@ export function ExploreClient({
             placeholder={t("searchPlaceholder")}
             aria-label={t("search")}
             className={cn(
-              "min-h-11 w-full rounded-sm border border-border bg-surface py-2.5 pl-10 pr-3 text-sm text-brown",
-              "placeholder:text-brown-light/40 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/30",
+              "min-h-12 w-full rounded-sm border border-border bg-cream py-2.5 pl-10 pr-3 text-sm text-brown",
+              "placeholder:text-brown-light/60 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15",
               "transition-colors duration-150 disabled:cursor-wait disabled:opacity-70"
             )}
           />
@@ -498,11 +504,11 @@ export function ExploreClient({
           aria-controls="explore-filter-panel"
           onClick={() => setFiltersOpen((open) => !open)}
           className={cn(
-            "inline-flex min-h-11 items-center justify-center gap-2 rounded-sm border px-3 text-xs font-medium transition-colors duration-150",
+            "inline-flex min-h-12 items-center justify-center gap-2 rounded-sm border px-3 text-xs font-semibold transition-colors duration-150",
             "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40",
             filtersOpen
               ? "border-brown bg-brown text-cream"
-              : "border-border bg-surface text-brown-medium hover:border-brown-light"
+              : "border-border bg-cream text-brown-medium hover:border-brown-light"
           )}
         >
           <svg aria-hidden="true" className="h-4 w-4" viewBox="0 0 16 16" fill="none">
@@ -522,7 +528,7 @@ export function ExploreClient({
             value={sortValue}
             onChange={(e) => handleSortChange(e.target.value)}
             className={cn(
-              "min-h-11 w-full cursor-pointer appearance-none rounded-sm border border-border bg-surface py-2 pl-3 pr-9 text-xs font-medium text-brown-medium",
+              "min-h-12 w-full cursor-pointer appearance-none rounded-sm border border-border bg-cream py-2 pl-3 pr-9 text-xs font-semibold text-brown-medium",
               "transition-colors duration-150 hover:border-brown-light focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
             )}
           >
@@ -542,7 +548,7 @@ export function ExploreClient({
       </div>
 
       {filtersOpen && (
-        <div id="explore-filter-panel" className="mt-3 border-y border-border-light py-3">
+        <div id="explore-filter-panel" className="mt-4 border-y-2 border-brown bg-surface-warm py-4">
           <div className="grid grid-cols-2 gap-2 md:grid-cols-3">
             <FilterChip
               label={t("allOrigins")}
@@ -617,9 +623,8 @@ export function ExploreClient({
         </div>
       )}
 
-      {/* Result count / view mode */}
-      <div className="mt-5 flex items-center justify-between">
-        <p className="text-xs text-brown-light">
+      <div className="mt-8 flex items-center justify-between border-b-2 border-brown pb-3">
+        <p className="folio-label">
           {loading ? t("results", { count: 0 }) : t("results", { count: total })}
         </p>
         <div
@@ -665,8 +670,8 @@ export function ExploreClient({
         data-testid="bean-grid"
         data-view={viewMode}
         className={cn(
-          "mt-4 grid grid-cols-1 gap-3",
-          viewMode === "grid" && "md:grid-cols-2"
+          "mt-4 grid grid-cols-1 gap-4",
+          viewMode === "grid" && "md:grid-cols-2 md:gap-5"
         )}
       >
         {loading ? (

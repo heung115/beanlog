@@ -115,8 +115,8 @@ export function TagInput({ value, onChange }: TagInputProps) {
         }}
         placeholder={t("tastingNotesPlaceholder")}
         className={cn(
-          "w-full rounded-sm border border-border bg-surface px-3 py-2.5 text-sm text-brown placeholder:text-brown-light/40",
-          "transition-colors duration-150 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/30"
+          "min-h-12 w-full rounded-sm border border-border bg-surface px-3.5 py-2.5 text-sm text-brown placeholder:text-brown-light/60",
+          "transition-colors duration-150 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15"
         )}
       />
 
@@ -129,7 +129,7 @@ export function TagInput({ value, onChange }: TagInputProps) {
           if (presets.length === 0) return null;
           return (
             <div key={category.id} className="flex flex-col gap-1.5">
-              <span className="text-[11px] font-medium uppercase tracking-widest text-brown-light/60">
+              <span className="folio-label">
                 {locale === "ko" ? category.labelKo : category.label}
               </span>
               <div className="flex flex-wrap gap-1.5">

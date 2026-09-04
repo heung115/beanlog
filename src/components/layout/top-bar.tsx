@@ -4,8 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import { brand } from "@/config/brand";
 import { buttonClassName } from "@/components/ui/button";
+import { BeanmapMark } from "@/components/brand/beanmap-mark";
 import { LocaleSwitcher } from "./locale-switcher";
 
 interface TopBarProps {
@@ -19,31 +19,35 @@ export function TopBar({ user }: TopBarProps) {
   const t = useTranslations("nav");
   const tAuth = useTranslations("auth");
 
+  if (appPathname === "/signup/check-email") {
+    return null;
+  }
+
   if (!user) {
     return (
       <header className="sticky top-0 z-40 border-b border-border bg-cream/95 backdrop-blur-sm">
-        <div className="mx-auto flex w-full max-w-4xl flex-col gap-2 px-4 py-3 sm:min-h-16 sm:flex-row sm:items-center sm:justify-between sm:px-6 sm:py-2">
+        <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-x-3 gap-y-2 px-4 py-3 sm:min-h-[4.5rem] sm:flex-nowrap sm:px-6 sm:py-2">
           <Link
             href={`/${locale}`}
-            className="w-fit font-display text-xl font-bold tracking-tight text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+            className="w-fit focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
           >
-            {brand.name}
+            <BeanmapMark />
           </Link>
           <nav
             aria-label={t("publicNavigation")}
-            className="flex flex-wrap items-center gap-1.5 sm:justify-end"
+            className="order-2 flex w-full items-center justify-between gap-1 border-t border-border-light pt-2 sm:order-none sm:w-auto sm:justify-end sm:border-t-0 sm:pt-0"
           >
             <Link
               href={`/${locale}/origins`}
               aria-current={appPathname.startsWith("/origins") ? "page" : undefined}
-              className="inline-flex min-h-11 items-center rounded-sm px-2 text-sm font-medium text-brown-light transition-colors hover:bg-cream-dark hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+              className="inline-flex min-h-11 items-center rounded-sm px-1.5 text-xs font-semibold text-brown-light transition-colors hover:bg-surface hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 sm:px-2 sm:text-sm"
             >
               {t("origins")}
             </Link>
             <LocaleSwitcher locale={locale} />
             <Link
               href={`/${locale}/login`}
-              className="inline-flex min-h-11 items-center rounded-sm px-2 text-sm font-medium text-brown-light transition-colors hover:bg-cream-dark hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+              className="inline-flex min-h-11 items-center rounded-sm px-1.5 text-xs font-semibold text-brown-light transition-colors hover:bg-surface hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 sm:px-2 sm:text-sm"
             >
               {tAuth("login")}
             </Link>
@@ -73,12 +77,12 @@ export function TopBar({ user }: TopBarProps) {
 
   return (
     <header className="sticky top-0 z-40 hidden border-b border-border bg-cream/95 backdrop-blur-sm md:block">
-      <div className="mx-auto flex max-w-4xl items-center justify-between px-6 py-3">
-        <Link href={`/${locale}/explore`} className="font-display text-xl font-bold text-brown tracking-tight">
-          {brand.name}
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">
+        <Link href={`/${locale}/explore`} className="focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40">
+          <BeanmapMark compact />
         </Link>
         <nav className="flex items-center gap-1">
-          {links.map(({ href, label }) => {
+          {links.map(({ href, label }, index) => {
             const isActive = appPathname === href || appPathname.startsWith(href + "/");
             return (
               <Link
@@ -86,12 +90,13 @@ export function TopBar({ user }: TopBarProps) {
                 href={`/${locale}${href}`}
                 aria-current={isActive ? "page" : undefined}
                 className={cn(
-                  "border-b-2 border-transparent px-3 py-2 text-sm font-medium transition-colors",
+                  "group relative border-b-2 border-transparent px-3 py-2 text-sm font-semibold transition-colors",
                   isActive
                     ? "border-brown text-brown"
                     : "text-brown-light hover:border-accent-light hover:text-brown"
                 )}
               >
+                <span aria-hidden="true" className="mr-1 font-mono text-[10px] font-semibold text-brown-light">{String(index + 1).padStart(2, "0")}</span>
                 {label}
               </Link>
             );
@@ -101,9 +106,9 @@ export function TopBar({ user }: TopBarProps) {
               href={`/${locale}/settings`}
               aria-label={`${t("account")}: ${user.displayName}`}
               title={user.displayName}
-              className="flex items-center gap-2 rounded-md px-1.5 py-1 transition-colors hover:bg-cream-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+              className="flex items-center gap-2 rounded-sm border border-transparent px-1.5 py-1 transition-colors hover:border-border hover:bg-surface focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
             >
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brown text-xs font-semibold text-cream">
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm border border-brown bg-brown font-mono text-xs font-semibold text-cream">
                 {user.displayName.slice(0, 1).toLocaleUpperCase()}
               </span>
               <span className="flex min-w-0 max-w-28 flex-col leading-tight">

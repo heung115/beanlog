@@ -34,11 +34,10 @@ services:
     read_only: true
     tmpfs:
       - /tmp:rw,noexec,nosuid,nodev,size=64m,uid=1001,gid=1001,mode=1777
-      - /app/.next:rw,noexec,nosuid,nodev,size=1g,uid=1001,gid=1001,mode=0700
+      - /app/.next:rw,noexec,nosuid,nodev,size=2g,uid=1001,gid=1001,mode=0700
     pids_limit: 300
-    # Turbopack keeps compiled route graphs in memory. A full browser QA pass
-    # exceeded 1 GiB and Docker restarted the dev server, interrupting active
-    # browser tabs and making the session appear logged out.
+    # Turbopack's route graph cache approaches 1 GiB after a full desktop/mobile
+    # audit, so leave headroom for later hot reloads in the same QA session.
     mem_limit: 3g
     cpus: 2.0
     security_opt:

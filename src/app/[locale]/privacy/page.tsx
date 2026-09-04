@@ -45,7 +45,12 @@ function KoreanPrivacy() {
       effectiveDate={legal.effectiveDate}
     >
       <LegalSection title="1. 처리하는 개인정보와 목적">
-        <div className="overflow-x-auto">
+        <div
+          className="w-full max-w-full overflow-x-auto"
+          tabIndex={0}
+          role="region"
+          aria-label="개인정보 처리 항목 표"
+        >
           <table className="w-full min-w-[40rem] border-collapse text-left">
             <thead>
               <tr className="border-y border-border text-brown">

@@ -8,21 +8,29 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { signInAction, signInWithOAuth } from "@/lib/actions/auth";
 import { brand } from "@/config/brand";
+import { AuthShell } from "@/components/auth/auth-shell";
 
 export default function LoginPage() {
   const t = useTranslations("auth");
   const locale = useLocale();
   const searchParams = useSearchParams();
   const hasGuestDraft = searchParams.get("draft") === "1";
-  const nextPath = hasGuestDraft ? `/${locale}/beans/new?draft=1` : "/explore";
+  const requestedNext = searchParams.get("next");
+  const safeRequestedNext =
+    requestedNext?.startsWith(`/${locale}/`) && !requestedNext.startsWith("//")
+      ? requestedNext
+      : null;
+  const nextPath = hasGuestDraft
+    ? `/${locale}/beans/new?draft=1`
+    : safeRequestedNext ?? `/${locale}/explore`;
   const [state, formAction, pending] = useActionState(signInAction, {});
   const [socialTermsAccepted, setSocialTermsAccepted] = useState(false);
 
   return (
-    <div className="flex min-h-[80vh] flex-col items-center justify-center">
-      <div className="w-full max-w-sm">
-        <div className="mb-10 text-center">
-          <h1 className="font-display text-3xl font-bold text-brown tracking-tight">
+    <AuthShell>
+        <div className="mb-9 border-b-2 border-brown pb-5">
+          <p className="journal-kicker">MEMBER ACCESS / 01</p>
+          <h1 className="mt-3 font-display text-4xl font-bold tracking-[-0.04em] text-brown">
             {brand.name}
           </h1>
           <p className="mt-2 text-sm text-brown-light">{t("loginTitle")}</p>
@@ -136,8 +144,7 @@ export default function LoginPage() {
             {t("goSignup")}
           </Link>
         </p>
-      </div>
-    </div>
+    </AuthShell>
   );
 }
 

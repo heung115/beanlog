@@ -35,13 +35,13 @@ export function SiteFooter({
   const copy = labels[locale];
 
   return (
-    <footer className="border-t border-border bg-surface text-xs text-brown-light">
+    <footer className="border-t-2 border-brown bg-surface text-xs text-brown-light">
       <div
         className={`mx-auto flex w-full flex-col gap-3 px-4 py-6 sm:flex-row sm:items-center sm:justify-between md:px-6 ${
-          wide ? "max-w-6xl" : "max-w-4xl"
+          wide ? "max-w-6xl" : "max-w-6xl"
         } ${mobileNavOffset ? "pb-24 md:pb-6" : ""}`}
       >
-        <span className="font-semibold text-brown">© {brand.name}</span>
+        <span className="font-mono font-semibold uppercase tracking-[0.08em] text-brown">© {brand.name} · private tasting archive</span>
         <nav
           aria-label={copy.navigation}
           className="flex flex-wrap items-center gap-x-4 gap-y-2"

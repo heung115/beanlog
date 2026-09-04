@@ -34,8 +34,8 @@ function SectionCard({
         plain
           ? "border-t border-border-light px-1 pt-6"
           : feature
-            ? "journal-panel-feature p-5 md:p-6"
-            : "journal-panel-quiet p-5 md:p-6"
+            ? "paper-sheet paper-sheet-feature p-5 md:p-7"
+            : "border-l-2 border-accent bg-surface-warm p-5 md:p-7"
       } ${danger ? "border-red-200 bg-red-50/30" : ""}`}
       style={{ animationDelay: `${delay}ms` }}
     >
@@ -44,7 +44,7 @@ function SectionCard({
           danger ? "text-red-700" : "text-brown"
         }`}
       >
-        {danger && <span className="h-2 w-2 rounded-full bg-red-600" />}
+        {danger && <span className="font-mono text-[10px] tracking-widest text-red-700">CAUTION /</span>}
         {title}
       </h2>
       {children}
@@ -174,7 +174,7 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="mx-auto max-w-xl space-y-7">
+    <div className="mx-auto max-w-4xl space-y-8">
       <style>{`
         @keyframes settings-rise-kf {
           from { opacity: 0; transform: translateY(12px); }
@@ -186,10 +186,14 @@ export default function SettingsPage() {
       `}</style>
 
       {/* ---------- header ---------- */}
-      <header className="settings-rise pt-2">
-        <h1 className="font-display text-3xl font-bold tracking-tight text-brown md:text-4xl">
+      <header className="settings-rise border-y-2 border-brown py-9 md:grid md:grid-cols-[1fr_14rem] md:items-end md:py-12">
+        <div>
+          <p className="journal-kicker">ACCOUNT LEDGER / SETTINGS</p>
+          <h1 className="display-title mt-3 text-5xl text-brown md:text-7xl">
           {t("title")}
-        </h1>
+          </h1>
+        </div>
+        <p className="folio-label mt-5 border-l-2 border-accent pl-4 md:mt-0">PROFILE · DATA · ACCESS</p>
       </header>
 
       {/* ---------- profile ---------- */}
@@ -217,7 +221,7 @@ export default function SettingsPage() {
         <div
           role="radiogroup"
           aria-label={t("language")}
-          className="inline-flex rounded-md border border-border bg-cream p-1"
+          className="inline-flex rounded-sm border border-border bg-cream p-1"
         >
           {locales.map((l) => {
             const active = l.value === locale;
@@ -228,10 +232,10 @@ export default function SettingsPage() {
                 role="radio"
                 aria-checked={active}
                 onClick={() => switchLocale(l.value)}
-                className={`min-h-11 rounded px-5 py-2 text-sm font-medium transition-all duration-150 ${
+                className={`min-h-11 rounded-sm border px-5 py-2 text-sm font-semibold transition-all duration-150 ${
                   active
-                    ? "bg-brown text-cream shadow-sm"
-                    : "text-brown-light hover:text-brown"
+                    ? "border-brown bg-brown text-cream shadow-[2px_2px_0_var(--color-accent-light)]"
+                    : "border-transparent text-brown-light hover:border-border hover:text-brown"
                 }`}
               >
                 {l.label}
@@ -311,13 +315,13 @@ export default function SettingsPage() {
           onClick={() => !deleting && setConfirmOpen(false)}
         >
           <div
-            className="settings-rise w-full max-w-sm rounded-lg border border-border bg-surface p-6 shadow-xl"
+            className="settings-rise paper-sheet w-full max-w-sm border-t-[3px] border-t-red-700 p-6"
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
             aria-labelledby="delete-account-title"
           >
-            <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-red-50 text-red-600">
+            <div className="mx-auto mb-4 flex h-11 w-11 items-center justify-center rounded-sm border border-red-200 bg-red-50 text-red-700">
               <Icon path={ICONS.trash} className="h-5 w-5" />
             </div>
             <h3

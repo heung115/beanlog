@@ -36,15 +36,21 @@ export function BeanCard({ bean, view = "grid" }: BeanCardProps) {
       data-testid="bean-card"
       data-view={view}
       className={cn(
-        "journal-panel group relative flex flex-col border-l-2 border-l-transparent px-5 py-4 transition-all duration-200 hover:border-l-accent hover:border-t-border hover:border-r-border hover:border-b-border hover:bg-surface-warm md:px-5 md:py-5",
-        view === "grid" ? "min-h-64" : "min-h-0"
+        "journal-panel pressable group relative flex flex-col overflow-hidden border-t-[3px] border-t-brown px-5 py-4 hover:border-t-accent hover:bg-surface-warm hover:shadow-[4px_4px_0_var(--color-cream-dark)] md:px-5 md:py-5",
+        view === "grid" ? "min-h-60" : "min-h-0"
       )}
     >
       <div className="relative z-10 flex h-full flex-1 flex-col">
-        {/* Name / roastery / origin + score */}
+        <div className="mb-4 flex items-center justify-between border-b border-border pb-3">
+          <span className="folio-label">TASTING RECORD</span>
+          <time className="folio-label" dateTime={bean.consumed_at}>
+            {formatDate(bean.consumed_at, locale)}
+          </time>
+        </div>
+
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
-            <h3 className="line-clamp-2 font-display text-lg font-bold leading-snug text-brown transition-colors duration-150 group-hover:text-accent">
+            <h3 className="line-clamp-2 font-display text-xl font-bold leading-[1.15] tracking-[-0.025em] text-brown transition-colors duration-150 group-hover:text-accent">
               <Link
                 href={`/${locale}/beans/${bean.id}`}
                 className="rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
@@ -52,8 +58,8 @@ export function BeanCard({ bean, view = "grid" }: BeanCardProps) {
                 {bean.name}
               </Link>
             </h3>
-            <p className="mt-1 truncate text-sm text-brown-light">{bean.roastery}</p>
-            <p className="mt-2 text-xs font-medium text-brown-light">
+            <p className="mt-1 truncate text-xs font-semibold uppercase tracking-[0.05em] text-brown-light">{bean.roastery}</p>
+            <p className="mt-3 text-xs font-semibold text-brown-medium">
               {countryName}
               {bean.origin_region ? ` · ${bean.origin_region}` : ""}
             </p>
@@ -63,7 +69,7 @@ export function BeanCard({ bean, view = "grid" }: BeanCardProps) {
 
         <p
           data-testid="bean-card-metadata"
-          className="mt-4 text-xs font-medium text-brown-medium"
+          className="mt-4 border-l-2 border-accent pl-3 font-mono text-[10px] font-semibold uppercase tracking-[0.04em] text-brown-medium"
         >
           {[
             tProcess(bean.process_method),
@@ -86,7 +92,7 @@ export function BeanCard({ bean, view = "grid" }: BeanCardProps) {
             {visibleTags.map((tag) => (
               <span
                 key={tag.id}
-                className="rounded-sm bg-cream-dark px-2 py-0.5 text-[11px] text-brown-medium"
+                className="rounded-sm border border-border px-2 py-0.5 text-[11px] font-medium text-brown-medium"
               >
                 {tagDisplayName(tag.tag, locale)}
               </span>
@@ -104,12 +110,10 @@ export function BeanCard({ bean, view = "grid" }: BeanCardProps) {
             view === "grid" ? "mt-auto" : "mt-5"
           )}
         >
-          <span className="text-xs text-brown-light">
+          <span className="folio-label">
             {bean.place_type === "cafe" ? t("cafe") : t("home")}
           </span>
-          <time className="text-xs text-brown-light" dateTime={bean.consumed_at}>
-            {formatDate(bean.consumed_at, locale)}
-          </time>
+          <span aria-hidden="true" className="font-display text-lg text-accent transition-transform group-hover:translate-x-1">→</span>
         </div>
       </div>
     </article>

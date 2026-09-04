@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { OriginContours } from "@/components/brand/origin-contours";
 import {
   findCountryPresetBySlug,
   originSlug,
@@ -93,7 +94,7 @@ export default async function OriginDetailPage({
   };
 
   return (
-    <article className="mx-auto max-w-2xl pb-8">
+    <article className="mx-auto max-w-5xl pb-8">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
@@ -121,54 +122,65 @@ export default async function OriginDetailPage({
         {t("indexTitle")}
       </Link>
 
-      <header className="animate-rise pb-8 pt-4 md:pb-10 md:pt-7">
-        <p className="journal-kicker">{t("guide")}</p>
-        <h1 className="mt-2 font-display text-4xl font-bold leading-tight tracking-tight text-brown md:text-5xl">
-          {countryName}
-        </h1>
-        <p className="mt-1 text-base text-brown-light">{secondaryCountryName}</p>
-        <p className="mt-5 max-w-xl text-sm leading-relaxed text-brown-medium md:text-base">
+      <header className="animate-rise relative mt-2 overflow-hidden border-y-2 border-brown px-5 py-10 md:grid md:min-h-80 md:grid-cols-[1fr_18rem] md:items-end md:px-8 md:py-12">
+        <OriginContours className="pointer-events-none absolute -right-36 -top-36 h-[34rem] w-[42rem] opacity-55" />
+        <div className="relative">
+          <p className="journal-kicker">{t("guide")}</p>
+          <h1 className="display-title mt-4 text-6xl text-brown md:text-8xl">{countryName}</h1>
+          <p className="folio-label mt-2">{secondaryCountryName}</p>
+        </div>
+        <p className="relative mt-8 border-l-2 border-accent pl-5 text-sm leading-7 text-brown-medium md:mt-0 md:text-base">
           {t("intro", { country: countryName })}
         </p>
       </header>
 
       <section
-        className="journal-panel-feature animate-rise p-5 md:p-7"
+        className="paper-sheet animate-rise mt-10 p-5 md:p-8"
         style={{ animationDelay: "60ms" }}
       >
-        <h2 className="journal-section-title">{t("cupProfile")}</h2>
-        <p className="mt-2 text-sm text-brown-light">{t("cupProfileHint")}</p>
-        <ul className="mt-5 flex flex-wrap gap-2" aria-label={t("cupProfile")}>
-          {flavorNotes.map((note) => (
+        <div className="flex items-end justify-between gap-4 border-b-2 border-brown pb-4">
+          <div>
+            <p className="journal-kicker">01 / profile</p>
+            <h2 className="mt-2 font-display text-2xl font-bold text-brown">{t("cupProfile")}</h2>
+          </div>
+          <p className="hidden text-xs text-brown-light sm:block">{t("cupProfileHint")}</p>
+        </div>
+        <ul className="grid sm:grid-cols-2 md:grid-cols-3" aria-label={t("cupProfile")}>
+          {flavorNotes.map((note, index) => (
             <li
               key={note}
-              className="rounded-sm border border-border bg-cream-dark px-3 py-1.5 text-sm font-medium text-brown"
+              className="grid min-h-24 grid-cols-[2rem_1fr] items-center border-b border-border py-4 text-sm font-semibold text-brown sm:border-r sm:px-4 sm:first:pl-0 sm:nth-[2n]:border-r-0 md:nth-[2n]:border-r md:nth-[3n]:border-r-0"
             >
-              {note}
+              <span className="font-display text-xl italic text-accent">{String(index + 1).padStart(2, "0")}</span>
+              <span>{note}</span>
             </li>
           ))}
         </ul>
+        <p className="mt-4 text-xs text-brown-light sm:hidden">{t("cupProfileHint")}</p>
       </section>
 
       <section
-        className="animate-rise mt-8 border-y border-border py-6"
+        className="animate-rise mt-10 grid border-y-2 border-brown md:grid-cols-[14rem_1fr]"
         style={{ animationDelay: "100ms" }}
       >
-        <h2 className="journal-section-title">{t("growingConditions")}</h2>
-        <dl className="mt-5 grid gap-6 sm:grid-cols-2 sm:gap-8">
-          <div>
-            <dt className="text-xs font-medium text-brown-light">
+        <div className="bg-surface-warm p-5 md:p-7">
+          <p className="journal-kicker">02 / terrain</p>
+          <h2 className="mt-2 font-display text-2xl font-bold text-brown">{t("growingConditions")}</h2>
+        </div>
+        <dl className="grid grid-cols-2 border-t border-border md:border-l md:border-t-0">
+          <div className="p-5 md:p-7">
+            <dt className="folio-label">
               {t("altitude")}
             </dt>
-            <dd className="mt-1.5 text-lg font-semibold tabular-nums text-brown">
+            <dd className="mt-3 font-display text-2xl font-bold tabular-nums text-brown md:text-3xl">
               {preset.altitudeRange}
             </dd>
           </div>
-          <div>
-            <dt className="text-xs font-medium text-brown-light">
+          <div className="border-l border-border p-5 md:p-7">
+            <dt className="folio-label">
               {t("keyVarietals")}
             </dt>
-            <dd className="mt-1.5 text-sm font-medium leading-relaxed text-brown">
+            <dd className="mt-3 text-sm font-semibold leading-7 text-brown">
               {preset.keyVarietals.join(" · ")}
             </dd>
           </div>
@@ -179,23 +191,24 @@ export default async function OriginDetailPage({
         className="animate-rise mt-9"
         style={{ animationDelay: "140ms" }}
       >
-        <div className="flex items-end justify-between gap-4 border-b border-border pb-3">
+        <div className="flex items-end justify-between gap-4 border-b-2 border-brown pb-4">
           <div>
-            <h2 className="journal-section-title">{t("regions")}</h2>
+            <p className="journal-kicker">03 / regions</p>
+            <h2 className="mt-2 font-display text-2xl font-bold text-brown">{t("regions")}</h2>
             <p className="mt-1 text-sm text-brown-light">{t("regionsHint")}</p>
           </div>
           <span className="shrink-0 text-xs tabular-nums text-brown-light">
             {t("regionCount", { count: preset.regions.length })}
           </span>
         </div>
-        <ol className="divide-y divide-border-light">
+        <ol className="grid md:grid-cols-2">
           {preset.regions.map((region, index) => {
             const regionName = isKorean ? region.nameKo : region.name;
             const secondaryRegionName = isKorean ? region.name : region.nameKo;
 
             return (
-              <li key={region.name} className="flex items-center gap-4 py-4">
-                <span className="w-6 shrink-0 text-xs tabular-nums text-brown-light">
+              <li key={region.name} className="ledger-row flex min-h-24 items-center gap-4 py-4 md:px-5 md:nth-[odd]:border-r md:nth-[odd]:pl-0">
+                <span className="w-8 shrink-0 font-display text-xl italic tabular-nums text-accent">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <div>
@@ -212,7 +225,7 @@ export default async function OriginDetailPage({
         </ol>
       </section>
 
-      <aside className="journal-panel-quiet mt-9 p-4 text-sm leading-relaxed text-brown-light">
+      <aside className="mt-10 border-l-2 border-accent bg-surface-warm p-5 text-sm leading-7 text-brown-light">
         {t("disclaimer")}
       </aside>
     </article>

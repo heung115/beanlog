@@ -46,17 +46,21 @@ export default function EditBeanPage() {
   }, [params.id]);
 
   return (
-    <div className="mx-auto max-w-2xl">
-      <header className="animate-rise mb-6">
-        <h1 className="font-display text-3xl font-bold tracking-tight text-brown md:text-4xl">
+    <div className="mx-auto max-w-4xl">
+      <header className="animate-rise mb-8 border-y-2 border-brown py-9 md:grid md:grid-cols-[1fr_13rem] md:items-end md:py-12">
+        <div>
+          <p className="journal-kicker">REVISE TASTING RECORD / 02</p>
+          <h1 className="display-title mt-3 text-5xl text-brown md:text-7xl">
           {t("editTitle")}
-        </h1>
+          </h1>
+        </div>
+        <p className="folio-label mt-5 border-l-2 border-accent pl-4 md:mt-0">ARCHIVE REVISION</p>
       </header>
 
       {loading ? (
         <FormSkeleton />
       ) : !bean ? (
-        <div className="animate-rise rounded-lg border border-border bg-surface px-6 py-16 text-center">
+        <div className="paper-sheet animate-rise px-6 py-16 text-center">
           <p className="font-display text-xl font-bold text-brown">
             {t("notFound")}
           </p>

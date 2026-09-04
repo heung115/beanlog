@@ -6,6 +6,7 @@ import {
   stagingAnonKey,
   stagingSupabaseUrl,
   qaApiURL,
+  qaBaseURL,
   qaOtherUser,
   qaUser,
   signIn,
@@ -38,7 +39,9 @@ test("security headers and unauthenticated route protection are enforced", async
   const response = await request.get("/ko/explore", { maxRedirects: 0 });
   expect(response.status()).toBeGreaterThanOrEqual(300);
   expect(response.status()).toBeLessThan(400);
-  expect(response.headers()["location"]).toBe("/");
+  expect(response.headers()["location"]).toBe(
+    "/ko/login?next=%2Fko%2Fexplore"
+  );
 
   const login = await request.get("/ko/login");
   expect(login.headers()["x-frame-options"]).toBe("DENY");
@@ -60,7 +63,7 @@ test("security headers and unauthenticated route protection are enforced", async
   );
   expect(poisonedCallback.status()).toBeGreaterThanOrEqual(300);
   expect(poisonedCallback.status()).toBeLessThan(400);
-  expect(poisonedCallback.headers().location).toBe("http://localhost:3100/login");
+  expect(poisonedCallback.headers().location).toBe(new URL("/login", qaBaseURL).toString());
 });
 
 test("RLS and table privileges prevent cross-user access and direct writes", async () => {

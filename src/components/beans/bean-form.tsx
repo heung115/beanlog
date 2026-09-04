@@ -183,7 +183,7 @@ function Segmented<T extends string>({
     <div
       role="radiogroup"
       aria-label={ariaLabel}
-      className="grid auto-cols-fr grid-flow-col gap-1 rounded-md border border-border bg-cream-dark/60 p-1"
+      className="grid auto-cols-fr grid-flow-col gap-1 rounded-sm border border-border bg-cream-dark/60 p-1"
     >
       {options.map((option) => (
         <button
@@ -193,11 +193,11 @@ function Segmented<T extends string>({
           aria-checked={value === option.value}
           onClick={() => onChange(option.value)}
           className={cn(
-            "min-h-11 rounded px-3 py-2 text-sm font-medium transition-all duration-150",
+            "min-h-11 rounded-sm border px-3 py-2 text-sm font-semibold transition-all duration-150",
             "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
             value === option.value
-              ? "bg-brown text-cream shadow-sm"
-              : "text-brown-light hover:text-brown"
+              ? "border-brown bg-brown text-cream shadow-[2px_2px_0_var(--color-accent-light)]"
+              : "border-transparent text-brown-light hover:border-border hover:text-brown"
           )}
         >
           {option.label}
@@ -673,7 +673,7 @@ export function BeanForm({
       action={mode === "create" ? createBeanFromForm : undefined}
       onSubmit={handleSubmit}
       onKeyDown={handleFormKeyDown}
-      className="flex flex-col gap-4"
+      className="flex flex-col gap-6"
     >
       {guestDraftLoaded && (
         <p className="journal-panel-quiet px-4 py-3 text-sm leading-6 text-brown-medium">
@@ -685,7 +685,11 @@ export function BeanForm({
       <input type="hidden" name="place_type" value={form.place_type} />
       <input type="hidden" name="overall_score" value={form.overall_score} />
       {/* ── Quick section ─────────────────────────────── */}
-      <section className="journal-panel-feature animate-rise p-5 md:p-6">
+      <section className="paper-sheet paper-sheet-feature animate-rise p-5 md:p-8">
+        <div className="mb-7 flex items-center justify-between border-b-2 border-brown pb-4">
+          <p className="journal-kicker">FIELD NOTE / ESSENTIALS</p>
+          <span className="font-display text-3xl italic text-accent">01</span>
+        </div>
         <div className="flex flex-col gap-5">
           {/* 종류 토글 — 맨 위 */}
           <div className="flex flex-col gap-1.5">
@@ -772,7 +776,7 @@ export function BeanForm({
         {/* Origin — 산지 → 생산자 → 품종 → 가공 정보 순 */}
         {!isBlend && (
           <div className="mt-6 flex flex-col gap-4 border-t border-border-light pt-6">
-            <h2 className="text-lg font-semibold tracking-[-0.01em] text-brown">
+            <h2 className="font-display text-2xl font-bold tracking-[-0.025em] text-brown">
               {t("originInfo")}
             </h2>
 
@@ -886,7 +890,7 @@ export function BeanForm({
               <div className="journal-panel-quiet animate-rise p-4">
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-[10px] font-semibold uppercase tracking-widest text-brown-light/60">
+                    <span className="folio-label">
                       {t("altitudeRange")}
                     </span>
                     <span className="text-sm font-medium text-brown">
@@ -894,7 +898,7 @@ export function BeanForm({
                     </span>
                   </div>
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-[10px] font-semibold uppercase tracking-widest text-brown-light/60">
+                    <span className="folio-label">
                       {t("signature")}
                     </span>
                     <span className="text-sm text-brown-medium">
@@ -904,7 +908,7 @@ export function BeanForm({
                     </span>
                   </div>
                   <div className="flex flex-col gap-0.5">
-                    <span className="text-[10px] font-semibold uppercase tracking-widest text-brown-light/60">
+                    <span className="folio-label">
                       {t("keyVarietals")}
                     </span>
                     <span className="text-sm text-brown-medium">
@@ -918,7 +922,11 @@ export function BeanForm({
         )}
 
         {/* Roast / place */}
-        <div className="mt-6 flex flex-col gap-5 border-t border-border-light pt-6">
+        <div className="mt-8 flex flex-col gap-5 border-t-2 border-brown pt-6">
+          <div className="flex items-center justify-between">
+            <p className="journal-kicker">ROAST &amp; PLACE</p>
+            <span className="font-display text-2xl italic text-accent">02</span>
+          </div>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <Select
               label={req(t("roastLevel"))}
@@ -982,7 +990,11 @@ export function BeanForm({
         </div>
 
         {/* Score + note */}
-        <div className="mt-6 flex flex-col gap-6 border-t border-border-light pt-6">
+        <div className="mt-8 flex flex-col gap-6 border-t-2 border-brown pt-6">
+          <div className="flex items-center justify-between">
+            <p className="journal-kicker">CUP IMPRESSION</p>
+            <span className="font-display text-2xl italic text-accent">03</span>
+          </div>
           <ScoreSlider
             label={req(t("overallScore"))}
             value={form.overall_score}
@@ -1007,10 +1019,10 @@ export function BeanForm({
         aria-expanded={showDetails}
         aria-controls="bean-detail-fields"
         className={cn(
-          "animate-rise flex items-center justify-center gap-2 rounded-lg border border-dashed border-border py-3.5",
-          "text-sm font-medium text-brown-light transition-all duration-200",
-          "hover:border-accent hover:bg-surface hover:text-brown",
-          showDetails && "border-solid border-border bg-surface text-brown"
+          "animate-rise flex min-h-14 items-center justify-between gap-2 rounded-sm border-y-2 border-brown px-4 py-3.5",
+          "text-sm font-semibold text-brown transition-all duration-200",
+          "hover:bg-surface-warm",
+          showDetails && "bg-surface-warm"
         )}
         style={{ animationDelay: "60ms" }}
       >
@@ -1039,7 +1051,7 @@ export function BeanForm({
       {showDetails && (
         <section
           id="bean-detail-fields"
-          className="animate-rise rounded-lg border border-border bg-surface p-5 md:p-6"
+          className="paper-sheet animate-rise border-t-[3px] border-t-accent p-5 md:p-8"
         >
             <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
               <Input
@@ -1150,7 +1162,7 @@ export function BeanForm({
 
       {/* ── Submit ────────────────────────────────────── */}
       <div
-        className="animate-rise flex flex-col-reverse gap-3 sm:flex-row sm:justify-end"
+        className="animate-rise flex flex-col-reverse gap-3 border-t-2 border-brown bg-cream py-5 sm:flex-row sm:justify-end"
         style={{ animationDelay: "120ms" }}
       >
         <Button

@@ -75,7 +75,7 @@ function ChartTooltip({
   const item = payload[0];
   const name = (item.payload?.label as string) ?? item.name ?? label ?? "";
   return (
-    <div className="rounded-md border border-border bg-surface-warm px-3 py-2 shadow-sm">
+    <div className="rounded-sm border border-border bg-surface-warm px-3 py-2 shadow-[2px_2px_0_var(--color-cream-dark)]">
       <p className="text-[11px] font-medium text-brown-light">{name}</p>
       <p className="font-display text-base font-bold text-brown">
         {item.value}
@@ -87,10 +87,9 @@ function ChartTooltip({
 
 function SectionHeading({ index, title }: { index: string; title: string }) {
   return (
-    <div className="mb-4 flex items-baseline gap-3">
-      <span className="font-display text-sm font-semibold text-accent-light">{index}</span>
-      <h2 className="font-display text-lg font-bold tracking-tight text-brown">{title}</h2>
-      <div className="ml-1 h-px flex-1 bg-border-light" />
+    <div className="mb-4 flex items-baseline gap-4 border-b-2 border-brown pb-3">
+      <span className="font-display text-2xl font-semibold italic text-accent">{index}</span>
+      <h2 className="font-display text-xl font-bold tracking-[-0.02em] text-brown">{title}</h2>
     </div>
   );
 }
@@ -108,7 +107,7 @@ function ChartCard({
 }) {
   return (
     <div
-      className={`stats-rise ${emphasis ? "journal-panel-feature" : "journal-panel"} p-5 transition-all duration-200 hover:border-accent-light ${className}`}
+      className={`stats-rise ${emphasis ? "paper-sheet paper-sheet-feature" : "journal-panel"} p-5 transition-all duration-200 hover:border-accent ${className}`}
       style={{ animationDelay: `${delay}ms` }}
     >
       {children}
@@ -194,8 +193,8 @@ export default function StatsPage() {
           {tExplore("emptySub")}
         </p>
         <Link
-          href="/beans/new"
-          className="mt-8 inline-flex items-center gap-2 rounded-md bg-brown px-6 py-3 text-sm font-medium text-cream transition-colors duration-150 hover:bg-brown-medium"
+          href={`/${locale}/beans/new`}
+          className="pressable mt-8 inline-flex items-center gap-2 rounded-sm border border-brown bg-brown px-6 py-3 text-sm font-semibold text-cream shadow-[3px_3px_0_var(--color-accent-light)] hover:bg-accent"
         >
           {tExplore("addFirst")}
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
@@ -235,7 +234,7 @@ export default function StatsPage() {
   const cupsSuffix = tCommon("cups");
 
   return (
-    <div className="space-y-12">
+    <div className="mx-auto max-w-6xl space-y-14">
       <style>{`
         @keyframes stats-rise-kf {
           from { opacity: 0; transform: translateY(14px); }
@@ -247,20 +246,24 @@ export default function StatsPage() {
       `}</style>
 
       {/* ---------- header ---------- */}
-      <header className="stats-rise">
-        <div className="flex flex-wrap items-end justify-between gap-2">
-          <h1 className="font-display text-3xl font-bold tracking-tight text-brown md:text-4xl">
+      <header className="stats-rise grid border-y-2 border-brown md:grid-cols-[1fr_14rem]">
+        <div className="py-9 md:py-12">
+          <p className="journal-kicker">TASTE REPORT / ARCHIVE</p>
+          <h1 className="display-title mt-3 text-5xl text-brown md:text-7xl">
             {t("title")}
           </h1>
-          <p className="pb-1 text-sm text-brown-light">
+        </div>
+        <div className="border-t border-border bg-surface-warm p-5 md:border-l md:border-t-0 md:p-7">
+          <p className="folio-label">
             {tExplore("results", { count: stats.total })}
           </p>
+          <p className="mt-3 font-display text-6xl font-bold italic tabular-nums tracking-[-0.06em] text-accent">{stats.total}</p>
         </div>
       </header>
 
       {/* ---------- summary cards ---------- */}
-      <section className="grid gap-3 sm:grid-cols-3">
-        <ChartCard delay={60} emphasis>
+      <section className="stats-rise grid border-y-2 border-brown sm:grid-cols-3" style={{ animationDelay: "60ms" }}>
+        <div className="p-5 sm:border-r sm:border-border md:p-7">
           <p className="text-xs font-medium text-brown-light">
             {t("totalBeans")}
           </p>
@@ -268,16 +271,16 @@ export default function StatsPage() {
             {stats.total}
             <span className="ml-1.5 text-sm font-normal text-brown-light">{cupsSuffix}</span>
           </p>
-        </ChartCard>
-        <ChartCard delay={120} emphasis>
+        </div>
+        <div className="border-t border-border p-5 sm:border-r sm:border-t-0 md:p-7">
           <p className="text-xs font-medium text-brown-light">
             {t("avgScore")}
           </p>
           <div className="mt-2">
             <ScoreDisplay score={stats.avgScore} size="lg" />
           </div>
-        </ChartCard>
-        <ChartCard delay={180} emphasis>
+        </div>
+        <div className="border-t border-border p-5 sm:border-t-0 md:p-7">
           <p className="text-xs font-medium text-brown-light">
             {t("bestBean")}
           </p>
@@ -288,14 +291,14 @@ export default function StatsPage() {
             {stats.best.roastery} · {Number(stats.best.score).toFixed(1)}
             {tCommon("score")}
           </p>
-        </ChartCard>
+        </div>
       </section>
 
       {/* ---------- my taste ---------- */}
       <section className="stats-rise" style={{ animationDelay: "240ms" }}>
         <SectionHeading index="01" title={t("myTaste")} />
         <div className="grid gap-3 sm:grid-cols-2">
-          <div className="journal-panel-quiet p-5 transition-colors duration-200 hover:border-accent-light">
+          <div className="border-l-2 border-accent bg-surface-warm p-5">
             <p className="text-xs font-medium text-brown-light">
               {t("topOrigin")}
             </p>
@@ -305,13 +308,13 @@ export default function StatsPage() {
               {cupsSuffix}
             </p>
           </div>
-          <div className="journal-panel-quiet p-5 transition-colors duration-200 hover:border-accent-light">
+          <div className="border-l-2 border-accent bg-surface-warm p-5">
             <p className="text-xs font-medium text-brown-light">
               {t("topProcess")}
             </p>
             <p className="mt-2 flex items-center gap-2.5 font-display text-2xl font-bold text-brown">
               <span
-                className="inline-block h-3 w-3 shrink-0 rounded-full"
+                className="inline-block h-3 w-3 shrink-0 rounded-sm"
                 style={{ backgroundColor: PROCESS_COLORS[stats.topProcess[0]] ?? PROCESS_COLORS.other }}
               />
               {processLabel(stats.topProcess[0])}
@@ -392,7 +395,7 @@ export default function StatsPage() {
                   <li key={p.name} className="group">
                     <div className="flex items-baseline justify-between text-sm">
                       <span className="flex items-center gap-2 font-medium text-brown">
-                        <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: p.color }} />
+                        <span className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: p.color }} />
                         {p.name}
                       </span>
                       <span className="tabular-nums text-xs text-brown-light">
@@ -400,9 +403,9 @@ export default function StatsPage() {
                         {cupsSuffix} · {pct}%
                       </span>
                     </div>
-                    <div className="mt-1.5 h-1 overflow-hidden rounded-full bg-border-light">
+                    <div className="mt-1.5 h-1 overflow-hidden bg-border-light">
                       <div
-                        className="h-full rounded-full transition-[width] duration-700 ease-out"
+                        className="h-full transition-[width] duration-700 ease-out"
                         style={{ width: `${pct}%`, backgroundColor: p.color }}
                       />
                     </div>
