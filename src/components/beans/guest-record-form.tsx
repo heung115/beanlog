@@ -142,7 +142,7 @@ export function GuestRecordForm() {
       <section className="paper-sheet paper-sheet-feature p-5 md:p-8">
         <div className="mb-7 flex items-center justify-between border-b-2 border-brown pb-4">
           <p className="journal-kicker">{tb("basicInfo")}</p>
-          <span className="font-display text-3xl italic text-accent">01</span>
+          <span className="font-display text-3xl text-accent">01</span>
         </div>
         <div className="flex flex-col gap-5">
           <Input
@@ -209,7 +209,7 @@ export function GuestRecordForm() {
           <div className="mt-2 border-t-2 border-brown pt-6">
             <div className="mb-5 flex items-center justify-between">
               <p className="journal-kicker">{tb("evaluation")}</p>
-              <span className="font-display text-2xl italic text-accent">02</span>
+              <span className="font-display text-2xl text-accent">02</span>
             </div>
             <div className="flex flex-col gap-5">
               <ScoreSlider

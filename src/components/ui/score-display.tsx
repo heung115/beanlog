@@ -11,7 +11,7 @@ export function ScoreDisplay({ score, size = "md", className }: ScoreDisplayProp
     <div className={cn("flex items-baseline gap-1", className)}>
       <span
         className={cn(
-          "font-display font-bold italic tabular-nums tracking-[-0.045em] text-accent",
+          "font-display font-bold tabular-nums tracking-[-0.045em] text-accent",
           size === "sm" && "text-lg",
           size === "md" && "text-2xl",
           size === "lg" && "text-4xl"

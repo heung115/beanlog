@@ -88,7 +88,7 @@ function ChartTooltip({
 function SectionHeading({ index, title }: { index: string; title: string }) {
   return (
     <div className="mb-4 flex items-baseline gap-4 border-b-2 border-brown pb-3">
-      <span className="font-display text-2xl font-semibold italic text-accent">{index}</span>
+      <span className="font-display text-2xl font-semibold text-accent">{index}</span>
       <h2 className="font-display text-xl font-bold tracking-[-0.02em] text-brown">{title}</h2>
     </div>
   );
@@ -257,7 +257,7 @@ export default function StatsPage() {
           <p className="folio-label">
             {tExplore("results", { count: stats.total })}
           </p>
-          <p className="mt-3 font-display text-6xl font-bold italic tabular-nums tracking-[-0.06em] text-accent">{stats.total}</p>
+          <p className="mt-3 font-display text-6xl font-bold tabular-nums tracking-[-0.06em] text-accent">{stats.total}</p>
         </div>
       </header>
 

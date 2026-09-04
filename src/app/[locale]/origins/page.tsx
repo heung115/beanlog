@@ -115,7 +115,7 @@ export default async function OriginsPage({ params }: { params: Promise<{ locale
             <section id={group.id} key={group.id} aria-labelledby={`${group.id}-title`} className="scroll-mt-44 md:grid md:grid-cols-[12rem_minmax(0,1fr)] md:gap-12">
               <header className="mb-5 flex items-end justify-between border-b border-border pb-4 md:mb-0 md:block md:border-b-0 md:pb-0">
                 <div>
-                  <p className="font-display text-4xl italic leading-none text-accent/75">{String(groupIndex + 1).padStart(2, "0")}</p>
+                  <p className="font-display text-4xl leading-none text-accent/75">{String(groupIndex + 1).padStart(2, "0")}</p>
                   <h2 id={`${group.id}-title`} className="mt-3 font-display text-2xl font-bold tracking-[-0.03em] text-brown">{isKorean ? group.label.ko : group.label.en}</h2>
                 </div>
                 <p className="folio-label md:mt-4">{isKorean ? `${presets.length}개 산지` : `${presets.length} origins`}</p>

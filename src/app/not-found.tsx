@@ -23,7 +23,7 @@ export default function NotFound() {
           </div>
         </div>
         <div className="relative flex min-h-52 items-end justify-end border-t border-border bg-surface-warm/65 p-7 md:min-h-0 md:border-l md:border-t-0">
-          <span className="font-display text-8xl font-bold italic tracking-[-0.08em] text-accent">404</span>
+          <span className="font-display text-8xl font-bold tracking-[-0.08em] text-accent">404</span>
         </div>
       </section>
     </main>

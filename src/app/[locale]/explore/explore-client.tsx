@@ -465,7 +465,7 @@ export function ExploreClient({
         </div>
         <div className="flex items-end justify-between border-t border-border-light bg-surface-warm p-5 md:block md:border-l md:border-t-0 md:p-7">
           <p className="folio-label">{t("recordCount")}</p>
-          <p className="font-display text-5xl font-bold italic tabular-nums tracking-[-0.05em] text-accent md:mt-5 md:text-6xl">{total}</p>
+          <p className="font-display text-5xl font-bold tabular-nums tracking-[-0.05em] text-accent md:mt-5 md:text-6xl">{total}</p>
         </div>
       </header>
 

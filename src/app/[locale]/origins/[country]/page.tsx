@@ -150,7 +150,7 @@ export default async function OriginDetailPage({
               key={note}
               className="grid min-h-24 grid-cols-[2rem_1fr] items-center border-b border-border py-4 text-sm font-semibold text-brown sm:border-r sm:px-4 sm:first:pl-0 sm:nth-[2n]:border-r-0 md:nth-[2n]:border-r md:nth-[3n]:border-r-0"
             >
-              <span className="font-display text-xl italic text-accent">{String(index + 1).padStart(2, "0")}</span>
+              <span className="font-display text-xl text-accent">{String(index + 1).padStart(2, "0")}</span>
               <span>{note}</span>
             </li>
           ))}
@@ -205,7 +205,7 @@ export default async function OriginDetailPage({
 
             return (
               <li key={region.name} className="ledger-row flex min-h-24 items-center gap-4 py-4 md:px-5 md:nth-[odd]:border-r md:nth-[odd]:pl-0">
-                <span className="w-8 shrink-0 font-display text-xl italic tabular-nums text-accent">
+                <span className="w-8 shrink-0 font-display text-xl tabular-nums text-accent">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <div>

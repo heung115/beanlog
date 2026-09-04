@@ -139,7 +139,7 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
             <ol className="mt-12 border-t-2 border-brown">
               {copy.features.items.map(([term, description], index) => (
                 <li key={term} className="ledger-row group grid gap-3 py-6 md:grid-cols-[5rem_minmax(15rem,0.55fr)_minmax(0,0.8fr)] md:items-baseline md:gap-8 md:py-7">
-                  <span className="font-display text-3xl italic text-accent/80">{String(index + 1).padStart(2, "0")}</span>
+                  <span className="font-display text-3xl text-accent/80">{String(index + 1).padStart(2, "0")}</span>
                   <h3 className="font-display text-xl font-bold tracking-[-0.02em] text-brown md:text-2xl">{term}</h3>
                   <p className="max-w-2xl text-sm leading-7 text-brown-medium">{description}</p>
                 </li>
@@ -171,7 +171,7 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
                       className="group grid min-h-36 grid-cols-[3.25rem_1fr_auto] items-center gap-3 py-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
                       aria-label={`${countryName}: ${copy.origins.viewCountry}`}
                     >
-                      <span className="font-display text-3xl italic text-accent">{String(index + 1).padStart(2, "0")}</span>
+                      <span className="font-display text-3xl text-accent">{String(index + 1).padStart(2, "0")}</span>
                       <span>
                         <span className="block font-display text-2xl font-bold tracking-[-0.03em] text-brown transition-colors group-hover:text-accent md:text-3xl">{countryName}</span>
                         <span className="mt-2 block max-w-sm text-xs leading-5 text-brown-medium">{signature}</span>

@@ -688,7 +688,7 @@ export function BeanForm({
       <section className="paper-sheet paper-sheet-feature animate-rise p-5 md:p-8">
         <div className="mb-7 flex items-center justify-between border-b-2 border-brown pb-4">
           <p className="journal-kicker">{t("basicInfo")}</p>
-          <span className="font-display text-3xl italic text-accent">01</span>
+          <span className="font-display text-3xl text-accent">01</span>
         </div>
         <div className="flex flex-col gap-5">
           {/* 종류 토글 — 맨 위 */}
@@ -925,7 +925,7 @@ export function BeanForm({
         <div className="mt-8 flex flex-col gap-5 border-t-2 border-brown pt-6">
           <div className="flex items-center justify-between">
             <p className="journal-kicker">{t("roastAndPlace")}</p>
-            <span className="font-display text-2xl italic text-accent">02</span>
+            <span className="font-display text-2xl text-accent">02</span>
           </div>
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             <Select
@@ -993,7 +993,7 @@ export function BeanForm({
         <div className="mt-8 flex flex-col gap-6 border-t-2 border-brown pt-6">
           <div className="flex items-center justify-between">
             <p className="journal-kicker">{t("evaluation")}</p>
-            <span className="font-display text-2xl italic text-accent">03</span>
+            <span className="font-display text-2xl text-accent">03</span>
           </div>
           <ScoreSlider
             label={req(t("overallScore"))}

@@ -153,6 +153,8 @@ Display, body, and interface typography use the self-hosted **SUIT Variable** fa
 
 Reserve bold display type for meaningful hierarchy. A screen should usually have one dominant title; avoid making every card label look like a headline.
 
+Keep scores, totals, dates, and numbered steps upright. Do not synthesize italic or oblique text from the normal SUIT face; italics require an intentionally loaded italic face and a rare editorial purpose.
+
 ## Layout
 
 beanmap is mobile-first. The shared editorial canvas is capped at `72rem`, with a `1rem` mobile gutter and a `1.5rem` desktop gutter. Detail and form content use narrower reading widths when that improves focus.
