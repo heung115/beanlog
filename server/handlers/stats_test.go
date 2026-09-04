@@ -1,7 +1,10 @@
 package handlers
 
 import (
+	"encoding/json"
+	"fmt"
 	"reflect"
+	"strings"
 	"testing"
 
 	"beanmap-server/models"
@@ -141,6 +144,197 @@ func TestBuildOriginMapLeavesAmbiguousCatalogNameUnmapped(t *testing.T) {
 
 	if len(got) != 1 || got[0].Mapped || got[0].CountryID != nil || got[0].NameEn != sharedKo {
 		t.Fatalf("origin map = %#v, want ambiguous exact name preserved as unmapped", got)
+	}
+}
+
+func TestBuildOriginMapBoundsCardinalityDeterministically(t *testing.T) {
+	catalog := newOriginCatalog(
+		[]originCatalogCountry{{id: 1, nameEn: "Zulu Mapped"}},
+		nil,
+	)
+	occurrences := make([]originOccurrence, 0, maxStatsOriginMapCountries+maxStatsOriginMapRegions+32)
+
+	for index := 0; index < maxStatsOriginMapCountries+2; index++ {
+		occurrences = append(occurrences, originOccurrence{
+			beanID:  fmt.Sprintf("country-%03d", index),
+			country: fmt.Sprintf("Country %03d", index),
+			region:  "Only region",
+		})
+	}
+	occurrences = append(occurrences, originOccurrence{
+		beanID:    "mapped-country",
+		countryID: testInt64(1),
+		region:    "Mapped region",
+	})
+	for index := 0; index < 4; index++ {
+		occurrences = append(occurrences, originOccurrence{
+			beanID:  fmt.Sprintf("competing-primary-%d", index),
+			country: "Competing",
+			region:  "Primary",
+		})
+	}
+	for index := 0; index < 3; index++ {
+		occurrences = append(occurrences, originOccurrence{
+			beanID:  fmt.Sprintf("competing-secondary-%d", index),
+			country: "Competing",
+			region:  "Secondary",
+		})
+	}
+	for index := 0; index < maxStatsOriginMapRegions+16; index++ {
+		occurrences = append(occurrences, originOccurrence{
+			beanID:  fmt.Sprintf("priority-%03d", index),
+			country: "Priority",
+			region:  fmt.Sprintf("Region %04d", index),
+		})
+	}
+	occurrences = append(occurrences,
+		originOccurrence{beanID: "popular-a", country: "Priority", region: "Popular"},
+		originOccurrence{beanID: "popular-b", country: "Priority", region: "Popular"},
+	)
+
+	got := buildOriginMap(occurrences, catalog)
+	if len(got) != maxStatsOriginMapCountries {
+		t.Fatalf("len(origin_map) = %d, want %d", len(got), maxStatsOriginMapCountries)
+	}
+
+	totalRegions := 0
+	mappedFound := false
+	for _, entry := range got {
+		totalRegions += len(entry.Regions)
+		if len(entry.Regions) == 0 {
+			t.Fatalf("retained country %q has no retained region", entry.NameEn)
+		}
+		if entry.NameEn == "Zulu Mapped" {
+			mappedFound = true
+		}
+	}
+	if totalRegions != maxStatsOriginMapRegions {
+		t.Fatalf("origin map regions = %d, want %d", totalRegions, maxStatsOriginMapRegions)
+	}
+	if !mappedFound {
+		t.Fatal("mapped country was dropped before equally frequent free-text countries")
+	}
+
+	priority := got[0]
+	wantPriorityCount := maxStatsOriginMapRegions + 18
+	if priority.NameEn != "Priority" || priority.Count != wantPriorityCount {
+		t.Fatalf("top country = %#v, want Priority count %d", priority, wantPriorityCount)
+	}
+	wantPriorityRegions := maxStatsOriginMapRegions - (maxStatsOriginMapCountries - 1) - 1
+	if len(priority.Regions) != wantPriorityRegions {
+		t.Fatalf("Priority regions = %d, want %d", len(priority.Regions), wantPriorityRegions)
+	}
+	if priority.Regions[0].Name != "Popular" || priority.Regions[0].Count != 2 {
+		t.Fatalf("top Priority region = %#v, want Popular count 2", priority.Regions[0])
+	}
+	competing := got[1]
+	if competing.NameEn != "Competing" || len(competing.Regions) != 2 {
+		t.Fatalf("globally ranked competing country = %#v, want both regions retained", competing)
+	}
+	if competing.Regions[1].Name != "Secondary" || competing.Regions[1].Count != 3 {
+		t.Fatalf("globally ranked region = %#v, want Secondary count 3", competing.Regions[1])
+	}
+
+	reversed := append([]originOccurrence(nil), occurrences...)
+	for left, right := 0, len(reversed)-1; left < right; left, right = left+1, right-1 {
+		reversed[left], reversed[right] = reversed[right], reversed[left]
+	}
+	if reversedResult := buildOriginMap(reversed, catalog); !reflect.DeepEqual(reversedResult, got) {
+		t.Fatalf("reversed input changed bounded origin map\n got: %#v\nwant: %#v", reversedResult, got)
+	}
+}
+
+func TestBoundedOriginMapFitsBufferedStatsResponse(t *testing.T) {
+	countries := make([]originCatalogCountry, 0, maxStatsOriginMapCountries+2)
+	regions := make([]originCatalogRegion, 0, (maxStatsOriginMapCountries+2)*3)
+	occurrences := make([]originOccurrence, 0, (maxStatsOriginMapCountries+2)*3)
+
+	for countryIndex := 0; countryIndex < maxStatsOriginMapCountries+2; countryIndex++ {
+		countryID := int64(countryIndex + 1)
+		countryName := fmt.Sprintf("%03d%s", countryIndex, strings.Repeat("&", 97))
+		countryNameKo := countryName
+		countries = append(countries, originCatalogCountry{
+			id:     countryID,
+			nameEn: countryName,
+			nameKo: &countryNameKo,
+		})
+
+		for countryRegionIndex := 0; countryRegionIndex < 3; countryRegionIndex++ {
+			regionIndex := countryIndex*3 + countryRegionIndex
+			regionID := int64(regionIndex + 1)
+			regionName := fmt.Sprintf("%03d%s", regionIndex, strings.Repeat("&", 197))
+			regionNameKo := regionName
+			regions = append(regions, originCatalogRegion{
+				id:        regionID,
+				countryID: countryID,
+				name:      regionName,
+				nameKo:    &regionNameKo,
+			})
+			occurrences = append(occurrences, originOccurrence{
+				beanID:    fmt.Sprintf("bean-%03d-%d", countryIndex, countryRegionIndex),
+				countryID: testInt64(countryID),
+				regionID:  testInt64(regionID),
+			})
+		}
+	}
+
+	originMap := buildOriginMap(occurrences, newOriginCatalog(countries, regions))
+	if len(originMap) != maxStatsOriginMapCountries {
+		t.Fatalf("len(origin_map) = %d, want %d", len(originMap), maxStatsOriginMapCountries)
+	}
+	regionCount := 0
+	for _, entry := range originMap {
+		regionCount += len(entry.Regions)
+	}
+	if regionCount != maxStatsOriginMapRegions {
+		t.Fatalf("origin map regions = %d, want %d", regionCount, maxStatsOriginMapRegions)
+	}
+
+	originPayload, err := json.Marshal(originMap)
+	if err != nil {
+		t.Fatalf("marshal origin map: %v", err)
+	}
+	if len(originPayload) >= 2<<20 {
+		t.Fatalf("origin map payload = %d bytes, want less than 2 MiB", len(originPayload))
+	}
+
+	byOrigin := make([]models.CountEntry, len(originMap))
+	for index, entry := range originMap {
+		byOrigin[index] = models.CountEntry{Key: entry.NameEn, Count: entry.Count}
+	}
+	byVarietal := make([]models.CountEntry, maxStatsBeans)
+	byMonth := make([]models.CountEntry, maxStatsBeans)
+	for index := 0; index < maxStatsBeans; index++ {
+		byVarietal[index] = models.CountEntry{
+			Key:   fmt.Sprintf("%05d%s", index, strings.Repeat("&", 95)),
+			Count: 1,
+		}
+		byMonth[index] = models.CountEntry{
+			Key:   fmt.Sprintf("%04d-%02d", 1000+index/12, index%12+1),
+			Count: 1,
+		}
+	}
+	byProcess := []models.CountEntry{{Key: "washed", Count: maxStatsBeans}}
+	scoreDist := []models.CountEntry{{Key: "10", Count: maxStatsBeans}}
+	stats := models.BeanStats{
+		Total:      maxStatsBeans,
+		AvgScore:   10,
+		Best:       &models.BestBean{Name: strings.Repeat("&", 200), Roastery: strings.Repeat("&", 200), Score: 10},
+		ByOrigin:   byOrigin,
+		ByProcess:  byProcess,
+		ByVarietal: byVarietal,
+		ByMonth:    byMonth,
+		ScoreDist:  scoreDist,
+		TopOrigin:  &byOrigin[0],
+		TopProcess: &byProcess[0],
+		OriginMap:  originMap,
+	}
+	statsPayload, err := json.Marshal(stats)
+	if err != nil {
+		t.Fatalf("marshal stats response: %v", err)
+	}
+	if len(statsPayload) >= 8<<20 {
+		t.Fatalf("stats response payload = %d bytes, want less than 8 MiB", len(statsPayload))
 	}
 }
 

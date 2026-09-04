@@ -19,8 +19,10 @@ import (
 type StatsHandler struct{}
 
 const (
-	maxStatsBeans             = 10000
-	maxStatsOriginOccurrences = maxStatsBeans * 50
+	maxStatsBeans              = 10000
+	maxStatsOriginOccurrences  = maxStatsBeans * 50
+	maxStatsOriginMapCountries = 256
+	maxStatsOriginMapRegions   = 512
 )
 
 func NewStatsHandler() *StatsHandler {
@@ -514,7 +516,115 @@ func buildOriginMap(occurrences []originOccurrence, catalog originCatalog) []mod
 		result = append(result, country.entry)
 	}
 	sort.Slice(result, func(i, j int) bool { return originMapLess(result[i], result[j]) })
-	return result
+	return limitOriginMap(result)
+}
+
+// limitOriginMap keeps the response comfortably below the request database
+// middleware's buffered-response limit without making the selected tail depend
+// on database row order. Countries and regions arrive here with exact counts and
+// their normal display order already established.
+func limitOriginMap(entries []models.OriginMapEntry) []models.OriginMapEntry {
+	if len(entries) > maxStatsOriginMapCountries {
+		countryIndexes := make([]int, len(entries))
+		for index := range entries {
+			countryIndexes[index] = index
+		}
+		sort.Slice(countryIndexes, func(i, j int) bool {
+			left := entries[countryIndexes[i]]
+			right := entries[countryIndexes[j]]
+			if left.Count != right.Count {
+				return left.Count > right.Count
+			}
+			if left.Mapped != right.Mapped {
+				return left.Mapped
+			}
+			return originMapLess(left, right)
+		})
+
+		selected := make([]bool, len(entries))
+		for _, index := range countryIndexes[:maxStatsOriginMapCountries] {
+			selected[index] = true
+		}
+		limited := make([]models.OriginMapEntry, 0, maxStatsOriginMapCountries)
+		for index, entry := range entries {
+			if selected[index] {
+				limited = append(limited, entry)
+			}
+		}
+		entries = limited
+	}
+
+	totalRegions := 0
+	for _, entry := range entries {
+		totalRegions += len(entry.Regions)
+	}
+	if totalRegions <= maxStatsOriginMapRegions {
+		return entries
+	}
+
+	type regionCandidate struct {
+		countryIndex int
+		regionIndex  int
+	}
+
+	selectedRegions := make([][]bool, len(entries))
+	candidates := make([]regionCandidate, 0, totalRegions)
+	selectedCount := 0
+	for countryIndex, entry := range entries {
+		selectedRegions[countryIndex] = make([]bool, len(entry.Regions))
+		if len(entry.Regions) == 0 {
+			continue
+		}
+
+		// Preserve the leading region for every retained country before sharing
+		// the remaining global budget among the rest.
+		selectedRegions[countryIndex][0] = true
+		selectedCount++
+		for regionIndex := 1; regionIndex < len(entry.Regions); regionIndex++ {
+			candidates = append(candidates, regionCandidate{
+				countryIndex: countryIndex,
+				regionIndex:  regionIndex,
+			})
+		}
+	}
+
+	sort.Slice(candidates, func(i, j int) bool {
+		leftCandidate := candidates[i]
+		rightCandidate := candidates[j]
+		left := entries[leftCandidate.countryIndex].Regions[leftCandidate.regionIndex]
+		right := entries[rightCandidate.countryIndex].Regions[rightCandidate.regionIndex]
+		if left.Count != right.Count {
+			return left.Count > right.Count
+		}
+		if (left.RegionID != nil) != (right.RegionID != nil) {
+			return left.RegionID != nil
+		}
+		if leftCandidate.countryIndex != rightCandidate.countryIndex {
+			return leftCandidate.countryIndex < rightCandidate.countryIndex
+		}
+		return originRegionLess(left, right)
+	})
+
+	remaining := maxStatsOriginMapRegions - selectedCount
+	if remaining > len(candidates) {
+		remaining = len(candidates)
+	}
+	for _, candidate := range candidates[:remaining] {
+		selectedRegions[candidate.countryIndex][candidate.regionIndex] = true
+	}
+
+	for countryIndex := range entries {
+		regions := entries[countryIndex].Regions
+		limited := regions[:0]
+		for regionIndex, region := range regions {
+			if selectedRegions[countryIndex][regionIndex] {
+				limited = append(limited, region)
+			}
+		}
+		entries[countryIndex].Regions = limited
+	}
+
+	return entries
 }
 
 func stableTextLess(candidate, current string) bool {
