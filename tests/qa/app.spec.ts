@@ -55,6 +55,9 @@ test("public landing explains the product and uses the operator theme", async ({
   await expect(
     page.getByRole("heading", { level: 2, name: "커피 산지 정보" })
   ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 2, name: "개인정보와 데이터" })
+  ).toHaveCount(0);
   await expect(page.getByRole("link", { name: "비회원으로 기록하기" })).toHaveAttribute(
     "href",
     "/ko/try"
@@ -107,6 +110,9 @@ test("public landing explains the product and uses the operator theme", async ({
   await expect(
     page.getByRole("heading", { level: 2, name: "Record features" })
   ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { level: 2, name: "Privacy and data" })
+  ).toHaveCount(0);
   await expect(page.getByRole("link", { name: "Record without an account" })).toHaveAttribute(
     "href",
     "/en/try"

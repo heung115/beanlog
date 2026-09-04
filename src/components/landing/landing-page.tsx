@@ -66,7 +66,7 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
                 <span aria-hidden="true" className="h-px flex-1 bg-border" />
                 <span className="folio-label">EST. 2026</span>
               </div>
-              <h1 className="display-title mt-7 max-w-3xl text-7xl tracking-[-0.065em] text-brown md:text-9xl">
+              <h1 className="display-title mt-7 max-w-3xl text-6xl tracking-[-0.055em] text-brown md:text-8xl">
                 {copy.title}
               </h1>
               <p className="mt-7 max-w-[39rem] text-base leading-7 text-brown-medium md:text-lg md:leading-8">
@@ -215,18 +215,6 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
                 </li>
               ))}
             </ol>
-          </div>
-        </section>
-
-        <section className="border-y-2 border-brown bg-accent text-cream">
-          <div className="mx-auto grid w-full max-w-6xl gap-8 px-4 py-12 md:grid-cols-[9rem_1fr_auto] md:items-center md:gap-12 md:px-6 md:py-16">
-            <div className="font-display text-7xl italic leading-none text-cream/35">P</div>
-            <div>
-              <p className="font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-cream">{copy.privacy.eyebrow}</p>
-              <h2 className="mt-3 font-display text-3xl font-bold tracking-[-0.03em] md:text-4xl">{copy.privacy.title}</h2>
-              <p className="mt-4 max-w-3xl text-sm leading-7 text-cream/85">{copy.privacy.description}</p>
-            </div>
-            <span className="hidden border border-cream/45 px-3 py-2 font-mono text-[0.6875rem] uppercase tracking-[0.08em] md:block">private by default</span>
           </div>
         </section>
 

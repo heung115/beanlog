@@ -39,11 +39,6 @@ interface LandingCopy {
     title: string;
     items: readonly (readonly [string, string])[];
   };
-  privacy: {
-    eyebrow: string;
-    title: string;
-    description: string;
-  };
   faq: {
     eyebrow: string;
     title: string;
@@ -124,14 +119,8 @@ export const landingCopy: Record<LandingLocale, LandingCopy> = {
         ["검색과 통계", "저장한 기록은 검색·필터·통계에서 확인할 수 있습니다."],
       ],
     },
-    privacy: {
-      eyebrow: "개인정보 / 04",
-      title: "개인정보와 데이터",
-      description:
-        "커피 기록은 본인 계정에서만 볼 수 있습니다. 전체 기록을 JSON으로 내려받거나 설정에서 계정과 데이터를 삭제할 수 있으며, 광고·행동 추적 쿠키를 사용하지 않습니다.",
-    },
     faq: {
-      eyebrow: "도움말 / 05",
+      eyebrow: "도움말 / 04",
       title: "자주 묻는 질문",
       items: [
         [
@@ -221,14 +210,8 @@ export const landingCopy: Record<LandingLocale, LandingCopy> = {
         ["Search and statistics", "Saved records are available through search, filters, and statistics."],
       ],
     },
-    privacy: {
-      eyebrow: "Privacy / 04",
-      title: "Privacy and data",
-      description:
-        "Coffee entries are private to your account. You can export every record as JSON or delete your account and its data from Settings. beanmap uses no advertising or behavioral-tracking cookies.",
-    },
     faq: {
-      eyebrow: "Help / 05",
+      eyebrow: "Help / 04",
       title: "Frequently asked questions",
       items: [
         [
