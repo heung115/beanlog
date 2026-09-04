@@ -7,7 +7,6 @@ import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { signInAction, signInWithOAuth } from "@/lib/actions/auth";
-import { brand } from "@/config/brand";
 import { AuthShell } from "@/components/auth/auth-shell";
 
 export default function LoginPage() {
@@ -28,12 +27,12 @@ export default function LoginPage() {
 
   return (
     <AuthShell>
-        <div className="mb-9 border-b-2 border-brown pb-5">
-          <h1 className="font-display text-4xl font-bold tracking-[-0.04em] text-brown">
-            {brand.name}
-          </h1>
-          <p className="mt-2 text-sm text-brown-light">{t("loginTitle")}</p>
-        </div>
+      <div className="mb-8">
+        <h1 className="font-display text-2xl font-semibold tracking-[-0.025em] text-brown">
+          {t("login")}
+        </h1>
+        <p className="mt-1.5 text-sm text-brown-light">{t("loginTitle")}</p>
+      </div>
 
         <form action={formAction} className="flex flex-col gap-4">
           <input type="hidden" name="next" value={nextPath} />
@@ -78,9 +77,9 @@ export default function LoginPage() {
         </form>
 
         <div className="my-6 flex items-center gap-3">
-          <div className="h-px flex-1 bg-border" />
+          <div className="h-px flex-1 bg-border-light" />
           <span className="text-xs text-brown-light">{t("orContinueWith")}</span>
-          <div className="h-px flex-1 bg-border" />
+          <div className="h-px flex-1 bg-border-light" />
         </div>
 
         <div className="flex flex-col gap-3">
