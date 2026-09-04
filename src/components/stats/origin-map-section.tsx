@@ -39,53 +39,63 @@ export function OriginMapSection({ entries }: OriginMapSectionProps) {
   }
 
   return (
-    <section className="stats-rise" style={{ animationDelay: "300ms" }}>
-      <div className="mb-4 flex items-center gap-3">
-        <span className="font-display text-sm font-semibold text-accent-light">02</span>
-        <h2 className="font-display text-lg font-bold tracking-tight text-brown">
+    <section className="animate-rise" style={{ animationDelay: "180ms" }}>
+      <div className="mb-4 flex items-baseline gap-3">
+        <span className="font-mono text-[11px] font-medium tracking-[0.08em] text-accent">
+          02
+        </span>
+        <h2 className="text-lg font-semibold tracking-[-0.015em] text-brown">
           {t("originMapTitle")}
         </h2>
-        <button
-          ref={triggerRef}
-          type="button"
-          aria-haspopup="dialog"
-          aria-expanded={inspectorOpen}
-          onClick={showOriginList}
-          className={cn(
-            "ml-auto inline-flex min-h-11 shrink-0 items-center rounded-md px-2 text-sm font-medium text-brown-light",
-            "transition-colors duration-150 hover:bg-surface-warm hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
-          )}
-        >
-          {t("findOrigin")}
-        </button>
+        {entries.length > 0 && (
+          <button
+            ref={triggerRef}
+            type="button"
+            aria-haspopup="dialog"
+            aria-expanded={inspectorOpen}
+            onClick={showOriginList}
+            className={cn(
+              "ml-auto inline-flex min-h-11 shrink-0 items-center rounded-md px-2 text-sm font-medium text-brown-light",
+              "transition-colors duration-150 hover:bg-surface-warm hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+            )}
+          >
+            {t("findOrigin")}
+          </button>
+        )}
       </div>
 
-      <div className="journal-panel relative h-80 overflow-hidden bg-surface-warm md:h-96">
-        <OriginMap
-          entries={entries}
-          selectedCountry={selectedCountry}
-          onSelect={selectOrigin}
-          labels={{
-            zoomIn: t("zoomIn"),
-            zoomOut: t("zoomOut"),
-            reset: t("resetMap"),
-            modifierHint: t("mapModifierHint"),
-            description: t("mapDescription"),
-          }}
-        />
-      </div>
+      {entries.length === 0 ? (
+        <p className="py-7 text-sm text-brown-light">{t("originMapEmpty")}</p>
+      ) : (
+        <>
+          <div className="journal-panel relative h-80 overflow-hidden bg-surface-warm md:h-96">
+            <OriginMap
+              entries={entries}
+              selectedCountry={selectedCountry}
+              onSelect={selectOrigin}
+              labels={{
+                zoomIn: t("zoomIn"),
+                zoomOut: t("zoomOut"),
+                reset: t("resetMap"),
+                modifierHint: t("mapModifierHint"),
+                description: t("mapDescription"),
+              }}
+            />
+          </div>
 
-      <OriginInspector
-        entries={entries}
-        locale={locale}
-        open={inspectorOpen}
-        view={inspectorView}
-        selectedEntry={selectedEntry}
-        returnFocusRef={triggerRef}
-        onSelect={selectOrigin}
-        onBack={() => setInspectorView("list")}
-        onClose={() => setInspectorOpen(false)}
-      />
+          <OriginInspector
+            entries={entries}
+            locale={locale}
+            open={inspectorOpen}
+            view={inspectorView}
+            selectedEntry={selectedEntry}
+            returnFocusRef={triggerRef}
+            onSelect={selectOrigin}
+            onBack={() => setInspectorView("list")}
+            onClose={() => setInspectorOpen(false)}
+          />
+        </>
+      )}
     </section>
   );
 }

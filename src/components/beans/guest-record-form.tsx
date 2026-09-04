@@ -79,7 +79,7 @@ export function GuestRecordForm() {
 
   if (saved) {
     return (
-      <article className="paper-sheet paper-sheet-feature p-5 md:p-8" aria-label={t("savedTitle")}>
+      <article className="paper-sheet p-5 md:p-8" aria-label={t("savedTitle")}>
         <div className="flex items-center justify-between">
           <h2 className="font-display text-2xl font-bold text-brown">{t("savedTitle")}</h2>
           <time className="folio-label" dateTime={form.consumed_at}>
@@ -135,11 +135,11 @@ export function GuestRecordForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-      <p className="journal-panel-quiet px-4 py-3 text-sm leading-6 text-brown-medium">
+      <p className="max-w-2xl px-1 text-sm leading-6 text-brown-medium">
         {t("storageNotice")}
       </p>
 
-      <section className="paper-sheet paper-sheet-feature p-5 md:p-8">
+      <section className="paper-sheet p-5 md:p-8">
         <div className="mb-7 flex items-center justify-between">
           <p className="journal-kicker">{tb("basicInfo")}</p>
           <span className="font-display text-3xl text-accent">01</span>

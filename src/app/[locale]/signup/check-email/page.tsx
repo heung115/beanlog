@@ -36,30 +36,28 @@ export default async function CheckEmailPage({
   const loginHref = `/${locale}/login${draft === "1" ? "?draft=1" : ""}`;
 
   return (
-    <section className="flex min-h-[80vh] items-center justify-center py-10 text-center">
-      <div className="w-full max-w-md">
+    <section className="flex min-h-[70vh] items-center py-10">
+      <div className="mx-auto w-full max-w-md">
         <p className="journal-kicker mb-4">{brand.name}</p>
-        <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-surface-warm text-brown">
-          <MailIcon className="h-6 w-6" />
-        </div>
+        <MailIcon className="mt-5 h-6 w-6 text-accent" />
 
-        <h1 className="mt-6 font-display text-3xl font-bold tracking-tight text-brown">
+        <h1 className="mt-5 font-display text-2xl font-semibold tracking-[-0.025em] text-brown">
           {t("checkEmailTitle")}
         </h1>
-        <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-brown-light">
+        <p className="mt-3 max-w-sm text-sm leading-6 text-brown-light">
           {t("checkEmailDescription")}
         </p>
 
-        <ol className="mt-8 rounded-lg bg-surface-warm p-5 text-left text-sm leading-6 text-brown-light">
+        <ol className="mt-8 space-y-3 text-sm leading-6 text-brown-light">
           <li className="flex gap-3">
             <span className="font-semibold text-brown">1</span>
             <span>{t("checkEmailStepInbox")}</span>
           </li>
-          <li className="mt-3 flex gap-3">
+          <li className="flex gap-3">
             <span className="font-semibold text-brown">2</span>
             <span>{t("checkEmailStepConfirm")}</span>
           </li>
-          <li className="mt-3 flex gap-3">
+          <li className="flex gap-3">
             <span className="font-semibold text-brown">3</span>
             <span>{t("checkEmailStepLogin")}</span>
           </li>

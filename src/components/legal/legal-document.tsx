@@ -22,19 +22,19 @@ export function LegalDocument({
         ← {locale === "ko" ? "홈으로" : "Back to home"}
       </Link>
 
-      <header className="mt-5 py-10 md:grid md:grid-cols-[1fr_15rem] md:items-end md:py-14">
+      <header className="mt-4 py-6 md:grid md:grid-cols-[1fr_15rem] md:items-end md:py-8">
         <div>
-        <h1 className="display-title text-5xl text-brown md:text-7xl">
-          {title}
-        </h1>
-        <p className="mt-4 max-w-2xl text-sm leading-7 text-brown-light">{description}</p>
+          <h1 className="font-display text-3xl font-semibold leading-tight tracking-[-0.03em] text-brown md:text-4xl">
+            {title}
+          </h1>
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-brown-light">{description}</p>
         </div>
-        <p className="folio-label mt-6 border-l border-accent-light pl-4 md:mt-0">
+        <p className="folio-label mt-5 md:mt-0 md:text-right">
           {locale === "ko" ? "시행일" : "Effective"}: {effectiveDate}
         </p>
       </header>
 
-      <div className="legal-copy mt-12 text-sm leading-7 text-brown">
+      <div className="legal-copy mt-6 text-sm leading-7 text-brown md:mt-8">
         {children}
       </div>
     </article>
@@ -66,7 +66,7 @@ export function LegalContact({
   contactEmail: string;
 }) {
   return (
-    <dl className="grid gap-3 border-l border-accent-light pl-4 sm:grid-cols-[9rem_1fr]">
+    <dl className="grid gap-3 sm:grid-cols-[9rem_1fr]">
       <dt className="font-semibold text-brown">{locale === "ko" ? "담당" : "Contact"}</dt>
       <dd>{operatorName}</dd>
       {contactEmail ? (

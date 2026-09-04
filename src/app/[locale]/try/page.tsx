@@ -11,11 +11,11 @@ export default function GuestRecordPage() {
 
   return (
     <div className="mx-auto max-w-4xl py-4 md:py-8">
-      <header className="relative mb-8 overflow-hidden rounded-lg bg-surface-warm px-5 py-8 md:px-8 md:py-10">
+      <header className="mb-8 px-1 py-4 md:mb-10 md:py-6">
         <Link href="/" aria-label={brand.name} className="inline-flex focus:outline-none focus-visible:ring-2 focus-visible:ring-accent">
           <BeanmapMark compact />
         </Link>
-        <h1 className="display-title mt-8 max-w-xl text-4xl text-brown md:text-6xl">
+        <h1 className="mt-6 max-w-xl font-display text-3xl font-semibold leading-tight tracking-[-0.03em] text-brown md:text-4xl">
           {t("title")}
         </h1>
       </header>

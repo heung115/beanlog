@@ -17,27 +17,18 @@ function SectionCard({
   title,
   children,
   delay = 0,
-  feature = false,
-  plain = false,
 }: {
   title: string;
   children: React.ReactNode;
   delay?: number;
-  feature?: boolean;
-  plain?: boolean;
 }) {
   return (
     <section
-      className={`settings-rise ${
-        plain
-          ? "px-1 pt-6"
-          : feature
-            ? "paper-sheet paper-sheet-feature p-5 md:p-7"
-            : "paper-sheet p-5 md:p-7"
-      }`}
+      data-settings-section
+      className="settings-rise px-1"
       style={{ animationDelay: `${delay}ms` }}
     >
-      <h2 className="mb-4 font-display text-lg font-bold tracking-tight text-brown">
+      <h2 className="mb-3 text-base font-semibold tracking-tight text-brown">
         {title}
       </h2>
       {children}
@@ -55,6 +46,7 @@ function Icon({ path, className = "h-4 w-4" }: { path: string; className?: strin
       strokeWidth="1.8"
       strokeLinecap="round"
       strokeLinejoin="round"
+      aria-hidden="true"
     >
       <path d={path} />
     </svg>
@@ -215,7 +207,7 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="mx-auto max-w-4xl space-y-8">
+    <div className="mx-auto max-w-2xl space-y-7">
       <style>{`
         @keyframes settings-rise-kf {
           from { opacity: 0; transform: translateY(12px); }
@@ -227,15 +219,19 @@ export default function SettingsPage() {
       `}</style>
 
       {/* ---------- header ---------- */}
-      <header className="settings-rise py-9 md:py-12">
-        <h1 className="display-title text-5xl text-brown md:text-7xl">
+      <header data-testid="settings-header" className="settings-rise pb-2 pt-1">
+        <h1 className="text-2xl font-bold tracking-tight text-brown md:text-3xl">
           {t("title")}
         </h1>
       </header>
 
       {/* ---------- profile ---------- */}
-      <SectionCard title={t("profile")} delay={60} feature>
-        <form onSubmit={handleSaveProfile} className="flex flex-col gap-3 sm:flex-row sm:items-end">
+      <SectionCard title={t("profile")} delay={60}>
+        <form
+          onSubmit={handleSaveProfile}
+          aria-busy={profileLoading || saving}
+          className="flex flex-col gap-3 sm:flex-row sm:items-end"
+        >
           <div className="flex-1">
             <Input
               label={t("displayName")}
@@ -245,16 +241,22 @@ export default function SettingsPage() {
               placeholder={profileLoading ? tCommon("loading") : "beanmap"}
               maxLength={30}
               required
+              disabled={profileLoading || saving}
             />
           </div>
-          <Button type="submit" loading={saving} className="sm:shrink-0">
+          <Button
+            type="submit"
+            loading={saving}
+            disabled={profileLoading}
+            className="sm:shrink-0"
+          >
             {tCommon("confirm")}
           </Button>
         </form>
       </SectionCard>
 
       {/* ---------- language ---------- */}
-      <SectionCard title={t("language")} delay={120} plain>
+      <SectionCard title={t("language")} delay={120}>
         <div
           role="radiogroup"
           aria-label={t("language")}
@@ -283,7 +285,7 @@ export default function SettingsPage() {
       </SectionCard>
 
       {/* ---------- export ---------- */}
-      <SectionCard title={t("exportData")} delay={180} plain>
+      <SectionCard title={t("exportData")} delay={180}>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="flex items-start gap-2.5 text-sm leading-relaxed text-brown-light">
             <Icon path={ICONS.download} className="mt-0.5 h-4 w-4 shrink-0 text-accent" />
@@ -301,7 +303,7 @@ export default function SettingsPage() {
       </SectionCard>
 
       {/* ---------- legal ---------- */}
-      <SectionCard title={t("legal")} delay={240} plain>
+      <SectionCard title={t("legal")} delay={240}>
         <div className="grid gap-2 sm:grid-cols-2">
           <Link
             href={`/${locale}/terms`}
@@ -321,7 +323,7 @@ export default function SettingsPage() {
       </SectionCard>
 
       {/* ---------- logout ---------- */}
-      <SectionCard title={tAuth("logout")} delay={300} plain>
+      <SectionCard title={tAuth("logout")} delay={300}>
         <Button variant="secondary" onClick={() => signOut()} className="w-full sm:w-auto">
           <Icon path={ICONS.logout} className="mr-2 h-4 w-4" />
           {tAuth("logout")}
@@ -331,7 +333,7 @@ export default function SettingsPage() {
       {/* ---------- account deletion ---------- */}
       <section
         data-account-deletion
-        className="settings-rise px-1 pt-6"
+        className="settings-rise px-1"
         style={{ animationDelay: "360ms" }}
       >
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">

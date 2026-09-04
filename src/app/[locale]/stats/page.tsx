@@ -77,9 +77,11 @@ function ChartTooltip({
 
 function SectionHeading({ index, title }: { index: string; title: string }) {
   return (
-    <div className="mb-4 flex items-baseline gap-4 pb-3">
-      <span className="font-display text-2xl font-semibold text-accent">{index}</span>
-      <h2 className="font-display text-xl font-bold tracking-[-0.02em] text-brown">{title}</h2>
+    <div className="mb-4 flex items-baseline gap-3">
+      <span className="font-mono text-[11px] font-medium tracking-[0.08em] text-accent">
+        {index}
+      </span>
+      <h2 className="text-lg font-semibold tracking-[-0.015em] text-brown">{title}</h2>
     </div>
   );
 }
@@ -87,21 +89,24 @@ function SectionHeading({ index, title }: { index: string; title: string }) {
 function ChartCard({
   children,
   className = "",
-  delay = 0,
-  emphasis = false,
 }: {
   children: React.ReactNode;
   className?: string;
-  delay?: number;
-  emphasis?: boolean;
 }) {
   return (
-    <div
-      className={`stats-rise min-w-0 ${emphasis ? "paper-sheet paper-sheet-feature" : "journal-panel"} p-5 ${className}`}
-      style={{ animationDelay: `${delay}ms` }}
-    >
+    <div className={`journal-panel min-w-0 p-5 ${className}`}>
       {children}
     </div>
+  );
+}
+
+function PageHeading({ title }: { title: string }) {
+  return (
+    <header data-testid="stats-header" className="animate-rise">
+      <h1 className="text-2xl font-semibold tracking-[-0.025em] text-brown md:text-3xl">
+        {title}
+      </h1>
+    </header>
   );
 }
 
@@ -120,7 +125,6 @@ export default function StatsPage() {
   const t = useTranslations("stats");
   const tProcess = useTranslations("process");
   const tCommon = useTranslations("common");
-  const tExplore = useTranslations("explore");
   const locale = useLocale();
 
   const [stats, setStats] = useState<BeanStats | null>(null);
@@ -147,15 +151,14 @@ export default function StatsPage() {
   /* ---------- loading skeleton ---------- */
   if (loading) {
     return (
-      <div className="space-y-6">
-        <div className="h-16 w-56 animate-pulse rounded-md bg-cream-dark" />
+      <div className="mx-auto max-w-5xl space-y-8">
+        <PageHeading title={t("title")} />
         <div className="grid gap-3 sm:grid-cols-3">
           {[0, 1, 2].map((i) => (
-            <div key={i} className="h-28 animate-pulse rounded-lg bg-surface" />
+            <div key={i} className="h-24 animate-pulse rounded-md bg-surface/55" />
           ))}
         </div>
-        <div className="h-64 animate-pulse rounded-lg bg-surface" />
-        <div className="h-64 animate-pulse rounded-lg bg-surface" />
+        <div className="h-56 animate-pulse rounded-lg bg-surface/70" />
       </div>
     );
   }
@@ -163,35 +166,54 @@ export default function StatsPage() {
   /* ---------- empty state ---------- */
   if (!stats || stats.total === 0) {
     return (
-      <div className="stats-rise flex min-h-[70vh] flex-col items-center justify-center text-center">
-        <svg width="56" height="56" viewBox="0 0 56 56" fill="none" className="mb-6 text-accent-light">
-          <path
-            d="M10 22h30v14a10 10 0 0 1-10 10H20a10 10 0 0 1-10-10V22Z"
-            stroke="currentColor"
-            strokeWidth="2.5"
-          />
-          <path d="M40 26h4a6 6 0 0 1 0 12h-4" stroke="currentColor" strokeWidth="2.5" />
-          <path
-            d="M20 8c-2 3 2 4 0 8M28 8c-2 3 2 4 0 8"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-          />
-        </svg>
-        <h1 className="font-display text-2xl font-bold text-brown">{t("noData")}</h1>
-        <p className="mt-2 max-w-xs text-sm leading-relaxed text-brown-light">
-          {tExplore("emptySub")}
-        </p>
-        <Link
-          href={`/${locale}/beans/new`}
-          prefetch={false}
-          className={buttonClassName({ size: "lg", className: "mt-8 gap-2" })}
-        >
-          {tExplore("addFirst")}
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-            <path d="M5 12h14M13 6l6 6-6 6" />
+      <div className="mx-auto max-w-5xl space-y-8">
+        <PageHeading title={t("title")} />
+        <section className="animate-rise flex flex-col items-center py-10 text-center md:py-14">
+          <svg
+            width="40"
+            height="40"
+            viewBox="0 0 56 56"
+            fill="none"
+            className="mb-5 text-accent-light"
+            aria-hidden="true"
+          >
+            <path
+              d="M10 22h30v14a10 10 0 0 1-10 10H20a10 10 0 0 1-10-10V22Z"
+              stroke="currentColor"
+              strokeWidth="2"
+            />
+            <path d="M40 26h4a6 6 0 0 1 0 12h-4" stroke="currentColor" strokeWidth="2" />
+            <path
+              d="M20 8c-2 3 2 4 0 8M28 8c-2 3 2 4 0 8"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
           </svg>
-        </Link>
+          <h2 className="text-lg font-semibold text-brown">{t("noData")}</h2>
+          <p className="mt-2 max-w-sm text-sm leading-relaxed text-brown-light">
+            {t("emptySub")}
+          </p>
+          <Link
+            href={`/${locale}/beans/new`}
+            prefetch={false}
+            className={buttonClassName({ size: "sm", className: "mt-6 gap-2" })}
+          >
+            {t("addFirst")}
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              aria-hidden="true"
+            >
+              <path d="M5 12h14M13 6l6 6-6 6" />
+            </svg>
+          </Link>
+        </section>
       </div>
     );
   }
@@ -232,44 +254,25 @@ export default function StatsPage() {
   const cupsSuffix = tCommon("cups");
 
   return (
-    <div className="mx-auto max-w-6xl space-y-14">
-      <style>{`
-        @keyframes stats-rise-kf {
-          from { opacity: 0; transform: translateY(14px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .stats-rise {
-          animation: stats-rise-kf 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
-        }
-      `}</style>
-
-      {/* ---------- header ---------- */}
-      <header className="stats-rise grid overflow-hidden rounded-lg bg-surface/55 md:grid-cols-[1fr_14rem]">
-        <div className="py-9 md:py-12">
-          <h1 className="display-title text-5xl text-brown md:text-7xl">
-            {t("title")}
-          </h1>
-        </div>
-        <div className="border-t border-border-light bg-surface-warm p-5 md:border-l md:border-t-0 md:p-7">
-          <p className="folio-label">
-            {tExplore("results", { count: stats.total })}
-          </p>
-          <p className="mt-3 font-display text-6xl font-bold tabular-nums tracking-[-0.06em] text-accent">{stats.total}</p>
-        </div>
-      </header>
+    <div className="mx-auto max-w-5xl space-y-10">
+      <PageHeading title={t("title")} />
 
       {/* ---------- summary cards ---------- */}
-      <section className="stats-rise grid overflow-hidden rounded-lg bg-surface sm:grid-cols-3" style={{ animationDelay: "60ms" }}>
-        <div className="p-5 sm:border-r sm:border-border-light md:p-7">
+      <section
+        data-testid="stats-summary"
+        className="animate-rise grid gap-3 sm:grid-cols-3"
+        style={{ animationDelay: "60ms" }}
+      >
+        <div className="rounded-md bg-surface/55 p-5 md:p-6">
           <p className="text-xs font-medium text-brown-light">
             {t("totalBeans")}
           </p>
-          <p className="mt-2 font-display text-4xl font-bold tabular-nums text-brown">
+          <p className="mt-2 text-3xl font-semibold tabular-nums tracking-[-0.03em] text-brown">
             {stats.total}
             <span className="ml-1.5 text-sm font-normal text-brown-light">{cupsSuffix}</span>
           </p>
         </div>
-        <div className="border-t border-border-light p-5 sm:border-r sm:border-t-0 md:p-7">
+        <div className="rounded-md bg-surface/55 p-5 md:p-6">
           <p className="text-xs font-medium text-brown-light">
             {t("avgScore")}
           </p>
@@ -277,11 +280,11 @@ export default function StatsPage() {
             <ScoreDisplay score={stats.avgScore} size="lg" />
           </div>
         </div>
-        <div className="border-t border-border-light p-5 sm:border-t-0 md:p-7">
+        <div className="rounded-md bg-surface/55 p-5 md:p-6">
           <p className="text-xs font-medium text-brown-light">
             {t("bestBean")}
           </p>
-          <p className="mt-2 truncate font-display text-lg font-bold leading-snug text-brown">
+          <p className="mt-2 truncate text-base font-semibold leading-snug text-brown">
             {stats.best.name}
           </p>
           <p className="truncate text-xs text-brown-light">
@@ -292,14 +295,14 @@ export default function StatsPage() {
       </section>
 
       {/* ---------- my taste ---------- */}
-      <section className="stats-rise" style={{ animationDelay: "240ms" }}>
+      <section className="animate-rise" style={{ animationDelay: "120ms" }}>
         <SectionHeading index="01" title={t("myTaste")} />
         <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-lg border-l border-accent-light bg-surface-warm p-5">
+          <div className="rounded-md bg-surface-warm/70 p-5">
             <p className="text-xs font-medium text-brown-light">
               {t("topOrigin")}
             </p>
-            <p className="mt-2 font-display text-2xl font-bold text-brown">
+            <p className="mt-2 text-xl font-semibold text-brown">
               {displayedTopOrigin?.name || "—"}
             </p>
             {displayedTopOrigin && (
@@ -309,11 +312,11 @@ export default function StatsPage() {
               </p>
             )}
           </div>
-          <div className="rounded-lg border-l border-accent-light bg-surface-warm p-5">
+          <div className="rounded-md bg-surface-warm/70 p-5">
             <p className="text-xs font-medium text-brown-light">
               {t("topProcess")}
             </p>
-            <p className="mt-2 flex items-center gap-2.5 font-display text-2xl font-bold text-brown">
+            <p className="mt-2 flex items-center gap-2.5 text-xl font-semibold text-brown">
               {stats.topProcess && (
                 <span
                   className="inline-block h-3 w-3 shrink-0 rounded-sm"
@@ -336,7 +339,7 @@ export default function StatsPage() {
       <OriginMapSection entries={stats.originMap} />
 
       {/* ---------- by process ---------- */}
-      <section className="stats-rise" style={{ animationDelay: "360ms" }}>
+      <section className="animate-rise" style={{ animationDelay: "240ms" }}>
         <SectionHeading index="03" title={t("byProcess")} />
         <ChartCard>
           <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
@@ -397,7 +400,7 @@ export default function StatsPage() {
 
       {/* ---------- by varietal ---------- */}
       {varietalData.length > 0 && (
-        <section className="stats-rise" style={{ animationDelay: "420ms" }}>
+        <section className="animate-rise" style={{ animationDelay: "300ms" }}>
           <SectionHeading index="04" title={t("byVarietal")} />
           <ChartCard>
             <ResponsiveContainer width="100%" height={varietalHeight}>
@@ -428,7 +431,7 @@ export default function StatsPage() {
       )}
 
       {/* ---------- monthly trend ---------- */}
-      <section className="stats-rise" style={{ animationDelay: "480ms" }}>
+      <section className="animate-rise" style={{ animationDelay: "360ms" }}>
         <SectionHeading index="05" title={t("monthlyTrend")} />
         <ChartCard>
           <ResponsiveContainer width="100%" height={240}>
@@ -457,7 +460,7 @@ export default function StatsPage() {
       </section>
 
       {/* ---------- score distribution ---------- */}
-      <section className="stats-rise" style={{ animationDelay: "540ms" }}>
+      <section className="animate-rise" style={{ animationDelay: "420ms" }}>
         <SectionHeading index="06" title={t("scoreDistribution")} />
         <ChartCard>
           <ResponsiveContainer width="100%" height={220}>

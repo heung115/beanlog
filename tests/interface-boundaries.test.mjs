@@ -139,3 +139,45 @@ test("interface class lists do not recreate borders with hard offset shadows", (
     `Hard offset shadows read as heavy borders and must stay out of the interface:\n${violations.join("\n")}`
   );
 });
+
+test("application and supporting pages do not reintroduce oversized archive heroes", () => {
+  const restrainedSurfaces = [
+    "src/app/[locale]/explore/explore-client.tsx",
+    "src/app/[locale]/beans/new/page.tsx",
+    "src/app/[locale]/beans/[id]/edit/page.tsx",
+    "src/app/[locale]/beans/[id]/page.tsx",
+    "src/app/[locale]/origins/page.tsx",
+    "src/app/[locale]/origins/[country]/page.tsx",
+    "src/app/[locale]/stats/page.tsx",
+    "src/app/[locale]/settings/page.tsx",
+    "src/app/[locale]/try/page.tsx",
+    "src/app/[locale]/signup/check-email/page.tsx",
+    "src/app/not-found.tsx",
+    "src/components/beans/bean-form.tsx",
+    "src/components/beans/guest-record-form.tsx",
+    "src/components/legal/legal-document.tsx",
+  ];
+
+  const oversized = [];
+  const elevated = [];
+  for (const relativeFile of restrainedSurfaces) {
+    const source = fs.readFileSync(path.join(root, relativeFile), "utf8");
+    if (/(?:^|\s)(?:[a-z]+:)*text-[5-9]xl(?:\s|$|["'`])/.test(source)) {
+      oversized.push(relativeFile);
+    }
+    if (/\bpaper-sheet-feature\b/.test(source)) {
+      elevated.push(relativeFile);
+    }
+  }
+
+  assert.deepEqual(
+    oversized,
+    [],
+    `Only the public landing hero may use 5xl-or-larger display type:\n${oversized.join("\n")}`
+  );
+  assert.deepEqual(
+    elevated,
+    [],
+    `Routine application pages must not stack elevated paper surfaces:\n${elevated.join("\n")}`
+  );
+});

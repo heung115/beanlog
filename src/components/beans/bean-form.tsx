@@ -685,7 +685,7 @@ export function BeanForm({
       <input type="hidden" name="place_type" value={form.place_type} />
       <input type="hidden" name="overall_score" value={form.overall_score} />
       {/* ── Quick section ─────────────────────────────── */}
-      <section className="paper-sheet paper-sheet-feature animate-rise p-5 md:p-8">
+      <section className="paper-sheet animate-rise p-5 md:p-8">
         <div className="mb-7 flex items-center justify-between">
           <p className="journal-kicker">{t("basicInfo")}</p>
           <span className="font-display text-3xl text-accent">01</span>

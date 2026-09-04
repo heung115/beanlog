@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { notFound } from "next/navigation";
-import { OriginContours } from "@/components/brand/origin-contours";
 import {
   findCountryPresetBySlug,
   originSlug,
@@ -94,7 +93,7 @@ export default async function OriginDetailPage({
   };
 
   return (
-    <article className="mx-auto max-w-5xl pb-8">
+    <article className="mx-auto max-w-4xl pb-8">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
@@ -122,35 +121,33 @@ export default async function OriginDetailPage({
         {t("indexTitle")}
       </Link>
 
-      <header className="animate-rise relative mt-2 overflow-hidden rounded-lg bg-surface-warm/40 px-5 py-10 md:grid md:min-h-80 md:grid-cols-[1fr_18rem] md:items-end md:px-8 md:py-12">
-        <OriginContours className="pointer-events-none absolute -right-36 -top-36 h-[34rem] w-[42rem] opacity-55" />
-        <div className="relative">
-          <p className="journal-kicker">{t("guide")}</p>
-          <h1 className="display-title mt-4 text-6xl text-brown md:text-8xl">{countryName}</h1>
-          <p className="folio-label mt-2">{secondaryCountryName}</p>
-        </div>
-        <p className="relative mt-8 border-l border-accent-light pl-5 text-sm leading-7 text-brown-medium md:mt-0 md:text-base">
+      <header data-testid="origin-detail-header" className="animate-rise mt-2 py-4 md:py-6">
+        <p className="journal-kicker">{t("guide")}</p>
+        <h1 className="mt-2 max-w-full break-words text-3xl font-semibold leading-tight tracking-[-0.03em] text-brown md:text-4xl">
+          {countryName}
+        </h1>
+        <p className="mt-1 text-xs text-brown-light">{secondaryCountryName}</p>
+        <p className="mt-4 max-w-2xl text-sm leading-6 text-brown-medium md:text-base md:leading-7">
           {t("intro", { country: countryName })}
         </p>
       </header>
 
       <section
-        className="paper-sheet animate-rise mt-10 p-5 md:p-8"
+        data-testid="origin-profile"
+        className="animate-rise mt-8"
         style={{ animationDelay: "60ms" }}
       >
-        <div className="flex items-end justify-between gap-4 border-b border-border-light pb-4">
-          <div>
-            <h2 className="font-display text-2xl font-bold text-brown">{t("cupProfile")}</h2>
-          </div>
+        <div className="flex items-end justify-between gap-4">
+          <h2 className="text-lg font-semibold tracking-[-0.015em] text-brown">{t("cupProfile")}</h2>
           <p className="hidden text-xs text-brown-light sm:block">{t("cupProfileHint")}</p>
         </div>
-        <ul className="grid sm:grid-cols-2 md:grid-cols-3" aria-label={t("cupProfile")}>
+        <ul className="mt-5 flex flex-wrap gap-x-8 gap-y-3" aria-label={t("cupProfile")}>
           {flavorNotes.map((note, index) => (
             <li
               key={note}
-              className="grid min-h-24 grid-cols-[2rem_1fr] items-center border-b border-border-light py-4 text-sm font-semibold text-brown sm:px-4 sm:first:pl-0"
+              className="inline-flex min-h-8 items-center gap-2 text-sm font-semibold text-brown"
             >
-              <span className="font-display text-xl text-accent">{String(index + 1).padStart(2, "0")}</span>
+              <span className="font-mono text-xs font-normal text-accent">{String(index + 1).padStart(2, "0")}</span>
               <span>{note}</span>
             </li>
           ))}
@@ -159,22 +156,21 @@ export default async function OriginDetailPage({
       </section>
 
       <section
-        className="animate-rise mt-10 grid overflow-hidden rounded-lg bg-surface md:grid-cols-[14rem_1fr]"
+        data-testid="origin-growing-info"
+        className="animate-rise mt-10"
         style={{ animationDelay: "100ms" }}
       >
-        <div className="bg-surface-warm p-5 md:p-7">
-          <h2 className="font-display text-2xl font-bold text-brown">{t("growingConditions")}</h2>
-        </div>
-        <dl className="grid grid-cols-2 border-t border-border-light md:border-l md:border-t-0">
-          <div className="p-5 md:p-7">
+        <h2 className="text-lg font-semibold tracking-[-0.015em] text-brown">{t("growingConditions")}</h2>
+        <dl className="mt-5 grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-10">
+          <div>
             <dt className="folio-label">
               {t("altitude")}
             </dt>
-            <dd className="mt-3 font-display text-2xl font-bold tabular-nums text-brown md:text-3xl">
+            <dd className="mt-2 text-xl font-semibold tabular-nums text-brown md:text-2xl">
               {preset.altitudeRange}
             </dd>
           </div>
-          <div className="border-l border-border-light p-5 md:p-7">
+          <div>
             <dt className="folio-label">
               {t("keyVarietals")}
             </dt>
@@ -191,7 +187,7 @@ export default async function OriginDetailPage({
       >
         <div className="flex items-end justify-between gap-4 pb-4">
           <div>
-            <h2 className="font-display text-2xl font-bold text-brown">{t("regions")}</h2>
+            <h2 className="text-lg font-semibold tracking-[-0.015em] text-brown">{t("regions")}</h2>
             <p className="mt-1 text-sm text-brown-light">{t("regionsHint")}</p>
           </div>
           <span className="shrink-0 text-xs tabular-nums text-brown-light">
@@ -204,8 +200,8 @@ export default async function OriginDetailPage({
             const secondaryRegionName = isKorean ? region.name : region.nameKo;
 
             return (
-              <li key={region.name} className="ledger-row flex min-h-24 items-center gap-4 py-4 md:px-5 md:nth-[odd]:pl-0">
-                <span className="w-8 shrink-0 font-display text-xl tabular-nums text-accent">
+              <li key={region.name} className="ledger-row flex min-h-20 items-center gap-4 py-4 md:px-5 md:nth-[odd]:pl-0">
+                <span className="w-8 shrink-0 font-mono text-xs tabular-nums text-accent">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <div>
@@ -222,7 +218,7 @@ export default async function OriginDetailPage({
         </ol>
       </section>
 
-      <aside className="mt-10 border-l border-accent-light bg-surface-warm p-5 text-sm leading-7 text-brown-light">
+      <aside className="mt-10 max-w-2xl text-xs leading-6 text-brown-light">
         {t("disclaimer")}
       </aside>
     </article>

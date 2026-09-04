@@ -6,11 +6,12 @@ import { buttonClassName } from "@/components/ui/button";
 export default function NotFound() {
   return (
     <main id="main-content" className="flex min-h-screen items-center bg-cream px-4 py-12">
-      <section className="relative mx-auto grid w-full max-w-5xl overflow-hidden rounded-lg bg-surface md:grid-cols-[1fr_18rem]">
+      <section className="relative mx-auto w-full max-w-3xl overflow-hidden py-4 md:py-8">
         <OriginContours className="pointer-events-none absolute -right-40 -top-40 h-[38rem] w-[46rem] opacity-55" />
-        <div className="relative p-7 md:p-14">
+        <div className="relative max-w-2xl">
           <BeanmapMark />
-          <h1 className="display-title mt-16 max-w-xl text-5xl text-brown md:text-7xl">
+          <p className="folio-label mt-12 text-accent">404</p>
+          <h1 className="mt-4 max-w-xl font-display text-3xl font-semibold leading-tight tracking-[-0.03em] text-brown md:text-4xl">
             페이지를 찾을 수 없습니다.
           </h1>
           <p className="mt-5 max-w-lg text-sm leading-7 text-brown-medium">
@@ -21,9 +22,6 @@ export default function NotFound() {
             <Link href="/ko" className={buttonClassName({ size: "lg" })}>한국어 홈</Link>
             <Link href="/en" className={buttonClassName({ variant: "secondary", size: "lg" })}>English home</Link>
           </div>
-        </div>
-        <div className="relative flex min-h-52 items-end justify-end border-t border-border-light bg-surface-warm/65 p-7 md:min-h-0 md:border-l md:border-t-0">
-          <span className="font-display text-8xl font-bold tracking-[-0.08em] text-accent">404</span>
         </div>
       </section>
     </main>

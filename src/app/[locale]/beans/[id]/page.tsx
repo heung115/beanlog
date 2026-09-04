@@ -53,7 +53,7 @@ function Card({
     <section
       data-detail-section
       data-testid={testId}
-      className={cn("paper-sheet paper-sheet-feature animate-rise p-5 md:p-7", className)}
+      className={cn("paper-sheet animate-rise p-5 md:p-7", className)}
       style={delay ? { animationDelay: `${delay}ms` } : undefined}
     >
       {children}
@@ -273,41 +273,62 @@ export default function BeanDetailPage() {
       </div>
 
       {/* Header */}
-      <header className="animate-rise mb-7 grid overflow-hidden rounded-lg bg-surface md:grid-cols-[1fr_15rem]" style={{ animationDelay: "40ms" }}>
-        <div className="py-8 md:py-11 md:pr-10">
-          <h1 className="display-title text-5xl text-brown md:text-7xl">{bean.name}</h1>
-          <p className="mt-3 text-sm font-semibold uppercase tracking-[0.06em] text-brown-light">{bean.roastery}</p>
-        </div>
-        <div className="border-t border-border-light bg-surface-warm p-5 md:border-l md:border-t-0 md:p-7">
-          <p className="folio-label">{t("classification")}</p>
-          <p className="mt-4 text-sm font-semibold leading-6 text-brown-medium">
-          {[
-            bean.bean_type === "blend" ? t("blend") : null,
-            tp(bean.process_method),
-            tr(bean.roast_level),
-          ]
-            .filter(Boolean)
-            .join(" · ")}
-          </p>
-          <p className="mt-5 flex items-center gap-2 border-t border-border-light pt-4 text-xs text-brown-light">
-          <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
-            <rect
-              x="1"
-              y="2"
-              width="11"
-              height="10"
-              rx="1.5"
-              stroke="currentColor"
-              strokeWidth="1.2"
-            />
-            <path d="M1 5h11M4 1v2M9 1v2" stroke="currentColor" strokeWidth="1.2" />
-          </svg>
-          {formatDate(bean.consumed_at, locale)}
-          <span className="text-border">·</span>
-          {bean.place_type === "cafe"
-            ? bean.cafe_name || t("cafe")
-            : t("home")}
-          </p>
+      <header
+        data-testid="bean-detail-header"
+        className="animate-rise mb-7 pt-1"
+        style={{ animationDelay: "40ms" }}
+      >
+        <h1 className="break-words text-3xl font-semibold leading-tight tracking-[-0.025em] text-brown md:text-4xl">
+          {bean.name}
+        </h1>
+        <p className="mt-2 text-sm font-medium text-brown-medium">
+          {bean.roastery}
+        </p>
+        <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-brown-light">
+          <span className="text-brown-medium">
+            <span className="sr-only">{t("classification")}: </span>
+            {[
+              bean.bean_type === "blend" ? t("blend") : null,
+              tp(bean.process_method),
+              tr(bean.roast_level),
+            ]
+              .filter(Boolean)
+              .join(" · ")}
+          </span>
+          <span aria-hidden="true" className="text-border">
+            ·
+          </span>
+          <span className="flex items-center gap-2">
+            <svg
+              aria-hidden="true"
+              width="13"
+              height="13"
+              viewBox="0 0 13 13"
+              fill="none"
+            >
+              <rect
+                x="1"
+                y="2"
+                width="11"
+                height="10"
+                rx="1.5"
+                stroke="currentColor"
+                strokeWidth="1.2"
+              />
+              <path
+                d="M1 5h11M4 1v2M9 1v2"
+                stroke="currentColor"
+                strokeWidth="1.2"
+              />
+            </svg>
+            {formatDate(bean.consumed_at, locale)}
+            <span aria-hidden="true" className="text-border">
+              ·
+            </span>
+            {bean.place_type === "cafe"
+              ? bean.cafe_name || t("cafe")
+              : t("home")}
+          </span>
         </div>
       </header>
 
