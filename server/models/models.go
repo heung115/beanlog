@@ -205,16 +205,40 @@ type BeanFilters struct {
 }
 
 type BeanStats struct {
-	Total      int          `json:"total"`
-	AvgScore   float64      `json:"avg_score"`
-	Best       *BestBean    `json:"best"`
-	ByOrigin   []CountEntry `json:"by_origin"`
-	ByProcess  []CountEntry `json:"by_process"`
-	ByVarietal []CountEntry `json:"by_varietal"`
-	ByMonth    []CountEntry `json:"by_month"`
-	ScoreDist  []CountEntry `json:"score_dist"`
-	TopOrigin  *CountEntry  `json:"top_origin"`
-	TopProcess *CountEntry  `json:"top_process"`
+	Total      int              `json:"total"`
+	AvgScore   float64          `json:"avg_score"`
+	Best       *BestBean        `json:"best"`
+	ByOrigin   []CountEntry     `json:"by_origin"`
+	ByProcess  []CountEntry     `json:"by_process"`
+	ByVarietal []CountEntry     `json:"by_varietal"`
+	ByMonth    []CountEntry     `json:"by_month"`
+	ScoreDist  []CountEntry     `json:"score_dist"`
+	TopOrigin  *CountEntry      `json:"top_origin"`
+	TopProcess *CountEntry      `json:"top_process"`
+	OriginMap  []OriginMapEntry `json:"origin_map"`
+}
+
+// OriginMapEntry is one country in the origin map. Count is the number of
+// distinct bean records containing the country; repeated components from the
+// same blend therefore count once. Unmatched free text is retained with a nil
+// CountryID and Mapped=false so it can be surfaced instead of silently lost.
+// Mapped reports a catalog match; geographic coverage is decided by the client.
+type OriginMapEntry struct {
+	CountryID *int64                 `json:"country_id"`
+	NameEn    string                 `json:"name_en"`
+	NameKo    *string                `json:"name_ko"`
+	Mapped    bool                   `json:"mapped"`
+	Count     int                    `json:"count"`
+	Regions   []OriginMapRegionEntry `json:"regions"`
+}
+
+// OriginMapRegionEntry is a region subtotal within one country. A nil RegionID
+// represents user-entered text (or an empty region when no region was saved).
+type OriginMapRegionEntry struct {
+	RegionID *int64  `json:"region_id"`
+	Name     string  `json:"name"`
+	NameKo   *string `json:"name_ko"`
+	Count    int     `json:"count"`
 }
 
 type BestBean struct {

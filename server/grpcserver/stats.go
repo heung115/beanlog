@@ -50,7 +50,7 @@ func (s *StatsServer) GetStats(ctx context.Context, _ *beanmapv1.GetStatsRequest
 	}
 
 	rows, err := tx.Query(ctx,
-		`SELECT origin_country, process_method, COALESCE(varietal,''), overall_score, consumed_at, name, roastery
+		`SELECT COALESCE(origin_country, ''), process_method, COALESCE(varietal,''), overall_score, consumed_at, name, roastery
 		 FROM beans WHERE user_id = $1`, userID,
 	)
 	if err != nil {
@@ -97,7 +97,9 @@ func (s *StatsServer) GetStats(ctx context.Context, _ *beanmapv1.GetStatsRequest
 		if b.score > best.score {
 			best = b
 		}
-		byOrigin[b.origin]++
+		if b.origin != "" {
+			byOrigin[b.origin]++
+		}
 		byProcess[b.process]++
 		if b.varietal != "" {
 			byVarietal[b.varietal]++

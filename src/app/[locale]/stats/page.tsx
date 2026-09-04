@@ -20,20 +20,9 @@ import {
 import { getBeanStats } from "@/lib/actions/beans";
 import { ScoreDisplay } from "@/components/ui/score-display";
 import { buttonClassName } from "@/components/ui/button";
+import { OriginMapSection } from "@/components/stats/origin-map-section";
 import { chartColors } from "@/config/chart-colors";
-
-interface BeanStats {
-  total: number;
-  avgScore: number;
-  best: { name: string; roastery: string; score: number };
-  byOrigin: [string, number][];
-  byProcess: [string, number][];
-  byVarietal: [string, number][];
-  byMonth: [string, number][];
-  scoreDist: [string, number][];
-  topOrigin: [string, number];
-  topProcess: [string, number];
-}
+import type { BeanStats } from "@/types/stats";
 
 const BROWN_PALETTE = [
   chartColors.primary,
@@ -108,7 +97,7 @@ function ChartCard({
 }) {
   return (
     <div
-      className={`stats-rise ${emphasis ? "paper-sheet paper-sheet-feature" : "journal-panel"} p-5 ${className}`}
+      className={`stats-rise min-w-0 ${emphasis ? "paper-sheet paper-sheet-feature" : "journal-panel"} p-5 ${className}`}
       style={{ animationDelay: `${delay}ms` }}
     >
       {children}
@@ -208,9 +197,6 @@ export default function StatsPage() {
   }
 
   /* ---------- chart data ---------- */
-  const originData = summarizeCategories(stats.byOrigin, t("otherCategories")).map(
-    ([name, count]) => ({ name, count })
-  );
   const varietalData = summarizeCategories(stats.byVarietal, t("otherCategories")).map(
     ([name, count]) => ({ name, count })
   );
@@ -230,8 +216,18 @@ export default function StatsPage() {
     name: `${i + 1}`,
     count: Number(distMap.get(`${i + 1}`) ?? 0),
   }));
+  const mapTopOrigin = stats.originMap[0];
+  const displayedTopOrigin = mapTopOrigin
+    ? {
+        name: locale === "ko" && mapTopOrigin.nameKo
+          ? mapTopOrigin.nameKo
+          : mapTopOrigin.nameEn,
+        count: mapTopOrigin.count,
+      }
+    : stats.topOrigin
+      ? { name: stats.topOrigin[0], count: stats.topOrigin[1] }
+      : null;
 
-  const originHeight = Math.max(200, originData.length * 40 + 40);
   const varietalHeight = Math.max(200, varietalData.length * 40 + 40);
   const cupsSuffix = tCommon("cups");
 
@@ -303,60 +299,41 @@ export default function StatsPage() {
             <p className="text-xs font-medium text-brown-light">
               {t("topOrigin")}
             </p>
-            <p className="mt-2 font-display text-2xl font-bold text-brown">{stats.topOrigin[0]}</p>
-            <p className="mt-1 text-xs text-brown-light">
-              {stats.topOrigin[1]}
-              {cupsSuffix}
+            <p className="mt-2 font-display text-2xl font-bold text-brown">
+              {displayedTopOrigin?.name || "—"}
             </p>
+            {displayedTopOrigin && (
+              <p className="mt-1 text-xs text-brown-light">
+                {displayedTopOrigin.count}
+                {cupsSuffix}
+              </p>
+            )}
           </div>
           <div className="rounded-lg border-l border-accent-light bg-surface-warm p-5">
             <p className="text-xs font-medium text-brown-light">
               {t("topProcess")}
             </p>
             <p className="mt-2 flex items-center gap-2.5 font-display text-2xl font-bold text-brown">
-              <span
-                className="inline-block h-3 w-3 shrink-0 rounded-sm"
-                style={{ backgroundColor: PROCESS_COLORS[stats.topProcess[0]] ?? PROCESS_COLORS.other }}
-              />
-              {processLabel(stats.topProcess[0])}
+              {stats.topProcess && (
+                <span
+                  className="inline-block h-3 w-3 shrink-0 rounded-sm"
+                  style={{ backgroundColor: PROCESS_COLORS[stats.topProcess[0]] ?? PROCESS_COLORS.other }}
+                />
+              )}
+              {stats.topProcess ? processLabel(stats.topProcess[0]) : "—"}
             </p>
-            <p className="mt-1 text-xs text-brown-light">
-              {stats.topProcess[1]}
-              {cupsSuffix}
-            </p>
+            {stats.topProcess && (
+              <p className="mt-1 text-xs text-brown-light">
+                {stats.topProcess[1]}
+                {cupsSuffix}
+              </p>
+            )}
           </div>
         </div>
       </section>
 
       {/* ---------- by origin ---------- */}
-      <section className="stats-rise" style={{ animationDelay: "300ms" }}>
-        <SectionHeading index="02" title={t("byOrigin")} />
-        <ChartCard>
-          <ResponsiveContainer width="100%" height={originHeight}>
-            <BarChart data={originData} layout="vertical" margin={{ left: 0, right: 16, top: 0, bottom: 0 }}>
-              <CartesianGrid horizontal={false} stroke={GRID_STROKE} />
-              <XAxis type="number" hide allowDecimals={false} />
-              <YAxis
-                type="category"
-                dataKey="name"
-                width={88}
-                tickLine={false}
-                axisLine={false}
-                tick={AXIS_TICK}
-              />
-              <Tooltip
-                cursor={{ fill: chartColors.accentWash }}
-                content={<ChartTooltip suffix={cupsSuffix} />}
-              />
-              <Bar dataKey="count" barSize={18} radius={[0, 4, 4, 0]}>
-                {originData.map((_, i) => (
-                  <Cell key={i} fill={BROWN_PALETTE[i % BROWN_PALETTE.length]} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </ChartCard>
-      </section>
+      <OriginMapSection entries={stats.originMap} />
 
       {/* ---------- by process ---------- */}
       <section className="stats-rise" style={{ animationDelay: "360ms" }}>

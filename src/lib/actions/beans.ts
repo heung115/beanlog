@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import type { BeanFormData, BeanWithTags } from "@/types/database";
+import type { OriginMapEntry } from "@/types/stats";
 import {
   beanFiltersSchema,
   beanFormSchema,
@@ -38,6 +39,20 @@ const nativeBeanSchema = z.object({
 
 // Go API response shapes (snake_case, matching server/models).
 type GoCountEntry = { key: string; count: number };
+type GoOriginMapRegion = {
+  region_id: number | null;
+  name: string;
+  name_ko: string | null;
+  count: number;
+};
+type GoOriginMapEntry = {
+  country_id: number | null;
+  name_en: string;
+  name_ko: string | null;
+  mapped: boolean;
+  count: number;
+  regions: GoOriginMapRegion[] | null;
+};
 type GoStats = {
   total: number;
   avg_score: number;
@@ -49,10 +64,26 @@ type GoStats = {
   by_varietal: GoCountEntry[] | null;
   by_month: GoCountEntry[] | null;
   score_dist: GoCountEntry[] | null;
+  origin_map?: GoOriginMapEntry[] | null;
 };
 
 const toTuples = (entries: GoCountEntry[] | null): [string, number][] =>
   (entries ?? []).map((e) => [e.key, e.count]);
+
+const toOriginMapEntries = (entries: GoOriginMapEntry[] | null | undefined): OriginMapEntry[] =>
+  (entries ?? []).map((entry) => ({
+    countryId: entry.country_id,
+    nameEn: entry.name_en,
+    nameKo: entry.name_ko,
+    mapped: entry.mapped,
+    count: entry.count,
+    regions: (entry.regions ?? []).map((region) => ({
+      regionId: region.region_id,
+      name: region.name,
+      nameKo: region.name_ko,
+      count: region.count,
+    })),
+  }));
 
 export async function createBean(formData: BeanFormData) {
   const supabase = await createClient();
@@ -290,6 +321,7 @@ export async function getBeanStats() {
     topProcess: stats.top_process
       ? ([stats.top_process.key, stats.top_process.count] as [string, number])
       : undefined,
+    originMap: toOriginMapEntries(stats.origin_map),
   };
 }
 

@@ -228,7 +228,22 @@
     "topOrigin": "Top origin",
     "topProcess": "Top process",
     "otherCategories": "Other",
-    "noData": "Stats will appear as you log more coffee"
+    "noData": "Stats will appear as you log more coffee",
+    "originMapTitle": "My coffee map",
+    "findOrigin": "Find origin",
+    "allOrigins": "All",
+    "searchOrigin": "Search origins",
+    "originListLabel": "Records by origin",
+    "noOriginMatch": "No matching origins",
+    "subregions": "Subregions",
+    "noSubregionData": "No subregion information",
+    "regionUnspecified": "Region not entered",
+    "unmappedOrigin": "Location unavailable",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "resetMap": "Reset",
+    "mapModifierHint": "Hold Command or Ctrl while scrolling to zoom",
+    "mapDescription": "A world map showing coffee origins as circles. Larger circles indicate more records."
   },
   "settings": {
     "title": "Settings",

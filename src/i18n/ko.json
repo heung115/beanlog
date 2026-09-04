@@ -228,7 +228,22 @@
     "topOrigin": "최다 산지",
     "topProcess": "최다 프로세싱",
     "otherCategories": "기타",
-    "noData": "기록이 쌓이면 통계가 표시됩니다"
+    "noData": "기록이 쌓이면 통계가 표시됩니다",
+    "originMapTitle": "나의 커피 지도",
+    "findOrigin": "산지 찾기",
+    "allOrigins": "전체",
+    "searchOrigin": "산지 검색",
+    "originListLabel": "산지별 기록",
+    "noOriginMatch": "일치하는 산지가 없습니다",
+    "subregions": "하위 산지",
+    "noSubregionData": "하위 산지 정보가 없습니다",
+    "regionUnspecified": "지역 미입력",
+    "unmappedOrigin": "위치 미확인",
+    "zoomIn": "지도 확대",
+    "zoomOut": "지도 축소",
+    "resetMap": "전체",
+    "mapModifierHint": "⌘/Ctrl을 누른 채 스크롤해 확대",
+    "mapDescription": "커피 기록이 있는 산지를 원으로 표시한 세계 지도입니다. 원이 클수록 기록이 많습니다."
   },
   "settings": {
     "title": "설정",
