@@ -50,12 +50,12 @@ test("public landing explains the product and uses the operator theme", async ({
     })
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { level: 2, name: "점수 하나보다 오래 남는 커피 기록" })
+    page.getByRole("heading", { level: 2, name: "기록 기능" })
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { level: 2, name: "봉투에 적힌 산지가 궁금할 때" })
+    page.getByRole("heading", { level: 2, name: "커피 산지 정보" })
   ).toBeVisible();
-  await expect(page.getByRole("link", { name: "기록 하나 먼저 써보기" })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "비회원으로 기록하기" })).toHaveAttribute(
     "href",
     "/ko/try"
   );
@@ -105,9 +105,9 @@ test("public landing explains the product and uses the operator theme", async ({
     })
   ).toBeVisible();
   await expect(
-    page.getByRole("heading", { level: 2, name: "More memorable than a score alone" })
+    page.getByRole("heading", { level: 2, name: "Record features" })
   ).toBeVisible();
-  await expect(page.getByRole("link", { name: "Try one record" })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "Record without an account" })).toHaveAttribute(
     "href",
     "/en/try"
   );
@@ -120,7 +120,7 @@ test("public landing explains the product and uses the operator theme", async ({
 
 test("guest record stays in the browser and loads after login", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("link", { name: "기록 하나 먼저 써보기" }).click();
+  await page.getByRole("link", { name: "비회원으로 기록하기" }).click();
 
   await expect(page).toHaveURL(/\/ko\/try$/);
   await expect(page.getByRole("heading", { level: 1, name: "로그인 없이 기록하기" })).toBeVisible();

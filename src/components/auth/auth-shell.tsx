@@ -7,9 +7,9 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
         <aside className="relative hidden min-h-[42rem] overflow-hidden border-r border-brown bg-surface-warm p-9 md:flex md:flex-col md:justify-between">
           <OriginContours className="absolute -bottom-20 -left-36 h-[38rem] w-[46rem] opacity-70" />
           <div className="relative">
-            <p className="journal-kicker">PRIVATE TASTING ARCHIVE</p>
+            <p className="journal-kicker">BEANLOG / ACCOUNT</p>
             <p className="mt-5 max-w-xs font-display text-5xl font-bold leading-[1.03] tracking-[-0.045em] text-brown">
-              Keep a field note for every memorable cup.
+              beanlog
             </p>
           </div>
           <dl className="relative border-t-2 border-brown bg-surface/60">
