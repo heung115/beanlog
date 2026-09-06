@@ -33,7 +33,13 @@ export default function LoginPage() {
         <p className="mt-1.5 text-sm text-brown-light">{t("loginTitle")}</p>
       </div>
 
-        <form action={formAction} className="flex flex-col gap-4">
+        <form
+          action={formAction}
+          // Failed actions must preserve input and the session preference.
+          // Successful sign-in redirects and unmounts this form.
+          onReset={(event) => event.preventDefault()}
+          className="flex flex-col gap-4"
+        >
           <input type="hidden" name="next" value={nextPath} />
           <Input
             label={t("email")}
