@@ -1,7 +1,13 @@
 "use client";
 
 import { parseBeanLabelText } from "./bean-label-parser.ts";
-import type { LabelExtraction } from "./bean-label";
+import { mergeLabelExtractions, type LabelExtraction } from "./bean-label.ts";
+
+export interface LabelImageVariant {
+  image: Blob;
+  psm: "6" | "11";
+  kind: "full" | "text";
+}
 
 export interface LabelReadProgress {
   phase: "loading" | "reading";
@@ -32,6 +38,7 @@ const abortError = () => new DOMException("Reading cancelled", "AbortError");
 export function createBrowserLabelReader() {
   let worker: Worker | null = null;
   let initialized = false;
+  let psm = "6";
   let busy = false;
   let generation = 0;
   let nextJob = 0;
@@ -97,14 +104,20 @@ export function createBrowserLabelReader() {
 
   return {
     dispose: () => stop(),
-    async recognize(image: Blob, options: ReadOptions): Promise<{ text: string; extraction: LabelExtraction }> {
+    async recognize(image: Blob | LabelImageVariant[], options: ReadOptions): Promise<{ text: string; extraction: LabelExtraction }> {
       const { signal, onProgress } = options;
       signal.throwIfAborted();
       if (typeof Worker === "undefined" || typeof WebAssembly === "undefined") throw new Error("browser_unsupported");
       if (busy) throw new Error("recognition_failed");
+      const variants: LabelImageVariant[] = Array.isArray(image) ? image : [{ image, psm: "6", kind: "full" }];
+      if (!variants.length || variants.length > 3) throw new Error("recognition_failed");
       busy = true;
       const currentGeneration = generation;
-      progress = onProgress;
+      let pass = 0;
+      let reading = false;
+      progress = value => onProgress(reading
+        ? { phase: "reading", progress: (pass + (value.phase === "reading" ? value.progress : 0)) / variants.length }
+        : value);
       const abort = () => { if (generation === currentGeneration) stop(); };
       const assertCurrent = () => {
         signal.throwIfAborted();
@@ -127,21 +140,36 @@ export function createBrowserLabelReader() {
           await job("setParameters", { params: { tessedit_pageseg_mode: "6", preserve_interword_spaces: "1", user_defined_dpi: "300" } });
           assertCurrent();
           initialized = true;
+          psm = "6";
         }
-        const pixels = new Uint8Array(await image.arrayBuffer());
-        assertCurrent();
+        reading = true;
         onProgress({ phase: "reading", progress: 0 });
         assertCurrent();
-        const result = await job("recognize", { image: pixels, options: {}, output: { text: true } }, [pixels.buffer]);
-        assertCurrent();
-        if (!result || typeof result !== "object" || !("text" in result) || typeof result.text !== "string") {
-          throw new Error("recognition_failed");
+        const texts: string[] = [];
+        const extractions: LabelExtraction[] = [];
+        for (pass = 0; pass < variants.length; pass++) {
+          const variant = variants[pass];
+          if (psm !== variant.psm) {
+            await job("setParameters", { params: { tessedit_pageseg_mode: variant.psm, preserve_interword_spaces: "1", user_defined_dpi: "300" } });
+            assertCurrent();
+            psm = variant.psm;
+          }
+          const pixels = new Uint8Array(await variant.image.arrayBuffer());
+          assertCurrent();
+          const result = await job("recognize", { image: pixels, options: {}, output: { text: true } }, [pixels.buffer]);
+          assertCurrent();
+          if (!result || typeof result !== "object" || !("text" in result) || typeof result.text !== "string") throw new Error("recognition_failed");
+          const text = result.text.slice(0, MAX_TEXT_LENGTH).trim();
+          texts.push(text);
+          extractions.push(parseBeanLabelText(text));
         }
-        // Bound retained text; the original photo remains a tab-local object URL.
-        const text = result.text.slice(0, MAX_TEXT_LENGTH).trim();
+        // Parse each view independently so repeated scans cannot double blend shares.
+        const text = [...new Set(texts.flatMap(value => value.split("\n")).map(line => line.trim()).filter(Boolean))].join("\n").slice(0, MAX_TEXT_LENGTH);
         onProgress({ phase: "reading", progress: 1 });
         assertCurrent();
-        return { text, extraction: parseBeanLabelText(text) };
+        const preferred = extractions.map((extraction, index) => ({ extraction, kind: variants[index].kind }))
+          .sort((left, right) => Number(right.kind === "text") - Number(left.kind === "text"));
+        return { text, extraction: mergeLabelExtractions(preferred.map(result => result.extraction)) };
       } catch (error) {
         if (generation === currentGeneration) stop();
         if (signal.aborted) throw abortError();

@@ -1,5 +1,7 @@
 import { originPresets } from "../../data/origin-presets.ts";
 import { varietalPresets } from "../../data/varietal-presets.ts";
+import { flavorPresets } from "../../data/flavor-wheel.ts";
+import type { BlendComponent } from "../../types/database.ts";
 import { normalizeLabelExtraction, type LabelExtraction, type LabelField } from "./bean-label.ts";
 
 type ParserField = LabelField | "ignore";
@@ -35,6 +37,7 @@ const nextLabel = new RegExp(`(?:\\s+|\\s*[/,|¦;]\\s*)(${labelPattern})\\s*[:�
 const recipePattern = /\b(?:brew(?:ing)?|recipe|dose|dosage|dosing|water|yield|ratio)\b|레\s*시\s*피|추\s*출|도\s*징|투\s*입|사\s*용\s*량|물\s*[:：=]/iu;
 const blendPattern = new RegExp(`(?:\\b${spaced("blend")}s?\\b|${spaced("블렌드")}|${spaced("블렌딩")}|${spaced("혼합")})`, "iu");
 const singlePattern = new RegExp(`(?:\\b${spaced("single origin")}\\b|${spaced("싱글 오리진")}|${spaced("단일 산지")})`, "iu");
+const nutritionPattern = /\b(?:nutrition(?:al)?|per serving|protein|fat|sodium|carbohydrate|calories|ingredients)\b|영양|단백질|지방|나트륨|탄수화물|원재료|성분/iu;
 
 function key(value: string): string {
   return value.trim().toLowerCase().replace(/\s+/gu, "");
@@ -72,6 +75,44 @@ function hasOriginShare(value: string): boolean {
   return Boolean(share && Number(share[1]) >= 0 && Number(share[1]) < 100);
 }
 
+function parseBlendComponent(value: string): BlendComponent | undefined {
+  const share = /^(.*?)\s+(\d+(?:\.\d+)?)\s*%$/u.exec(value.trim());
+  if (!share) return undefined;
+  const countryMatches = countriesIn(share[1]);
+  const percentage = Number(share[2]);
+  if (countryMatches.length !== 1 || percentage <= 0 || percentage >= 100) return undefined;
+  const country = countryMatches[0];
+  const prefix = new RegExp(`^(?:${country.aliases.map(spaced).join("|")})(?:\\s+|$)`, "iu").exec(share[1]);
+  if (!prefix) return undefined;
+  const component: BlendComponent = { origin_country: country.preset.country, percentage };
+  let detail = share[1].slice(prefix[0].length).trim();
+  const processing = new RegExp(`(?:^|\\s)(${componentProcessPattern})$`, "iu").exec(detail);
+  if (processing) {
+    component.process_method = parseProcess(processing[1]) as BlendComponent["process_method"];
+    component.process_detail = processing[1];
+    detail = detail.slice(0, processing.index).trim();
+  }
+  const variety = new RegExp(`(?:^|\\s)(${componentVarietyPattern}(?:\\s*[,/&+]\\s*${componentVarietyPattern})*)$`, "iu").exec(detail);
+  if (variety && !/\b(?:lot|batch|crop|harvest)\s*$/iu.test(detail.slice(0, variety.index))) {
+    component.varietal = variety[1].replace(/\s*[,/&+]\s*/gu, ", ");
+    detail = detail.slice(0, variety.index).trim();
+  }
+  // Gedeb is already a canonical Ethiopia region in 00010_normalize_origin_regions.sql.
+  const regions = [...country.preset.regions, ...(country.preset.country === "Ethiopia" ? [{ name: "Gedeb", nameKo: "게데브" }] : [])]
+    .sort((left, right) => right.name.length - left.name.length);
+  for (const region of regions) {
+    const match = new RegExp(`^(?:${spaced(region.name)}|${spaced(region.nameKo)})(?:\\s+|$)`, "iu").exec(detail);
+    if (!match) continue;
+    component.origin_region = region.name;
+    detail = detail.slice(match[0].length).trim();
+    break;
+  }
+  // A facility/farm marker identifies the whole printed name; unknown place tokens stay in evidence.
+  if (detail && (/\b(?:station|mill|estate|farm|cooperative)\b\.?$/iu.test(detail) || /^(?:finca|hacienda|farm|producer)\s+/iu.test(detail)
+    || /(?:농장|가공소|조합)$/u.test(detail))) component.farm_producer = detail;
+  return component;
+}
+
 function parseWeight(value: string): number | undefined {
   const match = /^(\d+(?:\.\d+)?)\s*(kg|k\s*g|g|㎏|㎎|그램|킬로그램)\.?$/iu.exec(value.trim());
   if (!match || match[2] === "㎎") return undefined;
@@ -95,6 +136,10 @@ const processAliases: Record<string, string[]> = {
   decaf: ["decaf", "decaffeinated", "swiss water decaf", "sugarcane decaf", "디카페인"],
 };
 const processes = new Map(Object.entries(processAliases).flatMap(([method, aliases]) => aliases.map((alias) => [key(alias), method])));
+const componentProcessPattern = Object.values(processAliases).flat().sort((left, right) => right.length - left.length).map(spaced).join("|");
+// These printed coffee accession names are vocabulary, not a rule that any five-digit number is a variety.
+const componentVarietyPattern = `(?:${[...varietalPresets.flatMap((preset) => [preset.en, preset.ko]), "74110", "74158"]
+  .sort((left, right) => right.length - left.length).map(spaced).join("|")})`;
 const roastLevels = new Map(Object.entries({
   light: ["light", "light roast", "라이트", "라이트 로스트", "약배전"],
   medium: ["medium", "medium roast", "미디엄", "미디엄 로스트", "중배전"],
@@ -127,6 +172,8 @@ export function parseBeanLabelText(text: string): LabelExtraction {
   const blocked = new Set<LabelField>();
   const standalone: { text: string; evidence: string }[] = [];
   const impliedProcessDetails: Candidate[] = [];
+  const componentRows: { value: BlendComponent; evidence: string }[] = [];
+  let invalidComponents = false;
   let blend = false;
   let single = false;
   let excludedSection = false;
@@ -143,6 +190,7 @@ export function parseBeanLabelText(text: string): LabelExtraction {
   function read(field: ParserField, value: string, evidence: string) {
     if (!value || field === "ignore") return;
     if (field === "origin_country") {
+      readComponents(value, evidence, true);
       if (countriesIn(value).length > 1 || hasOriginShare(value) || blendPattern.test(value)) {
         blend = true;
         blocked.add("origin_country");
@@ -169,6 +217,24 @@ export function parseBeanLabelText(text: string): LabelExtraction {
       impliedProcessDetails.push({ value, evidence });
     } else {
       add(field, value, evidence);
+    }
+  }
+
+  function readComponents(value: string, evidence: string, labelled = false) {
+    if (!value.includes("%")) {
+      if (!labelled && parseCountry(value)) invalidComponents = true;
+      return;
+    }
+    if (countriesIn(value).length === 0) {
+      if (/%\s*$/u.test(value) && /\p{L}/u.test(value) && !/^(?:arabica|robusta|아라비카|로부스타)\s*100\s*%$/iu.test(value)) invalidComponents = true;
+      return;
+    }
+    const rows = value.split(/\s*%\s*(?:(?:[/,;+|&]|\band\b)\s*)?(?=\p{L})/iu);
+    for (let index = 0; index < rows.length; index += 1) {
+      const row = rows[index] + (index < rows.length - 1 ? "%" : "");
+      const parsed = parseBlendComponent(row);
+      if (!parsed) invalidComponents = true;
+      else componentRows.push({ value: parsed, evidence });
     }
   }
 
@@ -200,6 +266,7 @@ export function parseBeanLabelText(text: string): LabelExtraction {
         continue;
       }
       const countryMatches = countriesIn(part);
+      readComponents(part, line);
       if ((countryMatches.length > 1 && /[/,+&%]|\band\b|\bblend\b|혼합/iu.test(part)) || hasOriginShare(part)) {
         blend = true;
         blocked.add("origin_country");
@@ -213,6 +280,59 @@ export function parseBeanLabelText(text: string): LabelExtraction {
       if (method) impliedProcessDetails.push({ value: part, evidence: line });
       add("roast_level", roastLevels.get(key(part)), line);
       if (!country) standalone.push({ text: part, evidence: line });
+    }
+  }
+
+  if (componentRows.length > 0) {
+    const firstComponent = lines.indexOf(componentRows[0].evidence);
+    const titles = standalone.filter((item) => {
+      const index = lines.indexOf(item.evidence);
+      return index >= 0 && index < firstComponent && lines.slice(index, firstComponent).filter(Boolean).length <= 3 && item.text.length <= 200
+        && blendPattern.test(item.text) && !/[:：=]/u.test(item.text)
+        && !/^(?:blend|blends|블렌드|블렌딩|혼합)$/iu.test(item.text.trim())
+        && !recipePattern.test(item.text) && countriesIn(item.text).length === 0;
+    });
+    if (titles.length === 1) {
+      const title = titles[0];
+      if (!candidates.has("name")) add("name", title.text, title.evidence);
+      const titleIndex = lines.indexOf(title.evidence);
+      const context = lines.slice(0, titleIndex).filter(Boolean).slice(-5);
+      const descriptor = /^(?:(.+?)\s+)?(coffee\s+roasters?|커피\s*로스터스)$/iu;
+      const brandReadable = (brand: string) => Boolean(brand && brand.length <= 80 && !firstLabel.test(brand) && countriesIn(brand).length === 0
+        && !blendPattern.test(brand) && /^[\p{L}\p{N} .&'’\-]+$/u.test(brand));
+      const fromMarks = context.map((line) => ({ line, match: /^from[.：:\-\s]+(.+)$/iu.exec(line) }))
+        .filter((item) => item.match && brandReadable(item.match[1]) && !/[a-z]/u.test(item.match[1])
+          && !/^(?:our|the|your|their|a|an|fresh|selected|local|best|farms?|farmers|source|origin|beans?)\b/iu.test(item.match[1]));
+      const coffeeContext = context.filter((line) => /\bcoffee\b|커피/iu.test(line));
+      if (fromMarks.length && (coffeeContext.length >= 2 || context.some((line) => descriptor.test(line)))) {
+        for (const item of fromMarks) add("roastery", item.match![1], [...coffeeContext, item.line].join(" / "));
+      }
+      for (let index = 0; !fromMarks.length && index < context.length; index += 1) {
+        const wordmark = descriptor.exec(context[index]);
+        if (!wordmark) continue;
+        const brand = wordmark[1] ?? context[index - 1] ?? "";
+        if (!brandReadable(brand)) continue;
+        const evidence = wordmark[1] ? context[index] : `${brand} / ${context[index]}`;
+        add("roastery", brand, evidence);
+      }
+    }
+  }
+
+  // A unit-bearing package weight can share a printed line with cup notes.
+  if (componentRows.length > 0 || candidates.has("origin_country")) {
+    let recipe = false;
+    for (let index = 0; index < lines.length; index += 1) {
+      const line = lines[index];
+      if (!line) recipe = false;
+      if (recipePattern.test(line)) recipe = true;
+      else if (segments(line).some(({ field }) => field !== "ignore")) recipe = false;
+      if (recipe || recipePattern.test(lines[index - 1] ?? "") || recipePattern.test(lines[index + 1] ?? "")) continue;
+      if (nutritionPattern.test(line) || segments(line).some(({ field }) => field !== "ignore")) continue;
+      const labelledNotes = /(?:tasting|cup)\s*notes|향미|컵\s*노트/iu.test(line);
+      const flavors = flavorPresets.filter((flavor) => new RegExp(`\\b${spaced(flavor.tag.replaceAll("-", " "))}\\b|${spaced(flavor.tagKo)}`, "iu").test(line));
+      if (!labelledNotes && (!/[,，]/u.test(line) || flavors.length < 2)) continue;
+      const trailing = /(?:^|\s)(\d+(?:\.\d+)?\s*(?:kg|k\s*g|g|㎏|그램|킬로그램))\.?$/iu.exec(line);
+      if (trailing) add("weight_g", parseWeight(trailing[1]), line);
     }
   }
 
@@ -239,5 +359,28 @@ export function parseBeanLabelText(text: string): LabelExtraction {
   }
   const fields = Object.fromEntries([...candidates].filter(([field, values]) => !blocked.has(field) && values.size === 1)
     .map(([field, values]) => [field, [...values.values()][0]]));
-  return normalizeLabelExtraction({ bean_type: blend ? "blend" : single ? "single_origin" : "unknown", fields });
+  const componentEvidence = [...new Set(componentRows.map((row) => row.evidence))].join(" / ");
+  const validComponents = !invalidComponents && componentRows.length >= 2 && componentRows.length <= 10 && componentEvidence.length <= 500
+    && componentRows.every(({ value }) => Math.abs(value.percentage * 100 - Math.round(value.percentage * 100)) <= 0.000001)
+    && Math.abs(componentRows.reduce((sum, row) => sum + row.value.percentage, 0) - 100) <= 0.005;
+  const mixedProcessing = validComponents && !candidates.has("process_method") && !blocked.has("process_method")
+    && componentRows.every(({ value }) => Boolean(value.process_method))
+    && new Set(componentRows.map(({ value }) => value.process_method)).size > 1;
+  if (mixedProcessing) {
+    fields.process_method = { value: "other", evidence: componentEvidence };
+    if (!candidates.has("process_detail") && !blocked.has("process_detail")) fields.process_detail = {
+      value: componentRows.map(({ value }) => `${value.process_detail ?? value.process_method} ${value.percentage}%`).join(" / "),
+      evidence: componentEvidence,
+    };
+  }
+  return normalizeLabelExtraction({
+    bean_type: blend ? "blend" : single ? "single_origin" : "unknown",
+    fields: {
+      ...fields,
+      ...(validComponents ? { blend_components: {
+        value: componentRows.map((row) => row.value),
+        evidence: componentEvidence,
+      } } : {}),
+    },
+  });
 }

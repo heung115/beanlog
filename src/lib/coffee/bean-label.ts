@@ -1,4 +1,4 @@
-import type { BeanFormData } from "../../types/database";
+import type { BeanFormData, BlendComponent } from "../../types/database";
 
 export const LABEL_FIELDS = [
   "name",
@@ -12,6 +12,7 @@ export const LABEL_FIELDS = [
   "roast_level",
   "roast_date",
   "weight_g",
+  "blend_components",
 ] as const;
 
 export type LabelField = (typeof LABEL_FIELDS)[number];
@@ -26,7 +27,7 @@ export interface LabelExtraction {
 const PROCESS_METHODS = ["washed", "natural", "honey", "anaerobic", "carbonic", "decaf", "other"] as const;
 const ROAST_LEVELS = ["light", "medium", "dark"] as const;
 const ORIGIN_FIELDS: readonly LabelField[] = ["origin_country", "origin_region", "farm_producer"];
-const TEXT_LIMITS: Record<Exclude<LabelField, "weight_g">, number> = {
+const TEXT_LIMITS: Record<Exclude<LabelField, "weight_g" | "blend_components">, number> = {
   name: 200,
   roastery: 200,
   origin_country: 100,
@@ -66,7 +67,28 @@ function isRealDate(value: string): boolean {
   return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
 }
 
-function cleanValue(field: LabelField, value: unknown): string | number | undefined {
+function cleanComposition(value: unknown): BlendComponent[] | undefined {
+  if (!Array.isArray(value) || value.length < 2 || value.length > 10) return undefined;
+  const components: BlendComponent[] = [];
+  for (const entry of value) {
+    if (!isRecord(entry)) return undefined;
+    const country = cleanText(own(entry, "origin_country"), TEXT_LIMITS.origin_country);
+    const percentage = own(entry, "percentage");
+    if (!country || typeof percentage !== "number" || !Number.isFinite(percentage) || percentage <= 0 || percentage > 100) return undefined;
+    if (Math.abs(percentage * 100 - Math.round(percentage * 100)) > 0.000001) return undefined;
+    const component: BlendComponent = { origin_country: country, percentage, sort_order: components.length };
+    for (const field of ["origin_region", "farm_producer", "varietal", "process_method", "process_detail"] as const) {
+      const text = cleanText(own(entry, field), TEXT_LIMITS[field]);
+      if (text && (field !== "process_method" || PROCESS_METHODS.some(method => method === text))) Object.assign(component, { [field]: text });
+    }
+    components.push(component);
+  }
+  // Do not invent a missing share or normalize an incomplete printed recipe.
+  return Math.abs(components.reduce((sum, component) => sum + component.percentage, 0) - 100) < 0.005 ? components : undefined;
+}
+
+function cleanValue(field: LabelField, value: unknown): string | number | BlendComponent[] | undefined {
+  if (field === "blend_components") return cleanComposition(value);
   if (field === "weight_g") {
     return typeof value === "number" && Number.isInteger(value) && value > 0 && value <= 100_000 ? value : undefined;
   }
@@ -88,6 +110,7 @@ export function normalizeLabelExtraction(raw: unknown): LabelExtraction {
   if (!isRecord(fields)) return result;
 
   for (const field of LABEL_FIELDS) {
+    if (field === "blend_components" && result.bean_type !== "blend") continue;
     const candidate = own(fields, field);
     if (!isRecord(candidate)) continue;
     const evidence = cleanText(own(candidate, "evidence"), EVIDENCE_LIMIT);
@@ -107,6 +130,35 @@ function validatedExtraction(extraction: LabelExtraction): LabelExtraction {
       evidence: extraction.evidence[field],
     }])),
   });
+}
+
+/** Independent views may fill missing facts, but conflicting readings stay unselected. */
+export function mergeLabelExtractions(extractions: LabelExtraction[]): LabelExtraction {
+  const safe = extractions.map(validatedExtraction);
+  const bean_type = safe.some(result => result.bean_type === "blend") ? "blend"
+    : safe.some(result => result.bean_type === "single_origin") ? "single_origin" : "unknown";
+  const fields: Record<string, { value: unknown; evidence: string | undefined }> = {};
+  const textKey = (value: unknown) => JSON.stringify(value).normalize("NFKC").replace(/\s+/gu, " ").toLowerCase();
+  const key = (field: LabelField, result: LabelExtraction) => {
+    const value = result.fields[field];
+    // Sparse OCR can swap printed lines. Compare lots as a multiset while
+    // retaining the preferred block scan's original display order.
+    if (field === "blend_components" && Array.isArray(value)) {
+      return JSON.stringify(value.map(component => textKey(Object.fromEntries(Object.entries(component).filter(([name]) => name !== "sort_order")))).sort());
+    }
+    if (field === "process_detail" && result.bean_type === "blend" && typeof value === "string") {
+      const shares = value.split(" / ");
+      if (shares.length > 1 && shares.every(share => /\D.*\d+(?:\.\d+)?%$/u.test(share))) return JSON.stringify(shares.map(textKey).sort());
+    }
+    return textKey(value);
+  };
+  for (const field of LABEL_FIELDS) {
+    const candidates = safe.filter(result => result.fields[field] !== undefined);
+    if (candidates.length && new Set(candidates.map(result => key(field, result))).size === 1) {
+      fields[field] = { value: candidates[0].fields[field], evidence: candidates[0].evidence[field] };
+    }
+  }
+  return normalizeLabelExtraction({ bean_type, fields });
 }
 
 function sameOrigin(left: string | undefined, right: string | undefined): boolean {
@@ -152,7 +204,7 @@ export function applyLabelFields(current: BeanFormData, extraction: LabelExtract
   }
 
   for (const field of LABEL_FIELDS) {
-    if (eligible.has(field) && !ORIGIN_FIELDS.includes(field)) Object.assign(next, { [field]: safe.fields[field] });
+    if (eligible.has(field) && field !== "blend_components" && !ORIGIN_FIELDS.includes(field)) Object.assign(next, { [field]: safe.fields[field] });
   }
 
   if (eligible.has("origin_country")) {
@@ -182,6 +234,10 @@ export function applyLabelFields(current: BeanFormData, extraction: LabelExtract
   if (eligible.has("farm_producer")) {
     if (!sameOrigin(next.farm_producer, safe.fields.farm_producer)) next.origin_entity_id = undefined;
     next.farm_producer = safe.fields.farm_producer;
+  }
+  if (eligible.has("blend_components")) {
+    next.bean_type = "blend";
+    next.blend_components = safe.fields.blend_components?.map(component => ({ ...component }));
   }
   return next;
 }

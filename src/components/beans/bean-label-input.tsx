@@ -6,10 +6,10 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { eligibleLabelFields, LABEL_FIELDS, type LabelExtraction, type LabelField } from "@/lib/coffee/bean-label";
 import { createBrowserLabelReader, type LabelReadProgress } from "@/lib/coffee/bean-label-ocr";
+import { prepareLabelImages } from "@/lib/coffee/bean-label-image";
 import type { BeanFormData } from "@/types/database";
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
-const MAX_PHOTO_DIMENSION = 2200;
 const READ_TIMEOUT_MS = 180_000;
 const IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const FIELD_LABELS = {
@@ -17,6 +17,7 @@ const FIELD_LABELS = {
   origin_region: "originRegion", farm_producer: "farmProducer", varietal: "varietal",
   process_method: "processMethod", process_detail: "processDetail",
   roast_level: "roastLevel", roast_date: "roastDate", weight_g: "weight",
+  blend_components: "blendComposition",
 } as const;
 const ERROR_CODES = [
   "browser_unsupported", "loading_failed", "invalid_image", "image_too_large",
@@ -25,6 +26,24 @@ const ERROR_CODES = [
 type LabelError = typeof ERROR_CODES[number];
 type Phase = "idle" | "preparing" | LabelReadProgress["phase"];
 type LabelSelection = { field: LabelField; valueAtSelection: BeanFormData[LabelField] };
+const SELECTION_DEPENDENCIES: Partial<Record<LabelField, readonly (keyof BeanFormData)[]>> = {
+  process_method: ["process_detail"],
+  farm_producer: ["origin_entity_id"],
+  origin_country: [
+    "origin_country_id", "origin_region", "origin_region_id", "origin_subregions",
+    "origin_lat", "origin_lng", "farm_producer", "origin_entity_id",
+  ],
+  origin_region: [
+    "origin_region_id", "origin_subregions", "origin_lat", "origin_lng",
+    "farm_producer", "origin_entity_id",
+  ],
+};
+const BLEND_CONTEXT_FIELDS = [
+  "bean_type", "blend_components", "origin_country", "origin_country_id",
+  "origin_region", "origin_region_id", "origin_subregions", "origin_lat", "origin_lng",
+  "farm_producer", "origin_entity_id", "varietal", "process_method", "process_detail",
+  "altitude_m", "harvest_year",
+] as const satisfies readonly (keyof BeanFormData)[];
 
 interface BeanLabelInputProps {
   form: BeanFormData;
@@ -33,7 +52,27 @@ interface BeanLabelInputProps {
 }
 
 function isEmpty(value: unknown) {
-  return value === undefined || value === null || (typeof value === "string" && !value.trim());
+  return value === undefined || value === null || (typeof value === "string" && !value.trim())
+    || (Array.isArray(value) && value.length === 0);
+}
+
+function selectionKey(form: BeanFormData, field: LabelField) {
+  if (field === "blend_components") {
+    return JSON.stringify(BLEND_CONTEXT_FIELDS.map((key) => form[key]));
+  }
+  const dependencies = SELECTION_DEPENDENCIES[field];
+  // Replacing a parent can clear its descendants, so later edits revoke that selection too.
+  return dependencies
+    ? JSON.stringify([form[field], ...dependencies.map((key) => form[key])])
+    : form[field];
+}
+
+function selectField(form: BeanFormData, field: LabelField): LabelSelection {
+  return { field, valueAtSelection: selectionKey(form, field) };
+}
+
+function selectionIsCurrent(form: BeanFormData, selection: LabelSelection) {
+  return Object.is(selectionKey(form, selection.field), selection.valueAtSelection);
 }
 
 function candidatesFor(extraction: LabelExtraction) {
@@ -47,44 +86,6 @@ function blockedReason(form: BeanFormData, extraction: LabelExtraction, field: L
   return "originSelectionHint";
 }
 
-function canvasBlob(canvas: HTMLCanvasElement): Promise<Blob> {
-  return new Promise((resolve, reject) => {
-    // Lossless pixels keep small label text readable without an upload-size target.
-    canvas.toBlob((blob) => blob ? resolve(blob) : reject(new Error("invalid_image")), "image/png");
-  });
-}
-
-async function preparePhoto(url: string, signal: AbortSignal): Promise<Blob> {
-  signal.throwIfAborted();
-  const picture = new window.Image();
-  const abort = () => { picture.src = ""; };
-  signal.addEventListener("abort", abort, { once: true });
-  try {
-    picture.src = url;
-    try { await picture.decode(); }
-    catch { signal.throwIfAborted(); throw new Error("invalid_image"); }
-    signal.throwIfAborted();
-    if (!picture.naturalWidth || !picture.naturalHeight || picture.naturalWidth * picture.naturalHeight > 100_000_000) {
-      throw new Error("invalid_image");
-    }
-    const canvas = document.createElement("canvas");
-    const context = canvas.getContext("2d");
-    if (!context) throw new Error("invalid_image");
-    const scale = Math.min(1, MAX_PHOTO_DIMENSION / Math.max(picture.naturalWidth, picture.naturalHeight));
-    canvas.width = Math.max(1, Math.round(picture.naturalWidth * scale));
-    canvas.height = Math.max(1, Math.round(picture.naturalHeight * scale));
-    context.fillStyle = "white";
-    context.fillRect(0, 0, canvas.width, canvas.height);
-    context.drawImage(picture, 0, 0, canvas.width, canvas.height);
-    const blob = await canvasBlob(canvas);
-    signal.throwIfAborted();
-    return blob;
-  } finally {
-    signal.removeEventListener("abort", abort);
-    picture.src = "";
-  }
-}
-
 export function BeanLabelInput({ form, onApply, disabled = false }: BeanLabelInputProps) {
   const t = useTranslations("beans.labelImport");
   const tb = useTranslations("beans");
@@ -95,7 +96,7 @@ export function BeanLabelInput({ form, onApply, disabled = false }: BeanLabelInp
   const currentForm = useRef(form);
   const request = useRef<{ sequence: number; controller: AbortController | null }>({ sequence: 0, controller: null });
   const [reader] = useState(createBrowserLabelReader);
-  const [photo, setPhoto] = useState<{ url: string; name: string } | null>(null);
+  const [photo, setPhoto] = useState<{ url: string; name: string; file: File } | null>(null);
   const [phase, setPhase] = useState<Phase>("idle");
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<LabelError | null>(null);
@@ -137,7 +138,7 @@ export function BeanLabelInput({ form, onApply, disabled = false }: BeanLabelInp
     if (!IMAGE_TYPES.has(file.type)) { setError("invalid_image"); return; }
     if (file.size > MAX_FILE_BYTES) { setError("image_too_large"); return; }
     setError(null);
-    setPhoto({ url: URL.createObjectURL(file), name: file.name });
+    setPhoto({ url: URL.createObjectURL(file), name: file.name, file });
   }
 
   async function readPhoto() {
@@ -153,7 +154,7 @@ export function BeanLabelInput({ form, onApply, disabled = false }: BeanLabelInp
     setNotice(null);
     clearResults();
     try {
-      const image = await preparePhoto(photo.url, controller.signal);
+      const image = await prepareLabelImages(photo.file, controller.signal);
       if (sequence !== request.current.sequence) return;
       setPhase("loading");
       const { text, extraction: result } = await reader.recognize(image, {
@@ -176,10 +177,8 @@ export function BeanLabelInput({ form, onApply, disabled = false }: BeanLabelInp
         return;
       }
       const latestForm = currentForm.current;
-      const emptyFields = candidates.filter((field) => isEmpty(latestForm[field]));
-      setSelections(eligibleLabelFields(latestForm, result, emptyFields).map((field) => ({
-        field, valueAtSelection: latestForm[field],
-      })));
+      const emptyFields = candidates.filter((field) => field !== "blend_components" && isEmpty(latestForm[field]));
+      setSelections(eligibleLabelFields(latestForm, result, emptyFields).map((field) => selectField(latestForm, field)));
       setExtraction(result);
     } catch (failure) {
       if (sequence !== request.current.sequence) return;
@@ -198,13 +197,32 @@ export function BeanLabelInput({ form, onApply, disabled = false }: BeanLabelInp
   // An earlier checkbox selection never grants permission to replace a later edit.
   // Selecting that field again explicitly allows replacing its current value.
   const selected = selections
-    .filter(({ field, valueAtSelection }) => Object.is(form[field], valueAtSelection))
+    .filter((selection) => selectionIsCurrent(form, selection))
     .map(({ field }) => field);
   const candidates = extraction ? candidatesFor(extraction) : [];
   const applicable = extraction ? eligibleLabelFields(form, extraction, selected) : [];
   const replacesExisting = applicable.some((field) => !isEmpty(form[field]));
 
   function displayValue(field: LabelField) {
+    if (field === "blend_components") {
+      return (
+        <span role="list" className="mt-2 block space-y-3">
+          {extraction?.fields.blend_components?.map((component, index) => (
+            <span key={index} role="listitem" className="block min-w-0">
+              <span className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                <span className="min-w-0 break-words">{t("blendComponent", { index: index + 1 })} · {component.origin_country}</span>
+                <span className="shrink-0 tabular-nums">{component.percentage}%</span>
+              </span>
+              {component.origin_region && <span className="mt-1 block break-words text-xs font-normal leading-5 text-brown-medium">{tb("originRegion")}: {component.origin_region}</span>}
+              {component.farm_producer && <span className="mt-1 block break-words text-xs font-normal leading-5 text-brown-medium">{tb("farmProducer")}: {component.farm_producer}</span>}
+              {component.varietal && <span className="mt-1 block break-words text-xs font-normal leading-5 text-brown-medium">{tb("varietal")}: {component.varietal}</span>}
+              {component.process_method && <span className="mt-1 block break-words text-xs font-normal leading-5 text-brown-medium">{tb("processMethod")}: {tp(component.process_method)}</span>}
+              {component.process_detail && <span className="mt-1 block break-words text-xs font-normal leading-5 text-brown-medium">{tb("processDetail")}: {component.process_detail}</span>}
+            </span>
+          ))}
+        </span>
+      );
+    }
     const value = extraction?.fields[field];
     if (field === "process_method") return tp(value as Parameters<typeof tp>[0]);
     if (field === "roast_level") return tr(value as Parameters<typeof tr>[0]);
@@ -286,14 +304,15 @@ export function BeanLabelInput({ form, onApply, disabled = false }: BeanLabelInp
                           const checked = event.target.checked;
                           setSelections((previous) => [
                             ...previous.filter((selection) => selection.field !== field
-                              && Object.is(form[selection.field], selection.valueAtSelection)),
-                            ...(checked ? [{ field, valueAtSelection: form[field] }] : []),
+                              && selectionIsCurrent(form, selection)),
+                            ...(checked ? [selectField(form, field)] : []),
                           ]);
                         }} />
                       <span className="min-w-0 flex-1">
                         <span className="block text-xs text-brown-light">{tb(FIELD_LABELS[field])}</span>
                         <span className="block break-words text-sm font-medium text-brown">{displayValue(field)}</span>
-                        <span className="mt-1 block break-words text-xs leading-5 text-brown-medium">{t("evidence", { text: extraction.evidence[field] ?? "" })}</span>
+                        {field === "blend_components" && <span className="mt-2 block text-xs leading-5 text-brown-medium">{t(form.bean_type === "blend" ? "blendReplaceHint" : "blendSwitchHint")}</span>}
+                        <span className="mt-1 block whitespace-pre-wrap break-words text-xs leading-5 text-brown-medium">{t("evidence", { text: extraction.evidence[field] ?? "" })}</span>
                         {blocked && <span className="mt-1 block text-xs leading-5 text-brown-medium">{t(blocked)}</span>}
                       </span>
                     </label>

@@ -25,7 +25,8 @@ for (const locale of ["ko", "en"] as const) {
         "Variety: Heirloom", "Process: Natural", "Roast level: Light", "Roasted on: 2026-09-01", "Net weight: 200 g",
       ];
       try {
-        const fixture = await browser.newPage({ viewport: { width: 1200, height: 1150 } });
+        // Keep the printed image at the same resolution on desktop and mobile.
+        const fixture = await browser.newPage({ viewport: { width: 1200, height: 1150 }, deviceScaleFactor: 1 });
         try {
           await fixture.setContent(`<html lang="${locale}"><meta charset="UTF-8"><style>body{margin:0;padding:65px;background:#e9e1d0;color:#21190e;font-family:Arial,"Apple SD Gothic Neo",sans-serif}main{background:white;padding:50px;border:2px solid #493b26}small{font-size:22px}p{font-size:40px;line-height:1.6;margin:20px 0}</style><main><small>BEANMAP · SYNTHETIC TEST LABEL</small><p>${lines.join("<br>")}</p></main></html>`);
           await fixture.screenshot({ path: imagePath });

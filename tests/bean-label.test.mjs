@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { LABEL_FIELDS, normalizeLabelExtraction, eligibleLabelFields, applyLabelFields } from "../src/lib/coffee/bean-label.ts";
+import { LABEL_FIELDS, normalizeLabelExtraction, eligibleLabelFields, applyLabelFields, mergeLabelExtractions } from "../src/lib/coffee/bean-label.ts";
 
 function raw(fields = {}, bean_type = "single_origin") {
   return { bean_type, fields: Object.fromEntries(LABEL_FIELDS.map((key) => [key, fields[key] ?? { value: null, evidence: null }])) };
@@ -177,4 +177,54 @@ test("replacing the processing method clears old details unless the new details 
 
   const unchangedMethod = applyLabelFields(current, extraction({ process_method: "washed" }), ["process_method"]);
   assert.equal(unchangedMethod.process_detail, current.process_detail);
+});
+
+test("printed blend composition keeps two lots from the same country and strips identifiers", () => {
+  const components = [
+    { origin_country: "Ethiopia", origin_region: "Gedeb", varietal: "74110, Kurume", process_method: "washed", percentage: 60, id: "untrusted", origin_country_id: 9 },
+    { origin_country: "Ethiopia", farm_producer: "Bursa Main Station", varietal: "74158", process_method: "honey", process_detail: "White Honey", percentage: 40, user_id: "untrusted" },
+  ];
+  const result = normalizeLabelExtraction({ bean_type: "blend", fields: { blend_components: { value: components, evidence: "Ethiopia Gedeb 60% / Ethiopia Bursa Main Station 40%" } } });
+  assert.equal(result.fields.blend_components.length, 2);
+  assert.deepEqual(result.fields.blend_components.map(c => c.percentage), [60, 40]);
+  for (const component of result.fields.blend_components) {
+    assert.equal(component.id, undefined); assert.equal(component.user_id, undefined); assert.equal(component.origin_country_id, undefined);
+  }
+  const current = form();
+  assert.deepEqual(applyLabelFields(current, result, []), current);
+  const applied = applyLabelFields(current, result, ["blend_components"]);
+  assert.equal(applied.bean_type, "blend");
+  assert.deepEqual(applied.blend_components, result.fields.blend_components);
+  for (const key of ["origin_country", "origin_country_id", "origin_region", "origin_region_id", "origin_subregions", "origin_lat", "origin_lng", "farm_producer", "origin_entity_id", "varietal"]) assert.deepEqual(applied[key], current[key], key);
+  assert.equal(applied.note, current.note); assert.equal(applied.overall_score, current.overall_score);
+});
+
+test("incomplete, malformed and unsupported composition never changes the form", () => {
+  for (const components of [
+    [{ origin_country: "Ethiopia", percentage: 60 }],
+    [{ origin_country: "Ethiopia", percentage: 60 }, { origin_country: "Brazil", percentage: 30 }],
+    [{ origin_country: "Ethiopia", percentage: 60 }, { origin_country: "", percentage: 40 }],
+    [{ origin_country: "Ethiopia", percentage: 60 }, { origin_country: "Brazil", percentage: "40" }],
+    [{ origin_country: "Ethiopia", percentage: 100 }, { origin_country: "Brazil", percentage: 0 }],
+    [{ origin_country: "Ethiopia", percentage: 33.333 }, { origin_country: "Brazil", percentage: 66.667 }],
+  ]) {
+    const candidate = { bean_type: "blend", fields: { blend_components: components }, evidence: { blend_components: "Printed composition" } };
+    assert.deepEqual(applyLabelFields(form(), candidate, ["blend_components"]), form());
+  }
+  const fields = { blend_components: { value: [{ origin_country: "Ethiopia", percentage: 60 }, { origin_country: "Brazil", percentage: 40 }], evidence: "60 / 40" } };
+  assert.equal(normalizeLabelExtraction({ bean_type: "unknown", fields }).fields.blend_components, undefined);
+});
+
+test("independent OCR views fill missing facts without duplicating lots or resolving conflicts by guessing", () => {
+  const components = [{ origin_country: "Ethiopia", percentage: 60 }, { origin_country: "Ethiopia", percentage: 40 }];
+  const full = extraction({ roastery: "Printed Brand", name: "House Blend", blend_components: components }, "blend");
+  const detail = extraction({ name: "House Blend", blend_components: components, weight_g: 200 }, "blend");
+  const result = mergeLabelExtractions([full, detail]);
+  assert.equal(result.fields.roastery, "Printed Brand"); assert.equal(result.fields.weight_g, 200);
+  assert.equal(result.fields.blend_components.length, 2);
+  const reordered = mergeLabelExtractions([detail, extraction({ blend_components: [...components].reverse() }, "blend")]);
+  assert.deepEqual(reordered.fields.blend_components.map(c => c.percentage), [60, 40]);
+  const conflict = mergeLabelExtractions([full, extraction({ name: "Other Blend", weight_g: 250 }, "blend"), detail]);
+  assert.equal(conflict.fields.name, undefined); assert.equal(conflict.fields.weight_g, undefined);
+  assert.equal(conflict.fields.roastery, "Printed Brand");
 });

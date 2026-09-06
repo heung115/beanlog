@@ -88,6 +88,36 @@ async function retrySuccessfully(reader, workers) {
   return worker;
 }
 
+test("two complementary image views reuse one worker and merge only consistent facts", async (t) => {
+  const { reader, workers } = harness(t);
+  const read = reader.recognize([{ image, psm: "11", kind: "full" }, { image, psm: "6", kind: "text" }], emptyOptions());
+  const worker = workers[0]; await initialize(worker);
+  const sparse = await worker.waitFor("setParameters");
+  assert.equal(sparse.payload.params.tessedit_pageseg_mode, "11"); worker.respond(sparse);
+  await complete(worker, "Roaster: Small Roastery\nProduct: House Blend");
+  const block = await worker.waitFor("setParameters");
+  assert.equal(block.payload.params.tessedit_pageseg_mode, "6"); worker.respond(block);
+  await complete(worker, "Product: House Blend\nEthiopia 60%\nEthiopia 40%\n200g");
+  const result = await read;
+  assert.equal(workers.length, 1);
+  assert.equal(result.extraction.fields.roastery, "Small Roastery");
+  assert.equal(result.extraction.fields.weight_g, 200);
+  assert.deepEqual(result.extraction.fields.blend_components.map(c => c.percentage), [60, 40]);
+  assert.equal(worker.requests.filter(r => r.action === "loadLanguage").length, 1);
+  reader.dispose();
+});
+
+test("cancelling between image passes stops the worker and discards partial extraction", async (t) => {
+  const { reader, workers } = harness(t); const controller = new AbortController();
+  const read = reader.recognize([{ image, psm: "6", kind: "full" }, { image, psm: "11", kind: "text" }], { ...emptyOptions(), signal: controller.signal });
+  const rejected = assert.rejects(read, { name: "AbortError" });
+  const worker = workers[0]; await initialize(worker); await complete(worker);
+  const next = await worker.waitFor("setParameters"); controller.abort(); worker.respond(next);
+  await rejected; assert.equal(worker.terminateCalls, 1);
+  assert.equal(worker.requests.filter(r => r.action === "recognize").length, 1);
+  await retrySuccessfully(reader, workers);
+});
+
 test("browser OCR initializes local Korean and English assets and reuses its successful worker", async (t) => {
   const { reader, workers } = harness(t);
   const progress = [];

@@ -60,7 +60,7 @@ test("standalone known facts stay anchored to their actual country without guess
   assert.equal(parseBeanLabelText("Country: Colombia\nVariety: Colombia").fields.varietal, "Colombia");
 });
 
-test("blend and mixed origin labels cannot create a single origin or percentages", () => {
+test("blend and mixed origin labels cannot create a single origin", () => {
   for (const input of [
     "Product: House Blend\nOrigin: Brazil\nRegion: Cerrado\nVariety: Bourbon\n200g",
     "BLEND\nEthiopia 60% / Brazil 40%",
@@ -71,9 +71,21 @@ test("blend and mixed origin labels cannot create a single origin or percentages
   ]) {
     const result = parseBeanLabelText(input);
     assert.equal(result.bean_type, "blend", input);
-    for (const field of ["origin_country", "origin_region", "farm_producer", "varietal", "blend_components"]) assert.equal(result.fields[field], undefined, field);
+    for (const field of ["origin_country", "origin_region", "farm_producer", "varietal"]) assert.equal(result.fields[field], undefined, field);
   }
   assert.equal(parseBeanLabelText("Origin: Ethiopia (에티오피아) 100%").fields.origin_country, "Ethiopia");
+});
+
+test("incomplete, conflicting, unreadable, and overfull blend shares are not repaired", () => {
+  for (const input of [
+    "House Blend\nEthiopia 60%", "House Blend\nEthiopia 60%\nBrazil 30%",
+    "House Blend\nEthiopia 33.33%\nBrazil 33.33%\nColombia 33.33%",
+    "House Blend\nEthiopia 60%\nEtblopia 40%", "House Blend\nEthiopia 60%\nBrazil 40%\nEtblopia 10%",
+    "House Blend\nEthiopia 60%\nBrazil 40%\nColombia 10%", "House Blend\nEthiopia 60%\nBrazil ?%",
+    "House Blend\nEthiopia 60%\nBrazil 40%\nColombia", "House Blend\nEthiopia 0%\nBrazil 100%",
+  ]) assert.equal(parseBeanLabelText(input).fields.blend_components, undefined, input);
+  const valid = parseBeanLabelText("House Blend\nEthiopia 33.33%\nBrazil 33.33%\nColombia 33.34%");
+  assert.equal(valid.fields.blend_components.length, 3);
 });
 
 test("conflicting values remain empty even if the first value is repeated later", () => {
@@ -129,4 +141,94 @@ test("printed instruction-like text is inert text and cannot widen the extracted
 test("unreadable or overlong input yields no unsupported evidence", () => {
   assert.deepEqual(parseBeanLabelText(""), { bean_type: "unknown", fields: {}, evidence: {} });
   assert.deepEqual(parseBeanLabelText("Product: unknown\nCountry: Atlantis\nRoaster: Farm\u202eevil\n" + "X".repeat(501)).fields, {});
+});
+
+test("two printed shares from the same country remain distinct blend components", () => {
+  const result = parseBeanLabelText("House Blend\nEthiopia 60%\nEthiopia 40%");
+  assert.equal(result.bean_type, "blend");
+  assert.deepEqual(result.fields.blend_components, [
+    { origin_country: "Ethiopia", percentage: 60, sort_order: 0 },
+    { origin_country: "Ethiopia", percentage: 40, sort_order: 1 },
+  ]);
+  assert.match(result.evidence.blend_components, /Ethiopia 60%.*Ethiopia 40%/u);
+  assert.equal(result.fields.origin_country, undefined);
+});
+
+test("explicit inline composition separators preserve both printed shares", () => {
+  for (const separator of ["/", "&", "and", "+", ";"]) {
+    const result = parseBeanLabelText(`House Blend\nEthiopia 60% ${separator} Brazil 40%`);
+    assert.deepEqual(result.fields.blend_components?.map(({ origin_country, percentage }) => [origin_country, percentage]), [["Ethiopia", 60], ["Brazil", 40]], separator);
+  }
+});
+
+test("printed component details keep variety and processing attached to each origin share", () => {
+  const result = parseBeanLabelText("지에이 블렌드(그린애플쥬스 블렌드)\nEthiopia Gedeb Chorso 74110, Kurume Washed 60%\nEthiopia Bursa Main Station 74158 White Honey 40%");
+  assert.deepEqual(result.fields.blend_components, [
+    { origin_country: "Ethiopia", origin_region: "Gedeb", varietal: "74110, Kurume", process_method: "washed", process_detail: "Washed", percentage: 60, sort_order: 0 },
+    { origin_country: "Ethiopia", farm_producer: "Bursa Main Station", varietal: "74158", process_method: "honey", process_detail: "White Honey", percentage: 40, sort_order: 1 },
+  ]);
+  assert.match(result.evidence.blend_components, /Chorso/u);
+});
+
+test("a blend title and adjacent roaster wordmark are usable with printed component context", () => {
+  const result = parseBeanLabelText("MALIC\nCOFFEE ROASTERS\n지에이 블렌드(그린애플쥬스 블렌드)\nEthiopia Gedeb Chorso 74110, Kurume Washed 60%\nEthiopia Bursa Main Station 74158 White Honey 40%\nGreen Apple, Red Apple, Lemon, Bergamot, Candy, Honey, Black Tea\n청사과, 빨간사과, 레몬, 베르가못, 캔디, 꿀, 블랙티 200g");
+  assert.equal(result.fields.name, "지에이 블렌드(그린애플쥬스 블렌드)");
+  assert.equal(result.fields.roastery, "MALIC");
+  assert.equal(result.fields.weight_g, 200);
+  assert.equal(result.fields.note, undefined);
+  assert.equal(result.fields.tags, undefined);
+  assert.equal(result.fields.process_method, "other");
+  assert.match(result.evidence.weight_g, /청사과.*200g/u);
+  const another = parseBeanLabelText("Small Mountain Coffee Roasters\nMorning Blend\nBrazil 70%\nColombia 30%\nCup notes: Chocolate, nuts 250g");
+  assert.equal(another.fields.name, "Morning Blend");
+  assert.equal(another.fields.roastery, "Small Mountain");
+  assert.equal(another.fields.weight_g, 250);
+});
+
+test("sparse OCR can identify a FROM wordmark without correcting garbled countries or units", () => {
+  const prefix = "COFFEE ROBS\n\nFROM .MALIC\n\nFAVORITE COFFEE\n\n지에이 블렌드(그린애플쥬스 블렌드)\n\n";
+  const result = parseBeanLabelText(prefix + "Ethiopia Gedeb Chorso 74110, Kurume Washed 60%\n\nEthiopia Bursa Main Station 74158 White Honey 40%\n\n청사과, 빨간사과,래몬,베르가못, 캔디, B, 볼랙티 2009");
+  assert.equal(result.fields.roastery, "MALIC");
+  assert.equal(result.fields.name, "지에이 블렌드(그린애플쥬스 블렌드)");
+  assert.equal(result.fields.blend_components.length, 2);
+  assert.equal(result.fields.weight_g, undefined);
+  const garbled = parseBeanLabelText("지에이 블렌드(그린애플쥬스 블렌드)\nEthiopia Gedeb Chorso 74110, Kurume Washed 60%\nEtblopia Bursa Main Station 74158 White Honey 40%\n청사과, 빨간사과,래온,베르가못, 캔디, §, BEE 2009");
+  assert.equal(garbled.fields.name, "지에이 블렌드(그린애플쥬스 블렌드)");
+  assert.equal(garbled.fields.blend_components, undefined);
+  assert.equal(garbled.fields.weight_g, undefined);
+  assert.equal(parseBeanLabelText("FROM MALIC\nA wonderful morning").fields.roastery, undefined);
+});
+
+test("FROM wordmarks allow punctuation separators without accepting longer words", () => {
+  for (const marker of ["FROM. RIDGE", "FROM:RIDGE", "FROM .RIDGE", "FROM RIDGE"]) {
+    const result = parseBeanLabelText(`COFFEE ROSE\n${marker}\nFAVORITE COFFEE\nHouse Blend\nBrazil 60%\nColombia 40%`);
+    assert.equal(result.fields.roastery, "RIDGE", marker);
+  }
+  const prose = parseBeanLabelText("COFFEE ROSE\nFROMAGE RIDGE\nFAVORITE COFFEE\nHouse Blend\nBrazil 60%\nColombia 40%");
+  assert.equal(prose.fields.roastery, undefined);
+});
+
+test("nutrition grams and FROM prose are not package weight or a roastery", () => {
+  for (const line of ["Nutrition per serving: fat 1g, protein 2g", "영양 정보: 지방 1g, 단백질 2g", "Delivery: ordered 250g, received 200g"]) {
+    assert.equal(parseBeanLabelText(`Country: Ethiopia\n${line}`).fields.weight_g, undefined, line);
+  }
+  for (const phrase of ["our farms", "OUR FARMS", "selected farmers"]) {
+    const result = parseBeanLabelText(`COFFEE ROASTERS\nFROM ${phrase}\nFAVORITE COFFEE\nHouse Blend\nBrazil 60%\nColombia 40%`);
+    assert.equal(result.fields.roastery, undefined, phrase);
+  }
+});
+
+test("fully printed mixed processing offers an other summary without overriding a top-level process", () => {
+  const composition = "House Blend\nEthiopia Washed 60%\nEthiopia White Honey 40%";
+  const mixed = parseBeanLabelText(composition);
+  assert.equal(mixed.fields.process_method, "other");
+  assert.equal(mixed.fields.process_detail, "Washed 60% / White Honey 40%");
+  assert.match(mixed.evidence.process_method, /Ethiopia Washed 60%.*Ethiopia White Honey 40%/u);
+  const explicit = parseBeanLabelText(`Process: Natural\n${composition}`);
+  assert.equal(explicit.fields.process_method, "natural");
+  assert.equal(explicit.fields.process_detail, "Natural");
+  for (const prefix of ["Process: Washed\nProcess: Natural", "Process: unreadable"])
+    assert.equal(parseBeanLabelText(`${prefix}\n${composition}`).fields.process_method, undefined);
+  for (const input of ["House Blend\nEthiopia Washed 60%\nEthiopia 40%", "House Blend\nEthiopia Washed 60%\nEthiopia White Honey 30%"])
+    assert.equal(parseBeanLabelText(input).fields.process_method, undefined);
 });

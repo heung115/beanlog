@@ -245,6 +245,31 @@ async function expectTastingDetails(page: Page) {
 }
 
 for (const locale of ["ko", "en"] as const) {
+  test(`${locale} manual dependent edits invalidate selected OCR parent fields`, async ({ page }) => {
+    const t = locale === "ko" ? ko : en;
+    const label = t.beans.labelImport;
+    await withLabelForm(page, locale, async () => {
+      await mockBrowserOcr(page);
+      await enterExistingDetails(page);
+      await page.getByLabel(label.choose, { exact: true }).setInputFiles(photo);
+      await page.getByRole("button", { name: label.read, exact: true }).click();
+      const review = page.getByRole("group", { name: label.review, exact: true });
+      await expect(review).toBeVisible();
+      const process = review.getByRole("checkbox", { name: t.beans.processMethod, exact: true });
+      const country = review.getByRole("checkbox", { name: t.beans.originCountry, exact: true });
+      await process.check();
+      await expect(country).toBeChecked();
+      await page.getByRole("button", { name: t.beans.moreDetails, exact: true }).click();
+      await page.locator('[name="process_detail"]').fill("My new hand-entered fermentation detail");
+      await expect(process).not.toBeChecked();
+      await page.locator('[name="origin_region"]').fill("My new hand-entered region");
+      await expect(country).not.toBeChecked();
+      await review.getByRole("button", { name: label.apply, exact: true }).click();
+      await expect(page.locator('[name="process_method"]')).toHaveValue("washed");
+      await expect(page.locator('[name="process_detail"]')).toHaveValue("My new hand-entered fermentation detail");
+      await expect(page.locator('[name="origin_region"]')).toHaveValue("My new hand-entered region");
+    });
+  });
   const t = locale === "ko" ? ko : en;
   const label = t.beans.labelImport;
 
@@ -478,3 +503,43 @@ test("recognized country replaces previously loaded origin suggestions", async (
     await expect(country).toHaveValue("Colombia");
   });
 });
+
+for (const locale of ["ko", "en"] as const) {
+  for (const mobile of [false, true]) {
+    test(`${mobile ? "@mobile " : ""}${locale} printed blend requires explicit selection and preserves manual changes`, async ({ page }) => {
+      const t = locale === "ko" ? ko : en;
+      const label = t.beans.labelImport;
+      await withLabelForm(page, locale, async () => {
+        const ocr = await mockBrowserOcr(page, [{ text: "Product: Sample Blend\nRoaster: Test Roastery\nEthiopia Gedeb 74110, Kurume Washed 60%\nEthiopia Bursa Main Station 74158 White Honey 40%\n200g" }]);
+        await enterExistingDetails(page);
+        await page.getByLabel(label.choose, { exact: true }).setInputFiles(photo);
+        await page.getByRole("button", { name: label.read, exact: true }).click();
+        const review = page.getByRole("group", { name: label.review, exact: true });
+        await expect(review).toBeVisible();
+        const composition = review.getByRole("checkbox", { name: t.beans.blendComposition, exact: true });
+        await expect(composition).not.toBeChecked();
+        await expect(review.getByRole("listitem")).toHaveCount(2);
+        await expect(review.getByRole("listitem").nth(0)).toContainText("60%");
+        await expect(review.getByRole("listitem").nth(1)).toContainText("40%");
+        await ocr.expectBrowserOnly();
+        await composition.check();
+        await page.locator('[name="origin_country"]').fill("Brazil");
+        await expect(composition).not.toBeChecked();
+        await composition.check();
+        await review.getByRole("checkbox", { name: t.beans.processMethod, exact: true }).check();
+        await review.getByRole("checkbox", { name: t.beans.processDetail, exact: true }).check();
+        await review.getByRole("button", { name: label.apply, exact: true }).click();
+        await expect(page.getByRole("radio", { name: t.beans.blend, exact: true })).toHaveAttribute("aria-checked", "true");
+        await expect(page.locator('[name="blend_percentage_0"]')).toHaveValue("60");
+        await expect(page.locator('[name="blend_percentage_1"]')).toHaveValue("40");
+        await expect(page.locator('[name="name"]')).toHaveValue("My existing coffee");
+        await expect(page.locator('[name="process_method"]')).toHaveValue("other");
+        await expectTastingDetails(page);
+        await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
+        // Returning to single-origin retains the person's earlier input.
+        await page.getByRole("radio", { name: t.beans.singleOrigin, exact: true }).click();
+        await expect(page.locator('[name="origin_country"]')).toHaveValue(locale === "ko" ? "브라질" : "Brazil");
+      });
+    });
+  }
+}
