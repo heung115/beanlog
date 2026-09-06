@@ -265,3 +265,100 @@ test("clearly grouped package grams are accepted without guessing decimal commas
   for (const value of ["1,00 g", "1,5 kg", "1,000,0 g", "0,250 g", "1,000 kg", "250 0", "2509"])
     assert.equal(parseBeanLabelText(`Net weight: ${value}`).fields.weight_g, undefined, value);
 });
+
+test("the full printed blend preserves lot descriptions and bilingual cup notes as display metadata", () => {
+  const rows = [
+    "Ethiopia Gedeb Chorso 74110, Kurume Washed 60%",
+    "Ethiopia Bursa Main Station 74158 White Honey 40%",
+  ];
+  const en = ["Green Apple", "Red Apple", "Lemon", "Bergamot", "Candy", "Honey", "Black Tea"];
+  const ko = ["청사과", "빨간사과", "레몬", "베르가못", "캔디", "꿀", "블랙티"];
+  const result = parseBeanLabelText(["지에이 블렌드(그린애플쥬스 블렌드)", ...rows, en.join(", "), ko.join(", "), "200g"].join("\n"));
+  assert.equal(result.fields.name, "지에이 블렌드(그린애플쥬스 블렌드)");
+  assert.deepEqual(result.composition_lines, rows);
+  assert.equal(result.fields.blend_components[0].origin_region, "Gedeb");
+  assert.equal(result.fields.blend_components[0].farm_producer, undefined);
+  assert.equal(result.fields.blend_components[0].origin_subregions, undefined);
+  assert.deepEqual(result.tasting_notes, { en, ko });
+  assert.deepEqual(result.tasting_notes_translation_ko, ko);
+  assert.deepEqual(result.tasting_notes_evidence, [en.join(", "), ko.join(", ")]);
+  assert.equal(result.fields.weight_g, 200);
+  for (const field of ["note", "tags", "overall_score"]) assert.equal(result.fields[field], undefined);
+});
+
+test("clear English notes can have dictionary translations without repairing the Korean reading or missing weight unit", () => {
+  const source = "청사과, 빨간사과,레몬,배르가옷, 캔디, B, 볼랙티 2009";
+  const result = parseBeanLabelText("Product: Orchard Coffee\nGreen Apple, Red Apple, Lemon, Bergamot, Candy, Honey, Black Tea\n" + source);
+  assert.deepEqual(result.tasting_notes_translation_ko, ["청사과", "빨간사과", "레몬", "베르가못", "캔디", "꿀", "블랙티"]);
+  assert.ok(result.tasting_notes.ko.includes("배르가옷"));
+  assert.ok(!result.tasting_notes.ko.includes("베르가못"));
+  assert.ok(result.tasting_notes_evidence.includes(source));
+  assert.equal(result.fields.weight_g, undefined);
+});
+
+test("other products keep their own lot rows, notes, and weight without introducing sample-label values", () => {
+  const rows = ["Brazil Cerrado Bourbon Natural 75%", "Colombia Huila Caturra Washed 25%"];
+  const result = parseBeanLabelText(["RIVER Coffee Roasters", "Evening Blend", ...rows, "Cup notes:", "Cocoa, Hazelnut, Plum", "코코아, 헤이즐넛, 자두", "350g"].join("\n"));
+  assert.equal(result.fields.name, "Evening Blend");
+  assert.equal(result.fields.roastery, "RIVER");
+  assert.equal(result.fields.weight_g, 350);
+  assert.deepEqual(result.composition_lines, rows);
+  assert.deepEqual(result.fields.blend_components.map(({ origin_country, percentage }) => [origin_country, percentage]), [["Brazil", 75], ["Colombia", 25]]);
+  assert.deepEqual(result.tasting_notes, { en: ["Cocoa", "Hazelnut", "Plum"], ko: ["코코아", "헤이즐넛", "자두"] });
+  assert.deepEqual(result.tasting_notes_translation_ko, ["코코아", "헤이즐넛", "자두"]);
+});
+
+test("cup-note sections accept printed unknown flavors but end at other headings", () => {
+  const result = parseBeanLabelText("Tasting notes:\nOrange blossom, Panela\nProcess: Honey\nRoastery address:\nApple, Honey\n\nNet weight: 1,000g");
+  assert.deepEqual(result.tasting_notes, { en: ["Orange blossom", "Panela"], ko: [] });
+  assert.equal(result.tasting_notes_translation_ko, undefined);
+  assert.equal(result.fields.process_method, "honey");
+  assert.equal(result.fields.weight_g, 1000);
+  const inline = parseBeanLabelText("Cup notes: Chocolate, nuts 1,000g");
+  assert.equal(inline.fields.weight_g, 1000);
+  assert.deepEqual(inline.tasting_notes.en, ["Chocolate", "nuts"]);
+  assert.equal(parseBeanLabelText("Cup notes: Honey | Process: Washed").fields.process_method, "washed");
+});
+
+test("product, processing, recipes, and ingredient lists cannot supply unlabelled cup notes", () => {
+  for (const source of [
+    "Product: Apple, Honey Blend\nProcess: Honey",
+    "House Blend\nEthiopia Honey 60%\nBrazil Natural 40%",
+    "Ingredients:\nApple, Honey\n200g",
+    "Brew recipe:\nApple, Honey\nWater: 200g",
+    "Roastery address:\nApple, Honey",
+    "Delivery: Apple, Honey 200g",
+  ]) assert.equal(parseBeanLabelText(source).tasting_notes, undefined, source);
+});
+
+test("inline lot metadata stays aligned with printed shares and incomplete compositions get no false row mapping", () => {
+  const result = parseBeanLabelText("Morning Blend\nOrigin: Brazil Cerrado 80% / Peru 20%");
+  assert.deepEqual(result.composition_lines, ["Brazil Cerrado 80%", "Peru 20%"]);
+  assert.equal(parseBeanLabelText("Morning Blend\nBrazil 80%\nPeru 10%").composition_lines, undefined);
+});
+
+test("unlabelled nutrition grams never become package weight and explicit package headings resume extraction", () => {
+  for (const text of [
+    "Product: Test Coffee\nNutrition facts\n3g",
+    "Product: Test Coffee\nNutrition facts\n\n3g",
+    "Product: Test Coffee\n영양성분\n지방\n3g",
+    "3g\nNutrition facts",
+    "Brew recipe\n18g\nWater: 300g",
+  ]) assert.equal(parseBeanLabelText(text).fields.weight_g, undefined, text);
+  for (const heading of ["Nutrition facts", "영양성분", "Brew recipe"]) {
+    assert.equal(parseBeanLabelText(`Product: Test Coffee\n${heading}\n3g\nNet weight: 350g`).fields.weight_g, 350, heading);
+  }
+});
+
+test("a Korean flavor list cannot lend evidence to unrelated Latin OCR fragments", () => {
+  const en = ["Green Apple", "Red Apple", "Lemon", "Bergamot", "Candy", "Honey", "Black Tea"];
+  const result = parseBeanLabelText([en.join(", "), "청사과, WTAE NEAR, 캔디, 꿀, BE 2000 개"].join("\n"));
+  assert.deepEqual(result.tasting_notes.en, en);
+  assert.deepEqual(result.tasting_notes_translation_ko, ["청사과", "빨간사과", "레몬", "베르가못", "캔디", "꿀", "블랙티"]);
+  assert.deepEqual(result.tasting_notes.ko, ["청사과", "캔디", "꿀"]);
+  assert.equal(result.fields.weight_g, undefined);
+  const reverse = parseBeanLabelText("Cocoa, 무의미한 조각, Hazelnut, Plum");
+  assert.deepEqual(reverse.tasting_notes, { en: ["Cocoa", "Hazelnut", "Plum"], ko: [] });
+  const explicit = parseBeanLabelText("Cup notes: Panela, Orange blossom");
+  assert.deepEqual(explicit.tasting_notes.en, ["Panela", "Orange blossom"]);
+});

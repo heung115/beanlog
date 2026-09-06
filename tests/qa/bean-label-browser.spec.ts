@@ -48,12 +48,16 @@ for (const locale of ["ko", "en"] as const) {
             && Boolean(request.headers()["next-action"]) && request.postData() === "[]",
         });
         context.on("request", collect);
-        await page.locator("input[type=file]").setInputFiles(imagePath);
-        expect(requests.filter((entry) => entry.url.includes("/ocr/"))).toHaveLength(0);
         const started = Date.now();
-        await page.getByRole("button", { name: t.beans.labelImport.read, exact: true }).click();
+        await page.locator("input[type=file]").setInputFiles(imagePath);
         const review = page.getByRole("group", { name: t.beans.labelImport.review, exact: true });
         await expect(review).toBeVisible({ timeout: 120_000 });
+        await expect(page.getByRole("region", { name: t.beans.labelImport.sectionTitle, exact: true })).toHaveAttribute("aria-busy", "false", { timeout: 120_000 });
+        // Selecting the photo alone must produce a complete preview, including exact weight.
+        await expect(review.getByTestId("label-result-summary")).toContainText(expected.name);
+        await expect(review.getByTestId("label-result-summary")).toContainText(expected.roastery);
+        await expect(review.getByLabel(`${t.beans.weight}: ${expected.weight_g} g`, { exact: true })).toBeVisible();
+        await expect(review.getByTestId("label-field-choices")).not.toHaveAttribute("open", "");
         const elapsedSeconds = (Date.now() - started) / 1000;
         await page.locator("summary").filter({ hasText: t.beans.labelImport.rawText }).click();
         const text = await page.locator("pre[aria-label]").innerText();
@@ -70,11 +74,13 @@ for (const locale of ["ko", "en"] as const) {
           // A warm reader continues to work with all browser networking disabled.
           await context.setOffline(true);
           try {
-            await page.getByRole("button", { name: t.beans.labelImport.read, exact: true }).click();
+            await page.getByRole("button", { name: t.beans.labelImport.retry, exact: true }).click();
             await expect(review).toBeVisible({ timeout: 60_000 });
+            await expect(page.getByRole("region", { name: t.beans.labelImport.sectionTitle, exact: true })).toHaveAttribute("aria-busy", "false", { timeout: 60_000 });
           } finally { await context.setOffline(false); }
         }
         await expect(page.locator("[name=name]")).toHaveValue("");
+        await review.getByTestId("label-field-choices").locator("summary").click();
         for (const name of [t.beans.processMethod, t.beans.roastLevel]) await review.getByRole("checkbox", { name, exact: true }).check();
         await review.getByRole("button", { name: t.beans.labelImport.apply, exact: true }).click();
         await expect(page.locator("[name=name]")).toHaveValue(expected.name);

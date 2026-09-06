@@ -228,3 +228,82 @@ test("independent OCR views fill missing facts without duplicating lots or resol
   assert.equal(conflict.fields.name, undefined); assert.equal(conflict.fields.weight_g, undefined);
   assert.equal(conflict.fields.roastery, "Printed Brand");
 });
+
+test("display metadata preserves printed descriptions without changing personal tasting fields", () => {
+  const base = extraction({ blend_components: [{ origin_country: "Ethiopia", percentage: 60 }, { origin_country: "Ethiopia", percentage: 40 }] }, "blend");
+  const result = mergeLabelExtractions([{ ...base,
+    composition_lines: ["Ethiopia Gedeb Chorso 60%", "Ethiopia Bursa Main Station 40%"],
+    tasting_notes: { en: ["Green Apple", "Honey"], ko: ["청사과", "꿀"] },
+    tasting_notes_evidence: ["Green Apple, Honey", "청사과, 꿀"],
+  }]);
+  assert.deepEqual(result.composition_lines, ["Ethiopia Gedeb Chorso 60%", "Ethiopia Bursa Main Station 40%"]);
+  assert.deepEqual(result.tasting_notes, { en: ["Green Apple", "Honey"], ko: ["청사과", "꿀"] });
+  assert.deepEqual(result.tasting_notes_translation_ko, ["청사과", "꿀"]);
+  const current = form();
+  const applied = applyLabelFields(current, result, [...LABEL_FIELDS, "tasting_notes", "composition_lines", "note", "tags"]);
+  for (const field of ["note", "tags", "overall_score"]) assert.deepEqual(applied[field], current[field]);
+  assert.equal(applied.tasting_notes, undefined);
+  assert.equal(applied.composition_lines, undefined);
+});
+
+test("display metadata is bounded, source-backed, and cannot shift descriptions onto the wrong lot", () => {
+  const fields = { blend_components: { value: [{ origin_country: "Brazil", percentage: 60 }, { origin_country: "Peru", percentage: 40 }], evidence: "Brazil 60% / Peru 40%" } };
+  for (const composition_lines of [["Brazil 60%"], ["Brazil 60%", ""], ["X".repeat(501), "Peru 40%"], ["Brazil\u202e60%", "Peru 40%"]]) {
+    assert.equal(normalizeLabelExtraction({ bean_type: "blend", fields, composition_lines }).composition_lines, undefined);
+  }
+  const labels = Array.from({ length: 25 }, (_, index) => `Printed flavor ${index}`);
+  const result = normalizeLabelExtraction({ fields: {},
+    tasting_notes: { en: labels, ko: ["없는 단어"] },
+    tasting_notes_evidence: [labels.join(", ")],
+    tasting_notes_translation_ko: ["invented translation"],
+  });
+  assert.equal(result.tasting_notes.en.length, 20);
+  assert.deepEqual(result.tasting_notes.ko, []);
+  assert.equal(result.tasting_notes_translation_ko, undefined);
+  assert.equal(normalizeLabelExtraction({ fields: {}, tasting_notes: { en: ["Peach"], ko: [] } }).tasting_notes, undefined);
+  assert.equal(normalizeLabelExtraction({ fields: {}, tasting_notes: { en: ["Peach"], ko: [] }, tasting_notes_evidence: ["Honey"] }).tasting_notes, undefined);
+  assert.equal(normalizeLabelExtraction({ fields: {}, tasting_notes: { en: ["Peach"], ko: [] }, tasting_notes_evidence: ["Peach\u202e"] }).tasting_notes, undefined);
+});
+
+test("merging retains component order and one complete source per cup-note language", () => {
+  const components = [{ origin_country: "Brazil", percentage: 70 }, { origin_country: "Colombia", percentage: 30 }];
+  const preferred = extraction({ blend_components: components }, "blend");
+  const second = { ...extraction({ blend_components: [...components].reverse() }, "blend"),
+    composition_lines: ["Colombia Huila 30%", "Brazil Cerrado 70%"],
+    tasting_notes: { en: ["Cocoa", "Hazelnut", "Plum"], ko: [] }, tasting_notes_evidence: ["Cocoa, Hazelnut, Plum"],
+  };
+  const third = { ...extraction({}, "blend"), tasting_notes: { en: ["Cocoa", "Plum"], ko: ["코코아", "헤이즐넛", "자두"] }, tasting_notes_evidence: ["Cocoa, Plum", "코코아, 헤이즐넛, 자두"] };
+  const merged = mergeLabelExtractions([preferred, second, third]);
+  assert.deepEqual(merged.composition_lines, ["Brazil Cerrado 70%", "Colombia Huila 30%"]);
+  assert.deepEqual(merged.tasting_notes, { en: ["Cocoa", "Hazelnut", "Plum"], ko: ["코코아", "헤이즐넛", "자두"] });
+  assert.deepEqual(merged.tasting_notes_translation_ko, ["코코아", "헤이즐넛", "자두"]);
+  const conflict = mergeLabelExtractions([second, extraction({ blend_components: [{ origin_country: "Brazil", percentage: 80 }, { origin_country: "Peru", percentage: 20 }] }, "blend")]);
+  assert.equal(conflict.fields.blend_components, undefined);
+  assert.equal(conflict.composition_lines, undefined);
+});
+
+test("dictionary translations require every English note to match and never overwrite Korean OCR", () => {
+  const result = normalizeLabelExtraction({ fields: {},
+    tasting_notes: { en: ["Red Apple", "Bergamot", "Black Tea"], ko: ["빨간사과", "배르가옷", "볼랙티"] },
+    tasting_notes_evidence: ["Red Apple, Bergamot, Black Tea", "빨간사과, 배르가옷, 볼랙티"],
+    tasting_notes_translation_ko: ["untrusted"],
+  });
+  assert.deepEqual(result.tasting_notes.ko, ["빨간사과", "배르가옷", "볼랙티"]);
+  assert.deepEqual(result.tasting_notes_translation_ko, ["빨간사과", "베르가못", "블랙티"]);
+  const partial = normalizeLabelExtraction({ fields: {}, tasting_notes: { en: ["Honey", "Unknown flower"], ko: [] }, tasting_notes_evidence: ["Honey, Unknown flower"] });
+  assert.equal(partial.tasting_notes_translation_ko, undefined);
+});
+
+test("explicit component subregions survive validation while oversized or malformed hierarchies do not", () => {
+  const components = [
+    { origin_country: "Ethiopia", origin_region: "Gedeb", origin_subregions: ["Printed locality"], percentage: 60 },
+    { origin_country: "Brazil", percentage: 40 },
+  ];
+  const result = extraction({ blend_components: components }, "blend");
+  assert.deepEqual(result.fields.blend_components[0].origin_subregions, ["Printed locality"]);
+  assert.deepEqual(applyLabelFields(form(), result, ["blend_components"]).blend_components[0].origin_subregions, ["Printed locality"]);
+  for (const origin_subregions of [[""], ["X".repeat(101)], Array(11).fill("place"), ["place", 1]]) {
+    const invalid = extraction({ blend_components: [{ ...components[0], origin_subregions }, components[1]] }, "blend");
+    assert.equal(invalid.fields.blend_components[0].origin_subregions, undefined);
+  }
+});

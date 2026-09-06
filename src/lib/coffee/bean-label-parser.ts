@@ -4,7 +4,7 @@ import { flavorPresets } from "../../data/flavor-wheel.ts";
 import type { BlendComponent } from "../../types/database.ts";
 import { normalizeLabelExtraction, type LabelExtraction, type LabelField } from "./bean-label.ts";
 
-type ParserField = LabelField | "ignore";
+type ParserField = LabelField | "tasting_notes" | "ignore";
 type Candidate = { value: string | number; evidence: string };
 
 // Match spacing noise in labels, without correcting or completing printed values.
@@ -24,8 +24,9 @@ const labels: [ParserField, string[]][] = [
   ["roast_date", ["로스팅 일자", "로스팅 날짜", "로스팅 일", "볶은 날", "roasting date", "roast date", "roasted date", "date roasted", "roasted on", "roasted"]],
   ["roast_level", ["로스팅 정도", "로스팅 레벨", "배전도", "roast level", "roast profile", "roast"]],
   ["weight_g", ["내용량", "순중량", "중량", "net weight", "net wt.", "net wt", "net contents", "weight", "net"]],
+  ["tasting_notes", ["tasting notes", "tasting note", "cup notes", "cup note", "flavor notes", "컵 노트", "컵노트", "맛", "향미"]],
   // Recognize other headings only to keep their text out of adjacent fields.
-  ["ignore", ["소비 기한", "유통 기한", "품질 유지 기한", "구매일", "수확일", "제조일", "포장일", "best before", "best by", "expiry date", "expiration date", "expires", "expiry", "purchased", "purchase date", "harvest date", "harvest", "packed on", "manufactured", "tasting notes", "cup notes", "컵 노트", "맛", "향미", "고도", "altitude", "roastery address", "address", "주소", "dose", "dosage", "water", "추출량", "물", "투입량", "사용량"]],
+  ["ignore", ["소비 기한", "유통 기한", "품질 유지 기한", "구매일", "수확일", "제조일", "포장일", "best before", "best by", "expiry date", "expiration date", "expires", "expiry", "purchased", "purchase date", "harvest date", "harvest", "packed on", "manufactured", "고도", "altitude", "roastery address", "address", "주소", "dose", "dosage", "water", "추출량", "물", "투입량", "사용량"]],
 ];
 
 const labelEntries = labels.flatMap(([field, aliases]) => aliases.map((alias) => ({ field, alias, pattern: spaced(alias) })))
@@ -38,6 +39,19 @@ const recipePattern = /\b(?:brew(?:ing)?|recipe|dose|dosage|dosing|water|yield|r
 const blendPattern = new RegExp(`(?:\\b${spaced("blend")}s?\\b|${spaced("블렌드")}|${spaced("블렌딩")}|${spaced("혼합")})`, "iu");
 const singlePattern = new RegExp(`(?:\\b${spaced("single origin")}\\b|${spaced("싱글 오리진")}|${spaced("단일 산지")})`, "iu");
 const nutritionPattern = /\b(?:nutrition(?:al)?|per serving|protein|fat|sodium|carbohydrate|calories|ingredients)\b|영양|단백질|지방|나트륨|탄수화물|원재료|성분/iu;
+const knownNotes = new Set([
+  ...flavorPresets.flatMap((flavor) => [flavor.tag.replaceAll("-", " "), flavor.tagKo]),
+  "green apple", "red apple", "yellow apple", "candy", "sugar", "nuts", "black tea", "milk chocolate",
+  "청사과", "풋사과", "빨간사과", "적사과", "캔디", "사탕", "블랙티", "밀크초콜릿", "견과류",
+].map(key));
+const trailingWeight = /(?:^|\s)([1-9]\d{0,2}(?:,\d{3})+\s*(?:kg|g|그램)|\d+(?:\.\d+)?\s*(?:kg|k\s*g|g|㎏|그램|킬로그램))\.?$/iu;
+
+function noteTokens(value: string): string[] {
+  return value.split(/[,，;；|¦•·/]+|\s+[&+]\s+|\.\s+/u).map((note) => note.trim())
+    .filter((note) => note.length <= 80 && /^[\p{L}][\p{L}\s'’()\-]*$/u.test(note)
+      && (/[가-힣]/u.test(note) || note.replace(/[^a-z]/giu, "").length >= 2)
+      && note.split(/\s+/u).length <= 6);
+}
 
 function key(value: string): string {
   return value.trim().toLowerCase().replace(/\s+/gu, "");
@@ -187,11 +201,14 @@ export function parseBeanLabelText(text: string): LabelExtraction {
   const blocked = new Set<LabelField>();
   const standalone: { text: string; evidence: string }[] = [];
   const impliedProcessDetails: Candidate[] = [];
-  const componentRows: { value: BlendComponent; evidence: string }[] = [];
+  const componentRows: { value: BlendComponent; evidence: string; printedText: string }[] = [];
+  const tastingNotes: { en: string[]; ko: string[] } = { en: [], ko: [] };
+  const tastingEvidence: string[] = [];
   let invalidComponents = false;
   let blend = false;
   let single = false;
   let excludedSection = false;
+  let nutritionSection = false;
   const lines = text.slice(0, 100_000).split(/\r?\n/u).map((line) => line.trim());
 
   function add(field: LabelField, value: string | number | undefined, evidence: string) {
@@ -203,7 +220,7 @@ export function parseBeanLabelText(text: string): LabelExtraction {
   }
 
   function read(field: ParserField, value: string, evidence: string) {
-    if (!value || field === "ignore") return;
+    if (!value || field === "ignore" || field === "tasting_notes") return;
     if (field === "origin_country") {
       readComponents(value, evidence, true);
       if (countriesIn(value).length > 1 || hasOriginShare(value) || blendPattern.test(value)) {
@@ -249,7 +266,7 @@ export function parseBeanLabelText(text: string): LabelExtraction {
       const row = rows[index] + (index < rows.length - 1 ? "%" : "");
       const parsed = parseBlendComponent(row);
       if (!parsed) invalidComponents = true;
-      else componentRows.push({ value: parsed, evidence });
+      else componentRows.push({ value: parsed, evidence, printedText: row.trim() });
     }
   }
 
@@ -281,9 +298,9 @@ export function parseBeanLabelText(text: string): LabelExtraction {
     const parts = firstLabel.test(line) ? [line] : line.split(/[|¦;]/u).map((part) => part.trim()).filter(Boolean);
     for (const part of parts) {
       const labelled = segments(part);
-      const recipe = recipePattern.test(part);
-      if (recipe) excludedSection = true;
-      if (!labelled.length && excludedSection) continue;
+      if (nutritionPattern.test(part)) nutritionSection = true;
+      if (recipePattern.test(part)) excludedSection = true;
+      if (!labelled.length && (excludedSection || nutritionSection)) continue;
       // A product title can explicitly identify a blend; a tasting note cannot.
       if (!labelled.length || labelled.some(({ field }) => field === "name" || field === "origin_country")) {
         blend ||= blendPattern.test(part);
@@ -291,7 +308,8 @@ export function parseBeanLabelText(text: string): LabelExtraction {
       }
       if (labelled.length) {
         for (const { field, value } of labelled) {
-          excludedSection = field === "ignore";
+          excludedSection = field === "ignore" || field === "tasting_notes";
+          nutritionSection = false;
           read(field, value, line);
         }
         continue;
@@ -304,8 +322,9 @@ export function parseBeanLabelText(text: string): LabelExtraction {
       }
       const country = parseCountry(part);
       add("origin_country", country, line);
-      const recipeNearby = recipePattern.test(lines[index - 1] ?? "") || recipePattern.test(lines[index + 1] ?? "");
-      if (!recipeNearby) add("weight_g", parseWeight(part), line);
+      const excludedNearby = [lines[index - 1] ?? "", lines[index + 1] ?? ""]
+        .some(line => recipePattern.test(line) || nutritionPattern.test(line));
+      if (!excludedNearby) add("weight_g", parseWeight(part), line);
       const method = parseProcess(part);
       add("process_method", method, line);
       if (method && hasSpecificProcessDetail(part)) impliedProcessDetails.push({ value: part, evidence: line });
@@ -349,22 +368,59 @@ export function parseBeanLabelText(text: string): LabelExtraction {
     }
   }
 
-  // A unit-bearing package weight can share a printed line with cup notes.
-  if (componentRows.length > 0 || candidates.has("origin_country")) {
-    let recipe = false;
-    for (let index = 0; index < lines.length; index += 1) {
-      const line = lines[index];
-      if (!line) recipe = false;
-      if (recipePattern.test(line)) recipe = true;
-      else if (segments(line).some(({ field }) => field !== "ignore")) recipe = false;
-      if (recipe || recipePattern.test(lines[index - 1] ?? "") || recipePattern.test(lines[index + 1] ?? "")) continue;
-      if (nutritionPattern.test(line) || segments(line).some(({ field }) => field !== "ignore")) continue;
-      const labelledNotes = /(?:tasting|cup)\s*notes|향미|컵\s*노트/iu.test(line);
-      const flavors = flavorPresets.filter((flavor) => new RegExp(`\\b${spaced(flavor.tag.replaceAll("-", " "))}\\b|${spaced(flavor.tagKo)}`, "iu").test(line));
-      if (!labelledNotes && (!/[,，]/u.test(line) || flavors.length < 2)) continue;
-      const trailing = /(?:^|\s)(\d+(?:\.\d+)?\s*(?:kg|k\s*g|g|㎏|그램|킬로그램))\.?$/iu.exec(line);
-      if (trailing) add("weight_g", parseWeight(trailing[1]), line);
+  // Keep printed cup notes separate from the drinker's own impressions. Known
+  // vocabulary anchors an unlabelled list; spelling stays exactly as read.
+  function readNotes(value: string, evidence: string, explicit: boolean): boolean {
+    const weight = trailingWeight.exec(value);
+    const content = weight ? value.slice(0, weight.index).trim() : value;
+    let tokens = noteTokens(content);
+    if (!explicit) {
+      // A Korean list can contain Latin OCR noise. Its Korean vocabulary is
+      // evidence only for Korean notes, not for unrelated Latin fragments.
+      const anchored = (language: "en" | "ko") => tokens.filter(note => (/[가-힣]/u.test(note) ? "ko" : "en") === language)
+        .filter(note => knownNotes.has(key(note))).length >= 2;
+      const en = anchored("en");
+      const ko = anchored("ko");
+      tokens = tokens.filter(note => /[가-힣]/u.test(note) ? ko : en);
     }
+    if (!tokens.length) return false;
+    if (!explicit && (blendPattern.test(content) || /[:：=%]/u.test(content))) return false;
+    for (const token of tokens) {
+      const language = /[가-힣]/u.test(token) ? "ko" : "en";
+      if (tastingNotes[language].length < 20 && !tastingNotes[language].some(note => key(note) === key(token))) tastingNotes[language].push(token);
+    }
+    if (tastingEvidence.length < 10 && !tastingEvidence.includes(evidence)) tastingEvidence.push(evidence);
+    if (weight) add("weight_g", parseWeight(weight[1]), evidence);
+    return true;
+  }
+  let notesSection = false;
+  let excludedNotesSection = false;
+  for (let index = 0; index < lines.length; index += 1) {
+    const line = lines[index];
+    if (!line) { notesSection = false; excludedNotesSection = false; continue; }
+    if (line.length > 500) continue;
+    if (recipePattern.test(line) || nutritionPattern.test(line)) {
+      notesSection = false;
+      excludedNotesSection = true;
+      continue;
+    }
+    const labelled = segments(line);
+    if (labelled.length) {
+      for (const { field, value } of labelled) {
+        notesSection = field === "tasting_notes";
+        excludedNotesSection = field === "ignore";
+        if (notesSection && value) readNotes(value, line, true);
+      }
+      continue;
+    }
+    if (excludedNotesSection || recipePattern.test(lines[index - 1] ?? "") || recipePattern.test(lines[index + 1] ?? "")) continue;
+    const weight = parseWeight(line);
+    if (notesSection && weight !== undefined) {
+      add("weight_g", weight, line);
+      notesSection = false;
+      continue;
+    }
+    if (!readNotes(line, line, notesSection)) notesSection = false;
   }
 
   const origin = candidates.get("origin_country");
@@ -406,6 +462,9 @@ export function parseBeanLabelText(text: string): LabelExtraction {
   }
   return normalizeLabelExtraction({
     bean_type: blend ? "blend" : single ? "single_origin" : "unknown",
+    composition_lines: validComponents ? componentRows.map(row => row.printedText) : undefined,
+    tasting_notes: tastingNotes,
+    tasting_notes_evidence: tastingEvidence,
     fields: {
       ...fields,
       ...(validComponents ? { blend_components: {

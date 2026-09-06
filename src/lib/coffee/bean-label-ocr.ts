@@ -1,5 +1,7 @@
 "use client";
 
+import { prepareLabelWordRetry } from "./bean-label-image.ts";
+import { findLabelWeightRegions, type LabelTextRegion } from "./bean-label-image-regions.ts";
 import { hasUnreadableLabelWeight, parseBeanLabelText } from "./bean-label-parser.ts";
 import { mergeLabelExtractions, type LabelExtraction } from "./bean-label.ts";
 
@@ -17,6 +19,7 @@ export interface LabelReadProgress {
 interface ReadOptions {
   signal: AbortSignal;
   onProgress: (progress: LabelReadProgress) => void;
+  onPartial?: (result: { text: string; extraction: LabelExtraction }) => void;
   prepareWeightRetry?: () => Promise<Blob>;
 }
 
@@ -39,6 +42,7 @@ const abortError = () => new DOMException("Reading cancelled", "AbortError");
 export function createBrowserLabelReader() {
   let worker: Worker | null = null;
   let initialized = false;
+  let language = "kor+eng";
   let psm = "6";
   let busy = false;
   let generation = 0;
@@ -116,10 +120,14 @@ export function createBrowserLabelReader() {
       const currentGeneration = generation;
       let pass = 0;
       let reading = false;
-      const plannedPasses = variants.length + (options.prepareWeightRetry ? 1 : 0);
-      progress = value => onProgress(reading
-        ? { phase: "reading", progress: (pass + (value.phase === "reading" ? value.progress : 0)) / plannedPasses }
-        : value);
+      let readingProgress = 0;
+      const plannedPasses = variants.length + (options.prepareWeightRetry || variants.length > 1 ? 1 : 0);
+      progress = value => {
+        if (!reading) { onProgress(value); return; }
+        readingProgress = Math.max(readingProgress,
+          Math.min(0.98, (pass + (value.phase === "reading" ? value.progress : 0)) / plannedPasses));
+        onProgress({ phase: "reading", progress: readingProgress });
+      };
       const abort = () => { if (generation === currentGeneration) stop(); };
       const assertCurrent = () => {
         signal.throwIfAborted();
@@ -142,14 +150,29 @@ export function createBrowserLabelReader() {
           await job("setParameters", { params: { tessedit_pageseg_mode: "6", preserve_interword_spaces: "1", user_defined_dpi: "300" } });
           assertCurrent();
           initialized = true;
+          language = "kor+eng";
           psm = "6";
+        }
+        if (language !== "kor+eng") {
+          await job("initialize", { langs: "kor+eng", oem: 1, config: {} });
+          assertCurrent();
+          language = "kor+eng";
+          psm = "";
         }
         reading = true;
         onProgress({ phase: "reading", progress: 0 });
         assertCurrent();
         const texts: string[] = [];
-        const extractions: LabelExtraction[] = [];
-        async function readPixels(image: Blob, mode: string) {
+        const extractions: { extraction: LabelExtraction; kind?: LabelImageVariant["kind"] }[] = [];
+        const wordRegions: { image: Blob; kind: LabelImageVariant["kind"]; region: LabelTextRegion }[] = [];
+        const combined = () => ({
+          text: [...new Set(texts.flatMap(value => value.split("\n")).map(line => line.trim()).filter(Boolean))].join("\n").slice(0, MAX_TEXT_LENGTH),
+          extraction: mergeLabelExtractions([...extractions]
+            .sort((left, right) => Number(right.kind === "text") - Number(left.kind === "text"))
+            .map(result => result.extraction)),
+        });
+        const partial = () => { options.onPartial?.(combined()); assertCurrent(); };
+        async function readPixels(image: Blob, mode: string, boxes = false) {
           if (psm !== mode) {
             await job("setParameters", { params: { tessedit_pageseg_mode: mode, preserve_interword_spaces: "1", user_defined_dpi: "300" } });
             assertCurrent();
@@ -157,35 +180,74 @@ export function createBrowserLabelReader() {
           }
           const pixels = new Uint8Array(await image.arrayBuffer());
           assertCurrent();
-          const result = await job("recognize", { image: pixels, options: {}, output: { text: true } }, [pixels.buffer]);
+          const result = await job("recognize", { image: pixels, options: {}, output: { text: true, ...(boxes ? { blocks: true } : {}) } }, [pixels.buffer]);
           assertCurrent();
           if (!result || typeof result !== "object" || !("text" in result) || typeof result.text !== "string") throw new Error("recognition_failed");
-          return result.text.slice(0, MAX_TEXT_LENGTH).trim();
+          const text = result.text.slice(0, MAX_TEXT_LENGTH).trim();
+          const extraction = parseBeanLabelText(text);
+          const hasLabelContext = [extraction, ...extractions.map(result => result.extraction)].some(result =>
+            Boolean(result.fields.name || result.fields.roastery || result.fields.origin_country || result.fields.blend_components?.length));
+          return {
+            text,
+            extraction,
+            regions: findLabelWeightRegions("blocks" in result ? result.blocks : undefined, hasLabelContext),
+            confidence: "confidence" in result && typeof result.confidence === "number" ? result.confidence : 0,
+          };
         }
         for (pass = 0; pass < variants.length; pass++) {
           const variant = variants[pass];
-          const text = await readPixels(variant.image, variant.psm);
-          texts.push(text);
-          extractions.push(parseBeanLabelText(text));
+          const result = await readPixels(variant.image, variant.psm, true);
+          texts.push(result.text);
+          extractions.push({ extraction: result.extraction, kind: variant.kind });
+          wordRegions.push(...result.regions.map(region => ({ image: variant.image, kind: variant.kind, region })));
+          partial();
         }
-        if (options.prepareWeightRetry && extractions.every(result => result.fields.weight_g === undefined)
+        if (options.prepareWeightRetry && extractions.every(result => result.extraction.fields.weight_g === undefined)
           && texts.some(hasUnreadableLabelWeight)) {
           const enlarged = await options.prepareWeightRetry();
           assertCurrent();
-          const text = await readPixels(enlarged, "6");
-          texts.push(text);
-          const retry = parseBeanLabelText(text);
+          const result = await readPixels(enlarged, "6");
+          texts.push(result.text);
+          const retry = result.extraction;
           // Enlarging a unit may damage other glyphs. Only its explicitly read
           // package weight can supplement the original, never names or origins.
-          extractions.push({ bean_type: "unknown", fields: { weight_g: retry.fields.weight_g }, evidence: { weight_g: retry.evidence.weight_g } });
+          extractions.push({ extraction: { bean_type: "unknown", fields: { weight_g: retry.fields.weight_g }, evidence: { weight_g: retry.evidence.weight_g } } });
+          partial();
         }
-        // Parse each view independently so repeated scans cannot double blend shares.
-        const text = [...new Set(texts.flatMap(value => value.split("\n")).map(line => line.trim()).filter(Boolean))].join("\n").slice(0, MAX_TEXT_LENGTH);
+        if (extractions.every(result => result.extraction.fields.weight_g === undefined)) {
+          // A sparse photograph keeps isolated digits separate from surrounding
+          // words. Prefer its coordinates and retry at most two observed tokens.
+          const candidates = wordRegions.sort((left, right) => Number(right.kind === "full") - Number(left.kind === "full")).slice(0, 2);
+          for (const candidate of candidates) {
+            for (const scale of [1, 1.5] as const) {
+              if (scale !== 1 && language !== "eng") {
+                // English units can be mistaken for a digit by the Korean model.
+                // Reuse the already loaded language data and the same worker.
+                await job("initialize", { langs: "eng", oem: 1, config: {} });
+                assertCurrent();
+                language = "eng";
+                psm = "";
+              }
+              const cropped = await prepareLabelWordRetry(candidate.image, candidate.region, signal, scale);
+              assertCurrent();
+              const result = await readPixels(cropped, scale === 1 ? "13" : "7");
+              // No whitelist, digit replacement, or assumed unit: accept only the
+              // package weight explicitly recognized in this independent pixel read.
+              const retry = result.extraction;
+              if (result.confidence >= 70 && retry.fields.weight_g !== undefined) {
+                texts.push(result.text);
+                extractions.push({ extraction: { bean_type: "unknown", fields: { weight_g: retry.fields.weight_g }, evidence: { weight_g: retry.evidence.weight_g } } });
+                partial();
+                break;
+              }
+            }
+            if (extractions.some(result => result.extraction.fields.weight_g !== undefined)) break;
+          }
+        }
+        // Parse views separately so repeated scans cannot double blend shares.
         onProgress({ phase: "reading", progress: 1 });
         assertCurrent();
-        const preferred = extractions.map((extraction, index) => ({ extraction, kind: variants[index]?.kind }))
-          .sort((left, right) => Number(right.kind === "text") - Number(left.kind === "text"));
-        return { text, extraction: mergeLabelExtractions(preferred.map(result => result.extraction)) };
+        return combined();
       } catch (error) {
         if (generation === currentGeneration) stop();
         if (signal.aborted) throw abortError();

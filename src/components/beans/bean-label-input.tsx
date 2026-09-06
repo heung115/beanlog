@@ -25,7 +25,8 @@ const ERROR_CODES = [
 ] as const;
 type LabelError = typeof ERROR_CODES[number];
 type Phase = "idle" | "preparing" | LabelReadProgress["phase"];
-type LabelSelection = { field: LabelField; valueAtSelection: BeanFormData[LabelField] };
+type LabelPhoto = { url: string; name: string; file: File };
+type LabelSelection = { field: LabelField; valueAtSelection: BeanFormData[LabelField]; defaultProcess?: boolean; automaticBlend?: boolean };
 const SELECTION_DEPENDENCIES: Partial<Record<LabelField, readonly (keyof BeanFormData)[]>> = {
   process_method: ["process_detail"],
   farm_producer: ["origin_entity_id"],
@@ -49,6 +50,7 @@ interface BeanLabelInputProps {
   form: BeanFormData;
   onApply: (extraction: LabelExtraction, selected: LabelField[]) => void;
   disabled?: boolean;
+  allowDefaultProcessFill?: boolean;
 }
 
 function isEmpty(value: unknown) {
@@ -65,6 +67,13 @@ function selectionKey(form: BeanFormData, field: LabelField) {
   return dependencies
     ? JSON.stringify([form[field], ...dependencies.map((key) => form[key])])
     : form[field];
+}
+
+function canSelectNewBlend(form: BeanFormData) {
+  // A printed recipe can be offered by default only before any bean identity or origin is entered.
+  return form.bean_type === "single_origin" && form.process_method === "washed"
+    && ["name", "roastery", ...BLEND_CONTEXT_FIELDS.filter((field) => !["bean_type", "process_method"].includes(field))]
+      .every((field) => isEmpty(form[field as keyof BeanFormData]));
 }
 
 function selectField(form: BeanFormData, field: LabelField): LabelSelection {
@@ -86,7 +95,7 @@ function blockedReason(form: BeanFormData, extraction: LabelExtraction, field: L
   return "originSelectionHint";
 }
 
-export function BeanLabelInput({ form, onApply, disabled = false }: BeanLabelInputProps) {
+export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultProcessFill = false }: BeanLabelInputProps) {
   const t = useTranslations("beans.labelImport");
   const tb = useTranslations("beans");
   const tp = useTranslations("process");
@@ -94,9 +103,14 @@ export function BeanLabelInput({ form, onApply, disabled = false }: BeanLabelInp
   const id = useId();
   const fileInput = useRef<HTMLInputElement>(null);
   const currentForm = useRef(form);
+  const currentDefaultProcessPermission = useRef(allowDefaultProcessFill);
   const request = useRef<{ sequence: number; controller: AbortController | null }>({ sequence: 0, controller: null });
   const [reader] = useState(createBrowserLabelReader);
-  const [photo, setPhoto] = useState<{ url: string; name: string; file: File } | null>(null);
+  const [photo, setPhoto] = useState<LabelPhoto | null>(null);
+  const [dragging, setDragging] = useState(false);
+  const dragDepth = useRef(0);
+  const startedAt = useRef(0);
+  const [elapsed, setElapsed] = useState(0);
   const [phase, setPhase] = useState<Phase>("idle");
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<LabelError | null>(null);
@@ -107,6 +121,12 @@ export function BeanLabelInput({ form, onApply, disabled = false }: BeanLabelInp
   const busy = phase !== "idle";
 
   useEffect(() => { currentForm.current = form; }, [form]);
+  useEffect(() => { currentDefaultProcessPermission.current = allowDefaultProcessFill; }, [allowDefaultProcessFill]);
+  useEffect(() => {
+    if (!busy) return;
+    const timer = window.setInterval(() => setElapsed(Math.floor((Date.now() - startedAt.current) / 1000)), 1000);
+    return () => window.clearInterval(timer);
+  }, [busy]);
   useEffect(() => () => { if (photo) URL.revokeObjectURL(photo.url); }, [photo]);
   useEffect(() => () => {
     request.current.sequence += 1;
@@ -138,28 +158,37 @@ export function BeanLabelInput({ form, onApply, disabled = false }: BeanLabelInp
     if (!IMAGE_TYPES.has(file.type)) { setError("invalid_image"); return; }
     if (file.size > MAX_FILE_BYTES) { setError("image_too_large"); return; }
     setError(null);
-    setPhoto({ url: URL.createObjectURL(file), name: file.name, file });
+    const nextPhoto = { url: URL.createObjectURL(file), name: file.name, file };
+    setPhoto(nextPhoto);
+    void readPhoto(nextPhoto);
   }
 
-  async function readPhoto() {
-    if (!photo || disabled || busy || request.current.controller) return;
+  async function readPhoto(selectedPhoto: LabelPhoto) {
+    if (disabled || request.current.controller) return;
     const sequence = ++request.current.sequence;
     const controller = new AbortController();
     request.current.controller = controller;
     let timedOut = false;
     const timeout = window.setTimeout(() => { timedOut = true; controller.abort(); }, READ_TIMEOUT_MS);
+    startedAt.current = Date.now();
+    setElapsed(0);
     setPhase("preparing");
     setProgress(0);
     setError(null);
     setNotice(null);
     clearResults();
     try {
-      const image = await prepareLabelImages(photo.file, controller.signal);
+      const image = await prepareLabelImages(selectedPhoto.file, controller.signal);
       if (sequence !== request.current.sequence) return;
       setPhase("loading");
       const { text, extraction: result } = await reader.recognize(image, {
         signal: controller.signal,
-        prepareWeightRetry: () => prepareLabelWeightRetry(photo.file, controller.signal),
+        prepareWeightRetry: () => prepareLabelWeightRetry(selectedPhoto.file, controller.signal),
+        onPartial: ({ text: partialText, extraction: partialExtraction }) => {
+          if (sequence !== request.current.sequence || controller.signal.aborted) return;
+          setRawText(partialText.trim());
+          setExtraction(partialExtraction);
+        },
         onProgress: ({ phase: nextPhase, progress: nextProgress }) => {
           if (sequence !== request.current.sequence || controller.signal.aborted) return;
           setPhase(nextPhase);
@@ -172,15 +201,22 @@ export function BeanLabelInput({ form, onApply, disabled = false }: BeanLabelInp
         throw new Error("recognition_failed");
       }
       setRawText(text.trim());
+      setExtraction(result);
       const candidates = candidatesFor(result);
       if (!candidates.length) {
         setError("no_fields");
         return;
       }
       const latestForm = currentForm.current;
-      const emptyFields = candidates.filter((field) => field !== "blend_components" && isEmpty(latestForm[field]));
-      setSelections(eligibleLabelFields(latestForm, result, emptyFields).map((field) => selectField(latestForm, field)));
-      setExtraction(result);
+      const newBlend = candidates.includes("blend_components") && canSelectNewBlend(latestForm);
+      const fillDefaultProcess = newBlend && currentDefaultProcessPermission.current;
+      const emptyFields = candidates.filter((field) => field === "blend_components" ? newBlend
+        : (fillDefaultProcess && (field === "process_method" || field === "process_detail")) || isEmpty(latestForm[field]));
+      setSelections(eligibleLabelFields(latestForm, result, emptyFields).map((field) => ({
+        ...selectField(latestForm, field),
+        defaultProcess: fillDefaultProcess && (field === "process_method" || field === "process_detail"),
+        automaticBlend: newBlend && field === "blend_components",
+      })));
     } catch (failure) {
       if (sequence !== request.current.sequence) return;
       reader.dispose();
@@ -190,6 +226,7 @@ export function BeanLabelInput({ form, onApply, disabled = false }: BeanLabelInp
       window.clearTimeout(timeout);
       if (sequence === request.current.sequence) {
         request.current.controller = null;
+        setElapsed(Math.floor((Date.now() - startedAt.current) / 1000));
         setPhase("idle");
       }
     }
@@ -197,12 +234,19 @@ export function BeanLabelInput({ form, onApply, disabled = false }: BeanLabelInp
 
   // An earlier checkbox selection never grants permission to replace a later edit.
   // Selecting that field again explicitly allows replacing its current value.
-  const selected = selections
-    .filter((selection) => selectionIsCurrent(form, selection))
+  const currentSelections = selections.filter((selection) => selectionIsCurrent(form, selection));
+  // Automatic mixed-process values belong to the original automatic blend selection.
+  // Removing that recipe or entering another origin revokes the linked defaults too.
+  const keepDefaultProcess = allowDefaultProcessFill && canSelectNewBlend(form)
+    && currentSelections.some((selection) => selection.field === "blend_components" && selection.automaticBlend)
+    && Boolean(extraction && eligibleLabelFields(form, extraction, ["blend_components"]).includes("blend_components"));
+  const selected = currentSelections
+    .filter((selection) => !selection.defaultProcess || keepDefaultProcess)
     .map(({ field }) => field);
   const candidates = extraction ? candidatesFor(extraction) : [];
   const applicable = extraction ? eligibleLabelFields(form, extraction, selected) : [];
-  const replacesExisting = applicable.some((field) => !isEmpty(form[field]));
+  const replacesExisting = applicable.some((field) => !isEmpty(form[field])
+    && !selections.some((selection) => selection.field === field && selection.defaultProcess));
 
   function displayValue(field: LabelField) {
     if (field === "blend_components") {
@@ -231,106 +275,192 @@ export function BeanLabelInput({ form, onApply, disabled = false }: BeanLabelInp
     return String(value ?? "");
   }
 
+  const notes = extraction?.tasting_notes;
+  const composition = extraction?.fields.blend_components;
+  const compositionLines = extraction?.composition_lines ?? [];
+  const resultVisible = Boolean(extraction && (candidates.length || compositionLines.length || notes?.en.length || notes?.ko.length || extraction?.tasting_notes_translation_ko?.length));
+  const compactFields = candidates.filter((field) => !["name", "roastery", "weight_g", "blend_components"].includes(field));
+
   return (
-    <div className="flex flex-col gap-3" aria-busy={busy}>
+    <section aria-label={t("sectionTitle")} className="min-w-0" aria-busy={busy}>
       <input
         ref={fileInput} id={`${id}-file`} type="file" accept="image/jpeg,image/png,image/webp"
         aria-label={t("choose")} hidden tabIndex={-1} disabled={disabled}
         onChange={(event) => { choosePhoto(event.target.files?.[0]); event.target.value = ""; }}
       />
-      <div>
-        <Button type="button" variant="secondary" disabled={disabled} onClick={() => fileInput.current?.click()}>
-          <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="mr-2 shrink-0">
-            <path d="M8 5 6.5 8H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-2.5L16 5H8Z" />
-            <circle cx="12" cy="14" r="4" />
-          </svg>
-          {photo ? t("replace") : t("choose")}
-        </Button>
-        {!photo && (
-          <div className="mt-2 text-xs leading-5 text-brown-medium">
-            <p>{t("intro")}</p>
-            <p className="mt-1">{t("privacy")}</p>
+      <div
+        className={`min-w-0 rounded-lg border transition-colors ${dragging ? "border-accent bg-accent/5" : "border-border-light bg-surface-warm"}`}
+        onDragEnter={(event) => {
+          if (!event.dataTransfer.types.includes("Files")) return;
+          event.preventDefault();
+          dragDepth.current += 1;
+          if (!disabled) setDragging(true);
+        }}
+        onDragOver={(event) => {
+          if (!event.dataTransfer.types.includes("Files")) return;
+          event.preventDefault();
+          event.dataTransfer.dropEffect = disabled ? "none" : "copy";
+        }}
+        onDragLeave={(event) => {
+          event.preventDefault();
+          dragDepth.current = Math.max(0, dragDepth.current - 1);
+          if (dragDepth.current === 0) setDragging(false);
+        }}
+        onDrop={(event) => {
+          event.preventDefault();
+          dragDepth.current = 0;
+          setDragging(false);
+          choosePhoto(event.dataTransfer.files[0]);
+        }}
+      >
+        {!photo ? (
+          <div className="flex flex-col items-start gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+            <div className="min-w-0">
+              <p className="text-base font-semibold tracking-tight text-brown">{dragging ? t("dropNow") : t("sectionTitle")}</p>
+              <p className="mt-1 max-w-prose text-sm leading-6 text-brown-medium">{t("intro")}</p>
+              <p className="mt-1 text-xs leading-5 text-brown-light">{t("formats")}</p>
+            </div>
+            <Button type="button" variant="secondary" className="shrink-0" disabled={disabled} onClick={() => fileInput.current?.click()}>
+              <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="mr-2 shrink-0">
+                <path d="M8 5 6.5 8H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-2.5L16 5H8Z" />
+                <circle cx="12" cy="14" r="4" />
+              </svg>
+              {t("choose")}
+            </Button>
           </div>
+        ) : (
+          <>
+            <div className="flex items-start gap-4 p-4 sm:p-5">
+              <a href={photo.url} target="_blank" rel="noreferrer" aria-label={t("enlarge")} className="shrink-0 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+                <Image src={photo.url} alt={t("preview")} width={72} height={92} unoptimized className="h-23 w-18 rounded-sm bg-surface object-contain" />
+              </a>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-xs text-brown-medium" title={photo.name}>{photo.name}</p>
+                <div className="mt-1 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                  <p className="text-sm font-semibold text-brown">{busy ? t(phase) : error ? t("needsReview") : notice === "applied" ? t("filledTitle") : extraction ? t("review") : t("cancelledTitle")}</p>
+                  <span className="text-xs tabular-nums text-brown-medium">{t("elapsed", { seconds: elapsed })}</span>
+                </div>
+                {busy && (
+                  <div className="mt-3">
+                    <progress max={1} value={phase === "preparing" ? undefined : progress} aria-label={t(phase === "preparing" ? "preparing" : phase)} className="block h-1.5 w-full accent-accent" />
+                    <div className="mt-1 flex items-start justify-between gap-3 text-xs leading-5 text-brown-medium">
+                      <span>{phase === "loading" ? t("firstLoadHint") : resultVisible ? t("refiningHint") : t("readingHint")}</span>
+                      {phase !== "preparing" && <span aria-hidden="true" className="shrink-0 tabular-nums">{Math.round(progress * 100)}%</span>}
+                    </div>
+                  </div>
+                )}
+                <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0">
+                  {busy && <Button type="button" variant="ghost" size="sm" className="-ml-3" disabled={disabled} onClick={() => { cancelRequest(); setNotice("cancelled"); }}>{t("cancel")}</Button>}
+                  {!busy && <Button type="button" variant="ghost" size="sm" className="-ml-3" disabled={disabled} onClick={() => void readPhoto(photo)}>{t("retry")}</Button>}
+                  <Button type="button" variant="ghost" size="sm" className="" disabled={disabled} onClick={() => fileInput.current?.click()}>{t("replace")}</Button>
+                  {!busy && <Button type="button" variant="ghost" size="sm" disabled={disabled} onClick={() => { cancelRequest(); setPhoto(null); setError(null); setNotice(null); }}>{t("remove")}</Button>}
+                </div>
+              </div>
+            </div>
+            {resultVisible && extraction && (
+              <div role="group" aria-label={t("review")} data-testid="label-result" className="min-w-0 border-t border-border-light bg-surface px-4 py-5 sm:px-5">
+                {busy && <p className="mb-3 text-xs font-medium text-brown-medium">{t("partialResult")}</p>}
+                <div data-testid="label-result-summary" className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className="text-xs font-medium text-brown-medium">{extraction.fields.roastery || t("missingRoastery")}</p>
+                    <h3 className="mt-1 break-words text-xl font-semibold leading-7 tracking-tight text-brown">{extraction.fields.name || t("missingName")}</h3>
+                  </div>
+                  <p className="shrink-0 pt-1 text-lg font-medium tabular-nums text-brown" aria-label={`${tb("weight")}: ${extraction.fields.weight_g ? `${extraction.fields.weight_g} g` : t("missingValue")}`}>
+                    {extraction.fields.weight_g ? <>{extraction.fields.weight_g}<span className="ml-1 text-xs font-normal text-brown-medium">g</span></> : <span className="text-sm text-brown-light">{t("missingWeight")}</span>}
+                  </p>
+                </div>
+                {Boolean(composition?.length || compositionLines.length) && (
+                  <div className="mt-5">
+                    <h4 className="text-xs font-medium text-brown-medium">{tb("blendComposition")}</h4>
+                    {composition?.length ? (
+                      <ol aria-label={tb("blendComposition")} data-testid="label-composition" className="mt-2 divide-y divide-border-light">
+                        {composition.map((component, index) => (
+                          <li key={index} className="grid grid-cols-[3rem_minmax(0,1fr)] items-baseline gap-3 py-3 first:pt-1">
+                            <span className="text-xl font-semibold tabular-nums tracking-tight text-brown">{component.percentage}<span className="ml-0.5 text-xs font-normal">%</span></span>
+                            <div className="min-w-0">
+                              <p className="break-words text-sm font-medium leading-6 text-brown">{compositionLines[index]?.replace(/\s*\d+(?:[.,]\d+)?\s*%\s*$/u, "").trim() || [component.origin_country, component.origin_region, component.farm_producer].filter(Boolean).join(" · ")}</p>
+                              {!compositionLines[index] && <p className="mt-0.5 break-words text-xs leading-5 text-brown-medium">{[component.varietal, component.process_detail || (component.process_method ? tp(component.process_method) : undefined)].filter(Boolean).join(" · ")}</p>}
+                            </div>
+                          </li>
+                        ))}
+                      </ol>
+                    ) : <ul className="mt-2 space-y-2">{compositionLines.map((line, index) => <li key={index} className="break-words text-sm leading-6 text-brown">{line}</li>)}</ul>}
+                  </div>
+                )}
+                {Boolean(notes?.en.length || notes?.ko.length || extraction?.tasting_notes_translation_ko?.length) && (
+                  <div data-testid="label-tasting-notes" className="mt-4 border-t border-border-light pt-4">
+                    <h4 className="text-xs font-medium text-brown-medium">{t("tastingNotes")}</h4>
+                    {Boolean(notes?.en.length) && <p lang="en" className="mt-2 break-words text-sm leading-6 text-brown">{notes?.en.join(", ")}</p>}
+                    {Boolean(notes?.ko.length && !extraction.tasting_notes_translation_ko?.length) && <p lang="ko" className="mt-1 break-words text-sm leading-6 text-brown">{notes?.ko.join(", ")}</p>}
+                    {Boolean(extraction.tasting_notes_translation_ko?.length) && <p lang="ko" className="mt-2 break-words text-sm leading-6 text-brown"><span className="mr-2 text-xs text-brown-medium">{t("translatedNotes")}</span>{extraction.tasting_notes_translation_ko?.join(", ")}</p>}
+                    <p className="mt-2 text-xs leading-5 text-brown-light">{t("tastingNotesHint")}</p>
+                  </div>
+                )}
+                {compactFields.length > 0 && !composition?.length && (
+                  <dl className="mt-4 grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-2 border-t border-border-light pt-4 text-sm leading-6">
+                    {compactFields.map((field) => <div key={field} className="contents"><dt className="text-xs text-brown-medium">{tb(FIELD_LABELS[field])}</dt><dd className="min-w-0 break-words text-brown">{displayValue(field)}</dd></div>)}
+                  </dl>
+                )}
+                {!busy && candidates.length > 0 && (
+                  <>
+                    <div className="mt-5 border-t border-border-light pt-4">
+                      <Button type="button" className="w-full sm:w-auto" disabled={disabled || !applicable.length} onClick={() => {
+                        onApply(extraction, applicable); setSelections([]); setNotice("applied");
+                      }}>{t("apply")}</Button>
+                      <p className="mt-2 text-xs leading-5 text-brown-medium">{notice === "applied" ? t("applied") : applicable.includes("blend_components") ? t("applyBlendHint") : applicable.length ? t("applyHint", { count: applicable.length }) : t("noSelectionHint")}</p>
+                      {replacesExisting && <p className="mt-1 text-xs leading-5 text-brown-medium">{t("replaceWarning")}</p>}
+                    </div>
+                    <details data-testid="label-field-choices" className="mt-2 min-w-0">
+                      <summary className="min-h-11 cursor-pointer py-3 text-xs font-medium text-brown focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">{t("selectionDetails")}</summary>
+                      <fieldset disabled={disabled}>
+                        <legend className="sr-only">{t("selectionDetails")}</legend>
+                        <p className="mb-1 text-xs leading-5 text-brown-medium">{t("reviewHint")}</p>
+                        <div className="divide-y divide-border-light">
+                          {candidates.map((field) => {
+                            const blocked = blockedReason(form, extraction, field, selected);
+                            return (
+                              <label key={field} className="flex min-h-11 items-start gap-3 py-3">
+                                <input type="checkbox" className="mt-1 h-4 w-4 shrink-0 accent-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                                  aria-label={tb(FIELD_LABELS[field])} checked={applicable.includes(field)} disabled={disabled || Boolean(blocked)}
+                                  onChange={(event) => {
+                                    const checked = event.target.checked;
+                                    setNotice(null);
+                                    setSelections((previous) => [
+                                      ...previous.filter((selection) => selection.field !== field && selectionIsCurrent(form, selection)),
+                                      ...(checked ? [selectField(form, field)] : []),
+                                    ]);
+                                  }} />
+                                <span className="min-w-0 flex-1">
+                                  <span className="block text-xs text-brown-light">{tb(FIELD_LABELS[field])}</span>
+                                  <span className="block break-words text-sm font-medium text-brown">{displayValue(field)}</span>
+                                  {field === "blend_components" && <span className="mt-2 block text-xs leading-5 text-brown-medium">{t(form.bean_type === "blend" ? "blendReplaceHint" : "blendSwitchHint")}</span>}
+                                  <span className="mt-1 block whitespace-pre-wrap break-words text-xs leading-5 text-brown-medium">{t("evidence", { text: extraction.evidence[field] ?? "" })}</span>
+                                  {blocked && <span className="mt-1 block text-xs leading-5 text-brown-medium">{t(blocked)}</span>}
+                                </span>
+                              </label>
+                            );
+                          })}
+                        </div>
+                      </fieldset>
+                    </details>
+                  </>
+                )}
+              </div>
+            )}
+            {rawText !== null && (
+              <details className="min-w-0 border-t border-border-light px-4 text-xs text-brown-medium sm:px-5" open={!busy && candidates.length === 0}>
+                <summary className="min-h-11 cursor-pointer py-3 font-medium text-brown focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">{t("rawText")}</summary>
+                <p className="mb-2 leading-5">{t("rawTextHint")}</p>
+                <pre tabIndex={0} aria-label={t("rawText")} className="mb-4 max-h-56 overflow-y-auto whitespace-pre-wrap break-words rounded-sm border border-border-light bg-surface p-3 font-sans text-sm leading-6 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">{rawText || t("noText")}</pre>
+              </details>
+            )}
+          </>
         )}
       </div>
-      {photo && (
-        <div className="flex flex-col gap-4 rounded-lg bg-surface-warm p-4">
-          <div className="flex flex-col items-start gap-3 sm:flex-row sm:gap-4">
-            <Image src={photo.url} alt={t("preview")} width={88} height={112} unoptimized className="h-28 w-[88px] shrink-0 rounded-sm bg-surface object-contain" />
-            <div className="w-full min-w-0 flex-1 sm:w-auto">
-              <p className="break-words text-sm font-medium text-brown">{photo.name}</p>
-              <a href={photo.url} target="_blank" rel="noreferrer" className="mt-1 inline-flex min-h-11 items-center text-xs font-medium text-accent underline underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">{t("enlarge")}</a>
-              <p id={`${id}-privacy`} className="mt-1 text-xs leading-5 text-brown-medium">{t("privacy")}</p>
-              <Button type="button" variant="ghost" size="sm" className="mt-1 -ml-3" disabled={disabled} onClick={() => {
-                cancelRequest(); setPhoto(null); setError(null); setNotice(null);
-              }}>{t("remove")}</Button>
-            </div>
-          </div>
-          <p className="text-xs leading-5 text-brown-medium">{t("readyHint")}</p>
-          <div className="flex flex-wrap items-center gap-2">
-            <Button type="button" variant="secondary" aria-describedby={`${id}-privacy`} disabled={disabled || busy} loading={busy} onClick={readPhoto}>
-              {busy ? t(phase) : error ? t("retry") : t("read")}
-            </Button>
-            {busy && <Button type="button" variant="ghost" disabled={disabled} onClick={() => { cancelRequest(); setNotice("cancelled"); }}>{t("cancel")}</Button>}
-          </div>
-          {(phase === "loading" || phase === "reading") && (
-            <div>
-              <div className="mb-1 flex items-center justify-between gap-3 text-xs leading-5 text-brown-medium" aria-hidden="true">
-                <span>{t(phase)}</span>
-                <span className="shrink-0 tabular-nums">{Math.round(progress * 100)}%</span>
-              </div>
-              <progress max={1} value={progress} aria-label={t(phase)} className="block h-2 w-full accent-accent" />
-            </div>
-          )}
-          {rawText !== null && (
-            <details className="min-w-0 text-xs text-brown-medium" open={candidates.length === 0}>
-              <summary className="min-h-11 cursor-pointer py-3 font-medium text-brown focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">{t("rawText")}</summary>
-              <p className="mb-2 leading-5">{t("rawTextHint")}</p>
-              <pre tabIndex={0} aria-label={t("rawText")} className="max-h-56 overflow-y-auto whitespace-pre-wrap break-words rounded-sm border border-border-light bg-surface p-3 font-sans text-sm leading-6 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">{rawText || t("noText")}</pre>
-            </details>
-          )}
-          {extraction && candidates.length > 0 && (
-            <fieldset className="min-w-0" disabled={disabled}>
-              <legend className="mb-1 text-sm font-semibold text-brown">{t("review")}</legend>
-              <p className="mb-3 text-xs leading-5 text-brown-medium">{t("reviewHint")}</p>
-              {(form.bean_type === "blend" || extraction.bean_type === "blend") && <p className="mb-3 text-xs leading-5 text-brown-medium">{t("blendOriginHint")}</p>}
-              <div className="divide-y divide-border-light">
-                {candidates.map((field) => {
-                  const blocked = blockedReason(form, extraction, field, selected);
-                  return (
-                    <label key={field} className="flex min-h-11 items-start gap-3 py-3">
-                      <input type="checkbox" className="mt-1 h-4 w-4 shrink-0 accent-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-                        aria-label={tb(FIELD_LABELS[field])} checked={applicable.includes(field)} disabled={disabled || Boolean(blocked)}
-                        onChange={(event) => {
-                          const checked = event.target.checked;
-                          setSelections((previous) => [
-                            ...previous.filter((selection) => selection.field !== field
-                              && selectionIsCurrent(form, selection)),
-                            ...(checked ? [selectField(form, field)] : []),
-                          ]);
-                        }} />
-                      <span className="min-w-0 flex-1">
-                        <span className="block text-xs text-brown-light">{tb(FIELD_LABELS[field])}</span>
-                        <span className="block break-words text-sm font-medium text-brown">{displayValue(field)}</span>
-                        {field === "blend_components" && <span className="mt-2 block text-xs leading-5 text-brown-medium">{t(form.bean_type === "blend" ? "blendReplaceHint" : "blendSwitchHint")}</span>}
-                        <span className="mt-1 block whitespace-pre-wrap break-words text-xs leading-5 text-brown-medium">{t("evidence", { text: extraction.evidence[field] ?? "" })}</span>
-                        {blocked && <span className="mt-1 block text-xs leading-5 text-brown-medium">{t(blocked)}</span>}
-                      </span>
-                    </label>
-                  );
-                })}
-              </div>
-              {replacesExisting && <p className="mt-2 text-xs leading-5 text-brown-medium">{t("replaceWarning")}</p>}
-              <Button type="button" className="mt-4" disabled={disabled || !applicable.length} onClick={() => {
-                onApply(extraction, applicable); setExtraction(null); setSelections([]); setNotice("applied");
-              }}>{t("apply")}</Button>
-            </fieldset>
-          )}
-        </div>
-      )}
-      <div role="status" aria-live="polite" aria-atomic="true" className="text-sm leading-6 text-brown-medium">
+      <p className="mt-2 text-xs leading-5 text-brown-light">{t("privacy")}</p>
+      <div role="status" aria-live="polite" aria-atomic="true" className="mt-1 text-sm leading-6 text-brown-medium">
         {error ? t(`errors.${error}`) : notice ? t(notice) : busy ? t(phase) : extraction ? t("found", { count: candidates.length }) : ""}
       </div>
-    </div>
+    </section>
   );
 }

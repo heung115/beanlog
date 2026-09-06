@@ -1,5 +1,70 @@
 export type LabelTextRegion = { x: number; y: number; width: number; height: number };
 
+/** Numeric words are only locations for another pixel reading, never inferred weights. */
+export function findLabelWeightRegions(blocks: unknown, hasLabelContext = false): LabelTextRegion[] {
+  if (!Array.isArray(blocks)) return [];
+  const lines: { text: string; words: { text?: unknown; bbox?: { x0: number; y0: number; x1: number; y1: number } }[] }[] = [];
+  for (const block of blocks.slice(0, 100)) {
+    if (!Array.isArray(block?.paragraphs)) continue;
+    for (const paragraph of block.paragraphs.slice(0, 100)) {
+      if (!Array.isArray(paragraph?.lines)) continue;
+      for (const line of paragraph.lines.slice(0, 100)) {
+        if (typeof line?.text === "string" && Array.isArray(line.words)) lines.push(line);
+        if (lines.length === 300) break;
+      }
+      if (lines.length === 300) break;
+    }
+    if (lines.length === 300) break;
+  }
+  const excluded = /%|\b(?:recipe|brew|brewing|dose|dosage|water|ratio|nutrition|nutritional|protein|carbohydrate|sugar|fat|sodium|serving|calorie|roast|harvest|expiry|best before|date|year|varietal|variety|cultivar|lot|batch|order|serial|altitude)\b|레시피|추출|도징|분쇄|물\s*양|영양|단백질|탄수화물|지방|당류|나트륨|열량|제공량|로스팅|소비기한|유통기한|품종|제조|생산|주문|고도/iu;
+  const excludedHeading = /^(?:brew(?:ing)?\s*(?:recipe|guide|instructions)?|recipe|nutrition(?:al)?(?:\s*(?:facts|information))?|레시피|추출\s*(?:안내|방법|가이드)|영양\s*(?:정보|성분))[\s:：]*$/iu;
+  const packageHeading = /^(?:net\s*(?:weight|wt\.?|contents)|weight|내용량|순중량|중량)(?:\b|\s|[:：])/iu;
+  const barePackageHeading = /^(?:net\s*(?:weight|wt\.?|contents)|weight|내용량|순중량|중량)[\s:：]*$/iu;
+  const regions: LabelTextRegion[] = [];
+  let excludedSection = false;
+  for (let index = 0; index < lines.length; index++) {
+    const line = lines[index];
+    const text = line.text.trim();
+    const previous = lines[index - 1]?.text.trim() ?? "";
+    if (excludedHeading.test(text)) excludedSection = true;
+    // A clear package heading starts a new section; a recipe's generic "weight"
+    // must not escape its context. The same rule covers a heading above its value.
+    const explicitPackage = /^(?:net\s*(?:weight|wt\.?|contents)|내용량|순중량)/iu.test(text);
+    if (explicitPackage) excludedSection = false;
+    if (excludedSection || excluded.test(text) || (!explicitPackage && excluded.test(previous))) continue;
+    const packageWeight = packageHeading.test(text) || barePackageHeading.test(previous);
+    // A plain number or a unit alone is insufficient. An unlabelled package
+    // amount may be printed after several cup notes, on an identified coffee label.
+    const noteList = hasLabelContext && (text.match(/[,，]/gu)?.length ?? 0) >= 2
+      && text.split(/[,，]/u).filter(part => /[\p{L}]/u.test(part)).length >= 3;
+    if (!packageWeight && !noteList) continue;
+    const words = line.words.filter(word => typeof word?.text === "string" && /[\p{L}\p{N}]/u.test(word.text));
+    const word = words.at(-1);
+    if (!word || typeof word.text !== "string") continue;
+    let box = word.bbox;
+    // A named weight often has whitespace before its unit. If OCR splits that
+    // unit into another short token, re-read the entire amount from those pixels.
+    // Joining the bounding boxes does not interpret or replace any characters.
+    const previousWord = words.at(-2);
+    if (packageWeight && previousWord && typeof previousWord.text === "string"
+      && /^\d[\d,.]{1,6}$/u.test(previousWord.text.trim()) && /^[\da-z]{1,2}$/iu.test(word.text.trim())) {
+      const first = previousWord.bbox;
+      if (!box || !first || ![first.x0, first.y0, first.x1, first.y1, box.x0, box.y0, box.x1, box.y1].every(Number.isFinite)) continue;
+      const lineHeight = Math.max(first.y1 - first.y0, box.y1 - box.y0);
+      if (box.x0 < first.x0 || box.x0 - first.x1 > lineHeight * 2
+        || Math.min(first.y1, box.y1) <= Math.max(first.y0, box.y0)) continue;
+      box = { x0: first.x0, y0: Math.min(first.y0, box.y0), x1: box.x1, y1: Math.max(first.y1, box.y1) };
+    } else if (!/^\d[\d,.]{1,6}[a-z]?$/iu.test(word.text.trim())) continue;
+    if (!box || ![box.x0, box.y0, box.x1, box.y1].every(Number.isFinite)) continue;
+    const width = box.x1 - box.x0;
+    const height = box.y1 - box.y0;
+    if (box.x0 < 0 || box.y0 < 0 || width < 3 || height < 3 || width > 500 || height > 250) continue;
+    regions.push({ x: box.x0, y: box.y0, width, height });
+    if (regions.length === 3) return regions;
+  }
+  return regions;
+}
+
 type PixelImage = { width: number; height: number; data: Uint8ClampedArray };
 type Component = { left: number; top: number; right: number; bottom: number; area: number };
 type TextBand = Component & { count: number; medianHeight: number; support: number };

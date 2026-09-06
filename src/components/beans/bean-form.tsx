@@ -273,6 +273,7 @@ export function BeanForm({
     initial ? hasDetails(beanToForm(initial)) : false
   );
   const [submitting, setSubmitting] = useState(false);
+  const [allowDefaultProcessFill, setAllowDefaultProcessFill] = useState(mode === "create" && !initial && !importingGuestDraft);
   const formRef = useRef<HTMLFormElement>(null);
   const errorRef = useRef<HTMLDivElement>(null);
   const [focusRequest, setFocusRequest] = useState<{ name: string } | null>(null);
@@ -292,6 +293,7 @@ export function BeanForm({
     enabled: Boolean(ownerId),
     validate: isBeanDraftValue,
     onRestore: (restored) => {
+      setAllowDefaultProcessFill(false);
       setForm(restored.form);
       setTagDraft(restored.tagDraft);
       setShowDetails(restored.showDetails);
@@ -321,6 +323,7 @@ export function BeanForm({
     : undefined;
 
   function handleLabelApply(extraction: LabelExtraction, selected: LabelField[]) {
+    setAllowDefaultProcessFill(false);
     const next = applyLabelFields(form, extraction, selected);
     if (selected.includes("origin_country") && next.bean_type === "single_origin") {
       const text = next.origin_country?.trim().toLowerCase();
@@ -353,6 +356,7 @@ export function BeanForm({
     if (!draft) return;
 
     startTransition(() => {
+      setAllowDefaultProcessFill(false);
       setForm(draft.bean);
       setShowDetails(hasDetails(draft.bean));
       setGuestDraftLoaded(true);
@@ -446,6 +450,7 @@ export function BeanForm({
   }, [recentRoasteries, form.roastery]);
 
   function set<K extends keyof BeanFormData>(key: K, value: BeanFormData[K]) {
+    if (key === "process_method" || key === "process_detail" || key === "bean_type") setAllowDefaultProcessFill(false);
     setForm((f) => ({ ...f, [key]: value }));
   }
 
@@ -457,6 +462,7 @@ export function BeanForm({
   }
 
   function handleBeanTypeChange(v: BeanType) {
+    setAllowDefaultProcessFill(false);
     setForm((f) => ({
       ...f,
       bean_type: v,
@@ -753,6 +759,7 @@ export function BeanForm({
       if (continueAdding) {
         toast.show(t("saved"));
         const nextForm = { ...defaultForm(), roastery: form.roastery };
+        setAllowDefaultProcessFill(true);
         setDraftBaseline({ form: nextForm, tagDraft: "", showDetails: false });
         draftRecovery.reset({ form: nextForm, tagDraft: "", showDetails: false });
         setForm(nextForm);
@@ -872,7 +879,7 @@ export function BeanForm({
         </div>
         <div className="flex flex-col gap-5">
           {mode === "create" && labelImportEnabled && (
-            <BeanLabelInput form={form} onApply={handleLabelApply} disabled={submitting || draftRecovery.status === "conflict"} />
+            <BeanLabelInput form={form} onApply={handleLabelApply} allowDefaultProcessFill={allowDefaultProcessFill} disabled={submitting || draftRecovery.status === "conflict"} />
           )}
           {/* 종류 토글 — 맨 위 */}
           <div className="flex flex-col gap-1.5">

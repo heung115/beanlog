@@ -1,6 +1,6 @@
 "use client";
 
-import { detectLabelTextRegion } from "./bean-label-image-regions.ts";
+import { detectLabelTextRegion, type LabelTextRegion } from "./bean-label-image-regions.ts";
 import { resizeLabelPixels } from "./bean-label-image-resample.ts";
 
 export interface PreparedLabelImage {
@@ -136,7 +136,39 @@ export async function prepareLabelImages(image: Blob, signal: AbortSignal): Prom
     const textScale = scaleFor(cropWidth, cropHeight, 3, MAX_TEXT_PIXELS);
     const text = scaledPhoto(picture, { x, y, width: cropWidth, height: cropHeight }, cropWidth * textScale, cropHeight * textScale);
     images.push({ image: await encodeCanvas(text.element, signal), psm: "6", kind: "text" });
-    return images;
+    // The compact label contains the useful facts and finishes first. The slower
+    // full photograph can subsequently contribute a roaster printed elsewhere.
+    return images.reverse();
+  } finally {
+    signal.removeEventListener("abort", abort);
+    picture.src = "";
+    URL.revokeObjectURL(url);
+  }
+}
+
+/** Re-read a detected numeric word at its existing scale with room around its ink. */
+export async function prepareLabelWordRetry(image: Blob, region: LabelTextRegion, signal: AbortSignal, scale: 1 | 1.5 | 2 = 1): Promise<Blob> {
+  signal.throwIfAborted();
+  const url = URL.createObjectURL(image);
+  const picture = new Image();
+  const abort = () => { picture.src = ""; };
+  signal.addEventListener("abort", abort, { once: true });
+  try {
+    picture.src = url;
+    try { await picture.decode(); }
+    catch { signal.throwIfAborted(); throw new Error("invalid_image"); }
+    signal.throwIfAborted();
+    const { width, height, x, y } = region;
+    if (![width, height, x, y].every(Number.isFinite) || width < 1 || height < 1 || x < 0 || y < 0
+      || x + width > picture.naturalWidth || y + height > picture.naturalHeight) throw new Error("invalid_image");
+    const padding = height * 0.3;
+    const left = Math.max(0, Math.floor(x - padding));
+    const top = Math.max(0, Math.floor(y - padding));
+    const cropWidth = Math.min(picture.naturalWidth - left, Math.ceil(width + padding * 2));
+    const cropHeight = Math.min(picture.naturalHeight - top, Math.ceil(height + padding * 2));
+    const cropped = canvas(Math.round(cropWidth * scale), Math.round(cropHeight * scale));
+    cropped.context.drawImage(picture, left, top, cropWidth, cropHeight, 0, 0, cropped.element.width, cropped.element.height);
+    return await encodeCanvas(cropped.element, signal);
   } finally {
     signal.removeEventListener("abort", abort);
     picture.src = "";

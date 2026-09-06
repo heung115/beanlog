@@ -133,7 +133,7 @@ test("browser OCR initializes local Korean and English assets and reuses its suc
   assert.equal(worker.requests[2].payload.oem, 1);
   assert.deepEqual(request.payload.image, imageBytes);
   assert.deepEqual(request.transfer, [request.payload.image.buffer]);
-  assert.deepEqual(request.payload.output, { text: true });
+  assert.deepEqual(request.payload.output, { text: true, blocks: true });
   worker.respond(request, { text: recognizedText });
   assert.equal((await first).extraction.fields.name, "Test Coffee");
   assert.deepEqual(progress.at(-1), { phase: "reading", progress: 1 });
@@ -394,3 +394,130 @@ test("cancelling a pending weight enlargement cannot publish the earlier partial
   assert.equal(workers[0].terminateCalls, 1);
   await retrySuccessfully(reader, workers);
 });
+
+
+test("partial callbacks publish completed views before the final result", async (t) => {
+  const { reader, workers } = harness(t);
+  const snapshots = [];
+  const read = reader.recognize([{ image, psm: "6", kind: "text" }, { image, psm: "11", kind: "full" }], {
+    ...emptyOptions(), onPartial: result => snapshots.push(result),
+  });
+  const worker = workers[0]; await initialize(worker);
+  await complete(worker, "Product: First Coffee");
+  const sparse = await worker.waitFor("setParameters");
+  assert.equal(snapshots.length, 1);
+  assert.equal(snapshots[0].extraction.fields.name, "First Coffee");
+  assert.equal(snapshots[0].extraction.fields.roastery, undefined);
+  worker.respond(sparse);
+  await complete(worker, "Roaster: Small Roastery");
+  const result = await read;
+  assert.equal(snapshots.length, 2);
+  assert.equal(snapshots[0].extraction.fields.roastery, undefined);
+  assert.deepEqual(snapshots[1], result);
+});
+
+for (const cancel of ["abort", "dispose"]) {
+  test(`${cancel} from a partial callback prevents later reads and final publication`, async (t) => {
+    const { reader, workers } = harness(t);
+    const controller = new AbortController();
+    const read = reader.recognize([{ image, psm: "6", kind: "text" }, { image, psm: "11", kind: "full" }], {
+      signal: controller.signal, onProgress() {},
+      onPartial() { if (cancel === "abort") controller.abort(); else reader.dispose(); },
+    });
+    const rejected = assert.rejects(read, { name: "AbortError" });
+    const worker = workers[0]; await initialize(worker); await complete(worker);
+    await rejected;
+    assert.equal(worker.requests.filter(request => request.action === "recognize").length, 1);
+    await retrySuccessfully(reader, workers);
+  });
+}
+
+function localPixels(t) {
+  const descriptors = new Map(["Image", "document"].map(key => [key, Object.getOwnPropertyDescriptor(globalThis, key)]));
+  class FakeImage {
+    naturalWidth = 400;
+    naturalHeight = 400;
+    src = "";
+    async decode() {}
+  }
+  const context = { fillRect() {}, drawImage() {} };
+  const document = { createElement: () => ({ width: 0, height: 0, getContext: () => context, toBlob: callback => callback(image) }) };
+  Object.defineProperty(globalThis, "Image", { configurable: true, value: FakeImage });
+  Object.defineProperty(globalThis, "document", { configurable: true, value: document });
+  t.after(() => {
+    for (const [key, descriptor] of descriptors) {
+      if (descriptor) Object.defineProperty(globalThis, key, descriptor);
+      else delete globalThis[key];
+    }
+  });
+}
+
+const numericWordOutput = {
+  text: "Product: Test Coffee\nApple, Honey, Tea 3509", confidence: 88,
+  blocks: [{ paragraphs: [{ lines: [{ text: "Apple, Honey, Tea 3509", words: [
+    { text: "Apple," }, { text: "Honey," }, { text: "Tea" }, { text: "3509", bbox: { x0: 90, y0: 100, x1: 150, y1: 125 } },
+  ] }] }] }],
+};
+
+for (const confidence of [90, 20]) {
+  test(`an observed numeric token needs an independently read unit and sufficient confidence (${confidence})`, async (t) => {
+    const { reader, workers } = harness(t); localPixels(t);
+    const read = reader.recognize(image, emptyOptions());
+    const worker = workers[0]; await initialize(worker);
+    worker.respond(await worker.waitFor("recognize"), numericWordOutput);
+    const rawLine = await worker.waitFor("setParameters");
+    assert.equal(rawLine.payload.params.tessedit_pageseg_mode, "13"); worker.respond(rawLine);
+    worker.respond(await worker.waitFor("recognize"), { text: "3509", confidence: 98 });
+    const english = await worker.waitFor("initialize");
+    assert.equal(english.payload.langs, "eng"); worker.respond(english);
+    const singleLine = await worker.waitFor("setParameters");
+    assert.equal(singleLine.payload.params.tessedit_pageseg_mode, "7");
+    assert.equal(singleLine.payload.params.tessedit_char_whitelist, undefined); worker.respond(singleLine);
+    worker.respond(await worker.waitFor("recognize"), { text: "350g", confidence });
+    const result = await read;
+    assert.equal(result.extraction.fields.weight_g, confidence >= 70 ? 350 : undefined);
+    assert.equal(workers.length, 1);
+    assert.equal(worker.requests.filter(request => request.action === "loadLanguage").length, 1);
+
+    // An English-only refinement must not leave the next Korean label on English.
+    const next = reader.recognize(image, emptyOptions());
+    const bilingual = await worker.waitFor("initialize");
+    assert.equal(bilingual.payload.langs, "kor+eng"); worker.respond(bilingual);
+    const block = await worker.waitFor("setParameters");
+    assert.equal(block.payload.params.tessedit_pageseg_mode, "6"); worker.respond(block);
+    await complete(worker, "상품명: 다음 커피");
+    assert.equal((await next).extraction.fields.name, "다음 커피");
+    assert.equal(workers.length, 1);
+  });
+}
+
+test("cancelling the English token refinement releases it before a fresh Korean read", async (t) => {
+  const { reader, workers } = harness(t); localPixels(t);
+  const controller = new AbortController();
+  const read = reader.recognize(image, { ...emptyOptions(), signal: controller.signal });
+  const rejected = assert.rejects(read, { name: "AbortError" });
+  const worker = workers[0]; await initialize(worker);
+  worker.respond(await worker.waitFor("recognize"), numericWordOutput);
+  worker.respond(await worker.waitFor("setParameters"));
+  worker.respond(await worker.waitFor("recognize"), { text: "3509", confidence: 98 });
+  const english = await worker.waitFor("initialize");
+  controller.abort(); worker.respond(english);
+  await rejected;
+  assert.equal(worker.terminateCalls, 1);
+  await retrySuccessfully(reader, workers);
+});
+
+for (const body of ["Dose: 20g", "Protein: 30g", "Brew recipe\n20g", "Date\n2026", "Order No. 3592"]) {
+  test(`a numeric refinement preserves excluded source context: ${body.replaceAll("\n", " / ")}`, async (t) => {
+    const { reader, workers } = harness(t);
+    const read = reader.recognize(image, emptyOptions());
+    const worker = workers[0]; await initialize(worker);
+    const lines = body.split("\n").map(text => ({ text, words: text.split(" ").map(text => ({ text, bbox: { x0: 20, y0: 40, x1: 70, y1: 65 } })) }));
+    worker.respond(await worker.waitFor("recognize"), { text: `Product: Test Coffee\n${body}`, confidence: 90,
+      blocks: [{ paragraphs: [{ lines }] }],
+    });
+    const result = await read;
+    assert.equal(result.extraction.fields.weight_g, undefined);
+    assert.equal(worker.requests.filter(request => request.action === "recognize").length, 1);
+  });
+}
