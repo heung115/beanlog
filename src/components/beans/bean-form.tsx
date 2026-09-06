@@ -616,7 +616,9 @@ export function BeanForm({
         setShowDetails(false);
         window.scrollTo({ top: 0, behavior: "smooth" });
       } else {
-        router.push(`/${locale}/explore`);
+        // A fresh document abandons queued origin Server Actions, whose late
+        // router-state updates can otherwise restore the saved edit screen.
+        window.location.assign(`/${locale}/explore`);
       }
     } catch {
       toast.show(tc("error"));

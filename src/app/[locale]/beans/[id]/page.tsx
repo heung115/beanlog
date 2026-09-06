@@ -192,6 +192,10 @@ export default function BeanDetailPage() {
     { key: "balance", label: t("balance"), value: bean.score_balance ?? 0 },
   ];
   const hasDetailScores = radarData.some((d) => d.value > 0);
+  const hasOriginInfo = Boolean(
+    countryName || bean.origin_region || bean.origin_subregions?.length ||
+    bean.altitude_m || bean.farm_producer || bean.varietal
+  );
 
   const tags = bean.tasting_tags ?? [];
   const hasPurchase =
@@ -417,68 +421,70 @@ export default function BeanDetailPage() {
       )}
 
       {/* Origin + process */}
-      <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-        <Card delay={200} testId="bean-origin-info">
-          <Overline>{t("originInfo")}</Overline>
-          <dl className="mt-2 divide-y divide-border-light">
-            <InfoRow
-              label={t("originCountry")}
-              value={countryName}
-            />
-            <InfoRow label={t("originRegion")} value={bean.origin_region} />
-            <InfoRow
-              label={t("originSubregion")}
-              value={(bean.origin_subregions ?? []).join(" · ")}
-            />
-            <InfoRow
-              label={t("altitudeRange")}
-              value={bean.altitude_m ? `${bean.altitude_m.toLocaleString()}m` : null}
-            />
-            <InfoRow label={t("farmProducer")} value={bean.farm_producer} />
-            <InfoRow label={t("varietal")} value={bean.varietal} />
-          </dl>
-          {countryPreset && (
-            <Link
-              data-testid="origin-detail-guide-link"
-              href={`/${locale}/origins/${originSlug(countryPreset.country)}`}
-              className="mt-4 flex min-h-10 w-full items-center justify-between gap-3 rounded-md border border-border-light bg-surface-warm px-3 text-xs font-semibold text-accent transition-colors hover:border-border hover:bg-cream-dark hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
-            >
-              <span className="inline-flex items-center gap-2">
+      <div className={cn("mt-4 grid grid-cols-1 gap-4", hasOriginInfo && "md:grid-cols-2")}>
+        {hasOriginInfo && (
+          <Card delay={200} testId="bean-origin-info">
+            <Overline>{t("originInfo")}</Overline>
+            <dl className="mt-2 divide-y divide-border-light">
+              <InfoRow
+                label={t("originCountry")}
+                value={countryName}
+              />
+              <InfoRow label={t("originRegion")} value={bean.origin_region} />
+              <InfoRow
+                label={t("originSubregion")}
+                value={(bean.origin_subregions ?? []).join(" · ")}
+              />
+              <InfoRow
+                label={t("altitudeRange")}
+                value={bean.altitude_m ? `${bean.altitude_m.toLocaleString()}m` : null}
+              />
+              <InfoRow label={t("farmProducer")} value={bean.farm_producer} />
+              <InfoRow label={t("varietal")} value={bean.varietal} />
+            </dl>
+            {countryPreset && (
+              <Link
+                data-testid="origin-detail-guide-link"
+                href={`/${locale}/origins/${originSlug(countryPreset.country)}`}
+                className="mt-4 flex min-h-10 w-full items-center justify-between gap-3 rounded-md border border-border-light bg-surface-warm px-3 text-xs font-semibold text-accent transition-colors hover:border-border hover:bg-cream-dark hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              >
+                <span className="inline-flex items-center gap-2">
+                  <svg
+                    aria-hidden="true"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                  >
+                    <path
+                      d="M8 14s4-3.8 4-7a4 4 0 10-8 0c0 3.2 4 7 4 7z"
+                      stroke="currentColor"
+                      strokeWidth="1.3"
+                      strokeLinejoin="round"
+                    />
+                    <circle cx="8" cy="7" r="1.35" stroke="currentColor" strokeWidth="1.2" />
+                  </svg>
+                  {t("viewOriginGuide", { country: countryName })}
+                </span>
                 <svg
                   aria-hidden="true"
-                  width="14"
-                  height="14"
-                  viewBox="0 0 16 16"
+                  width="11"
+                  height="11"
+                  viewBox="0 0 12 12"
                   fill="none"
                 >
                   <path
-                    d="M8 14s4-3.8 4-7a4 4 0 10-8 0c0 3.2 4 7 4 7z"
+                    d="M4 2.5L7.5 6 4 9.5"
                     stroke="currentColor"
-                    strokeWidth="1.3"
+                    strokeWidth="1.25"
+                    strokeLinecap="round"
                     strokeLinejoin="round"
                   />
-                  <circle cx="8" cy="7" r="1.35" stroke="currentColor" strokeWidth="1.2" />
                 </svg>
-                {t("viewOriginGuide", { country: countryName })}
-              </span>
-              <svg
-                aria-hidden="true"
-                width="11"
-                height="11"
-                viewBox="0 0 12 12"
-                fill="none"
-              >
-                <path
-                  d="M4 2.5L7.5 6 4 9.5"
-                  stroke="currentColor"
-                  strokeWidth="1.25"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </Link>
-          )}
-        </Card>
+              </Link>
+            )}
+          </Card>
+        )}
 
         <Card delay={240} testId="bean-process-roast-info">
           <Overline>{t("processMethod")} · {t("roastLevel")}</Overline>
