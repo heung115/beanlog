@@ -2,12 +2,12 @@ import { createClient } from "@/lib/supabase/server";
 import { getOAuthFailureKind, resolveAuthFailurePath, resolveTrustedAppRedirect } from "@/lib/security/redirect";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { getRequestAppOrigin } from "@/lib/admin/private-access";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get("code");
-  const configuredAppUrl =
-    process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3100";
+  const configuredAppUrl = await getRequestAppOrigin(request.headers);
   const next = resolveTrustedAppRedirect(
     searchParams.get("next"),
     configuredAppUrl

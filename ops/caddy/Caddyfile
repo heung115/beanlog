@@ -9,6 +9,12 @@
 	log default {
 		format filter {
 			request>headers>X-Hub-Signature-256 replace REDACTED
+			request>headers>X-Beanmap-Admin-Secret delete
+			request>headers>Tailscale-User-Login delete
+			request>headers>Tailscale-User-Name delete
+			request>headers>Tailscale-User-Profile-Pic delete
+			request>headers>Authorization delete
+			request>headers>Cookie delete
 		}
 	}
 }
@@ -40,6 +46,12 @@ beanmap.site {
 	import security_headers
 	import reject_proxy_methods
 	encode zstd gzip
+	request_header -X-Beanmap-Admin-Secret
+	@private_admin path /admin /admin/* /ko/admin /ko/admin/* /en/admin /en/admin/* /api/admin /api/admin/*
+	handle @private_admin {
+		header Cache-Control "no-store"
+		respond 404
+	}
 	handle_path /_deploy/github {
 		@not_post not method POST
 		respond @not_post 405
@@ -60,7 +72,18 @@ api.beanmap.site {
 	import security_headers
 	import reject_proxy_methods
 	encode zstd gzip
-	reverse_proxy 127.0.0.1:8000
+	request_header -X-Beanmap-Admin-Secret
+	@private_admin_rpc path /rest/v1/rpc/beanmap_is_admin /rest/v1/rpc/beanmap_admin_overview /rest/v1/rpc/beanmap_admin_update_catalog /rest/v1/rpc/beanmap_admin_audit
+	respond @private_admin_rpc 404
+	# Kong's bundled dashboard and /pg routes must never become public when
+	# operator tools join the container network. Admit only the application APIs.
+	@application_api path /auth/v1 /auth/v1/* /rest/v1 /rest/v1/* /graphql/v1 /graphql/v1/* /storage/v1 /storage/v1/* /functions/v1 /functions/v1/* /realtime/v1 /realtime/v1/*
+	handle @application_api {
+		reverse_proxy 127.0.0.1:8000
+	}
+	handle {
+		respond 404
+	}
 }
 
 :443 {
@@ -72,3 +95,6 @@ api.beanmap.site {
 		abort
 	}
 }
+
+# Installed only on hosts that enable the private operations console.
+import /etc/caddy/beanmap-private*.Caddyfile

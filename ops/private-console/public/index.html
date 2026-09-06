@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="referrer" content="no-referrer">
+  <title>beanmap · 운영 콘솔</title>
+  <link rel="stylesheet" href="./style.css">
+  <script src="./app.js" defer></script>
+</head>
+<body>
+  <div class="page">
+    <header class="masthead">
+      <a class="wordmark" href="./" aria-label="beanmap 운영 콘솔 홈">beanmap<span>운영</span></a>
+      <span class="private-label">개인 운영 공간</span>
+    </header>
+
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <div>
+          <p class="eyebrow">SERVER &amp; DATABASE</p>
+          <h1 id="page-title">운영 콘솔</h1>
+          <p class="intro-copy">서비스 상태를 살펴보고, 필요한 관리 도구로 이동하세요.</p>
+        </div>
+        <nav class="tool-links" aria-label="관리 도구">
+          <a id="studio-link" class="button button-primary" hidden target="_blank" rel="noopener noreferrer">데이터베이스 열기 <span aria-hidden="true">↗</span></a>
+          <a id="admin-link" class="button button-secondary" hidden target="_blank" rel="noopener noreferrer">서비스 관리 <span aria-hidden="true">↗</span></a>
+          <p id="links-pending" class="small-note">관리 도구 연결을 확인하고 있습니다.</p>
+        </nav>
+      </section>
+
+      <div class="snapshot-status" id="snapshot-status" data-state="loading" role="status" aria-live="polite">
+        <div class="snapshot-copy"><span class="signal" aria-hidden="true"></span><strong id="status-message">서버 상태를 불러오고 있습니다.</strong><span id="last-updated">15초마다 자동 갱신</span></div>
+        <button id="refresh" class="refresh-button" type="button">새로고침</button>
+      </div>
+
+      <section class="resource-strip" aria-label="서버 자원 사용량">
+        <div class="resource"><p class="metric-label">CPU</p><p id="cpu-value" class="metric-value">—</p><p id="cpu-detail" class="metric-detail">확인 중</p><div class="meter" aria-hidden="true"><div id="cpu-meter"></div></div></div>
+        <div class="resource"><p class="metric-label">메모리</p><p id="memory-value" class="metric-value">—</p><p id="memory-detail" class="metric-detail">확인 중</p><div class="meter" aria-hidden="true"><div id="memory-meter"></div></div></div>
+        <div class="resource"><p class="metric-label">디스크</p><p id="disk-value" class="metric-value">—</p><p id="disk-detail" class="metric-detail">확인 중</p><div class="meter" aria-hidden="true"><div id="disk-meter"></div></div></div>
+        <div class="resource uptime-resource"><p class="metric-label">서버 가동 시간</p><p id="uptime-value" class="metric-value">—</p><p id="uptime-detail" class="metric-detail">확인 중</p></div>
+      </section>
+
+      <div class="operations-grid">
+        <section class="services-panel" aria-labelledby="services-title">
+          <div class="section-heading"><h2 id="services-title">서비스</h2><span id="service-count" class="section-meta">상태 확인 중</span></div>
+          <div id="health-checks" class="health-checks"></div>
+          <div class="table-wrap"><table class="service-table"><thead><tr><th scope="col">서비스</th><th scope="col">상태</th><th scope="col" class="right">재시작</th></tr></thead><tbody id="services"><tr><td colspan="3" class="empty-cell">서비스 정보를 불러오고 있습니다.</td></tr></tbody></table></div>
+        </section>
+
+        <aside class="data-panel" aria-label="데이터베이스와 백업">
+          <section aria-labelledby="database-title">
+            <div class="section-heading"><h2 id="database-title">데이터베이스</h2><span id="database-state" class="section-meta">확인 중</span></div>
+            <dl class="data-facts"><div><dt>데이터 크기</dt><dd id="db-size">—</dd></div><div><dt>전체 연결</dt><dd id="db-connections">—</dd></div><div><dt>현재 작업 중</dt><dd id="db-active">—</dd></div></dl>
+            <div id="connection-states" class="connection-states"></div>
+            <p class="small-note">연결 수는 조회 시점 기준입니다.</p>
+          </section>
+          <section class="backup-section" aria-labelledby="backup-title">
+            <div class="section-heading"><h2 id="backup-title">백업 폴더</h2></div>
+            <p id="backup-time" class="backup-time">확인 중</p><p id="backup-detail" class="small-note">최근 파일의 시각과 크기를 표시합니다.</p>
+          </section>
+        </aside>
+      </div>
+
+      <section class="logs-panel" aria-labelledby="logs-title">
+        <div class="section-heading"><h2 id="logs-title">최근 로그 요약</h2><span class="section-meta">최근 15분 · 서비스별 최근 60줄 기준</span></div>
+        <p class="section-description">요청 결과와 오류·경고 건수를 확인할 수 있습니다. 개인 정보가 담길 수 있는 원문은 표시하지 않습니다.</p>
+        <div id="log-summary" class="log-summary"></div>
+        <div class="table-wrap"><table class="log-table"><thead><tr><th scope="col">시각</th><th scope="col">서비스</th><th scope="col">요청</th><th scope="col" class="right">응답</th><th scope="col" class="right">소요 시간</th></tr></thead><tbody id="requests"><tr><td colspan="5" class="empty-cell">로그 요약을 불러오고 있습니다.</td></tr></tbody></table></div>
+        <p id="log-note" class="small-note log-note">요청 목록은 API 접근 로그에서 요약한 최근 20건을 표시합니다.</p>
+      </section>
+    </main>
+    <footer><span>beanmap operations</span><span>상태 조회 전용</span></footer>
+  </div>
+</body>
+</html>

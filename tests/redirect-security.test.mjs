@@ -18,6 +18,9 @@ test("failed OAuth attempts offer a safe localized retry and retain the intended
 });
 
 test("post-login destinations retain locale and accept only application pages", () => {
+  assert.equal(resolvePostAuthPath("/ko/admin?kind=region"), "/ko/admin?kind=region");
+  assert.equal(resolvePostAuthPath("/en/admin"), "/en/admin");
+  assert.equal(resolvePostAuthPath("/en/admin-extra"), "/explore");
   for (const next of ["/ko/explore", "/en/stats?view=origins", "/en/beans/new?draft=1", "/ko/beans/12345678-1234-1234-1234-123456789abc/edit"]) {
     assert.equal(resolvePostAuthPath(next), next);
   }

@@ -8,10 +8,17 @@ import createIntlMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 import { getOAuthFailureKind, resolveAuthFailurePath } from "@/lib/security/redirect";
 import { isMissingOriginPath } from "@/lib/coffee/origin-route";
+import { isAdminPath } from "@/lib/security/admin-boundary";
+import { privateAdminContext } from "@/lib/admin/private-access";
 
 const intlMiddleware = createIntlMiddleware(routing);
 
 export async function proxy(request: NextRequest) {
+  // Next 16 Proxy runs on Node.js, so the secret can remain a mounted file.
+  // Public requests do not learn whether an account has administrator access.
+  if (isAdminPath(request.nextUrl.pathname) && !privateAdminContext(request.headers)) {
+    return new NextResponse(null, { status: 404, headers: { "Cache-Control": "no-store" } });
+  }
   // API routes (e.g. /api/auth/callback for OAuth code exchange) must pass
   // through untouched — no session redirect, no locale prefixing.
   if (request.nextUrl.pathname.startsWith("/api")) {

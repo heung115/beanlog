@@ -98,6 +98,8 @@ function proxyWith(error) {
       if (name === "@/lib/supabase/middleware") return middlewareModuleWith(error);
       if (name === "./i18n/routing") return { routing };
       if (name === "@/lib/security/redirect") return {};
+      if (name === "@/lib/security/admin-boundary") return { isAdminPath: () => false };
+      if (name === "@/lib/admin/private-access") return { privateAdminContext: () => null };
       if (name === "@/lib/coffee/origin-route") return originRoute;
       if (name === "next-intl/middleware") return { default: createIntlMiddleware };
       throw new Error(`Unexpected dependency: ${name}`);

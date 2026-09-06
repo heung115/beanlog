@@ -14,6 +14,7 @@ import { LogoutButton } from "@/components/auth/logout-button";
 import { RecordDraftNotice } from "@/components/beans/record-draft-notice";
 import { useRecordDraft } from "@/components/beans/use-record-draft";
 import { getProfile } from "@/lib/actions/profile";
+import { AdminLink } from "@/components/admin/admin-link";
 
 type Locale = "ko" | "en";
 
@@ -340,6 +341,8 @@ export default function SettingsPage() {
       />
 
       <div className="mt-10 max-w-2xl space-y-7">
+
+        <AdminLink />
 
         {/* ---------- profile ---------- */}
         <SectionCard title={t("profile")} delay={60}>

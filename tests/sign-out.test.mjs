@@ -18,6 +18,7 @@ function signOutWith(response) {
     require(name) {
       if (name === "zod") return { z };
       if (name === "@/lib/security/redirect") return {};
+      if (name === "@/lib/admin/private-access") return {};
       if (name === "@/lib/supabase/server") return {
         createClient: async () => ({ auth: { signOut: async (options) => {
           calls.push(["signOut", options.scope]);

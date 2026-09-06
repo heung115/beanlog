@@ -8,6 +8,7 @@ import {
 import { redirect, RedirectType } from "next/navigation";
 import { z } from "zod";
 import { resolvePostAuthPath } from "@/lib/security/redirect";
+import { getRequestAppOrigin } from "@/lib/admin/private-access";
 
 export type SignInState = {
   error?: "invalid_credentials" | "email_not_confirmed" | "rate_limited" | "temporarily_unavailable";
@@ -112,7 +113,7 @@ export async function signInWithOAuth(
   // The authorize URL must use the browser-accessible Supabase host, while
   // the shared server adapter persists the PKCE verifier for the callback.
   const supabase = await createPublicClient({ persistSession: true });
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3100";
+  const appUrl = await getRequestAppOrigin();
   const callbackUrl = new URL("/api/auth/callback", appUrl);
   callbackUrl.searchParams.set("next", resolvePostAuthPath(next));
 

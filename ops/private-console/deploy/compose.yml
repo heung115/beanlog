@@ -1,0 +1,98 @@
+name: beanmap-private-console
+
+# The existing database/auth/gateway stack remains the source of truth.
+# Requires Docker Compose 2.30+ for literal env_file values (no interpolation).
+services:
+  # Do not use the names "meta" or "studio": Compose adds service names as DNS
+  # aliases, and the existing public Kong has dormant routes to those aliases.
+  private-meta:
+    image: supabase/postgres-meta:v0.96.6@sha256:a84cc713585eea7b401e4a2561ec4a1e48c87083d1c7ecb4502f204bb4391300
+    container_name: beanmap-private-meta
+    user: "1000:1000"
+    env_file:
+      - path: /etc/beanmap-private-console/meta.env
+        format: raw
+    environment:
+      PG_META_PORT: "8080"
+      PG_META_DB_HOST: supabase-db
+      PG_META_DB_PORT: "5432"
+      PG_META_DB_USER: postgres
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:8080/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 4
+      start_period: 30s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 128
+    mem_limit: 512m
+    cpus: 1.0
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+    networks:
+      - supabase
+
+  private-studio:
+    image: supabase/studio:2026.08.03-sha-022b374@sha256:606aca9fdaa753b60968d5c304e2ada83869b76c9043684e63d5885aca9550e8
+    container_name: beanmap-private-studio
+    user: "1000:1000"
+    env_file:
+      - path: /etc/beanmap-private-console/studio.env
+        format: raw
+    environment:
+      HOSTNAME: "0.0.0.0"
+      PORT: "3000"
+      STUDIO_PG_META_URL: http://beanmap-private-meta:8080
+      POSTGRES_HOST: supabase-db
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER_READ_WRITE: postgres
+      SUPABASE_URL: http://supabase-kong:8000
+      DEFAULT_ORGANIZATION_NAME: beanmap
+      DEFAULT_PROJECT_NAME: beanmap 운영
+      OPENAI_API_KEY: ""
+      ENABLED_FEATURES_LOGS_ALL: "false"
+      SNIPPETS_MANAGEMENT_FOLDER: /app/snippets
+      EDGE_FUNCTIONS_MANAGEMENT_FOLDER: /app/edge-functions
+    ports:
+      - "127.0.0.1:4321:3000"
+    volumes:
+      - /var/lib/beanmap-private-studio/snippets:/app/snippets
+      - /var/lib/beanmap-private-studio/functions:/app/edge-functions:ro
+    tmpfs:
+      - /app/apps/studio/.next/cache:rw,nosuid,nodev,size=128m,uid=1000,gid=1000,mode=0700
+    depends_on:
+      private-meta:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/platform/profile').then(r=>{if(r.status!==200)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 10s
+      retries: 4
+      start_period: 40s
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    pids_limit: 256
+    mem_limit: 1536m
+    cpus: 1.5
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+    networks:
+      - supabase
+
+networks:
+  supabase:
+    external: true
+    name: beanlogsupabase_default

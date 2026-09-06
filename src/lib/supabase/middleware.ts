@@ -61,7 +61,7 @@ export function isProtectedPath(pathname: string): boolean {
 
   return (
     route.length > 0 &&
-    ["explore", "beans", "stats", "settings"].includes(route[0])
+    ["explore", "beans", "stats", "settings", "admin"].includes(route[0])
   );
 }
 

@@ -1,0 +1,99 @@
+# Import this at top level from the existing /etc/caddy/Caddyfile.
+# All listeners are loopback-only. Tailscale Serve is the sole remote ingress.
+# Tailscale Serve replaces its identity headers; it must never be Funnel.
+
+(beanmap_private_headers) {
+	header {
+		Cache-Control "no-store"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "no-referrer"
+		X-Frame-Options "DENY"
+		-Server
+	}
+}
+
+http://:9310 {
+	bind 127.0.0.1
+	import beanmap_private_headers
+	@owner header Tailscale-User-Login {$BEANMAP_TAILSCALE_OWNER}
+	handle @owner {
+		@unsupported not method GET HEAD
+		respond @unsupported 405
+		header Content-Security-Policy "default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self' data:; base-uri 'none'; frame-ancestors 'none'; form-action 'none'"
+		handle /status.json {
+			root * /var/lib/beanmap-console
+			file_server
+		}
+		@assets path / /index.html /app.js /style.css /config.json
+		handle @assets {
+			root * /opt/beanmap-private-console/public
+			file_server
+		}
+		handle {
+			respond 404
+		}
+	}
+	handle {
+		respond 404
+	}
+}
+
+http://:9311 {
+	bind 127.0.0.1
+	import beanmap_private_headers
+	@owner header Tailscale-User-Login {$BEANMAP_TAILSCALE_OWNER}
+	handle @owner {
+		# Browser writes must originate on the private Studio itself.
+		@foreign_origin {
+			header Origin *
+			not header Origin https://{$BEANMAP_TAILSCALE_DNS}:8443
+		}
+		respond @foreign_origin 403
+		@unsafe_without_origin {
+			not method GET HEAD OPTIONS
+			not header Origin https://{$BEANMAP_TAILSCALE_DNS}:8443
+		}
+		respond @unsafe_without_origin 403
+		@unsupported method TRACE CONNECT
+		respond @unsupported 405
+		reverse_proxy 127.0.0.1:4321 {
+			header_up Host {$BEANMAP_TAILSCALE_DNS}:8443
+			header_up X-Forwarded-Host {$BEANMAP_TAILSCALE_DNS}:8443
+			header_up X-Forwarded-Proto https
+			header_up -X-Beanmap-Admin-Secret
+			header_up -Tailscale-User-Login
+			header_up -Tailscale-User-Name
+			header_up -Tailscale-User-Profile-Pic
+		}
+	}
+	handle {
+		respond 404
+	}
+}
+
+http://:9312 {
+	bind 127.0.0.1
+	import beanmap_private_headers
+	@owner header Tailscale-User-Login {$BEANMAP_TAILSCALE_OWNER}
+	handle @owner {
+		@foreign_origin {
+			header Origin *
+			not header Origin https://{$BEANMAP_TAILSCALE_DNS}:9443
+		}
+		respond @foreign_origin 403
+		@unsupported method TRACE CONNECT
+		respond @unsupported 405
+		reverse_proxy 127.0.0.1:3100 {
+			header_up Host {$BEANMAP_TAILSCALE_DNS}:9443
+			header_up X-Forwarded-Host {$BEANMAP_TAILSCALE_DNS}:9443
+			header_up X-Forwarded-Proto https
+			header_up X-Beanmap-Admin-Secret {$BEANMAP_ADMIN_INGRESS_SECRET}
+			header_up -Tailscale-User-Login
+			header_up -Tailscale-User-Name
+			header_up -Tailscale-User-Profile-Pic
+		}
+	}
+	handle {
+		respond 404
+	}
+}

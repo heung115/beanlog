@@ -47,3 +47,36 @@ func TestGetEnvOrFileUsesFallbackWithoutConfiguredValueOrFile(t *testing.T) {
 		t.Fatalf("getEnvOrFile() = %q, want fallback", got)
 	}
 }
+
+func TestLoadAdminIngressSecretRequiresReadableConfiguredFile(t *testing.T) {
+	for _, test := range []struct {
+		name    string
+		content string
+		file    bool
+		missing bool
+		want    string
+	}{
+		{name: "disabled without file"},
+		{name: "disabled when file missing", missing: true},
+		{name: "disabled for empty file", file: true},
+		{name: "read trimmed secret file", file: true, content: "test-admin-ingress-secret-32-bytes\n", want: "test-admin-ingress-secret-32-bytes"},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			// A direct environment value must not bypass the mounted-file policy.
+			t.Setenv("ADMIN_INGRESS_SECRET", "ignored-test-environment-secret")
+			t.Setenv("ADMIN_INGRESS_SECRET_FILE", "")
+			if test.file || test.missing {
+				path := filepath.Join(t.TempDir(), "admin-ingress.secret")
+				if test.file {
+					if err := os.WriteFile(path, []byte(test.content), 0o600); err != nil {
+						t.Fatal(err)
+					}
+				}
+				t.Setenv("ADMIN_INGRESS_SECRET_FILE", path)
+			}
+			if got := Load().AdminIngressSecret; got != test.want {
+				t.Fatal("admin ingress secret did not follow the file-only fail-closed policy")
+			}
+		})
+	}
+}

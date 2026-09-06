@@ -1,0 +1,17 @@
+# Merge with the existing app compose file; do not replace it.
+services:
+  web:
+    environment:
+      ADMIN_PRIVATE_ORIGIN: https://oracle-free.tail6e4bc0.ts.net:9443
+      ADMIN_INGRESS_SECRET_FILE: /run/secrets/admin_ingress_secret
+    secrets:
+      - admin_ingress_secret
+  api:
+    environment:
+      ADMIN_INGRESS_SECRET_FILE: /run/secrets/admin_ingress_secret
+    secrets:
+      - admin_ingress_secret
+
+secrets:
+  admin_ingress_secret:
+    file: /etc/beanmap-private-console/admin_ingress_secret

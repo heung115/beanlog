@@ -1,4 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
+import { getPrivateAdminContext } from "@/lib/admin/private-access";
+import { ADMIN_INGRESS_HEADER } from "@/lib/security/admin-boundary";
 
 // Server-side base URL for the Go API. In Docker the web container reaches the
 // api service by name (http://api:8080); GO_API_URL is injected per environment.
@@ -44,6 +46,12 @@ function buildUrl(path: string, query?: ApiInit["query"]): string {
  * message on a non-2xx response.
  */
 export async function apiFetch<T>(path: string, init: ApiInit = {}): Promise<T> {
+  // Server Actions can be invoked through any page URL. Protect the data
+  // boundary itself, before reading a session or making an admin API request.
+  const adminRequest = path === "/api/admin" || path.startsWith("/api/admin/");
+  const adminContext = adminRequest ? await getPrivateAdminContext() : null;
+  if (adminRequest && !adminContext) throw new ApiError(404, "Not found");
+
   const token = await getAccessToken();
   if (!token) throw new ApiError(401, "Unauthorized");
 
@@ -52,6 +60,7 @@ export async function apiFetch<T>(path: string, init: ApiInit = {}): Promise<T> 
     headers: {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
+      ...(adminContext ? { [ADMIN_INGRESS_HEADER]: adminContext.secret } : {}),
     },
     body: init.body !== undefined ? JSON.stringify(init.body) : undefined,
     cache: "no-store",

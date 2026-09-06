@@ -1,0 +1,11 @@
+[Unit]
+Description=Refresh Beanmap private console every 15 seconds
+
+[Timer]
+OnBootSec=15s
+OnUnitActiveSec=15s
+AccuracySec=1s
+Unit=beanmap-console-collect.service
+
+[Install]
+WantedBy=timers.target

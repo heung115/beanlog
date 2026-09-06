@@ -1,0 +1,5 @@
+{
+  "output_dir": "/var/lib/beanmap-console",
+  "backup_dir": "/srv/beanlog/backups",
+  "disk_path": "/srv/beanlog"
+}

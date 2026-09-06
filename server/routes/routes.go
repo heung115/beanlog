@@ -47,6 +47,7 @@ func Setup(cfg *config.Config, db *pgxpool.Pool) *gin.Engine {
 	beanH := handlers.NewBeanHandler()
 	statsH := handlers.NewStatsHandler()
 	profileH := handlers.NewProfileHandler()
+	adminH := handlers.NewAdminHandler(cfg.AdminIngressSecret)
 
 	auth := r.Group("/api")
 	auth.Use(middleware.AuthRequired(cfg.JWKSURL, cfg.JWTIssuer))
@@ -74,7 +75,21 @@ func Setup(cfg *config.Config, db *pgxpool.Pool) *gin.Engine {
 		auth.GET("/profile", profileH.GetProfile)
 		auth.PUT("/profile", profileH.UpdateProfile)
 		auth.GET("/export", profileH.ExportData)
+
 	}
+
+	// Reject public requests before JWT/database work and disable caching even on denial.
+	// Admin role lives in a private DB allowlist, independent of user metadata.
+	admin := r.Group("/api/admin")
+	admin.Use(adminH.NoStore, adminH.RequirePrivate)
+	admin.Use(middleware.AuthRequired(cfg.JWKSURL, cfg.JWTIssuer))
+	admin.Use(middleware.RequestDatabase(db))
+	admin.GET("/access", adminH.Access)
+	admin.Use(adminH.RequireAdmin)
+	admin.GET("/overview", adminH.Overview)
+	admin.GET("/catalog", adminH.Catalog)
+	admin.PUT("/catalog/:kind/:id", adminH.UpdateCatalog)
+	admin.GET("/audit", adminH.Audit)
 
 	return r
 }

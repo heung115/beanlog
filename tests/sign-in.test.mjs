@@ -20,6 +20,7 @@ function signInWith(response, { throws = false, clientThrows = false } = {}) {
     require(name) {
       if (name === "zod") return { z };
       if (name === "@/lib/security/redirect") return { resolvePostAuthPath };
+      if (name === "@/lib/admin/private-access") return {};
       if (name === "@/lib/supabase/server") return {
         createClient: async ({ persistSession }) => {
           calls.push(["client", persistSession]);

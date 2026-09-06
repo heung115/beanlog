@@ -85,6 +85,9 @@ test("known application route families remain protected with or without a locale
     "/en/beans/record-id/edit",
     "/ko/stats",
     "/en/settings/profile",
+    "/admin",
+    "/ko/admin",
+    "/en/admin/",
   ]) {
     assert.equal(isPublicPath(pathname), false, pathname);
     assert.equal(isProtectedPath(pathname), true, pathname);
@@ -114,6 +117,7 @@ test("unknown and spoofed paths are neither public nor protected", () => {
     "/ko/origins/ethiopia%2Fedit",
     "/ko/origins/ethiopia/details",
     "/ko/explore-more",
+    "/ko/administrator",
   ]) {
     assert.equal(isPublicPath(pathname), false, pathname);
     assert.equal(isProtectedPath(pathname), false, pathname);

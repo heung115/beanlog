@@ -493,39 +493,65 @@ NODE
   fi
 
   FUNCTION_PRIVILEGE_COUNT="$(docker exec "$STAGING_DB_CONTAINER" psql -U postgres -d postgres -Atqc "
-    with sensitive as (
-      select p.oid, p.proname,
+    with expected(schema_name, signature, authenticated_execute) as (
+      values
+        ('public', 'handle_new_user()', false),
+        ('public', 'check_rate_limit(text,integer,integer)', false),
+        ('public', 'delete_current_account()', true),
+        ('public', 'create_bean_record(jsonb,jsonb,jsonb)', true),
+        ('public', 'update_bean_record(uuid,jsonb,jsonb,jsonb)', true),
+        ('public', 'delete_bean_record(uuid)', true),
+        ('public', 'assert_bean_mutation_payload(jsonb,jsonb,jsonb)', false),
+        ('beanmap_private', 'beanmap_is_admin()', true),
+        ('beanmap_private', 'beanmap_admin_overview()', true),
+        ('beanmap_private', 'beanmap_admin_update_catalog(text,bigint,text,text,text)', true),
+        ('beanmap_private', 'beanmap_admin_audit()', true)
+    ), sensitive as (
+      select expected.*, p.oid,
         exists (
           select 1
           from aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) acl
           where acl.grantee = 0 and acl.privilege_type = 'EXECUTE'
         ) as public_execute,
         has_function_privilege('anon', p.oid, 'EXECUTE') as anon_execute,
-        has_function_privilege('authenticated', p.oid, 'EXECUTE') as authenticated_execute
+        has_function_privilege('authenticated', p.oid, 'EXECUTE') as actual_authenticated_execute,
+        has_function_privilege('service_role', p.oid, 'EXECUTE') as service_execute
+      from expected
+      left join pg_proc p on p.oid = to_regprocedure(expected.schema_name || '.' || expected.signature)
+    ), misplaced_admin_functions as (
+      select p.oid
       from pg_proc p
-      join pg_namespace n on n.oid = p.pronamespace
-      where n.nspname = 'public'
-        and p.proname in (
-          'handle_new_user', 'check_rate_limit', 'delete_current_account',
-          'create_bean_record', 'update_bean_record', 'delete_bean_record',
-          'assert_bean_mutation_payload'
-        )
+      where p.proname in (
+        'beanmap_is_admin', 'beanmap_admin_overview',
+        'beanmap_admin_update_catalog', 'beanmap_admin_audit'
+      )
+      and not exists (
+        select 1 from sensitive s
+        where s.schema_name = 'beanmap_private' and s.oid = p.oid
+      )
+    ), private_schema as (
+      select n.oid,
+        exists (
+          select 1 from aclexplode(coalesce(n.nspacl, acldefault('n', n.nspowner))) acl
+          where acl.grantee = 0
+        ) as public_access
+      from pg_namespace n where n.nspname = 'beanmap_private'
     )
-    select count(*)
-    from sensitive
-    where public_execute
-      or anon_execute
-      or (
-        proname in ('delete_current_account', 'create_bean_record', 'update_bean_record', 'delete_bean_record')
-        and not authenticated_execute
-      )
-      or (
-        proname in ('handle_new_user', 'check_rate_limit')
-        and authenticated_execute
-      )
-      or (
-        proname = 'assert_bean_mutation_payload'
-        and authenticated_execute
+    select (
+      select count(*) from sensitive
+      where oid is null
+        or public_execute
+        or anon_execute
+        or actual_authenticated_execute is distinct from authenticated_execute
+        or (schema_name = 'beanmap_private' and service_execute)
+    ) + (select count(*) from misplaced_admin_functions)
+      + (
+        select count(*) from private_schema
+        where public_access
+          or has_schema_privilege('anon', oid, 'USAGE,CREATE')
+          or has_schema_privilege('service_role', oid, 'USAGE,CREATE')
+          or has_schema_privilege('authenticated', oid, 'CREATE')
+          or not has_schema_privilege('authenticated', oid, 'USAGE')
       );
   " 2>/dev/null || printf 'query-failed')"
   if [[ "$FUNCTION_PRIVILEGE_COUNT" == "0" ]]; then

@@ -241,7 +241,7 @@ test("robots allows public pages, protects internal routes, and names the sitema
   assert.deepEqual(robots.rules, {
     userAgent: "*",
     allow: "/",
-    disallow: ["/api/", "/_deploy/"],
+    disallow: ["/api/", "/_deploy/", "/ko/admin", "/en/admin"],
   });
   assert.equal(robots.sitemap, seo.absoluteUrl("/sitemap.xml"));
   assert.equal(robots.host, seo.SITE_ORIGIN);

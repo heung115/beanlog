@@ -6,7 +6,7 @@ export function resolvePostAuthPath(value: unknown): string {
     return "/explore";
   }
   const destination = new URL(value, localDevelopmentOrigin);
-  const allowed = /^\/(ko|en)\/(explore|stats|settings|beans\/(new|[0-9a-f-]{36}(\/edit)?))\/?$/i;
+  const allowed = /^\/(ko|en)\/(explore|stats|settings|admin|beans\/(new|[0-9a-f-]{36}(\/edit)?))\/?$/i;
   return destination.origin === localDevelopmentOrigin && allowed.test(destination.pathname)
     ? `${destination.pathname}${destination.search}${destination.hash}`
     : "/explore";
