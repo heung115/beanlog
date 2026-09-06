@@ -624,12 +624,13 @@ func (h *BeanHandler) FilterOptions(c *gin.Context) {
 	roasteries := map[string]struct{}{}
 	varietals := map[string]struct{}{}
 	for rows.Next() {
-		var origin, roastery, varietal string
+		var origin *string // Blends keep their origins in blend_components.
+		var roastery, varietal string
 		if err := rows.Scan(&origin, &roastery, &varietal); err != nil {
 			continue
 		}
-		if strings.TrimSpace(origin) != "" {
-			origins[origin] = struct{}{}
+		if origin != nil && strings.TrimSpace(*origin) != "" {
+			origins[*origin] = struct{}{}
 		}
 		if trimmed := strings.TrimSpace(roastery); trimmed != "" {
 			roasteries[trimmed] = struct{}{}

@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useCallback, useEffect, useMemo, useState } from "react";
+import { startTransition, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Input } from "@/components/ui/input";
 import { Combobox, type ComboboxOption } from "@/components/ui/combobox";
@@ -41,6 +41,20 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
     Record<string, OriginEntityOption[]>
   >({});
   const [subregionsByOrigin, setSubregionsByOrigin] = useState<Record<string, string[][]>>({});
+  const mounted = useRef(false);
+  const requested = useRef({
+    countries: false,
+    regions: new Set<number>(),
+    entities: new Set<string>(),
+    subregions: new Set<string>(),
+  });
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   const countryOptions = useMemo(() => {
     const ko = locale === "ko";
@@ -106,37 +120,39 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
   }
 
   useEffect(() => {
-    let active = true;
+    if (requested.current.countries) return;
+    requested.current.countries = true;
     startTransition(() => {
       void getOriginCountries().then((countries) => {
-        if (active) setOriginCountries(countries);
-      }).catch(() => undefined);
+        if (mounted.current) setOriginCountries(countries);
+      }).catch(() => {
+        requested.current.countries = false;
+      });
     });
-    return () => {
-      active = false;
-    };
   }, []);
 
+  // Requests populate caches keyed by origin, so their results remain useful
+  // across edits and sibling completions. Keep keys through successful empty
+  // results and effect replay; only an actual unmount invalidates callbacks.
   useEffect(() => {
     const countryIds = Array.from(
       new Set(value.map((comp) => countryIdFor(comp)).filter((id): id is number => Boolean(id)))
-    ).filter((id) => !regionsByCountry[id]);
+    ).filter((id) => !requested.current.regions.has(id));
 
     if (countryIds.length === 0) return;
 
-    let active = true;
     startTransition(() => {
       countryIds.forEach((countryId) => {
+        requested.current.regions.add(countryId);
         void getOriginRegions(countryId).then((regions) => {
-          if (!active) return;
+          if (!mounted.current) return;
           setRegionsByCountry((prev) => ({ ...prev, [countryId]: regions }));
-        }).catch(() => undefined);
+        }).catch(() => {
+          requested.current.regions.delete(countryId);
+        });
       });
     });
-    return () => {
-      active = false;
-    };
-  }, [countryIdFor, regionsByCountry, value]);
+  }, [countryIdFor, value]);
 
   useEffect(() => {
     const regionKeys = Array.from(
@@ -149,24 +165,23 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
           })
           .filter((key): key is string => Boolean(key))
       )
-    ).filter((key) => !entitiesByRegion[key]);
+    ).filter((key) => !requested.current.entities.has(key));
 
     if (regionKeys.length === 0) return;
 
-    let active = true;
     startTransition(() => {
       regionKeys.forEach((key) => {
+        requested.current.entities.add(key);
         const [countryId, regionId] = key.split(":").map(Number);
         void getOriginEntities(countryId, regionId).then((entities) => {
-          if (!active) return;
+          if (!mounted.current) return;
           setEntitiesByRegion((prev) => ({ ...prev, [key]: entities }));
-        }).catch(() => undefined);
+        }).catch(() => {
+          requested.current.entities.delete(key);
+        });
       });
     });
-    return () => {
-      active = false;
-    };
-  }, [countryIdFor, entitiesByRegion, regionIdFor, value]);
+  }, [countryIdFor, regionIdFor, value]);
 
   useEffect(() => {
     const keys = Array.from(
@@ -179,25 +194,23 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
           })
           .filter((key): key is string => Boolean(key))
       )
-    ).filter((key) => !subregionsByOrigin[key]);
+    ).filter((key) => !requested.current.subregions.has(key));
 
     if (keys.length === 0) return;
 
-    let active = true;
     startTransition(() => {
       keys.forEach((key) => {
+        requested.current.subregions.add(key);
         const [country, region] = key.split("\u001f");
         void getUserOriginSubregions({ country, region: region || undefined }).then((chains) => {
-          if (!active) return;
+          if (!mounted.current) return;
           setSubregionsByOrigin((prev) => ({ ...prev, [key]: chains }));
-        }).catch(() => undefined);
+        }).catch(() => {
+          requested.current.subregions.delete(key);
+        });
       });
     });
-
-    return () => {
-      active = false;
-    };
-  }, [subregionsByOrigin, value]);
+  }, [value]);
 
   const total = value.reduce((sum, c) => sum + (c.percentage || 0), 0);
   const isComplete = Math.abs(total - 100) < 0.01;
