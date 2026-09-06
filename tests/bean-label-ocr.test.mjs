@@ -1,0 +1,317 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import { setImmediate } from "node:timers/promises";
+import { createBrowserLabelReader } from "../src/lib/coffee/bean-label-ocr.ts";
+
+const imageBytes = Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+const image = new Blob([imageBytes], { type: "image/png" });
+const recognizedText = "Product: Test Coffee\nRoaster: Local Roastery\nOrigin: Ethiopia";
+const initialActions = ["load", "loadLanguage", "initialize", "setParameters"];
+const emptyOptions = () => ({ signal: new AbortController().signal, onProgress() {} });
+
+function harness(t) {
+  const previousWorker = Object.getOwnPropertyDescriptor(globalThis, "Worker");
+  const workers = [];
+
+  class FakeWorker {
+    constructor(url) {
+      this.url = url;
+      this.requests = [];
+      this.terminateCalls = 0;
+      this.throwOnPost = false;
+      workers.push(this);
+    }
+
+    postMessage(message, transfer) {
+      if (this.throwOnPost) throw new Error("Private worker transport failure");
+      this.requests.push({ ...message, transfer, answered: false });
+    }
+
+    terminate() {
+      this.terminateCalls += 1;
+    }
+
+    async waitFor(action) {
+      for (let attempt = 0; attempt < 30; attempt += 1) {
+        const request = this.requests.find((request) => request.action === action && !request.answered);
+        if (request) return request;
+        await setImmediate();
+      }
+      assert.fail(`Expected pending ${action}; observed ${this.requests.map(({ action }) => action).join(", ")}`);
+    }
+
+    respond(request, data = {}, status = "resolve") {
+      request.answered = status !== "progress";
+      // Deliver even after terminate to exercise protection against queued old events.
+      this.onmessage?.({ data: {
+        workerId: request.workerId, jobId: request.jobId, action: request.action, status, data,
+      } });
+    }
+
+    crash(kind = "error") {
+      if (kind === "messageerror") this.onmessageerror?.({});
+      else {
+        let prevented = false;
+        this.onerror?.({ message: "Private worker path and text", preventDefault() { prevented = true; } });
+        assert.equal(prevented, true);
+      }
+    }
+  }
+
+  Object.defineProperty(globalThis, "Worker", { configurable: true, writable: true, value: FakeWorker });
+  const reader = createBrowserLabelReader();
+  t.after(() => {
+    reader.dispose();
+    if (previousWorker) Object.defineProperty(globalThis, "Worker", previousWorker);
+    else delete globalThis.Worker;
+  });
+  return { reader, workers };
+}
+
+async function initialize(worker) {
+  for (const action of initialActions) worker.respond(await worker.waitFor(action));
+}
+
+async function complete(worker, text = recognizedText) {
+  const request = await worker.waitFor("recognize");
+  worker.respond(request, { text });
+  return request;
+}
+
+async function retrySuccessfully(reader, workers) {
+  const retried = reader.recognize(image, emptyOptions());
+  const worker = workers.at(-1);
+  await initialize(worker);
+  await complete(worker);
+  assert.equal((await retried).extraction.fields.name, "Test Coffee");
+  assert.equal(worker.terminateCalls, 0);
+  return worker;
+}
+
+test("browser OCR initializes local Korean and English assets and reuses its successful worker", async (t) => {
+  const { reader, workers } = harness(t);
+  const progress = [];
+  const first = reader.recognize(image, { ...emptyOptions(), onProgress: (value) => progress.push(value) });
+  const worker = workers[0];
+  assert.equal(worker.url, "/ocr/tesseract-7.0.0/worker.min.js");
+  await initialize(worker);
+  const request = await worker.waitFor("recognize");
+  assert.equal(worker.requests[0].payload.options.corePath, "/ocr/tesseract-7.0.0/core");
+  assert.equal(worker.requests[1].payload.options.langPath, "/ocr/tesseract-7.0.0/lang");
+  assert.equal(worker.requests[1].payload.langs, "kor+eng");
+  assert.equal(worker.requests[2].payload.langs, "kor+eng");
+  assert.equal(worker.requests[2].payload.oem, 1);
+  assert.deepEqual(request.payload.image, imageBytes);
+  assert.deepEqual(request.transfer, [request.payload.image.buffer]);
+  assert.deepEqual(request.payload.output, { text: true });
+  worker.respond(request, { text: recognizedText });
+  assert.equal((await first).extraction.fields.name, "Test Coffee");
+  assert.deepEqual(progress.at(-1), { phase: "reading", progress: 1 });
+
+  const second = reader.recognize(image, emptyOptions());
+  await complete(worker, "Product: Second Coffee");
+  assert.equal((await second).extraction.fields.name, "Second Coffee");
+  assert.equal(workers.length, 1);
+  assert.equal(worker.terminateCalls, 0);
+  assert.deepEqual(worker.requests.map(({ action }) => action), [...initialActions, "recognize", "recognize"]);
+});
+
+for (const stage of ["load", "loadLanguage"]) {
+  test(`abort during ${stage} immediately terminates the worker and permits an immediate retry`, async (t) => {
+    const { reader, workers } = harness(t);
+    const controller = new AbortController();
+    const first = reader.recognize(image, { ...emptyOptions(), signal: controller.signal });
+    const aborted = assert.rejects(first, { name: "AbortError" });
+    const oldWorker = workers[0];
+    if (stage === "loadLanguage") oldWorker.respond(await oldWorker.waitFor("load"));
+    const oldRequest = await oldWorker.waitFor(stage);
+    controller.abort();
+    assert.equal(oldWorker.terminateCalls, 1);
+
+    // Retry before the old recognize() promise's finally block runs.
+    const retried = reader.recognize(image, emptyOptions());
+    const newWorker = workers[1];
+    oldWorker.respond(oldRequest);
+    await aborted;
+    await assert.rejects(reader.recognize(image, emptyOptions()), { message: "recognition_failed" });
+    assert.equal(newWorker.terminateCalls, 0);
+    await initialize(newWorker);
+    await complete(newWorker);
+    assert.equal((await retried).text, recognizedText);
+  });
+}
+
+for (const stage of ["load", "loadLanguage", "initialize", "setParameters"]) {
+  test(`a rejected ${stage} reclaims the worker, hides internal errors, and can be retried`, async (t) => {
+    const { reader, workers } = harness(t);
+    const first = reader.recognize(image, emptyOptions());
+    const rejected = assert.rejects(first, { message: "loading_failed" });
+    const worker = workers[0];
+    for (const action of initialActions) {
+      const request = await worker.waitFor(action);
+      if (action === stage) {
+        worker.respond(request, "Private path / OCR text / backend error", "reject");
+        break;
+      }
+      worker.respond(request);
+    }
+    assert.equal(worker.terminateCalls, 1);
+    await rejected;
+    await retrySuccessfully(reader, workers);
+    assert.equal(workers.length, 2);
+  });
+}
+
+for (const kind of ["error", "messageerror"]) {
+  for (const phase of ["loading", "reading"]) {
+    test(`worker ${kind} during ${phase} terminates and allows a clean retry`, async (t) => {
+      const { reader, workers } = harness(t);
+      const first = reader.recognize(image, emptyOptions());
+      const rejected = assert.rejects(first, { message: phase === "loading" ? "loading_failed" : "recognition_failed" });
+      const worker = workers[0];
+      if (phase === "reading") {
+        await initialize(worker);
+        await worker.waitFor("recognize");
+      }
+      worker.crash(kind);
+      assert.equal(worker.terminateCalls, 1);
+      await rejected;
+      await retrySuccessfully(reader, workers);
+      assert.equal(workers.length, 2);
+    });
+  }
+}
+
+test("a concurrent recognition is rejected without interrupting the active read", async (t) => {
+  const { reader, workers } = harness(t);
+  const first = reader.recognize(image, emptyOptions());
+  await assert.rejects(reader.recognize(image, emptyOptions()), { message: "recognition_failed" });
+  assert.equal(workers.length, 1);
+  assert.equal(workers[0].terminateCalls, 0);
+  await initialize(workers[0]);
+  await complete(workers[0]);
+  assert.equal((await first).text, recognizedText);
+});
+
+test("dispose rejects the active read, and the old signal cannot cancel its replacement", async (t) => {
+  const { reader, workers } = harness(t);
+  const oldController = new AbortController();
+  const first = reader.recognize(image, { ...emptyOptions(), signal: oldController.signal });
+  const aborted = assert.rejects(first, { name: "AbortError" });
+  const oldWorker = workers[0];
+  reader.dispose();
+  assert.equal(oldWorker.terminateCalls, 1);
+  const replacementController = new AbortController();
+  const replacement = reader.recognize(image, { ...emptyOptions(), signal: replacementController.signal });
+  const newWorker = workers[1];
+  oldController.abort();
+  assert.equal(replacementController.signal.aborted, false);
+  assert.equal(newWorker.terminateCalls, 0);
+  oldWorker.respond(oldWorker.requests[0]);
+  oldWorker.crash();
+  assert.equal(newWorker.terminateCalls, 0);
+  await aborted;
+  await initialize(newWorker);
+  await complete(newWorker);
+  assert.equal((await replacement).text, recognizedText);
+});
+
+test("an idle disposed reader creates a new worker when reused", async (t) => {
+  const { reader, workers } = harness(t);
+  const oldWorker = await retrySuccessfully(reader, workers);
+  reader.dispose();
+  reader.dispose();
+  assert.equal(oldWorker.terminateCalls, 1);
+  const newWorker = await retrySuccessfully(reader, workers);
+  assert.notEqual(newWorker, oldWorker);
+  assert.equal(workers.length, 2);
+});
+
+test("raw OCR text remains available when the rule parser finds no supported fields", async (t) => {
+  const { reader, workers } = harness(t);
+  const pending = reader.recognize(image, emptyOptions());
+  await initialize(workers[0]);
+  await complete(workers[0], "  Enjoy your morning.\nPrinted for our community.  ");
+  assert.deepEqual(await pending, {
+    text: "Enjoy your morning.\nPrinted for our community.",
+    extraction: { bean_type: "unknown", fields: {}, evidence: {} },
+  });
+});
+
+test("malformed OCR output rejects without retaining the worker and permits retry", async (t) => {
+  const { reader, workers } = harness(t);
+  const pending = reader.recognize(image, emptyOptions());
+  const rejected = assert.rejects(pending, { message: "recognition_failed" });
+  await initialize(workers[0]);
+  workers[0].respond(await workers[0].waitFor("recognize"), { text: { unexpected: "object" } });
+  await rejected;
+  assert.equal(workers[0].terminateCalls, 1);
+  await retrySuccessfully(reader, workers);
+});
+
+for (const cancel of ["abort", "dispose"]) {
+  test(`${cancel} from the completion callback cannot return a stale successful result`, async (t) => {
+    const { reader, workers } = harness(t);
+    const controller = new AbortController();
+    const pending = reader.recognize(image, {
+      signal: controller.signal,
+      onProgress({ phase, progress }) {
+        if (phase === "reading" && progress === 1) {
+          if (cancel === "abort") controller.abort();
+          else reader.dispose();
+        }
+      },
+    });
+    const rejected = assert.rejects(pending, { name: "AbortError" });
+    await initialize(workers[0]);
+    await complete(workers[0]);
+    await rejected;
+    assert.equal(workers[0].terminateCalls, 1);
+    await retrySuccessfully(reader, workers);
+  });
+}
+
+for (const phase of ["loading", "reading"]) {
+  test(`cancel and immediate retry from ${phase} progress cannot post old work to the new worker`, async (t) => {
+    const { reader, workers } = harness(t);
+    const controller = new AbortController();
+    let replacement;
+    const first = reader.recognize(image, {
+      signal: controller.signal,
+      onProgress(update) {
+        if (update.phase === phase && update.progress === 0 && !replacement) {
+          controller.abort();
+          replacement = reader.recognize(image, emptyOptions());
+        }
+      },
+    });
+    const aborted = assert.rejects(first, { name: "AbortError" });
+    if (phase === "reading") await initialize(workers[0]);
+    await aborted;
+    const newWorker = workers[1];
+    assert.equal(workers[0].terminateCalls, 1);
+    assert.equal(newWorker.terminateCalls, 0);
+    assert.deepEqual(newWorker.requests.map(({ action }) => action), ["load"]);
+    await initialize(newWorker);
+    await complete(newWorker);
+    assert.equal((await replacement).text, recognizedText);
+  });
+}
+
+for (const action of ["loadLanguage", "recognize"]) {
+  test(`a synchronous ${action} transport error releases the worker for retry`, async (t) => {
+    const { reader, workers } = harness(t);
+    const first = reader.recognize(image, emptyOptions());
+    const rejected = assert.rejects(first, { message: action === "recognize" ? "recognition_failed" : "loading_failed" });
+    const worker = workers[0];
+    const precedingActions = action === "loadLanguage" ? ["load"] : initialActions;
+    for (const preceding of precedingActions) {
+      const request = await worker.waitFor(preceding);
+      if (preceding === precedingActions.at(-1)) worker.throwOnPost = true;
+      worker.respond(request);
+    }
+    await rejected;
+    assert.equal(worker.terminateCalls, 1);
+    await retrySuccessfully(reader, workers);
+  });
+}

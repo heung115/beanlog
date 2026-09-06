@@ -61,6 +61,19 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: securityHeaders,
       },
+      {
+        source: "/ocr/tesseract-7.0.0/:path*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+      {
+        // Only the isolated OCR worker may compile WebAssembly. The page's
+        // policy still prohibits eval, and every OCR asset comes from this site.
+        source: "/ocr/tesseract-7.0.0/worker.min.js",
+        headers: [{
+          key: "Content-Security-Policy",
+          value: "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; worker-src 'none'; object-src 'none'",
+        }],
+      },
     ];
   },
 };

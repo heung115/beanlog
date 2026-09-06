@@ -12,6 +12,7 @@ import {
   renderSupabaseConfig,
 } from "./staging-runtime.mjs";
 import { ensureQaCredentials } from "./staging-credentials.mjs";
+import { prepareOcrAssets } from "./prepare-ocr-assets.mjs";
 import { waitForHttpStatus } from "./http-readiness.mjs";
 import { reserveLoopbackPort } from "./port-reservation.mjs";
 import {
@@ -37,6 +38,7 @@ const envFile = path.join(runtimeRoot, "docker.env");
 const databaseSecretFile = path.join(runtimeRoot, "api-database-url.secret");
 const composeFile = path.join(root, "docker-compose.staging.yml");
 const command = process.argv[2] ?? "help";
+if (["up", "qa", "qa:production"].includes(command)) prepareOcrAssets();
 const gatewayNetwork = `${runtime.composeProject}-gateway`;
 const databaseNetwork = `${runtime.composeProject}-database`;
 

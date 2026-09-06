@@ -8,6 +8,7 @@
   },
   "scripts": {
     "dev": "node scripts/staging.mjs up",
+    "prebuild": "node scripts/prepare-ocr-assets.mjs",
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
@@ -53,6 +54,8 @@
     "@google/design.md": "0.4.0",
     "@playwright/test": "1.62.0",
     "@tailwindcss/postcss": "4.3.3",
+    "@tesseract.js-data/eng": "1.0.0",
+    "@tesseract.js-data/kor": "1.0.0",
     "@types/d3": "7.4.3",
     "@types/geojson": "7946.0.16",
     "@types/node": "20.19.43",
@@ -64,6 +67,7 @@
     "eslint": "9.39.5",
     "eslint-config-next": "16.2.11",
     "tailwindcss": "4.3.3",
+    "tesseract.js": "7.0.0",
     "typescript": "5.9.3"
   },
   "overrides": {

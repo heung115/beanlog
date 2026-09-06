@@ -38,6 +38,8 @@ import { isBeanDraftValue, type BeanDraftValue } from "@/lib/coffee/record-draft
 import { beanDetailHref, resolveExploreReturnPath } from "@/lib/coffee/explore-navigation";
 import { useRecordDraft } from "@/components/beans/use-record-draft";
 import { RecordDraftNotice } from "@/components/beans/record-draft-notice";
+import { BeanLabelInput } from "@/components/beans/bean-label-input";
+import { applyLabelFields, type LabelExtraction, type LabelField } from "@/lib/coffee/bean-label";
 import type {
   BeanFormData,
   BeanType,
@@ -239,10 +241,12 @@ export function BeanForm({
   mode,
   initial,
   draftOwnerId,
+  labelImportEnabled = false,
 }: {
   mode: "create" | "edit";
   initial?: BeanWithTags;
   draftOwnerId?: string;
+  labelImportEnabled?: boolean;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -315,6 +319,28 @@ export function BeanForm({
   const countryPreset = form.origin_country
     ? findCountryPreset(form.origin_country)
     : undefined;
+
+  function handleLabelApply(extraction: LabelExtraction, selected: LabelField[]) {
+    const next = applyLabelFields(form, extraction, selected);
+    if (selected.includes("origin_country") && next.bean_type === "single_origin") {
+      const text = next.origin_country?.trim().toLowerCase();
+      const country = originCountries.find((item) => item.name_en.toLowerCase() === text || item.name_ko?.toLowerCase() === text);
+      if (country) {
+        next.origin_country = country.name_en;
+        next.origin_country_id = country.id;
+      }
+    }
+    const countryChanged = next.origin_country !== form.origin_country || next.origin_country_id !== form.origin_country_id;
+    const regionChanged = next.origin_region !== form.origin_region || next.origin_region_id !== form.origin_region_id;
+    if (countryChanged) setOriginRegions([]);
+    if (countryChanged || regionChanged) {
+      setOriginEntities([]);
+      setSingleSubregionChains([]);
+    }
+    setForm(next);
+    if (selected.some((field) => ["process_detail", "roast_date", "weight_g"].includes(field))) setShowDetails(true);
+    setFormErrors([]);
+  }
 
   useEffect(() => {
     if (!importingGuestDraft) return;
@@ -845,6 +871,9 @@ export function BeanForm({
           <span className="font-display text-3xl text-accent">01</span>
         </div>
         <div className="flex flex-col gap-5">
+          {mode === "create" && labelImportEnabled && (
+            <BeanLabelInput form={form} onApply={handleLabelApply} disabled={submitting || draftRecovery.status === "conflict"} />
+          )}
           {/* 종류 토글 — 맨 위 */}
           <div className="flex flex-col gap-1.5">
             <span className="text-sm font-medium text-brown-medium">

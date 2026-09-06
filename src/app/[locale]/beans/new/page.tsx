@@ -39,7 +39,7 @@ export default async function NewBeanPage({ searchParams }: {
           </p>
         )}
         {params.saved === "1" && <p role="status" className="mb-5 text-sm text-brown">{t("saved")}</p>}
-        <BeanForm key={user.id} mode="create" draftOwnerId={user.id} />
+        <BeanForm key={user.id} mode="create" draftOwnerId={user.id} labelImportEnabled />
       </div>
     </div>
   );

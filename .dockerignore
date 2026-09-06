@@ -10,7 +10,9 @@ test-results
 playwright-report
 coverage
 docs
-scripts
+scripts/*
+!scripts/prepare-ocr-assets.mjs
+public/ocr
 server
 staging
 tests
