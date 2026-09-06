@@ -8,6 +8,8 @@ import {
   SESSION_ONLY_COOKIE_NAME,
   shouldPersistSession,
 } from "./session-persistence";
+import { resolvePostAuthPath } from "../security/redirect";
+import { createTrustedAuthFetch } from "../security/auth-client-ip";
 
 const AUTH_RESPONSE_HEADERS = ["cache-control", "expires", "pragma", "retry-after"] as const;
 
@@ -30,7 +32,7 @@ export function isPublicPath(pathname: string): boolean {
   if (route.length === 0) return true;
 
   if (route.length === 1) {
-    return ["login", "signup", "privacy", "terms", "try", "origins", "session-unavailable"].includes(
+    return ["login", "signup", "forgot-password", "reset-password", "privacy", "terms", "try", "origins", "session-unavailable"].includes(
       route[0]
     );
   }
@@ -104,6 +106,9 @@ export async function updateSession(request: NextRequest, preferredLocale?: "ko"
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookieOptions: supabaseCookieOptions,
+      ...(process.env.AUTH_CLIENT_IP_SECRET_FILE ? {
+        global: { fetch: createTrustedAuthFetch(request.headers) },
+      } : {}),
       cookies: {
         getAll() {
           return [...pendingCookies].map(([name, value]) => ({ name, value }));
@@ -196,8 +201,11 @@ export async function updateSession(request: NextRequest, preferredLocale?: "ko"
       url.pathname = `/${locale}/beans/new`;
       url.search = "?draft=1";
     } else {
-      url.pathname = `/${locale}/explore`;
-      url.search = "";
+      const next = resolvePostAuthPath(request.nextUrl.searchParams.get("next"));
+      const destination = new URL(next === "/explore" ? `/${locale}/explore` : next, request.url);
+      url.pathname = destination.pathname;
+      url.search = destination.search;
+      url.hash = destination.hash;
     }
     return preserveAuthResponse(supabaseResponse, NextResponse.redirect(url));
   }

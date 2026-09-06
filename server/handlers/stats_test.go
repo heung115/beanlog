@@ -1,14 +1,239 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"reflect"
 	"strings"
 	"testing"
+	"time"
 
+	"beanmap-server/middleware"
 	"beanmap-server/models"
+
+	"github.com/gin-gonic/gin"
+	"github.com/jackc/pgx/v5"
 )
+
+func TestGetStatsCountsIndividualCanonicalVarietals(t *testing.T) {
+	tx := &statsFixtureTx{t: t, beans: []statsBeanRow{
+		statsFixtureBean("one", "single_origin", "Bourbon, Typica, 버본", "2026-01-15", 8),
+		statsFixtureBean("two", "single_origin", "버본，게이샤", "2026-01-20", 9),
+		statsFixtureBean("three", "single_origin", " geisha, Custom Lot ", "2026-01-25", 10),
+	}}
+	got, status := requestFixtureStats(t, tx)
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want 200", status)
+	}
+	want := []models.CountEntry{{Key: "Bourbon", Count: 2}, {Key: "Geisha", Count: 2}, {Key: "Custom Lot", Count: 1}, {Key: "Typica", Count: 1}}
+	if !reflect.DeepEqual(got.ByVarietal, want) {
+		t.Fatalf("varietals = %#v, want %#v", got.ByVarietal, want)
+	}
+	if got.Total != 3 || got.AvgScore != 9 || got.Best.Score != 10 || !reflect.DeepEqual(got.ByProcess, []models.CountEntry{{Key: "washed", Count: 3}}) {
+		t.Fatalf("record-level totals changed: %#v", got)
+	}
+}
+
+func TestGetStatsIncludesBlendVarietalsOncePerRecord(t *testing.T) {
+	tx := &statsFixtureTx{t: t, beans: []statsBeanRow{
+		// Legacy top-level blend values must not replace the actual components.
+		statsFixtureBean("blend", "blend", "Bourbon", "2026-03-15", 8),
+		statsFixtureBean("single", "single_origin", "Geisha", "2026-03-16", 10),
+	}, components: [][4]string{
+		{"blend", "Ethiopia", "Guji", "게이샤, Typica"},
+		{"blend", "Ethiopia", "Sidama", "GEISHA，티피카"},
+		{"blend", "Brazil", "", ""},
+	}}
+	got, status := requestFixtureStats(t, tx)
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want 200", status)
+	}
+	want := []models.CountEntry{{Key: "Geisha", Count: 2}, {Key: "Typica", Count: 1}}
+	if !reflect.DeepEqual(got.ByVarietal, want) {
+		t.Fatalf("blend varietals = %#v, want %#v", got.ByVarietal, want)
+	}
+	if got.Total != 2 || got.AvgScore != 9 || !reflect.DeepEqual(got.ByMonth, []models.CountEntry{{Key: "2026-03", Count: 2}}) {
+		t.Fatalf("components changed record-level totals: %#v", got)
+	}
+	if len(got.OriginMap) != 2 || got.OriginMap[0].NameEn != "Ethiopia" || got.OriginMap[0].Count != 2 {
+		t.Fatalf("existing country deduplication changed: %#v", got.OriginMap)
+	}
+}
+
+func TestGetStatsIncludesEmptyMonthsAcrossYearBoundary(t *testing.T) {
+	tx := &statsFixtureTx{t: t, beans: []statsBeanRow{
+		statsFixtureBean("later", "single_origin", "", "2026-02-28", 8),
+		statsFixtureBean("earlier", "single_origin", "", "2025-12-31", 8),
+	}}
+	got, status := requestFixtureStats(t, tx)
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want 200", status)
+	}
+	want := []models.CountEntry{{Key: "2025-12", Count: 1}, {Key: "2026-01", Count: 0}, {Key: "2026-02", Count: 1}}
+	if !reflect.DeepEqual(got.ByMonth, want) {
+		t.Fatalf("month series = %#v, want %#v", got.ByMonth, want)
+	}
+}
+
+func TestGetStatsRejectsUnboundedMonthSpan(t *testing.T) {
+	tx := &statsFixtureTx{t: t, beans: []statsBeanRow{
+		statsFixtureBean("early", "single_origin", "Geisha", "0001-01-01", 8),
+		statsFixtureBean("late", "single_origin", "Geisha", "9999-12-31", 8),
+	}}
+	_, status := requestFixtureStats(t, tx)
+	if status != http.StatusRequestEntityTooLarge {
+		t.Fatalf("extreme month span status = %d, want 413", status)
+	}
+}
+
+func TestCompleteStatsMonthsPreservesBoundariesAndEarliestISOYear(t *testing.T) {
+	for _, test := range []struct {
+		name   string
+		counts map[string]int
+		want   []models.CountEntry
+	}{
+		{"empty", map[string]int{}, []models.CountEntry{}},
+		{"single month", map[string]int{"2026-03": 4}, []models.CountEntry{{Key: "2026-03", Count: 4}}},
+		{"earliest ISO year", map[string]int{"0001-01": 2, "0001-03": 1}, []models.CountEntry{{Key: "0001-01", Count: 2}, {Key: "0001-02", Count: 0}, {Key: "0001-03", Count: 1}}},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			got, ok := completeStatsMonths(test.counts)
+			if !ok || !reflect.DeepEqual(got, test.want) {
+				t.Fatalf("complete months = %#v, %v; want %#v, true", got, ok, test.want)
+			}
+		})
+	}
+	first := time.Date(1000, 1, 1, 0, 0, 0, 0, time.UTC)
+	last := first.AddDate(0, maxStatsMonths-1, 0)
+	got, ok := completeStatsMonths(map[string]int{first.Format("2006-01"): 1, last.Format("2006-01"): 2})
+	if !ok || len(got) != maxStatsMonths || got[0].Count != 1 || got[len(got)-1].Count != 2 {
+		t.Fatalf("exact month limit must retain both endpoints, got %d months, valid = %v", len(got), ok)
+	}
+	last = last.AddDate(0, 1, 0)
+	if _, ok := completeStatsMonths(map[string]int{first.Format("2006-01"): 1, last.Format("2006-01"): 2}); ok {
+		t.Fatal("month span beyond the limit must fail before interpolation")
+	}
+}
+
+func TestCountStatsVarietalsPreservesUnknownLabelsAndBoundsCategories(t *testing.T) {
+	occurrences := []originOccurrence{
+		{beanID: "blend", varietal: " Custom Lot, custom lot "},
+		{beanID: "blend", varietal: "CUSTOM LOT"},
+		{beanID: "single", varietal: "Custom Lot"},
+	}
+	got, tooMany := countStatsVarietals(occurrences)
+	want := []models.CountEntry{{Key: "CUSTOM LOT", Count: 2}}
+	if tooMany || !reflect.DeepEqual(got, want) {
+		t.Fatalf("free-text varietals = %#v, capped = %v; want %#v", got, tooMany, want)
+	}
+	for left, right := 0, len(occurrences)-1; left < right; left, right = left+1, right-1 {
+		occurrences[left], occurrences[right] = occurrences[right], occurrences[left]
+	}
+	if reversed, _ := countStatsVarietals(occurrences); !reflect.DeepEqual(reversed, want) {
+		t.Fatalf("unknown label display depends on component order: %#v", reversed)
+	}
+	occurrences = make([]originOccurrence, maxStatsVarietals+1)
+	for i := range occurrences {
+		occurrences[i] = originOccurrence{beanID: "blend", varietal: fmt.Sprintf("Custom %05d", i)}
+	}
+	if result, capped := countStatsVarietals(occurrences[:maxStatsVarietals]); capped || len(result) != maxStatsVarietals {
+		t.Fatalf("exact variety bound = %d entries, capped = %v", len(result), capped)
+	}
+	if _, capped := countStatsVarietals(occurrences); !capped {
+		t.Fatal("more distinct component varietals than the response bound must fail instead of silently truncating")
+	}
+}
+
+func statsFixtureBean(id, beanType, varietal, date string, score float64) statsBeanRow {
+	consumedAt, err := time.Parse("2006-01-02", date)
+	if err != nil {
+		panic(err)
+	}
+	return statsBeanRow{id: id, beanType: beanType, varietal: varietal, origin: "Ethiopia", process: "washed", consumedAt: consumedAt, score: score, name: id, roastery: "QA"}
+}
+
+func requestFixtureStats(t *testing.T, tx *statsFixtureTx) (models.BeanStats, int) {
+	t.Helper()
+	recorder := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(recorder)
+	c.Request = httptest.NewRequest(http.MethodGet, "/api/stats", nil)
+	c.Set(middleware.UserIDKey, "stats-user")
+	c.Set("request_database", tx)
+	NewStatsHandler().GetStats(c)
+	var stats models.BeanStats
+	if recorder.Code == http.StatusOK {
+		if err := json.Unmarshal(recorder.Body.Bytes(), &stats); err != nil {
+			t.Fatal(err)
+		}
+	}
+	return stats, recorder.Code
+}
+
+type statsFixtureTx struct {
+	pgx.Tx
+	t          *testing.T
+	beans      []statsBeanRow
+	components [][4]string
+}
+
+func (tx *statsFixtureTx) Query(_ context.Context, query string, args ...any) (pgx.Rows, error) {
+	tx.t.Helper()
+	values := [][]any{}
+	switch {
+	case strings.Contains(query, "FROM beans WHERE user_id"):
+		if !reflect.DeepEqual(args, []any{"stats-user", maxStatsBeans + 1}) {
+			tx.t.Fatalf("bean query args = %#v", args)
+		}
+		for _, b := range tx.beans {
+			values = append(values, []any{b.id, b.beanType, b.origin, b.originCountryID, b.region, b.originRegionID, b.process, b.varietal, b.score, b.consumedAt, b.name, b.roastery})
+		}
+	case strings.Contains(query, "FROM origin_countries"), strings.Contains(query, "FROM origin_regions"):
+		// No catalog is needed to exercise free-text origins and varietals.
+	case strings.Contains(query, "FROM blend_components AS components"):
+		if !reflect.DeepEqual(args, []any{"stats-user", maxStatsOriginOccurrences + 1}) || !strings.Contains(query, "beans.user_id = components.user_id") || !strings.Contains(query, "beans.bean_type = 'blend'") {
+			tx.t.Fatalf("blend query must stay owner-scoped and exclude stale single components: %s %#v", query, args)
+		}
+		for _, component := range tx.components {
+			row := []any{component[0], component[1], component[2]}
+			if strings.Contains(query, "components.varietal") {
+				row = append(row, component[3])
+			}
+			values = append(values, row)
+		}
+	default:
+		tx.t.Fatalf("unexpected stats query: %s", query)
+	}
+	return &statsFixtureRows{values: values}, nil
+}
+
+type statsFixtureRows struct {
+	pgx.Rows
+	values [][]any
+	index  int
+}
+
+func (rows *statsFixtureRows) Close()     {}
+func (rows *statsFixtureRows) Err() error { return nil }
+func (rows *statsFixtureRows) Next() bool {
+	if rows.index >= len(rows.values) {
+		return false
+	}
+	rows.index++
+	return true
+}
+func (rows *statsFixtureRows) Scan(dest ...any) error {
+	values := rows.values[rows.index-1]
+	if len(dest) != len(values) {
+		return fmt.Errorf("scan fields = %d, row columns = %d", len(dest), len(values))
+	}
+	for i, value := range values {
+		reflect.ValueOf(dest[i]).Elem().Set(reflect.ValueOf(value))
+	}
+	return nil
+}
 
 func TestBuildOriginMapMatchesCatalogAndDeduplicatesBeans(t *testing.T) {
 	ethiopiaKo := "에티오피아"

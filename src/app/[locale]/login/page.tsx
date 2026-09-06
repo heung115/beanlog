@@ -11,6 +11,7 @@ import { resolvePostAuthPath } from "@/lib/security/redirect";
 import { SocialSignInButtons } from "@/components/auth/social-sign-in-buttons";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { useSocialAuthConsent } from "@/components/auth/use-social-auth-consent";
+import { useAuthFailureFocus } from "@/components/auth/use-auth-failure-focus";
 
 export default function LoginPage() {
   const t = useTranslations("auth");
@@ -30,6 +31,8 @@ export default function LoginPage() {
   const submittingRef = useRef(false);
   const state = clientState ?? serverState;
   const pending = serverPending || clientPending;
+  const submitRef = useRef<HTMLButtonElement>(null);
+  useAuthFailureFocus(pending, Boolean(state.error), submitRef);
   const [socialTermsAccepted, setSocialTermsAccepted] = useSocialAuthConsent();
   const oauthError = searchParams.get("authError");
   const oauthMessage = oauthError === "expired" ? "socialExpired"
@@ -66,8 +69,8 @@ export default function LoginPage() {
         <h1 className="font-display text-2xl font-semibold tracking-[-0.025em] text-brown">
           {t("login")}
         </h1>
-        <p className="mt-1.5 text-sm text-brown-light">{t("loginTitle")}</p>
-        {oauthMessage && <p role="alert" className="mt-4 text-sm text-red-600">{t(oauthMessage)}</p>}
+        {oauthMessage && <p role="alert" className="mt-4 text-sm text-red-700">{t(oauthMessage)}</p>}
+        {searchParams.get("passwordReset") === "1" && <p role="status" className="mt-4 text-sm text-brown-medium">{t("passwordResetComplete")}</p>}
       </div>
 
         <form
@@ -95,6 +98,9 @@ export default function LoginPage() {
             required
             autoComplete="current-password"
           />
+          <Link href={`/${locale}/forgot-password${authQuery}`} className="self-end text-sm font-medium text-accent underline underline-offset-4">
+            {t("forgotPassword")}
+          </Link>
 
           <label className="flex cursor-pointer items-center gap-2 text-sm text-brown-light">
             <input
@@ -107,12 +113,12 @@ export default function LoginPage() {
           </label>
 
           {state.error && (
-            <p role="alert" className="text-sm text-red-600">
+            <p role="alert" className="text-sm text-red-700">
               {t(loginErrorMessage)}
             </p>
           )}
 
-          <Button type="submit" loading={pending} className="mt-2 w-full">
+          <Button ref={submitRef} type="submit" loading={pending} className="mt-2 w-full">
             {t("login")}
           </Button>
         </form>

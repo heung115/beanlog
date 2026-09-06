@@ -4,15 +4,37 @@ import {
   createClient,
   createPublicClient,
   setSessionPersistencePreference,
+  clearSessionCookies,
 } from "@/lib/supabase/server";
 import { redirect, RedirectType } from "next/navigation";
 import { z } from "zod";
 import { resolvePostAuthPath } from "@/lib/security/redirect";
 import { getRequestAppOrigin } from "@/lib/admin/private-access";
+import { validateRegistrationFields, validateNewPassword, type RegistrationField } from "@/lib/validation/auth";
+import { isTemporaryAuthError } from "@/lib/supabase/auth-recovery";
 
 export type SignInState = {
   error?: "invalid_credentials" | "email_not_confirmed" | "rate_limited" | "temporarily_unavailable";
 };
+
+export type SignUpState = {
+  error?: "display_name_required" | "password_length" | "password_mismatch" | "agreement_required" | "signup_failed" | "temporarily_unavailable";
+  field?: RegistrationField;
+};
+
+export type PasswordResetState = {
+  error?: "invalid_email" | "temporarily_unavailable" | "password_length" | "password_mismatch" | "expired" | "same_password";
+  field?: "email" | "password" | "passwordConfirm";
+  sent?: boolean;
+};
+
+function authFormDestination(formData: FormData) {
+  const locale = formData.get("locale") === "en" ? "en" : "ko";
+  const next = formData.get("draft") === "1" ? `/${locale}/beans/new?draft=1` : resolvePostAuthPath(formData.get("next"));
+  const query = new URLSearchParams();
+  if (next !== "/explore") query.set("next", next);
+  return { locale, next, query };
+}
 
 function signInError(error: unknown): SignInState {
   if (error && typeof error === "object") {
@@ -69,6 +91,71 @@ export async function signUp(
   // The profiles row is created by the handle_new_user database trigger from
   // raw_user_meta_data.display_name; no separate data write is needed here.
   return { success: true };
+}
+
+export async function signUpAction(_previousState: SignUpState, formData: FormData): Promise<SignUpState> {
+  const issue = validateRegistrationFields(formData);
+  if (issue) return issue;
+  let result;
+  try {
+    result = await signUp(String(formData.get("email") ?? ""), String(formData.get("password") ?? ""), String(formData.get("displayName") ?? ""), formData.get("acceptedTerms") === "on");
+  } catch {
+    return { error: "temporarily_unavailable" };
+  }
+  if (result.error) return { error: "signup_failed" };
+  const { locale, query } = authFormDestination(formData);
+  if (formData.get("draft") === "1") {
+    query.delete("next");
+    query.set("draft", "1");
+  }
+  redirect(`/${locale}/signup/check-email${query.size ? `?${query}` : ""}`);
+}
+
+export async function requestPasswordResetAction(_previousState: PasswordResetState, formData: FormData): Promise<PasswordResetState> {
+  const email = z.string().trim().email().max(320).safeParse(formData.get("email"));
+  if (!email.success) return { error: "invalid_email", field: "email" };
+  const { locale, next } = authFormDestination(formData);
+  try {
+    const supabase = await createClient({ persistSession: false });
+    const callback = new URL("/api/auth/callback", await getRequestAppOrigin());
+    callback.searchParams.set("mode", "recovery");
+    callback.searchParams.set("locale", locale);
+    if (next !== "/explore") callback.searchParams.set("next", next);
+    const { error } = await supabase.auth.resetPasswordForEmail(email.data, { redirectTo: callback.toString() });
+    // Account-specific errors and per-address throttling must not reveal whether
+    // an address is registered. Only a general service outage is distinguished.
+    if (error && ((error.status ?? 0) >= 500 || error.name === "AuthRetryableFetchError")) {
+      return { error: "temporarily_unavailable" };
+    }
+    return { sent: true };
+  } catch {
+    return { error: "temporarily_unavailable" };
+  }
+}
+
+export async function updatePasswordAction(_previousState: PasswordResetState, formData: FormData): Promise<PasswordResetState> {
+  const issue = validateNewPassword(formData);
+  if (issue) return issue;
+  const { locale, query } = authFormDestination(formData);
+  try {
+    const supabase = await createClient({ persistSession: false });
+    // getUser verifies the cookie-backed session with Auth; getSession alone
+    // would only trust the caller's locally stored claims.
+    const { data, error: identityError } = await supabase.auth.getUser();
+    if (identityError || !data.user) {
+      return { error: isTemporaryAuthError(identityError) ? "temporarily_unavailable" : "expired" };
+    }
+    const { error } = await supabase.auth.updateUser({ password: String(formData.get("password")) });
+    if (error) return { error: error.code === "same_password" ? "same_password" : "temporarily_unavailable", field: error.code === "same_password" ? "password" : undefined };
+    // The password has already changed. A remote logout failure must not tell
+    // the user that reset failed, or retain credentials in this browser.
+    try { await supabase.auth.signOut({ scope: "local" }); } catch { /* Local cookies are still removed below. */ }
+  } catch {
+    return { error: "temporarily_unavailable" };
+  }
+  await clearSessionCookies();
+  query.set("passwordReset", "1");
+  redirect(`/${locale}/login?${query}`);
 }
 
 export async function signInAction(

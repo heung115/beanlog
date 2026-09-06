@@ -19,7 +19,7 @@ export function BottomNav({ authenticated }: { authenticated: boolean }) {
 
   if (
     !authenticated ||
-    /^\/(?:login|signup(?:\/check-email)?|privacy|terms|try)\/?$/.test(appPathname)
+    /^\/(?:login|signup(?:\/check-email)?|forgot-password|reset-password|privacy|terms|try)\/?$/.test(appPathname)
   ) {
     return null;
   }

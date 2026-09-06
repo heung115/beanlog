@@ -1,3 +1,4 @@
+import * as authClientIp from "../src/lib/security/auth-client-ip.ts";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { registerHooks } from "node:module";
@@ -9,6 +10,7 @@ import { createServerClient } from "@supabase/ssr";
 import * as authRecovery from "../src/lib/supabase/auth-recovery.ts";
 import * as persistence from "../src/lib/supabase/session-persistence.ts";
 import * as originRoute from "../src/lib/coffee/origin-route.ts";
+import * as redirectHelpers from "../src/lib/security/redirect.ts";
 
 // next-intl uses Next's extensionless server import, resolved by Next in-app.
 const nextImports = registerHooks({ resolve(specifier, context, nextResolve) {
@@ -27,10 +29,13 @@ function middlewareModuleWith(error, throws = false, clientFactory) {
   const exports = {};
   vm.runInNewContext(outputText, {
     exports,
+    URL,
     process: { env: {} },
     require(name) {
+      if (name === "../security/auth-client-ip") return authClientIp;
       if (name === "next/server") return { NextResponse };
       if (name === "./auth-recovery") return authRecovery;
+      if (name === "../security/redirect") return redirectHelpers;
       if (name === "./session-persistence") return persistence;
       if (name === "./config") return { supabaseCookieOptions: { name: "auth-cookie", secure: false } };
       if (name === "@supabase/ssr") return { createServerClient: clientFactory ?? (() => ({ auth: { getUser: async () => {
@@ -75,6 +80,24 @@ test("a verified missing session still requires login with its return path", asy
   const response = await middlewareWith({ name: "AuthSessionMissingError", status: 400 })(new NextRequest("http://localhost:3100/ko/settings"));
   assert.equal(response.status, 307);
   assert.equal(new URL(response.headers.get("location")).pathname, "/ko/login");
+});
+
+test("signed-in users opening authentication pages retain a trusted next destination", async () => {
+  const { updateSession } = middlewareModuleWith(null, false, () => ({
+    auth: { getUser: async () => ({ data: { user: { id: "verified-fixture-user" } }, error: null }) },
+  }));
+  for (const locale of ["ko", "en"]) {
+    for (const authPage of ["login", "signup", "signup/check-email"]) {
+      for (const destination of [`/${locale}/stats`, `/${locale}/beans/new?draft=1`, "https://example.com/untrusted"]) {
+        const request = new NextRequest(`http://localhost:3100/${locale}/${authPage}?next=${encodeURIComponent(destination)}`);
+        const response = await updateSession(request);
+        assert.equal(response.status, 307);
+        const actual = new URL(response.headers.get("location"));
+        assert.equal(actual.origin, "http://localhost:3100");
+        assert.equal(`${actual.pathname}${actual.search}`, destination.startsWith("/") ? destination : `/${locale}/explore`);
+      }
+    }
+  }
 });
 
 test("public recovery and origin pages remain reachable during an auth outage", async () => {

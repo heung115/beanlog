@@ -76,7 +76,6 @@ export default async function OriginsPage({ params }: { params: Promise<{ locale
         testId="origin-index-header"
         eyebrow={t("guide")}
         title={t("indexTitle")}
-        description={t("indexIntro")}
         meta={(
           <p className="folio-label">
             {t("indexCount", { count: originPresets.length })}

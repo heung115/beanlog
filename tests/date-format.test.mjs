@@ -17,3 +17,17 @@ test("calendar dates stay on the recorded day in Korean and English across time 
     else process.env.TZ = previous;
   }
 });
+
+test("calendar fields serialized as API UTC timestamps keep their day without changing instant formatting", async () => {
+  const { formatCalendarDate } = await import("../src/lib/utils.ts");
+  const previous = process.env.TZ;
+  try {
+    process.env.TZ = "America/Los_Angeles";
+    assert.equal(formatCalendarDate("2026-08-31T00:00:00Z", "en"), "Aug 31, 2026");
+    assert.equal(formatCalendarDate("2026-08-31T00:00:00+00:00", "ko"), "2026년 8월 31일");
+    assert.equal(formatDate("2026-08-31T00:00:00Z", "en"), "Aug 30, 2026");
+  } finally {
+    if (previous === undefined) delete process.env.TZ;
+    else process.env.TZ = previous;
+  }
+});

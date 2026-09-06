@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 interface PageIntroProps {
   eyebrow: string;
   title: string;
-  description: string;
+  description?: string;
   meta?: ReactNode;
   testId?: string;
   className?: string;
@@ -27,7 +27,7 @@ export function PageIntro({
         <div className="min-w-0">
           <p className="journal-kicker">{eyebrow}</p>
           <h1 className="app-page-title mt-2">{title}</h1>
-          <p className="app-page-deck mt-3">{description}</p>
+          {description && <p className="app-page-deck mt-3">{description}</p>}
         </div>
         {meta ? <div className="shrink-0 pb-1 sm:text-right">{meta}</div> : null}
       </div>

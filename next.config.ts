@@ -54,6 +54,10 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   experimental: {
     proxyClientMaxBodySize: "1mb",
+    // Production containers have a read-only root filesystem. Metadata route
+    // bodies live under .next/server/app, outside the writable cache mount.
+    // Keep the bounded memory cache, but never try to rewrite those image files.
+    isrFlushToDisk: isDevelopment,
   },
   async headers() {
     return [

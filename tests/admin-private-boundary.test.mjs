@@ -7,6 +7,8 @@ import { z } from "zod";
 import { NextRequest, NextResponse } from "next/server.js";
 import * as boundary from "../src/lib/security/admin-boundary.ts";
 import * as redirects from "../src/lib/security/redirect.ts";
+import * as authValidation from "../src/lib/validation/auth.ts";
+import * as authRecovery from "../src/lib/supabase/auth-recovery.ts";
 
 const privateOrigin = "https://operator.example.ts.net:9443";
 const publicOrigin = "https://beanmap.example";
@@ -221,6 +223,8 @@ for (const [name, requestHeaders, expectedOrigin] of [
     const calls = [];
     const actions = loadModule("../src/lib/actions/auth.ts", {
       "zod": { z },
+      "@/lib/validation/auth": authValidation,
+      "@/lib/supabase/auth-recovery": authRecovery,
       "@/lib/admin/private-access": access,
       "@/lib/security/redirect": redirects,
       "next/navigation": { redirect: () => {} },

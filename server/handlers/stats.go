@@ -23,6 +23,8 @@ const (
 	maxStatsOriginOccurrences  = maxStatsBeans * 50
 	maxStatsOriginMapCountries = 256
 	maxStatsOriginMapRegions   = 512
+	maxStatsVarietals          = maxStatsBeans
+	maxStatsMonths             = 10000
 )
 
 func NewStatsHandler() *StatsHandler {
@@ -50,6 +52,7 @@ type originOccurrence struct {
 	countryID *int64
 	region    string
 	regionID  *int64
+	varietal  string
 }
 
 type originCatalogCountry struct {
@@ -140,6 +143,7 @@ func (h *StatsHandler) GetStats(c *gin.Context) {
 			countryID: b.originCountryID,
 			region:    b.region,
 			regionID:  b.originRegionID,
+			varietal:  b.varietal,
 		})
 	}
 	blendOccurrences, tooManyOrigins, err := loadBlendOriginOccurrences(c.Request.Context(), db, userID)
@@ -153,13 +157,17 @@ func (h *StatsHandler) GetStats(c *gin.Context) {
 	}
 	originOccurrences = append(originOccurrences, blendOccurrences...)
 	originMap := buildOriginMap(originOccurrences, catalog)
+	varietalCounts, tooManyVarietals := countStatsVarietals(originOccurrences)
+	if tooManyVarietals {
+		c.JSON(http.StatusRequestEntityTooLarge, gin.H{"error": "dataset too large for statistics"})
+		return
+	}
 
 	total := len(beanRows)
 	var sumScore float64
 	best := beanRows[0]
 	byOrigin := make(map[string]int, len(originMap))
 	byProcess := map[string]int{}
-	byVarietal := map[string]int{}
 	byMonth := map[string]int{}
 	scoreDist := map[string]int{}
 
@@ -174,9 +182,6 @@ func (h *StatsHandler) GetStats(c *gin.Context) {
 			best = b
 		}
 		byProcess[b.process]++
-		if b.varietal != "" {
-			byVarietal[b.varietal]++
-		}
 		month := b.consumedAt.Format("2006-01")
 		byMonth[month]++
 		bucket := fmt.Sprintf("%d", int(math.Floor(b.score)))
@@ -184,6 +189,11 @@ func (h *StatsHandler) GetStats(c *gin.Context) {
 	}
 
 	avgScore := math.Round(sumScore/float64(total)*10) / 10
+	monthCounts, validSpan := completeStatsMonths(byMonth)
+	if !validSpan {
+		c.JSON(http.StatusRequestEntityTooLarge, gin.H{"error": "date range too large for statistics"})
+		return
+	}
 
 	stats := models.BeanStats{
 		Total:    total,
@@ -195,8 +205,8 @@ func (h *StatsHandler) GetStats(c *gin.Context) {
 		},
 		ByOrigin:   toCountEntries(byOrigin, true),
 		ByProcess:  toCountEntries(byProcess, true),
-		ByVarietal: toCountEntries(byVarietal, true),
-		ByMonth:    toCountEntries(byMonth, false),
+		ByVarietal: varietalCounts,
+		ByMonth:    monthCounts,
 		ScoreDist:  toCountEntries(scoreDist, false),
 		OriginMap:  originMap,
 	}
@@ -209,6 +219,78 @@ func (h *StatsHandler) GetStats(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, stats)
+}
+
+// Group a record's components before counting so repeated varieties in a blend
+// contribute once, without retaining every (record, varietal) pair in memory.
+func countStatsVarietals(occurrences []originOccurrence) ([]models.CountEntry, bool) {
+	byBean := make(map[string][]string)
+	for _, occurrence := range occurrences {
+		if strings.TrimSpace(occurrence.varietal) != "" {
+			byBean[occurrence.beanID] = append(byBean[occurrence.beanID], occurrence.varietal)
+		}
+	}
+	counts := map[string]int{}
+	labels := map[string]string{}
+	for _, values := range byBean {
+		seen := map[string]struct{}{}
+		for _, value := range values {
+			for _, varietal := range splitCanonicalVarietals(value) {
+				key := strings.ToLower(varietal)
+				if label, exists := labels[key]; !exists || stableTextLess(varietal, label) {
+					labels[key] = varietal
+				}
+				// Components can introduce more distinct values than records. Keep
+				// the existing buffered response bound; never silently drop a tail.
+				if len(labels) > maxStatsVarietals {
+					return nil, true
+				}
+				if _, exists := seen[key]; !exists {
+					seen[key] = struct{}{}
+					counts[key]++
+				}
+			}
+		}
+	}
+	displayCounts := make(map[string]int, len(counts))
+	for key, count := range counts {
+		displayCounts[labels[key]] = count
+	}
+	return toCountEntries(displayCounts, true), false
+}
+
+// Emit every calendar month between the first and last record. Check the span
+// before allocating so an accidentally entered distant year cannot expand an
+// otherwise tiny account into an unbounded chart response.
+func completeStatsMonths(counts map[string]int) ([]models.CountEntry, bool) {
+	if len(counts) == 0 {
+		return []models.CountEntry{}, true
+	}
+	var first, last time.Time
+	initialized := false
+	for key := range counts {
+		month, err := time.Parse("2006-01", key)
+		if err != nil {
+			return nil, false
+		}
+		if !initialized || month.Before(first) {
+			first = month
+		}
+		if !initialized || month.After(last) {
+			last = month
+		}
+		initialized = true
+	}
+	span := (last.Year()-first.Year())*12 + int(last.Month()-first.Month()) + 1
+	if span <= 0 || span > maxStatsMonths {
+		return nil, false
+	}
+	result := make([]models.CountEntry, 0, span)
+	for month := first; !month.After(last); month = month.AddDate(0, 1, 0) {
+		key := month.Format("2006-01")
+		result = append(result, models.CountEntry{Key: key, Count: counts[key]})
+	}
+	return result, true
 }
 
 func loadOriginCatalog(ctx context.Context, db pgx.Tx) (originCatalog, error) {
@@ -263,7 +345,7 @@ func loadOriginCatalog(ctx context.Context, db pgx.Tx) (originCatalog, error) {
 func loadBlendOriginOccurrences(ctx context.Context, db pgx.Tx, userID string) ([]originOccurrence, bool, error) {
 	rows, err := db.Query(ctx,
 		`SELECT components.bean_id::text, components.origin_country,
-		        COALESCE(components.origin_region, '')
+		        COALESCE(components.origin_region, ''), COALESCE(components.varietal, '')
 		 FROM blend_components AS components
 		 JOIN beans ON beans.id = components.bean_id
 		           AND beans.user_id = components.user_id
@@ -280,7 +362,7 @@ func loadBlendOriginOccurrences(ctx context.Context, db pgx.Tx, userID string) (
 	occurrences := []originOccurrence{}
 	for rows.Next() {
 		var occurrence originOccurrence
-		if err := rows.Scan(&occurrence.beanID, &occurrence.country, &occurrence.region); err != nil {
+		if err := rows.Scan(&occurrence.beanID, &occurrence.country, &occurrence.region, &occurrence.varietal); err != nil {
 			return nil, false, err
 		}
 		occurrences = append(occurrences, occurrence)

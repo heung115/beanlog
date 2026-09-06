@@ -11,6 +11,7 @@ test("blend lookups keep pending and empty results across edits and sibling comp
     password: randomBytes(24).toString("hex"),
   };
   const userId = await ensureUser(user.email, user.password);
+  let finishEdit = () => {};
   try {
     const { session } = await signIn(user.email, user.password);
     const created = await request.post(`${qaApiURL}/api/beans`, {
@@ -37,9 +38,9 @@ test("blend lookups keep pending and empty results across edits and sibling comp
     const calls = new Map<string, number>();
     let releaseFirstLookup!: () => void;
     const firstLookup = new Promise<void>((resolve) => { releaseFirstLookup = resolve; });
-    let finishEdit!: () => void;
     const editedWhilePending = new Promise<void>((resolve) => { finishEdit = resolve; });
     let heldFirstLookup = false;
+    let completedLookups = 0;
     await page.route(`**/beans/${bean.id}/edit`, async (route) => {
       const request = route.request();
       if (request.method() !== "POST" || !request.headers()["next-action"]) {
@@ -64,6 +65,7 @@ test("blend lookups keep pending and empty results across edits and sibling comp
       // before the next response resolves, as real Server Actions do.
       await new Promise((resolve) => setTimeout(resolve, 100));
       await route.fulfill({ response });
+      completedLookups += 1;
     });
 
     await page.goto(`/en/beans/${bean.id}/edit`);
@@ -71,6 +73,7 @@ test("blend lookups keep pending and empty results across edits and sibling comp
     const percentage = page.getByLabel(en.beans.componentPercentage, { exact: true }).first();
     await percentage.fill("59");
     finishEdit();
+    await expect.poll(() => completedLookups).toBe(6);
     await page.waitForLoadState("networkidle");
 
     // Two countries each need regions, entities, and prior subregions. This
@@ -92,13 +95,22 @@ test("blend lookups keep pending and empty results across edits and sibling comp
     await page.getByRole("radio", { name: en.beans.blend, exact: true }).click();
     await expect(page.locator('[name="blend_origin_0"]')).toBeVisible();
     await expect.poll(() => [...calls.values()].reduce((sum, count) => sum + count, 0)).toBe(12);
+    // Request starts are counted before route.fetch and the intentional delay.
+    // A previously reached networkidle state can resolve immediately, so wait
+    // for every intercepted response before assertions and fixture teardown.
+    await expect.poll(() => completedLookups).toBe(12);
     await page.waitForLoadState("networkidle");
     expect(calls.size).toBe(6);
     expect(Object.fromEntries(calls)).toEqual(Object.fromEntries(
       [...calls.keys()].map((key) => [key, 2])
     ));
   } finally {
-    const { error } = await admin.auth.admin.deleteUser(userId);
-    if (error) throw error;
+    finishEdit();
+    try {
+      await page.unrouteAll({ behavior: "wait" });
+    } finally {
+      const { error } = await admin.auth.admin.deleteUser(userId);
+      if (error) throw error;
+    }
   }
 });

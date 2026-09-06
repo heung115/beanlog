@@ -17,6 +17,11 @@ export function formatDate(dateStr: string, locale: string = "ko"): string {
   });
 }
 
+/** A recorded calendar day remains the same when the API serializes it as midnight UTC. */
+export function formatCalendarDate(dateStr: string, locale: string = "ko"): string {
+  return formatDate(dateStr.slice(0, 10), locale);
+}
+
 export function formatScore(score: number): string {
   return score.toFixed(1);
 }

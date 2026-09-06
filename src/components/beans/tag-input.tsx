@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import {
@@ -48,6 +49,16 @@ export function TagInput({ value, onChange, draft, onDraftChange, "aria-invalid"
   const t = useTranslations("beans");
   const locale = useLocale();
 
+  const inputRef = useRef<HTMLInputElement>(null);
+  const removeRefs = useRef(new Map<string, HTMLButtonElement>());
+  const pendingFocus = useRef<{ tag: string | null } | null>(null);
+  useEffect(() => {
+    const pending = pendingFocus.current;
+    if (!pending) return;
+    pendingFocus.current = null;
+    const target = pending.tag ? removeRefs.current.get(pending.tag) : inputRef.current;
+    (target ?? inputRef.current)?.focus();
+  }, [value]);
   const selectedTags = new Set(value.map((v) => v.tag));
 
   function togglePreset(preset: FlavorTag) {
@@ -63,9 +74,12 @@ export function TagInput({ value, onChange, draft, onDraftChange, "aria-invalid"
     if (tags.length > 30) return;
     onChange(tags);
     onDraftChange("");
+    inputRef.current?.focus();
   }
 
   function removeTag(tag: string) {
+    const index = value.findIndex((item) => item.tag === tag);
+    pendingFocus.current = { tag: value[index + 1]?.tag ?? value[index - 1]?.tag ?? null };
     onChange(value.filter((v) => v.tag !== tag));
   }
 
@@ -77,16 +91,17 @@ export function TagInput({ value, onChange, draft, onDraftChange, "aria-invalid"
           {value.map((v) => (
             <span
               key={v.tag}
-              className="animate-rise inline-flex items-center gap-1.5 rounded-sm bg-brown py-1 pl-2.5 pr-1.5 text-xs font-medium text-cream"
+              className="animate-rise inline-flex max-w-full items-center gap-1.5 rounded-sm bg-brown py-1 pl-2.5 pr-1.5 text-xs font-medium text-cream"
             >
-              {tagDisplayName(v.tag, locale)}
+              <span className="min-w-0 [overflow-wrap:anywhere]">{tagDisplayName(v.tag, locale)}</span>
               <button
+                ref={(element) => { if (element) removeRefs.current.set(v.tag, element); else removeRefs.current.delete(v.tag); }}
                 type="button"
                 onClick={() => removeTag(v.tag)}
                 aria-label={t("removeTag", {
                   tag: tagDisplayName(v.tag, locale),
                 })}
-                className="flex h-4 w-4 items-center justify-center rounded-full text-cream/70 transition-colors hover:bg-cream/20 hover:text-cream"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full focus:outline-none focus-visible:ring-2 focus-visible:ring-cream text-cream/70 transition-colors hover:bg-cream/20 hover:text-cream"
               >
                 <svg width="8" height="8" viewBox="0 0 8 8" fill="none">
                   <path
@@ -108,10 +123,11 @@ export function TagInput({ value, onChange, draft, onDraftChange, "aria-invalid"
       {/* Custom tag input */}
       <div className="flex items-start gap-2">
         <input
+          ref={inputRef}
           type="text"
           name="tasting_tags_draft"
           aria-label={t("tastingNotesPlaceholder")}
-          aria-describedby={ariaDescribedBy ? `tasting-tag-hint ${ariaDescribedBy}` : "tasting-tag-hint"}
+          aria-describedby={[value.length >= 30 ? "tasting-tag-hint" : null, ariaDescribedBy].filter(Boolean).join(" ") || undefined}
           aria-invalid={ariaInvalid}
           maxLength={50}
           value={draft}
@@ -132,9 +148,7 @@ export function TagInput({ value, onChange, draft, onDraftChange, "aria-invalid"
           {t("addTag")}
         </Button>
       </div>
-      <p id="tasting-tag-hint" className="text-xs text-brown-medium">
-        {value.length >= 30 ? t("tagLimit") : t("tagInputHint")}
-      </p>
+      {value.length >= 30 && <p id="tasting-tag-hint" className="text-xs text-brown-medium">{t("tagLimit")}</p>}
 
       {/* Flavor wheel presets */}
       <div className="flex flex-col gap-3.5">

@@ -10,9 +10,9 @@ import { Button } from "@/components/ui/button";
 import { EmptyJournalGuide } from "@/components/beans/empty-journal-guide";
 import { PageIntro } from "@/components/layout/page-intro";
 import { cn } from "@/lib/utils";
-import { splitVarietals } from "@/lib/coffee/varietals";
+import { splitCanonicalVarietals, trimCoffeeWhitespace, varietalDisplayName } from "@/lib/coffee/canonical-varietals";
 import { originPresets } from "@/data/origin-presets";
-import { EXPLORE_PAGE_SIZE, exploreHref, exploreQuery, parseExploreQuery, type ExploreNavigationState } from "@/lib/coffee/explore-navigation";
+import { EXPLORE_PAGE_SIZE, exploreHref, exploreQuery, loadExploreWindow, parseExploreQuery, type ExploreNavigationState } from "@/lib/coffee/explore-navigation";
 import type {
   BeanFilters,
   BeanType,
@@ -162,16 +162,9 @@ function EmptyState({
     return (
       <EmptyJournalGuide
         testId="explore-empty-state"
-        eyebrow={t("emptyEyebrow")}
         title={t("emptyTitle")}
-        description={t("emptyDescription")}
         actionLabel={t("addFirst")}
         href={`/${locale}/beans/new`}
-        steps={[
-          { title: t("emptyStepBean"), description: t("emptyStepBeanDescription") },
-          { title: t("emptyStepTaste"), description: t("emptyStepTasteDescription") },
-          { title: t("emptyStepInsight"), description: t("emptyStepInsightDescription") },
-        ]}
       />
     );
   }
@@ -182,7 +175,6 @@ function EmptyState({
       className="col-span-full flex flex-col items-center px-6 py-10 text-center md:py-12"
     >
       <h2 className="text-lg font-semibold tracking-[-0.015em] text-brown">{t("noMatches")}</h2>
-      <p className="mt-1.5 max-w-sm text-sm leading-6 text-brown-light">{t("noMatchesSub")}</p>
       <Button variant="secondary" size="md" className="mt-6" onClick={onClear}>
         {t("clearFilters")}
       </Button>
@@ -300,7 +292,8 @@ export function ExploreClient({
   }, [searchInput, filterKey, queryKey, locale]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // A restored URL includes all pages previously revealed by “Load more”.
-  // Fetch only missing pages, stopping at the server count even for a large URL page.
+  // Refresh the visible prefix when adding a page: older offsets can shift after
+  // a record is added or deleted in another tab. Up to 100 rows use one request.
   useEffect(() => {
     let cancelled = false;
     const requestedFilters = parseExploreQuery(new URLSearchParams(filterKey)).filters;
@@ -317,21 +310,18 @@ export function ExploreClient({
         else setLoadingMore(true);
       }
 
-      while (cache.nextPage <= page &&
-        (cache.nextPage === 0 || cache.beans.length < cache.total)) {
-        const result = await getBeans({ ...requestedFilters, page: cache.nextPage, limit: PAGE_SIZE });
+      if (needsFetch) {
+        const result = await loadExploreWindow<BeanWithTags>(page,
+          (nextPage, limit) => getBeans({ ...requestedFilters, page: nextPage, limit }),
+          () => cancelled);
         if (cancelled) return;
-        if (result.error) throw new Error("Unable to load records");
-        const fetched = (result.beans ?? []) as BeanWithTags[];
         cache = {
           filterKey,
-          beans: [...cache.beans, ...fetched],
-          total: result.count,
-          nextPage: cache.nextPage + 1,
+          beans: result.beans,
+          total: result.total,
+          nextPage: page + 1,
         };
         cachedResults.current = cache;
-        // An empty page must terminate restoration if records changed concurrently.
-        if (fetched.length === 0) break;
       }
       if (cancelled) return;
       setLoadError(false);
@@ -343,9 +333,15 @@ export function ExploreClient({
         const roasteries = new Set(previous.roasteries);
         const varietals = new Set(previous.varietals);
         cache.beans.forEach((bean) => {
-          if (bean.origin_country) origins.add(bean.origin_country);
-          if (bean.roastery) roasteries.add(bean.roastery.trim());
-          for (const varietal of splitVarietals(bean.varietal)) varietals.add(varietal);
+          if (bean.bean_type === "single_origin" && bean.origin_country) origins.add(bean.origin_country);
+          if (bean.roastery) roasteries.add(trimCoffeeWhitespace(bean.roastery));
+          if (bean.bean_type === "single_origin") {
+            for (const varietal of splitCanonicalVarietals(bean.varietal)) varietals.add(varietal);
+          }
+          for (const component of bean.bean_type === "blend" ? bean.blend_components ?? [] : []) {
+            if (component.origin_country) origins.add(component.origin_country);
+            for (const varietal of splitCanonicalVarietals(component.varietal)) varietals.add(varietal);
+          }
         });
         return { origins: [...origins].sort(), roasteries: [...roasteries].sort(), varietals: [...varietals].sort() };
       });
@@ -434,8 +430,8 @@ export function ExploreClient({
   );
 
   const varietalOptions = useMemo(
-    () => optionPool.varietals.map((v) => ({ value: v, label: v })),
-    [optionPool.varietals]
+    () => optionPool.varietals.map((v) => ({ value: v, label: varietalDisplayName(v, locale) })),
+    [optionPool.varietals, locale]
   );
 
   const processOptions = PROCESS_METHODS.map((p) => ({ value: p, label: tProcess(p) }));
@@ -514,7 +510,6 @@ export function ExploreClient({
     <PageIntro
       eyebrow={t("eyebrow")}
       title={t("title")}
-      description={t("description")}
       testId="explore-header"
       meta={!loadError && (
         <p role="status" aria-live="polite" className="folio-label">

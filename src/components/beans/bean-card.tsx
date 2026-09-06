@@ -6,7 +6,7 @@ import type { BeanWithTags } from "@/types/database";
 import { ScoreDisplay } from "@/components/ui/score-display";
 import { tagDisplayName } from "@/components/beans/tag-input";
 import { findCountryPreset } from "@/data/origin-presets";
-import { cn, formatDate } from "@/lib/utils";
+import { cn, formatCalendarDate } from "@/lib/utils";
 import { beanDetailHref } from "@/lib/coffee/explore-navigation";
 
 interface BeanCardProps {
@@ -47,7 +47,7 @@ export function BeanCard({ bean, view = "grid", returnTo }: BeanCardProps) {
       <div className="flex h-full flex-1 flex-col">
         <div className="mb-3 flex items-center justify-end">
           <time className="folio-label" dateTime={bean.consumed_at}>
-            {formatDate(bean.consumed_at, locale)}
+            {formatCalendarDate(bean.consumed_at, locale)}
           </time>
         </div>
 

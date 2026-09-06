@@ -48,6 +48,7 @@ fetch_json() {
     --header 'Accept: application/vnd.github+json' \
     --header 'X-GitHub-Api-Version: 2022-11-28' \
     --header 'User-Agent: beanmap-deploy-poller' \
+    --header 'Cache-Control: no-cache' \
     --output "$output_file" \
     "$url"
 }
@@ -66,6 +67,25 @@ if [[ "$requested_sha" == "$deployed_sha" ]]; then
   requested_sha=""
   requested_run_id=""
 fi
+
+# BEGIN superseded trigger selection
+# Do not let a delayed, already superseded webhook prevent the timer fallback
+# from discovering a new successful release. Leave the request file untouched:
+# a concurrent webhook may already have replaced it with a newer request.
+if [[ "$requested_sha" =~ ^[0-9a-f]{40}$ && "$deployed_sha" =~ ^[0-9a-f]{40}$ ]] \
+  && /usr/bin/git --git-dir="$repository_dir" cat-file -e "$requested_sha^{commit}" 2>/dev/null \
+  && /usr/bin/git --git-dir="$repository_dir" cat-file -e "$deployed_sha^{commit}" 2>/dev/null; then
+  history_status=0
+  /usr/bin/git --git-dir="$repository_dir" merge-base --is-ancestor "$deployed_sha" "$requested_sha" || history_status=$?
+  if [[ "$history_status" -eq 1 ]]; then
+    requested_sha=""
+    requested_run_id=""
+  elif [[ "$history_status" -ne 0 ]]; then
+    echo "cannot compare the requested deployment history" >&2
+    exit 1
+  fi
+fi
+# END superseded trigger selection
 
 if [[ -n "$requested_sha" || -n "$requested_run_id" ]]; then
   if [[ ! "$requested_sha" =~ ^[0-9a-f]{40}$ || ! "$requested_run_id" =~ ^[1-9][0-9]*$ ]]; then
@@ -138,8 +158,27 @@ if ! /usr/bin/git --git-dir="$repository_dir" merge-base --is-ancestor "$verifie
   exit 1
 fi
 
+# BEGIN forward-only deployment guard
+# A delayed webhook or stale successful-run response may select an older main
+# commit. CI success and main membership do not authorize an automatic rollback.
+# An intentional rollback must use the operator's explicit deployment procedure.
+if [[ ! "$deployed_sha" =~ ^[0-9a-f]{40}$ ]] || ! /usr/bin/git --git-dir="$repository_dir" cat-file -e "$deployed_sha^{commit}"; then
+  echo "cannot verify the current deployment; refusing automatic replacement" >&2
+  exit 1
+fi
+history_status=0
+/usr/bin/git --git-dir="$repository_dir" merge-base --is-ancestor "$deployed_sha" "$verified_sha" || history_status=$?
+if [[ "$history_status" -eq 1 ]]; then
+  echo "ignored an older or diverging verified deployment" >&2
+  exit 0
+elif [[ "$history_status" -ne 0 ]]; then
+  echo "cannot compare the current deployment history" >&2
+  exit 1
+fi
+# END forward-only deployment guard
+
 /usr/bin/git --git-dir="$repository_dir" archive --format=tar.gz "$verified_sha" \
-  | "$deploy_command" deploy
+  | NEXT_DEPLOYMENT_ID="$verified_sha" "$deploy_command" deploy
 
 state_file="$(/usr/bin/mktemp "$state_dir/deployed-sha.XXXXXX")"
 /usr/bin/printf '%s\n' "$verified_sha" > "$state_file"

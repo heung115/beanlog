@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import * as authValidation from "../src/lib/validation/auth.ts";
+import * as authRecovery from "../src/lib/supabase/auth-recovery.ts";
 import vm from "node:vm";
 import ts from "typescript";
 import { z } from "zod";
@@ -16,6 +18,8 @@ function signOutWith(response) {
   vm.runInNewContext(outputText, {
     exports,
     require(name) {
+      if (name === "@/lib/validation/auth") return authValidation;
+      if (name === "@/lib/supabase/auth-recovery") return authRecovery;
       if (name === "zod") return { z };
       if (name === "@/lib/security/redirect") return {};
       if (name === "@/lib/admin/private-access") return {};

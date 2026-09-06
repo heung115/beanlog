@@ -409,7 +409,7 @@ test("authenticated journal uses a compact unframed workspace", async ({ page })
   ).toBeLessThanOrEqual(34);
 });
 
-test("an empty journal shows one focused first-record action", async ({ page }) => {
+test("an empty journal shows a compact heading and first-record action", async ({ page }) => {
   await login(page, qaEmptyUser);
 
   await expect(page.getByRole("heading", { level: 1, name: "커피 기록" })).toBeVisible();
@@ -425,20 +425,16 @@ test("an empty journal shows one focused first-record action", async ({ page }) 
   await expect(
     emptyGuide.getByRole("heading", { level: 2, name: "오늘의 한 잔부터 시작해보세요" })
   ).toBeVisible();
-  await expect(emptyGuide.locator(":scope > ol > li")).toHaveCount(3);
-  await expect(emptyGuide.locator(":scope > ol > li h3")).toHaveText([
-    "원두 정보",
-    "맛의 인상",
-    "취향의 흐름",
-  ]);
+  await expect(emptyGuide.getByRole("link", { name: "첫 기록 추가" })).toHaveCount(1);
+  await expect(emptyGuide.locator("ol, p")).toHaveCount(0);
 
   const guideLayout = await emptyGuide.evaluate((element) => {
     const style = getComputedStyle(element);
-    const [introduction, ledger] = Array.from(element.children);
-    if (!introduction || !ledger) throw new Error("Missing empty journal guide columns");
+    const heading = element.querySelector("h2");
+    const action = element.querySelector("a");
+    if (!heading || !action) throw new Error("Missing empty journal heading or action");
 
     return {
-      columns: style.gridTemplateColumns.split(" ").filter(Boolean).length,
       background: style.backgroundColor,
       boxShadow: style.boxShadow,
       borders: [
@@ -447,15 +443,14 @@ test("an empty journal shows one focused first-record action", async ({ page }) 
         style.borderBottomWidth,
         style.borderLeftWidth,
       ].map(Number.parseFloat),
-      introductionRight: introduction.getBoundingClientRect().right,
-      ledgerLeft: ledger.getBoundingClientRect().left,
+      headingBottom: heading.getBoundingClientRect().bottom,
+      actionTop: action.getBoundingClientRect().top,
     };
   });
-  expect(guideLayout.columns).toBe(2);
   expect(guideLayout.background).toBe("rgba(0, 0, 0, 0)");
   expect(guideLayout.boxShadow).toBe("none");
   expect(Math.max(...guideLayout.borders)).toBe(0);
-  expect(guideLayout.introductionRight).toBeLessThan(guideLayout.ledgerLeft);
+  expect(guideLayout.headingBottom).toBeLessThan(guideLayout.actionTop);
 
   const layout = await page.evaluate(() => {
     const action = document.querySelector<HTMLElement>(

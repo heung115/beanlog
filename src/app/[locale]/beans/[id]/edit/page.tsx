@@ -64,7 +64,6 @@ export default function EditBeanPage() {
         testId="bean-form-header"
         eyebrow={t("editEyebrow")}
         title={t("editTitle")}
-        description={t("editDescription")}
       />
 
       <div className="mt-8 max-w-4xl md:mt-10">

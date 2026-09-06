@@ -1,0 +1,42 @@
+_format_version: '2.1'
+consumers:
+  - username: fixture-anon
+    keyauth_credentials:
+      - key: fixture-only-api-key
+    acls:
+      - group: anon
+services:
+  - name: auth-v1-user-read
+    url: http://fixture-web:9999
+    routes:
+      - name: auth-v1-user-read
+        methods: [GET]
+        paths: [/auth/v1/user$]
+        regex_priority: 20
+        strip_path: false
+    plugins:
+      - name: key-auth
+      - name: acl
+        config:
+          allow: [anon]
+      - name: rate-limiting
+        config:
+          minute: 600
+          limit_by: ip
+          policy: local
+  - name: auth-v1
+    url: http://fixture-web:9999
+    routes:
+      - name: auth-v1
+        paths: [/auth/v1/]
+        strip_path: false
+    plugins:
+      - name: key-auth
+      - name: acl
+        config:
+          allow: [anon]
+      - name: rate-limiting
+        config:
+          minute: 60
+          limit_by: ip
+          policy: local

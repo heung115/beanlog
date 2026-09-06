@@ -1,0 +1,31 @@
+{
+ admin off
+ auto_https off
+}
+:8080 {
+ reverse_proxy fixture-web:3000 {
+  header_up X-Beanmap-Client-IP {remote_host}
+  header_up X-Beanmap-Client-Proof {$BEANMAP_AUTH_CLIENT_IP_SECRET}
+  header_up -X-Beanmap-Auth-Client-IP
+ }
+}
+:8081 {
+ reverse_proxy beanmap-auth-gateway:8000 {
+  header_up -X-Beanmap-Client-IP
+  header_up -X-Beanmap-Client-Proof
+  header_up -X-Beanmap-Auth-Client-IP
+ }
+}
+:8082 {
+ @owner header Tailscale-User-Login fixture-owner
+ handle @owner {
+  reverse_proxy fixture-web:3000 {
+   header_up X-Beanmap-Client-IP {remote_host}
+   header_up X-Beanmap-Client-Proof {$BEANMAP_AUTH_CLIENT_IP_SECRET}
+   header_up -X-Beanmap-Auth-Client-IP
+  }
+ }
+ handle {
+  respond 404
+ }
+}

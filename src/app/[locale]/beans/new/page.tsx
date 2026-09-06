@@ -29,7 +29,6 @@ export default async function NewBeanPage({ searchParams }: {
         testId="bean-form-header"
         eyebrow={t("newEyebrow")}
         title={t("newTitle")}
-        description={t("newDescription")}
       />
 
       <div className="mt-8 max-w-4xl md:mt-10">

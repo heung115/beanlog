@@ -1,6 +1,8 @@
 import { z } from "zod";
+import { isCalendarDate } from "../coffee/calendar-date.ts";
+import { trimCoffeeWhitespace } from "../coffee/canonical-varietals.ts";
 
-const dateString = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+const dateString = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(isCalendarDate, "Invalid calendar date");
 const optionalText = (max: number) => z.string().trim().max(max).optional();
 
 export const beanIdSchema = z.string().uuid();
@@ -110,8 +112,8 @@ export const beanFiltersSchema = z
   .object({
     origin_country: optionalText(100),
     process_method: processMethodSchema.optional(),
-    varietal: optionalText(100),
-    roastery: optionalText(200),
+    varietal: z.string().transform(trimCoffeeWhitespace).pipe(z.string().max(100)).optional(),
+    roastery: z.string().transform(trimCoffeeWhitespace).pipe(z.string().max(200)).optional(),
     bean_type: z.enum(["single_origin", "blend"]).optional(),
     roast_level: z.enum(["light", "medium", "dark"]).optional(),
     score_min: z.number().finite().min(1).max(10).optional(),

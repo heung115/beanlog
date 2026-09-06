@@ -5,6 +5,7 @@ import { unstable_rethrow } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { signInWithOAuth } from "@/lib/actions/auth";
+import { useAuthFailureFocus } from "./use-auth-failure-focus";
 
 export function SocialSignInButtons({ acceptedTerms, nextPath }: { acceptedTerms: boolean; nextPath: string }) {
   const t = useTranslations("auth");
@@ -12,6 +13,9 @@ export function SocialSignInButtons({ acceptedTerms, nextPath }: { acceptedTerms
   const [provider, setProvider] = useState<"google" | "kakao" | null>(null);
   const [failed, setFailed] = useState(false);
   const inFlight = useRef(false);
+  const googleRef = useRef<HTMLButtonElement>(null);
+  const kakaoRef = useRef<HTMLButtonElement>(null);
+  useAuthFailureFocus(pending, failed, provider === "kakao" ? kakaoRef : googleRef);
 
   function startSignIn(nextProvider: "google" | "kakao") {
     if (!acceptedTerms || inFlight.current) return;
@@ -33,8 +37,9 @@ export function SocialSignInButtons({ acceptedTerms, nextPath }: { acceptedTerms
 
   return (
     <div className="flex flex-col gap-3" aria-busy={pending}>
-      {failed && <p role="alert" className="text-sm text-red-600">{t("socialError")}</p>}
+      {failed && <p role="alert" className="text-sm text-red-700">{t("socialError")}</p>}
       <Button
+        ref={googleRef}
         type="button"
         variant="secondary"
         className="w-full"
@@ -46,6 +51,7 @@ export function SocialSignInButtons({ acceptedTerms, nextPath }: { acceptedTerms
         {pending && provider === "google" ? t("socialConnecting") : t("loginWithGoogle")}
       </Button>
       <Button
+        ref={kakaoRef}
         type="button"
         variant="secondary"
         className="w-full border-[#FEE500] bg-[#FEE500] text-[#191919] hover:bg-[#FEE500]/90"

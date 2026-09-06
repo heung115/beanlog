@@ -15,7 +15,6 @@ export function AuthShell({ children }: { children: React.ReactNode }) {
             <p className="mt-6 max-w-xs font-display text-3xl font-semibold leading-tight tracking-[-0.025em] text-brown">
               {t("journalPromise")}
             </p>
-            <p className="mt-4 max-w-xs text-sm leading-7 text-brown-medium">{t("journalPromiseDescription")}</p>
           </div>
         </aside>
         <section className="min-w-0 px-1 py-5 sm:px-6 lg:py-8">

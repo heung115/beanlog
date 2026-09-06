@@ -299,7 +299,6 @@ for (const locale of ["ko", "en"] as const) {
         const fileName = mobile ? `${"coffee-package-".repeat(10)}.png` : photo.name;
         await page.getByLabel(label.choose, { exact: true }).setInputFiles({ ...photo, name: fileName });
         await expect(page.getByAltText(label.preview, { exact: true })).toBeVisible();
-        await expect(page.getByText(label.privacy, { exact: true })).toBeVisible();
         const review = page.getByRole("group", { name: label.review, exact: true });
         await expect(review).toBeVisible();
         await expect(review.getByTestId("label-result-summary")).toContainText("Yirgacheffe Natural");
@@ -651,7 +650,6 @@ for (const locale of ["ko", "en"] as const) {
         await expect(notes.locator('[lang="en"]')).toHaveText(requestedBlend.notesEn);
         await expect(notes.locator('[lang="ko"]')).toContainText(requestedBlend.translatedKo);
         await expect(notes.locator('[lang="ko"]')).toContainText(label.translatedNotes);
-        await expect(notes).toContainText(label.tastingNotesHint);
         await expect(review.getByTestId("label-field-choices")).not.toHaveAttribute("open", "");
         await expect(page.locator('[name="name"]')).toHaveValue("");
         await expect(page.getByRole("radio", { name: t.beans.singleOrigin, exact: true })).toHaveAttribute("aria-checked", "true");

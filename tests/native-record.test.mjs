@@ -9,6 +9,8 @@ const { outputText } = ts.transpileModule(readFileSync(new URL("../src/lib/actio
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
 });
 
+class ApiError extends Error { constructor(status) { super("Request failed"); this.status = status; } }
+
 function fixture({ apiFailure = false } = {}) {
   const writes = [];
   const exports = {};
@@ -18,7 +20,7 @@ function fixture({ apiFailure = false } = {}) {
       if (name === "zod") return { z };
       if (name === "@/lib/supabase/server") return { createClient: async () => ({ auth: { getUser: async () => ({ data: { user: { id: "qa-user" } } }) } }) };
       if (name === "@/lib/validation/beans") return { beanFormSchema: z.any() };
-      if (name === "@/lib/api/client") return { apiFetch: async (_path, options) => { if (apiFailure) throw new Error("Unavailable"); writes.push(options.body); return { success: true, id: "qa-record" }; } };
+      if (name === "@/lib/api/client") return { ApiError, apiFetch: async (_path, options) => { if (apiFailure) throw new Error("Unavailable"); writes.push(options.body); return { success: true, id: "qa-record" }; } };
       if (name === "next/cache") return { revalidatePath() {} };
       if (name === "next/navigation") return { redirect: (destination) => { throw Object.assign(new Error("Redirect"), { destination }); } };
       if (["next/headers", "@/i18n/routing"].includes(name)) return {};

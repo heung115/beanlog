@@ -6,6 +6,7 @@ services:
         NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL:-http://localhost:54321}
         NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY:?set NEXT_PUBLIC_SUPABASE_ANON_KEY}
         NEXT_PUBLIC_APP_URL: ${NEXT_PUBLIC_APP_URL:-http://localhost:3000}
+        NEXT_DEPLOYMENT_ID: ${NEXT_DEPLOYMENT_ID:?set a unique release id for the production build}
     environment:
       # Server-side only: Docker container → host Supabase
       SUPABASE_SERVER_URL: http://host.docker.internal:54321

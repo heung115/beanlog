@@ -1,3 +1,4 @@
+import * as authClientIp from "../src/lib/security/auth-client-ip.ts";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
@@ -16,6 +17,7 @@ function deletionWith({ rpcError = null, logoutThrows = false } = {}) {
   vm.runInNewContext(actionsCode, {
     exports,
     require(name) {
+      if (name === "../security/auth-client-ip") return authClientIp;
       if (name === "zod") return { z };
       if (name === "@/lib/supabase/server") return {
         createClient: async () => ({
@@ -63,6 +65,7 @@ test("confirmed-deletion cleanup removes only the auth-cookie family and session
   vm.runInNewContext(compile("../src/lib/supabase/server.ts"), {
     exports,
     require(name) {
+      if (name === "../security/auth-client-ip") return authClientIp;
       if (name === "next/headers") return { cookies: async () => ({ getAll: () => [...cookies].map(([name, value]) => ({ name, value })), delete: (name) => cookies.delete(name) }) };
       if (name === "./config") return { supabaseCookieOptions: { name: "auth-cookie" } };
       if (name === "./session-persistence") return { SESSION_ONLY_COOKIE_NAME: "beanmap-session-only" };

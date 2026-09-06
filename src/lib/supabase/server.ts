@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
+import { createTrustedAuthFetch } from "../security/auth-client-ip";
 import { supabaseCookieOptions } from "./config";
 import {
   applySessionPersistence,
@@ -24,6 +25,9 @@ async function createServerSupabaseClient(url: string, options?: ClientOptions) 
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookieOptions: supabaseCookieOptions,
+      ...(process.env.AUTH_CLIENT_IP_SECRET_FILE ? {
+        global: { fetch: createTrustedAuthFetch(await headers()) },
+      } : {}),
       cookies: {
         getAll() {
           return cookieStore.getAll();

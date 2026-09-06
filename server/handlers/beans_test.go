@@ -189,6 +189,8 @@ type filterOptionsRows struct {
 
 func (rows *filterOptionsRows) Close() { rows.closed = true }
 
+func (rows *filterOptionsRows) Err() error { return nil }
+
 func (rows *filterOptionsRows) Next() bool {
 	if rows.closed || rows.index >= len(rows.values) {
 		return false

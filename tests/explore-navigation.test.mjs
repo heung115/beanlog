@@ -18,6 +18,10 @@ test("unsupported and excessive URL inputs cannot break record loading", () => {
   assert.equal(state.page, 0);
 });
 
+test("a saved Korean varietal filter restores the canonical choice after a language switch", () => {
+  assert.equal(parseExploreQuery(new URLSearchParams("varietal=게이샤")).filters.varietal, "Geisha");
+});
+
 test("record return links only target a canonical journal in the current language", () => {
   const id = "1ff7068e-13b6-4444-aaaa-e58813156d35";
   const returnTo = `/en/explore?search=coffee&sort=name&page=2&untrusted=1#bean-${id}`;

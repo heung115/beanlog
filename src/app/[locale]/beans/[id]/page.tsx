@@ -19,7 +19,7 @@ import { tagDisplayName } from "@/components/beans/tag-input";
 import { deleteBean, getBeanById } from "@/lib/actions/beans";
 import { findCountryPreset, originSlug } from "@/data/origin-presets";
 import { chartColors } from "@/config/chart-colors";
-import { cn, formatDate } from "@/lib/utils";
+import { cn, formatCalendarDate } from "@/lib/utils";
 import { LoadError } from "@/components/ui/load-error";
 import type { BeanWithTags } from "@/types/database";
 import { beanDetailHref, resolveExploreReturnPath } from "@/lib/coffee/explore-navigation";
@@ -31,11 +31,11 @@ function InfoRow({
   label: string;
   value?: React.ReactNode;
 }) {
-  if (!value) return null;
+  if (value === undefined || value === null || value === "") return null;
   return (
-    <div className="flex items-baseline justify-between gap-4 py-2">
+    <div className="flex min-w-0 items-baseline justify-between gap-4 py-2">
       <dt className="shrink-0 text-xs text-brown-light">{label}</dt>
-      <dd className="text-right text-sm font-medium text-brown">{value}</dd>
+      <dd className="min-w-0 text-right text-sm font-medium text-brown [overflow-wrap:anywhere]">{value}</dd>
     </div>
   );
 }
@@ -55,7 +55,7 @@ function Card({
     <section
       data-detail-section
       data-testid={testId}
-      className={cn("paper-sheet animate-rise p-5 md:p-7", className)}
+      className={cn("paper-sheet animate-rise min-w-0 p-5 md:p-7", className)}
       style={delay ? { animationDelay: `${delay}ms` } : undefined}
     >
       {children}
@@ -170,7 +170,14 @@ export default function BeanDetailPage() {
   if (loading) {
     return (
       <div className="mx-auto max-w-2xl pt-2">
-        <DetailSkeleton />
+        <noscript>
+          <style>{"[data-detail-loading] { display: none }"}</style>
+          <div role="alert" className="paper-sheet p-6 text-sm leading-6 text-brown">
+            <p>{t("detailJavascriptRequired")}</p>
+            <Link href={returnTo} prefetch={false} className="mt-3 inline-flex min-h-11 items-center underline underline-offset-4">{t("back")}</Link>
+          </div>
+        </noscript>
+        <div data-detail-loading><DetailSkeleton /></div>
       </div>
     );
   }
@@ -209,17 +216,18 @@ export default function BeanDetailPage() {
     : bean.origin_country ?? "";
 
   const radarData = [
-    { key: "aroma", label: t("aroma"), value: bean.score_aroma ?? 0 },
-    { key: "acidity", label: t("acidity"), value: bean.score_acidity ?? 0 },
-    { key: "body", label: t("body"), value: bean.score_body ?? 0 },
-    { key: "sweetness", label: t("sweetness"), value: bean.score_sweetness ?? 0 },
-    { key: "aftertaste", label: t("aftertaste"), value: bean.score_aftertaste ?? 0 },
-    { key: "balance", label: t("balance"), value: bean.score_balance ?? 0 },
+    { key: "aroma", label: t("aroma"), value: bean.score_aroma ?? null },
+    { key: "acidity", label: t("acidity"), value: bean.score_acidity ?? null },
+    { key: "body", label: t("body"), value: bean.score_body ?? null },
+    { key: "sweetness", label: t("sweetness"), value: bean.score_sweetness ?? null },
+    { key: "aftertaste", label: t("aftertaste"), value: bean.score_aftertaste ?? null },
+    { key: "balance", label: t("balance"), value: bean.score_balance ?? null },
   ];
-  const hasDetailScores = radarData.some((d) => d.value > 0);
+  const hasDetailScores = radarData.some((d) => d.value !== null);
+  const hasCompleteDetailScores = radarData.every((d) => d.value !== null);
   const hasOriginInfo = Boolean(
     countryName || bean.origin_region || bean.origin_subregions?.length ||
-    bean.altitude_m || bean.farm_producer || bean.varietal
+    bean.altitude_m != null || bean.farm_producer || bean.varietal
   );
 
   const tags = bean.tasting_tags ?? [];
@@ -245,7 +253,7 @@ export default function BeanDetailPage() {
     : null;
 
   return (
-    <div className="mx-auto max-w-4xl">
+    <div className="mx-auto min-w-0 max-w-4xl [overflow-wrap:anywhere]">
       {/* Toolbar */}
       <div className="animate-rise mb-6 flex flex-wrap items-center justify-between gap-3">
         <Link
@@ -337,7 +345,7 @@ export default function BeanDetailPage() {
         <h1 className="break-words text-3xl font-semibold leading-tight tracking-[-0.025em] text-brown md:text-4xl">
           {bean.name}
         </h1>
-        <p className="mt-2 text-sm font-medium text-brown-medium">
+        <p className="mt-2 break-words text-sm font-medium text-brown-medium">
           {bean.roastery}
         </p>
         <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-brown-light">
@@ -354,7 +362,7 @@ export default function BeanDetailPage() {
           <span aria-hidden="true" className="text-border">
             ·
           </span>
-          <span className="flex items-center gap-2">
+          <span className="flex min-w-0 flex-wrap items-center gap-2">
             <svg
               aria-hidden="true"
               width="13"
@@ -377,7 +385,7 @@ export default function BeanDetailPage() {
                 strokeWidth="1.2"
               />
             </svg>
-            {formatDate(bean.consumed_at, locale)}
+            {formatCalendarDate(bean.consumed_at, locale)}
             <span aria-hidden="true" className="text-border">
               ·
             </span>
@@ -395,7 +403,7 @@ export default function BeanDetailPage() {
             <Overline>{t("overallScore")}</Overline>
             <ScoreDisplay score={bean.overall_score} size="lg" />
           </div>
-          <p className="flex-1 text-base leading-relaxed text-brown-medium">
+          <p className="min-w-0 flex-1 whitespace-pre-wrap text-base leading-relaxed text-brown-medium [overflow-wrap:anywhere]">
             {bean.note}
           </p>
         </div>
@@ -409,7 +417,7 @@ export default function BeanDetailPage() {
             {tags.map((tag) => (
               <span
                 key={tag.id}
-                className="rounded-sm bg-cream-dark/60 px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.04em] text-brown-medium"
+                className="max-w-full rounded-sm bg-cream-dark/60 px-2.5 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.04em] text-brown-medium"
               >
                 {tagDisplayName(tag.tag, locale)}
               </span>
@@ -420,9 +428,9 @@ export default function BeanDetailPage() {
 
       {/* Detail scores radar */}
       {hasDetailScores && (
-        <Card delay={160} className="mt-4">
+        <Card delay={160} className="mt-4" testId="bean-detail-scores">
           <Overline>{t("detailedScores")}</Overline>
-          <div className="mt-2 h-64">
+          {hasCompleteDetailScores ? <div className="mt-2 h-64" data-testid="bean-detail-radar">
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart data={radarData} cx="50%" cy="50%" outerRadius="72%">
                 <PolarGrid stroke={chartColors.border} />
@@ -440,7 +448,7 @@ export default function BeanDetailPage() {
                 />
               </RadarChart>
             </ResponsiveContainer>
-          </div>
+          </div> : <p className="mt-3 text-sm leading-6 text-brown-medium">{t("partialDetailScores")}</p>}
           <div className="mt-2 grid grid-cols-3 gap-x-4 gap-y-2 border-t border-border-light pt-4 sm:grid-cols-6">
             {radarData.map((d) => (
               <div key={d.key} className="flex flex-col items-center gap-0.5">
@@ -448,10 +456,10 @@ export default function BeanDetailPage() {
                 <span
                   className={cn(
                     "text-sm font-semibold tabular-nums",
-                    d.value > 0 ? "text-brown" : "text-brown-light/40"
+                    d.value !== null ? "text-brown" : "text-brown-light/40"
                   )}
                 >
-                  {d.value > 0 ? d.value : "–"}
+                  {d.value !== null ? d.value : <span aria-label={t("notRated")}>–</span>}
                 </span>
               </div>
             ))}
@@ -476,7 +484,7 @@ export default function BeanDetailPage() {
               />
               <InfoRow
                 label={t("altitudeRange")}
-                value={bean.altitude_m ? `${bean.altitude_m.toLocaleString()}m` : null}
+                value={bean.altitude_m != null ? `${bean.altitude_m.toLocaleString()}m` : null}
               />
               <InfoRow label={t("farmProducer")} value={bean.farm_producer} />
               <InfoRow label={t("varietal")} value={bean.varietal} />
@@ -533,7 +541,7 @@ export default function BeanDetailPage() {
             <InfoRow label={t("roastLevel")} value={tr(bean.roast_level)} />
             <InfoRow
               label={t("roastDate")}
-              value={bean.roast_date ? formatDate(bean.roast_date, locale) : null}
+              value={bean.roast_date ? formatCalendarDate(bean.roast_date, locale) : null}
             />
             <InfoRow
               label={t("harvestYear")}
@@ -552,9 +560,6 @@ export default function BeanDetailPage() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <Overline>{t("originFlavorGuide")}</Overline>
-              <p className="mt-1 text-xs text-brown-light">
-                {t("originFlavorGuideHint")}
-              </p>
             </div>
             <Link
               href={`/${locale}/origins/${originSlug(countryPreset.country)}`}
@@ -611,8 +616,8 @@ export default function BeanDetailPage() {
                   : c.origin_country;
                 return (
                   <div key={c.id ?? c.origin_country} className="flex items-center gap-3">
-                    <div className="flex-1">
-                      <div className="flex items-baseline justify-between">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-baseline justify-between gap-3">
                         <span className="text-sm font-medium text-brown">
                           {[
                             cname,
@@ -623,7 +628,7 @@ export default function BeanDetailPage() {
                             .filter(Boolean)
                             .join(" · ")}
                         </span>
-                        <span className="text-sm font-semibold tabular-nums text-brown">
+                        <span className="shrink-0 text-sm font-semibold tabular-nums text-brown">
                           {c.percentage}%
                         </span>
                       </div>
@@ -666,7 +671,7 @@ export default function BeanDetailPage() {
             <InfoRow
               label={t("purchasedAt")}
               value={
-                bean.purchased_at ? formatDate(bean.purchased_at, locale) : null
+                bean.purchased_at ? formatCalendarDate(bean.purchased_at, locale) : null
               }
             />
           </dl>

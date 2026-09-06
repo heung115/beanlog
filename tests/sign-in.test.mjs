@@ -6,6 +6,8 @@ import ts from "typescript";
 import { z } from "zod";
 import { AuthApiError, AuthRetryableFetchError } from "@supabase/supabase-js";
 import { resolvePostAuthPath } from "../src/lib/security/redirect.ts";
+import * as authValidation from "../src/lib/validation/auth.ts";
+import * as authRecovery from "../src/lib/supabase/auth-recovery.ts";
 
 const source = readFileSync(new URL("../src/lib/actions/auth.ts", import.meta.url), "utf8");
 const { outputText } = ts.transpileModule(source, {
@@ -19,6 +21,8 @@ function signInWith(response, { throws = false, clientThrows = false } = {}) {
     exports,
     require(name) {
       if (name === "zod") return { z };
+      if (name === "@/lib/validation/auth") return authValidation;
+      if (name === "@/lib/supabase/auth-recovery") return authRecovery;
       if (name === "@/lib/security/redirect") return { resolvePostAuthPath };
       if (name === "@/lib/admin/private-access") return {};
       if (name === "@/lib/supabase/server") return {

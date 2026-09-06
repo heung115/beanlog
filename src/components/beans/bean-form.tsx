@@ -17,9 +17,13 @@ import { BlendComposer } from "@/components/beans/blend-composer";
 import {
   SubregionInput,
   nextSubregionSuggestions,
+  parseSubregionText,
 } from "@/components/beans/subregion-input";
 import { findCountryPreset, findRegionCoords } from "@/data/origin-presets";
 import { varietalOptions } from "@/data/varietal-presets";
+import { canonicalVarietal, canonicalizeVarietals } from "@/lib/coffee/canonical-varietals";
+import { MIN_CALENDAR_DATE, MAX_CALENDAR_DATE } from "@/lib/coffee/calendar-date";
+import { readRecentRoasteries, saveRecentRoastery } from "@/lib/coffee/recent-roasteries";
 import { createBean, createBeanFromForm, updateBean } from "@/lib/actions/beans";
 import {
   clearGuestBeanDraft,
@@ -53,8 +57,6 @@ import type {
   PurchaseSource,
   RoastLevel,
 } from "@/types/database";
-
-const RECENT_ROASTERIES_KEY = "recent_roasteries";
 
 function findMatchingOption(
   text: string,
@@ -163,18 +165,31 @@ function hasDetails(form: BeanFormData): boolean {
   );
 }
 
-function saveRecentRoastery(name: string): string[] | undefined {
-  const trimmed = name.trim();
-  if (!trimmed) return undefined;
-  try {
-    const raw = localStorage.getItem(RECENT_ROASTERIES_KEY);
-    const list: string[] = raw ? JSON.parse(raw) : [];
-    const next = [trimmed, ...list.filter((r) => r !== trimmed)].slice(0, 10);
-    localStorage.setItem(RECENT_ROASTERIES_KEY, JSON.stringify(next));
-    return next;
-  } catch {
-    return undefined;
+function earlyNativeEdits(node: HTMLFormElement, baseline: BeanFormData): Partial<BeanFormData> {
+  const textFields = ["name", "roastery", "origin_country", "origin_region", "farm_producer", "varietal", "consumed_at", "cafe_name", "note", "process_detail", "roast_date", "purchased_at"] as const;
+  const numberFields = ["altitude_m", "harvest_year", "price", "weight_g", "overall_score"] as const;
+  const selectFields = ["process_method", "roast_level", "purchase_source"] as const;
+  const edits: Record<string, unknown> = {};
+  for (const field of [...textFields, ...numberFields, "origin_subregions"] as const) {
+    const input = node.elements.namedItem(field);
+    if (!(input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement)
+      || input.value === input.defaultValue) continue;
+    if (field === "origin_subregions") edits[field] = parseSubregionText(input.value);
+    else if ((numberFields as readonly string[]).includes(field)) {
+      edits[field] = input.value === "" ? undefined : Number(input.value);
+    } else edits[field] = input.value;
   }
+  for (const field of selectFields) {
+    const input = node.elements.namedItem(field);
+    if (input instanceof HTMLSelectElement && input.value !== (baseline[field] ?? "")) {
+      edits[field] = field === "purchase_source" && input.value === "" ? undefined : input.value;
+    }
+  }
+  // Native text edits cannot retain an identifier for a different saved label.
+  if ("origin_country" in edits) Object.assign(edits, { origin_country_id: undefined, origin_region_id: undefined, origin_entity_id: undefined, origin_lat: undefined, origin_lng: undefined });
+  if ("origin_region" in edits) Object.assign(edits, { origin_region_id: undefined, origin_entity_id: undefined, origin_lat: undefined, origin_lng: undefined });
+  if ("farm_producer" in edits) edits.origin_entity_id = undefined;
+  return edits as Partial<BeanFormData>;
 }
 
 function Segmented<T extends string>({
@@ -279,6 +294,7 @@ export function BeanForm({
   const [focusRequest, setFocusRequest] = useState<{ name: string } | null>(null);
   const focusedRequest = useRef<{ name: string } | null>(null);
   const [formErrors, setFormErrors] = useState<{ name: string; message: string }[]>([]);
+  const [saveRecovery, setSaveRecovery] = useState<"conflict" | "session" | "retry" | null>(null);
   const [tagDraft, setTagDraft] = useState("");
   const [guestDraftLoaded, setGuestDraftLoaded] = useState(false);
   const [draftBaseline, setDraftBaseline] = useState<BeanDraftValue>(() => ({ form, tagDraft: "", showDetails }));
@@ -301,13 +317,26 @@ export function BeanForm({
     },
   });
 
+  const nativeEditsAdopted = useRef(false);
+  const adoptedNativeEdits = useRef<Partial<BeanFormData>>({});
+  useLayoutEffect(() => {
+    if (nativeEditsAdopted.current || !formRef.current) return;
+    nativeEditsAdopted.current = true;
+    const edits = earlyNativeEdits(formRef.current, form);
+    adoptedNativeEdits.current = edits;
+    if (Object.keys(edits).length === 0) return;
+    if ("process_method" in edits) setAllowDefaultProcessFill(false);
+    // The native POST form is usable before scripts load. Adopt those DOM edits
+    // before any controlled rerender; explicit new typing also wins over an old draft.
+    setForm((current) => ({ ...current, ...edits }));
+  }, [form]);
+
   const isBlend = form.bean_type === "blend";
 
   const [recentRoasteries, setRecentRoasteries] = useState<string[]>(() => {
     if (typeof window === "undefined") return [];
     try {
-      const raw = localStorage.getItem(RECENT_ROASTERIES_KEY);
-      return raw ? (JSON.parse(raw) as string[]) : [];
+      return readRecentRoasteries(localStorage, ownerId);
     } catch {
       return [];
     }
@@ -357,7 +386,7 @@ export function BeanForm({
 
     startTransition(() => {
       setAllowDefaultProcessFill(false);
-      setForm(draft.bean);
+      setForm({ ...draft.bean, ...adoptedNativeEdits.current });
       setShowDetails(hasDetails(draft.bean));
       setGuestDraftLoaded(true);
     });
@@ -674,14 +703,14 @@ export function BeanForm({
       message = issue.origin === "string" ? t("textLimitField", { field: label, max: Number(issue.maximum) })
         : issue.origin === "array" ? t("itemLimitField", { field: label, max: Number(issue.maximum) })
           : t("maximumField", { field: label, max: Number(issue.maximum) });
+    } else if (["consumed_at", "roast_date", "purchased_at"].includes(key)) {
+      message = t("dateField", { field: label });
     } else if (issue.code === "custom") {
       message = key === "blend_components" ? t("invalidBlend") : t("requiredField", { field: label });
     } else if (issue.code === "invalid_type" && issue.expected === "int") {
       message = t("integerField", { field: label });
     } else if (issue.code === "not_multiple_of" && key === "blend_components") {
       message = t("percentagePrecision");
-    } else if (issue.code === "invalid_format" && ["consumed_at", "roast_date", "purchased_at"].includes(key)) {
-      message = t("dateField", { field: label });
     }
     return { name, message };
   }
@@ -727,6 +756,11 @@ export function BeanForm({
     submission.purchased_at ||= undefined;
     submission.cafe_name = form.place_type === "cafe" ? form.cafe_name : undefined;
     submission.tags = tagsWithDraft(form.tags ?? [], tagDraft);
+    submission.varietal = submission.varietal ? canonicalizeVarietals(submission.varietal) : undefined;
+    submission.blend_components = submission.blend_components?.map((component) => ({
+      ...component,
+      varietal: component.varietal ? canonicalizeVarietals(component.varietal) : undefined,
+    }));
 
     const invalidInput = Array.from(formRef.current?.querySelectorAll<HTMLInputElement>('input') ?? [])
       .find((input) => input.validity.badInput);
@@ -741,19 +775,24 @@ export function BeanForm({
     }
 
     setFormErrors([]);
+    setSaveRecovery(null);
     setSubmitting(true);
     try {
       const result =
         mode === "edit" && initial
-          ? await updateBean(initial.id, parsed.data)
+          ? await updateBean(initial.id, parsed.data, initial.updated_at)
           : await createBean(parsed.data);
 
       if (result?.error) {
-        showFormErrors([{ name: "", message: t("saveFailed") }]);
+        const recovery = result.error === "record_conflict" ? "conflict"
+          : result.error === "Unauthorized" || result.error === "session_unavailable" ? "session" : "retry";
+        setSaveRecovery(recovery);
+        showFormErrors([{ name: "", message: t(recovery === "conflict" ? "saveConflict" : recovery === "session" ? "saveSessionExpired" : "saveFailed") }]);
         return;
       }
 
-      const nextRecents = saveRecentRoastery(form.roastery);
+      let nextRecents: string[] | undefined;
+      try { nextRecents = saveRecentRoastery(localStorage, ownerId, form.roastery); } catch { /* Storage is optional. */ }
       if (nextRecents) setRecentRoasteries(nextRecents);
       if (importingGuestDraft) clearGuestBeanDraft();
       if (continueAdding) {
@@ -775,6 +814,7 @@ export function BeanForm({
         window.location.assign(returnTo);
       }
     } catch {
+      setSaveRecovery("retry");
       showFormErrors([{ name: "", message: t("saveFailed") }]);
     } finally {
       setSubmitting(false);
@@ -857,10 +897,9 @@ export function BeanForm({
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="bean_type" value={form.bean_type} />
       <input type="hidden" name="place_type" value={form.place_type} />
-      <input type="hidden" name="overall_score" value={form.overall_score} />
       {formErrors.length > 0 && (
         <div id="bean-form-errors" ref={errorRef} role="alert" tabIndex={-1} className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-800">
-          <p className="font-semibold">{t("checkFields")}</p>
+          <p className="font-semibold">{t(saveRecovery ? "saveNeedsAttention" : "checkFields")}</p>
           <ul className="mt-2 space-y-1">
             {formErrors.map((error, index) => (
               <li key={`${error.name}-${index}`}>
@@ -868,6 +907,12 @@ export function BeanForm({
               </li>
             ))}
           </ul>
+          {saveRecovery === "conflict" && (
+            <button type="button" className="mt-3 min-h-11 font-semibold underline underline-offset-2" onClick={() => window.location.reload()}>{t("loadLatestRecord")}</button>
+          )}
+          {(saveRecovery === "session" || saveRecovery === "retry") && (
+            <a className="mt-3 inline-flex min-h-11 items-center font-semibold underline underline-offset-2" href={`/${locale}/login?next=${encodeURIComponent(`/${locale}/beans/${mode === "edit" && initial ? `${initial.id}/edit` : "new"}?returnTo=${encodeURIComponent(returnTo)}`)}`}>{t("signInToResume")}</a>
+          )}
         </div>
       )}
       <fieldset disabled={submitting || draftRecovery.status === "conflict"} aria-busy={submitting} className="contents">
@@ -1059,7 +1104,7 @@ export function BeanForm({
                 value={form.varietal ?? ""}
                 options={varietalOpts}
                 onTextChange={(text) => set("varietal", text)}
-                onPick={(option) => set("varietal", option.label)}
+                onPick={(option) => set("varietal", canonicalVarietal(option.value))}
                 placeholder={t("varietalPlaceholder")}
                 optional
                 optionalLabel={tc("optional")}
@@ -1172,6 +1217,8 @@ export function BeanForm({
               name="consumed_at"
               {...errorProps("consumed_at")}
               type="date"
+              min={MIN_CALENDAR_DATE}
+              max={MAX_CALENDAR_DATE}
               value={form.consumed_at}
               onChange={(e) => set("consumed_at", e.target.value)}
               required
@@ -1223,6 +1270,7 @@ export function BeanForm({
             <span className="font-display text-2xl text-accent">03</span>
           </div>
           <ScoreSlider
+            name="overall_score"
             label={req(t("overallScore"))}
             value={form.overall_score}
             onChange={(v) => set("overall_score", v)}
@@ -1299,6 +1347,8 @@ export function BeanForm({
                 name="roast_date"
                 {...errorProps("roast_date")}
                 type="date"
+                min={MIN_CALENDAR_DATE}
+                max={MAX_CALENDAR_DATE}
                 value={form.roast_date ?? ""}
                 onChange={(e) => set("roast_date", e.target.value || undefined)}
                 optional
@@ -1390,6 +1440,8 @@ export function BeanForm({
                   name="purchased_at"
                   {...errorProps("purchased_at")}
                   type="date"
+                  min={MIN_CALENDAR_DATE}
+                  max={MAX_CALENDAR_DATE}
                   value={form.purchased_at ?? ""}
                   onChange={(e) => set("purchased_at", e.target.value || undefined)}
                   optional

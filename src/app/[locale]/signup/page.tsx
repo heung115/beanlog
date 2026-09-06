@@ -1,20 +1,21 @@
 "use client";
 
-import { useState } from "react";
+import { useActionState, useEffect, useRef, useState, useTransition } from "react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { unstable_rethrow, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { signUp } from "@/lib/actions/auth";
+import { signUpAction, type SignUpState } from "@/lib/actions/auth";
 import { resolvePostAuthPath } from "@/lib/security/redirect";
 import { SocialSignInButtons } from "@/components/auth/social-sign-in-buttons";
 import { AuthShell } from "@/components/auth/auth-shell";
+import { validateRegistrationFields } from "@/lib/validation/auth";
+import { useAuthFailureFocus } from "@/components/auth/use-auth-failure-focus";
 
 export default function SignupPage() {
   const t = useTranslations("auth");
   const locale = useLocale();
-  const router = useRouter();
   const searchParams = useSearchParams();
   const hasGuestDraft = searchParams.get("draft") === "1";
   const requestedNext = resolvePostAuthPath(searchParams.get("next"));
@@ -22,47 +23,52 @@ export default function SignupPage() {
     : requestedNext !== "/explore" ? requestedNext : `/${locale}/explore`;
   const authQuery = hasGuestDraft ? "?draft=1"
     : requestedNext !== "/explore" ? `?${new URLSearchParams({ next: requestedNext })}` : "";
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [serverState, formAction, serverPending] = useActionState(signUpAction, {});
+  const [clientState, setClientState] = useState<SignUpState | null>(null);
+  const [clientPending, startTransition] = useTransition();
+  const state = clientState ?? serverState;
+  const loading = serverPending || clientPending;
+  const submitting = useRef(false);
+  const submitRef = useRef<HTMLButtonElement>(null);
+  const agreementRef = useRef<HTMLInputElement>(null);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
-  const [agreementError, setAgreementError] = useState(false);
+  useAuthFailureFocus(loading, Boolean(state.error), submitRef);
+  useEffect(() => {
+    if (agreementRef.current?.checked) startTransition(() => setAcceptedTerms(true));
+  }, []);
+  useEffect(() => {
+    if (state.field && !loading) document.querySelector<HTMLInputElement>(`main [name="${state.field}"]`)?.focus();
+  }, [state.field, loading]);
+  const message = state.error === "display_name_required" ? "displayNameRequired"
+    : state.error === "password_length" ? "passwordRequirements"
+    : state.error === "password_mismatch" ? "passwordMismatch"
+    : state.error === "agreement_required" ? "agreementRequired" : "signupError";
+  function fieldError(name: string) {
+    return { "aria-invalid": state.field === name || undefined, "aria-describedby": state.field === name ? "signup-form-error" : undefined };
+  }
 
-  async function handleSubmit(e: React.FormEvent) {
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    // Read native input values so typing/autofill before hydration is preserved.
-    const values = new FormData(e.currentTarget as HTMLFormElement);
-    const email = String(values.get("email") ?? "");
-    const password = String(values.get("password") ?? "");
-    const passwordConfirm = String(values.get("passwordConfirm") ?? "");
-    const displayName = String(values.get("displayName") ?? "");
-    setError("");
-    setAgreementError(false);
-
-    if (!acceptedTerms) {
-      setAgreementError(true);
+    if (submitting.current || serverPending) return;
+    const values = new FormData(e.currentTarget);
+    const issue = validateRegistrationFields(values);
+    if (issue) {
+      setClientState(issue);
+      e.currentTarget.querySelector<HTMLElement>(`[name="${issue.field}"]`)?.focus();
       return;
     }
-
-    if (password !== passwordConfirm) {
-      setError(t("passwordMismatch"));
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const result = await signUp(email, password, displayName, acceptedTerms);
-      if (result?.error) {
-        setError(t("signupError"));
-      } else {
-        router.replace(
-          `/${locale}/signup/check-email${authQuery}`
-        );
+    submitting.current = true;
+    setClientState({});
+    startTransition(async () => {
+      try {
+        setClientState(await signUpAction(state, values));
+      } catch (error) {
+        unstable_rethrow(error);
+        setClientState({ error: "temporarily_unavailable" });
+      } finally {
+        submitting.current = false;
       }
-    } catch {
-      setError(t("signupError"));
-    } finally {
-      setLoading(false);
-    }
+    });
   }
 
   return (
@@ -71,14 +77,17 @@ export default function SignupPage() {
         <h1 className="font-display text-2xl font-semibold tracking-[-0.025em] text-brown">
           {t("signup")}
         </h1>
-        <p className="mt-1.5 text-sm text-brown-light">{t("signupTitle")}</p>
       </div>
 
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form action={formAction} onSubmit={handleSubmit} onReset={(event) => event.preventDefault()} onChange={() => setClientState({})} className="flex flex-col gap-4">
+          <input type="hidden" name="locale" value={locale} />
+          <input type="hidden" name="next" value={nextPath} />
+          <input type="hidden" name="draft" value={hasGuestDraft ? "1" : "0"} />
           <Input
             label={t("displayName")}
             type="text"
             name="displayName"
+            {...fieldError("displayName")}
             placeholder={t("displayNamePlaceholder")}
             maxLength={50}
             required
@@ -96,17 +105,21 @@ export default function SignupPage() {
             label={t("password")}
             type="password"
             name="password"
+            aria-invalid={state.field === "password" || undefined}
+            aria-describedby={`password-requirements${state.field === "password" ? " signup-form-error" : ""}`}
             placeholder="••••••••"
             required
             minLength={6}
             maxLength={128}
             autoComplete="new-password"
           />
+          <p id="password-requirements" className="-mt-2 text-xs leading-5 text-brown-light">{t("passwordRequirements")}</p>
 
           <Input
             label={t("passwordConfirm")}
             type="password"
             name="passwordConfirm"
+            {...fieldError("passwordConfirm")}
             placeholder="••••••••"
             required
             minLength={6}
@@ -117,13 +130,13 @@ export default function SignupPage() {
           <label className="flex cursor-pointer items-start gap-2.5 text-sm leading-6 text-brown-light">
             <input
               type="checkbox"
-              checked={acceptedTerms}
+              name="acceptedTerms"
+              ref={agreementRef}
+              defaultChecked={false}
               onChange={(event) => {
                 setAcceptedTerms(event.target.checked);
-                setAgreementError(false);
               }}
-              aria-invalid={agreementError}
-              aria-describedby={agreementError ? "signup-agreement-error" : undefined}
+              {...fieldError("acceptedTerms")}
               className="mt-1 h-4 w-4 shrink-0 rounded border-border accent-accent"
             />
             <span>
@@ -150,14 +163,9 @@ export default function SignupPage() {
             </span>
           </label>
 
-          {agreementError && (
-            <p id="signup-agreement-error" role="alert" className="text-sm text-red-600">
-              {t("agreementRequired")}
-            </p>
-          )}
-          {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
+          {state.error && <p id="signup-form-error" role="alert" className="text-sm text-red-700">{t(message)}</p>}
 
-          <Button type="submit" loading={loading} className="mt-2 w-full">
+          <Button ref={submitRef} type="submit" loading={loading} className="mt-2 w-full">
             {t("signup")}
           </Button>
         </form>

@@ -107,7 +107,8 @@ export async function createBean(formData: BeanFormData) {
     revalidatePath("/explore");
     revalidatePath("/stats");
     return { success: true, id: result.id };
-  } catch {
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 401) return { error: "Unauthorized" };
     return { error: "Unable to save bean" };
   }
 }
@@ -171,7 +172,7 @@ export async function createBeanFromForm(formData: FormData) {
   );
 }
 
-export async function updateBean(id: string, formData: BeanFormData) {
+export async function updateBean(id: string, formData: BeanFormData, expectedUpdatedAt?: string) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -180,17 +181,22 @@ export async function updateBean(id: string, formData: BeanFormData) {
   const parsedId = beanIdSchema.safeParse(id);
   const parsed = beanFormSchema.safeParse(formData);
   if (!parsedId.success || !parsed.success) return { error: "Invalid bean data" };
+  if (expectedUpdatedAt !== undefined && !z.iso.datetime({ offset: true }).safeParse(expectedUpdatedAt).success) {
+    return { error: "Invalid record version" };
+  }
 
   try {
     await apiFetch<{ success: boolean }>(`/api/beans/${parsedId.data}`, {
       method: "PUT",
-      body: parsed.data,
+      body: { ...parsed.data, expected_updated_at: expectedUpdatedAt },
     });
     revalidatePath("/explore");
     revalidatePath(`/beans/${id}`);
     revalidatePath("/stats");
     return { success: true };
-  } catch {
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 409) return { error: "record_conflict" };
+    if (error instanceof ApiError && error.status === 401) return { error: "Unauthorized" };
     return { error: "Unable to update bean" };
   }
 }

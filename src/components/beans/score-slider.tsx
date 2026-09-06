@@ -4,9 +4,10 @@ interface ScoreSliderProps {
   value: number;
   onChange: (value: number) => void;
   label?: string;
+  name?: string;
 }
 
-export function ScoreSlider({ value, onChange, label }: ScoreSliderProps) {
+export function ScoreSlider({ value, onChange, label, name }: ScoreSliderProps) {
   const pct = ((value - 1) / 9) * 100;
 
   return (
@@ -29,6 +30,7 @@ export function ScoreSlider({ value, onChange, label }: ScoreSliderProps) {
         <div className="flex flex-1 flex-col gap-1.5">
           <input
             type="range"
+            name={name}
             min={1}
             max={10}
             step={0.5}

@@ -1,0 +1,24 @@
+{
+	admin off
+	auto_https off
+}
+import /rules/beanmap-upstream-errors.Caddyfile
+:8080 {
+	import beanmap_upstream_errors /rules
+	@private path /ko/admin /api/admin/*
+	handle @private {
+		respond 404
+	}
+	handle /upstream-503 {
+		reverse_proxy 127.0.0.1:8081
+	}
+	handle {
+		reverse_proxy 127.0.0.1:39999
+	}
+	handle_errors 413 {
+		respond "Payload Too Large" 413
+	}
+}
+:8081 {
+	respond "original app session recovery" 503
+}

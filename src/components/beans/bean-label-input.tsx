@@ -317,7 +317,6 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
           <div className="flex flex-col items-start gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
             <div className="min-w-0">
               <p className="text-base font-semibold tracking-tight text-brown">{dragging ? t("dropNow") : t("sectionTitle")}</p>
-              <p className="mt-1 max-w-prose text-sm leading-6 text-brown-medium">{t("intro")}</p>
               <p className="mt-1 text-xs leading-5 text-brown-light">{t("formats")}</p>
             </div>
             <Button type="button" variant="secondary" className="shrink-0" disabled={disabled} onClick={() => fileInput.current?.click()}>
@@ -343,8 +342,7 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
                 {busy && (
                   <div className="mt-3">
                     <progress max={1} value={phase === "preparing" ? undefined : progress} aria-label={t(phase === "preparing" ? "preparing" : phase)} className="block h-1.5 w-full accent-accent" />
-                    <div className="mt-1 flex items-start justify-between gap-3 text-xs leading-5 text-brown-medium">
-                      <span>{phase === "loading" ? t("firstLoadHint") : resultVisible ? t("refiningHint") : t("readingHint")}</span>
+                    <div className="mt-1 text-right text-xs leading-5 text-brown-medium">
                       {phase !== "preparing" && <span aria-hidden="true" className="shrink-0 tabular-nums">{Math.round(progress * 100)}%</span>}
                     </div>
                   </div>
@@ -393,7 +391,6 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
                     {Boolean(notes?.en.length) && <p lang="en" className="mt-2 break-words text-sm leading-6 text-brown">{notes?.en.join(", ")}</p>}
                     {Boolean(notes?.ko.length && !extraction.tasting_notes_translation_ko?.length) && <p lang="ko" className="mt-1 break-words text-sm leading-6 text-brown">{notes?.ko.join(", ")}</p>}
                     {Boolean(extraction.tasting_notes_translation_ko?.length) && <p lang="ko" className="mt-2 break-words text-sm leading-6 text-brown"><span className="mr-2 text-xs text-brown-medium">{t("translatedNotes")}</span>{extraction.tasting_notes_translation_ko?.join(", ")}</p>}
-                    <p className="mt-2 text-xs leading-5 text-brown-light">{t("tastingNotesHint")}</p>
                   </div>
                 )}
                 {compactFields.length > 0 && !composition?.length && (
@@ -407,14 +404,13 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
                       <Button type="button" className="w-full sm:w-auto" disabled={disabled || !applicable.length} onClick={() => {
                         onApply(extraction, applicable); setSelections([]); setNotice("applied");
                       }}>{t("apply")}</Button>
-                      <p className="mt-2 text-xs leading-5 text-brown-medium">{notice === "applied" ? t("applied") : applicable.includes("blend_components") ? t("applyBlendHint") : applicable.length ? t("applyHint", { count: applicable.length }) : t("noSelectionHint")}</p>
+                      {!applicable.length && notice !== "applied" && <p className="mt-2 text-xs leading-5 text-brown-medium">{t("noSelectionHint")}</p>}
                       {replacesExisting && <p className="mt-1 text-xs leading-5 text-brown-medium">{t("replaceWarning")}</p>}
                     </div>
                     <details data-testid="label-field-choices" className="mt-2 min-w-0">
                       <summary className="min-h-11 cursor-pointer py-3 text-xs font-medium text-brown focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">{t("selectionDetails")}</summary>
                       <fieldset disabled={disabled}>
                         <legend className="sr-only">{t("selectionDetails")}</legend>
-                        <p className="mb-1 text-xs leading-5 text-brown-medium">{t("reviewHint")}</p>
                         <div className="divide-y divide-border-light">
                           {candidates.map((field) => {
                             const blocked = blockedReason(form, extraction, field, selected);
@@ -433,7 +429,6 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
                                 <span className="min-w-0 flex-1">
                                   <span className="block text-xs text-brown-light">{tb(FIELD_LABELS[field])}</span>
                                   <span className="block break-words text-sm font-medium text-brown">{displayValue(field)}</span>
-                                  {field === "blend_components" && <span className="mt-2 block text-xs leading-5 text-brown-medium">{t(form.bean_type === "blend" ? "blendReplaceHint" : "blendSwitchHint")}</span>}
                                   <span className="mt-1 block whitespace-pre-wrap break-words text-xs leading-5 text-brown-medium">{t("evidence", { text: extraction.evidence[field] ?? "" })}</span>
                                   {blocked && <span className="mt-1 block text-xs leading-5 text-brown-medium">{t(blocked)}</span>}
                                 </span>
@@ -450,15 +445,13 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
             {rawText !== null && (
               <details className="min-w-0 border-t border-border-light px-4 text-xs text-brown-medium sm:px-5" open={!busy && candidates.length === 0}>
                 <summary className="min-h-11 cursor-pointer py-3 font-medium text-brown focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">{t("rawText")}</summary>
-                <p className="mb-2 leading-5">{t("rawTextHint")}</p>
                 <pre tabIndex={0} aria-label={t("rawText")} className="mb-4 max-h-56 overflow-y-auto whitespace-pre-wrap break-words rounded-sm border border-border-light bg-surface p-3 font-sans text-sm leading-6 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">{rawText || t("noText")}</pre>
               </details>
             )}
           </>
         )}
       </div>
-      <p className="mt-2 text-xs leading-5 text-brown-light">{t("privacy")}</p>
-      <div role="status" aria-live="polite" aria-atomic="true" className="mt-1 text-sm leading-6 text-brown-medium">
+      <div role="status" aria-live="polite" aria-atomic="true" className={error || notice === "cancelled" ? "mt-1 text-sm leading-6 text-brown-medium" : "sr-only"}>
         {error ? t(`errors.${error}`) : notice ? t(notice) : busy ? t(phase) : extraction ? t("found", { count: candidates.length }) : ""}
       </div>
     </section>

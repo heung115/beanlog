@@ -86,7 +86,7 @@ export function TopBar({ user }: TopBarProps) {
     );
   }
 
-  if (/^\/(?:login|signup(?:\/check-email)?|privacy|terms|try)\/?$/.test(appPathname)) {
+  if (/^\/(?:login|signup(?:\/check-email)?|forgot-password|reset-password|privacy|terms|try)\/?$/.test(appPathname)) {
     return null;
   }
 

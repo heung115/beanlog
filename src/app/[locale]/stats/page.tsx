@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import {
   Bar,
@@ -117,6 +118,7 @@ export default function StatsPage() {
   const t = useTranslations("stats");
   const tProcess = useTranslations("process");
   const tCommon = useTranslations("common");
+  const tBeans = useTranslations("beans");
   const locale = useLocale();
 
   const [stats, setStats] = useState<BeanStats | null>(null);
@@ -146,7 +148,6 @@ export default function StatsPage() {
     <PageIntro
       eyebrow={t("eyebrow")}
       title={t("title")}
-      description={t("description")}
       testId="stats-header"
       meta={!loadError && (
         <p role="status" aria-live="polite" className="folio-label">
@@ -162,13 +163,20 @@ export default function StatsPage() {
   if (loading) {
     return (
       <div className="mx-auto max-w-5xl space-y-8">
-        {pageIntro()}
-        <div className="grid gap-3 sm:grid-cols-3">
+        <noscript>
+          <style>{"[data-stats-loading] { display: none }"}</style>
+          <div role="alert" className="paper-sheet p-6 text-sm leading-6 text-brown">
+            <p>{tBeans("statsJavascriptRequired")}</p>
+            <Link href={`/${locale}/explore`} prefetch={false} className="mt-3 inline-flex min-h-11 items-center underline underline-offset-4">{tBeans("back")}</Link>
+          </div>
+        </noscript>
+        <div data-stats-loading>{pageIntro()}</div>
+        <div data-stats-loading className="grid gap-3 sm:grid-cols-3">
           {[0, 1, 2].map((i) => (
             <div key={i} className="h-24 animate-pulse rounded-md bg-surface/55" />
           ))}
         </div>
-        <div className="h-56 animate-pulse rounded-lg bg-surface/70" />
+        <div data-stats-loading className="h-56 animate-pulse rounded-lg bg-surface/70" />
       </div>
     );
   }
@@ -193,25 +201,9 @@ export default function StatsPage() {
         {pageIntro(0)}
         <EmptyJournalGuide
           testId="stats-empty-state"
-          eyebrow={t("emptyEyebrow")}
           title={t("emptyTitle")}
-          description={t("emptyDescription")}
           actionLabel={t("addFirst")}
           href={`/${locale}/beans/new`}
-          steps={[
-            {
-              title: t("emptyStepMap"),
-              description: t("emptyStepMapDescription"),
-            },
-            {
-              title: t("emptyStepTaste"),
-              description: t("emptyStepTasteDescription"),
-            },
-            {
-              title: t("emptyStepRhythm"),
-              description: t("emptyStepRhythmDescription"),
-            },
-          ]}
         />
       </div>
     );
@@ -254,7 +246,7 @@ export default function StatsPage() {
   const recordsSuffix = `${locale === "en" ? " " : ""}${t("recordUnit")}`;
 
   return (
-    <div className="mx-auto max-w-5xl space-y-10">
+    <div className="mx-auto min-w-0 max-w-5xl space-y-10 [overflow-wrap:anywhere]">
       {pageIntro(stats.total)}
 
       {/* ---------- summary cards ---------- */}
@@ -263,7 +255,7 @@ export default function StatsPage() {
         className="animate-rise grid grid-cols-1 gap-3 sm:grid-cols-3"
         style={{ animationDelay: "60ms" }}
       >
-        <div className="rounded-md bg-surface/55 p-5 md:p-6">
+        <div className="min-w-0 rounded-md bg-surface/55 p-5 md:p-6">
           <p className="text-xs font-medium text-brown-light">
             {t("totalBeans")}
           </p>
@@ -272,7 +264,7 @@ export default function StatsPage() {
             <span className="ml-1.5 text-sm font-normal text-brown-light">{recordsSuffix}</span>
           </p>
         </div>
-        <div className="rounded-md bg-surface/55 p-5 md:p-6">
+        <div className="min-w-0 rounded-md bg-surface/55 p-5 md:p-6">
           <p className="text-xs font-medium text-brown-light">
             {t("avgScore")}
           </p>
@@ -280,7 +272,7 @@ export default function StatsPage() {
             <ScoreDisplay score={stats.avgScore} size="lg" />
           </div>
         </div>
-        <div className="rounded-md bg-surface/55 p-5 md:p-6">
+        <div className="min-w-0 rounded-md bg-surface/55 p-5 md:p-6">
           <p className="text-xs font-medium text-brown-light">
             {t("bestBean")}
           </p>
@@ -299,7 +291,7 @@ export default function StatsPage() {
       <section className="animate-rise" style={{ animationDelay: "120ms" }}>
         <SectionHeading index="01" title={t("myTaste")} />
         <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-md bg-surface-warm/70 p-5">
+          <div className="min-w-0 rounded-md bg-surface-warm/70 p-5">
             <p className="text-xs font-medium text-brown-light">
               {t("topOrigin")}
             </p>
@@ -313,7 +305,7 @@ export default function StatsPage() {
               </p>
             )}
           </div>
-          <div className="rounded-md bg-surface-warm/70 p-5">
+          <div className="min-w-0 rounded-md bg-surface-warm/70 p-5">
             <p className="text-xs font-medium text-brown-light">
               {t("topProcess")}
             </p>

@@ -8,6 +8,7 @@ import { Select } from "@/components/ui/select";
 import { SubregionInput, nextSubregionSuggestions } from "@/components/beans/subregion-input";
 import { findCountryPreset } from "@/data/origin-presets";
 import { varietalOptions } from "@/data/varietal-presets";
+import { canonicalVarietal } from "@/lib/coffee/canonical-varietals";
 import {
   getOriginCountries,
   getOriginEntities,
@@ -484,7 +485,7 @@ export function BlendComposer({ value, onChange, errorProps }: BlendComposerProp
                   onTextChange={(text) =>
                     updateComponent(i, { varietal: text || undefined })
                   }
-                  onPick={(o) => updateComponent(i, { varietal: o.label })}
+                  onPick={(o) => updateComponent(i, { varietal: canonicalVarietal(o.value) })}
                   placeholder={t("varietalPlaceholder")}
                   inputClassName="py-2 text-xs"
                 />

@@ -21,6 +21,11 @@ import (
 
 type BeanHandler struct{}
 
+// PostgreSQL btrim(text) only removes ASCII spaces. Keep exact-match filters
+// consistent with strings.TrimSpace used when exposing options. This is a
+// fixed SQL literal, never request input (Unicode White_Space / Go IsSpace).
+const sqlTrimSpaceCharacters = `U&'\0009\000A\000B\000C\000D\0020\0085\00A0\1680\2000\2001\2002\2003\2004\2005\2006\2007\2008\2009\200A\2028\2029\202F\205F\3000'`
+
 func isInvalidBeanData(err error) bool {
 	var pgErr *pgconn.PgError
 	if !errors.As(err, &pgErr) {
@@ -30,6 +35,11 @@ func isInvalidBeanData(err error) bool {
 }
 
 func writeBeanMutationError(c *gin.Context, err error, operation string) {
+	var conflict *pgconn.PgError
+	if errors.As(err, &conflict) && conflict.Code == "PT409" {
+		c.JSON(http.StatusConflict, gin.H{"error": "record_conflict"})
+		return
+	}
 	if isInvalidBeanData(err) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid bean data"})
 		return
@@ -67,7 +77,9 @@ func (h *BeanHandler) List(c *gin.Context) {
 	argIdx++
 
 	if f.OriginCountry != "" {
-		wheres = append(wheres, fmt.Sprintf("b.origin_country = $%d", argIdx))
+		wheres = append(wheres, fmt.Sprintf(`((b.bean_type = 'single_origin' AND b.origin_country = $%[1]d) OR (b.bean_type = 'blend' AND EXISTS (
+			SELECT 1 FROM blend_components bc WHERE bc.bean_id = b.id AND bc.user_id = b.user_id
+			AND bc.origin_country = $%[1]d)))`, argIdx))
 		args = append(args, f.OriginCountry)
 		argIdx++
 	}
@@ -77,13 +89,19 @@ func (h *BeanHandler) List(c *gin.Context) {
 		argIdx++
 	}
 	if f.Varietal != "" {
-		wheres = append(wheres, fmt.Sprintf("b.varietal ILIKE $%d", argIdx))
-		args = append(args, "%"+f.Varietal+"%")
+		wheres = append(wheres, fmt.Sprintf(`((b.bean_type = 'single_origin' AND EXISTS (
+			SELECT 1 FROM regexp_split_to_table(COALESCE(b.varietal, ''), '[,，]') AS variety
+			WHERE lower(btrim(variety, %[2]s)) = ANY($%[1]d::text[]))) OR (b.bean_type = 'blend' AND EXISTS (
+			SELECT 1 FROM blend_components bc,
+			LATERAL regexp_split_to_table(COALESCE(bc.varietal, ''), '[,，]') AS variety
+			WHERE bc.bean_id = b.id AND bc.user_id = b.user_id
+			AND lower(btrim(variety, %[2]s)) = ANY($%[1]d::text[]))))`, argIdx, sqlTrimSpaceCharacters))
+		args = append(args, varietalSearchAliases(f.Varietal))
 		argIdx++
 	}
 	if f.Roastery != "" {
-		wheres = append(wheres, fmt.Sprintf("b.roastery ILIKE $%d", argIdx))
-		args = append(args, "%"+f.Roastery+"%")
+		wheres = append(wheres, fmt.Sprintf("btrim(b.roastery, %s) = $%d", sqlTrimSpaceCharacters, argIdx))
+		args = append(args, strings.TrimSpace(f.Roastery))
 		argIdx++
 	}
 	if f.BeanType != "" {
@@ -118,7 +136,7 @@ func (h *BeanHandler) List(c *gin.Context) {
 	}
 	if f.Search != "" {
 		wheres = append(wheres, fmt.Sprintf("(b.name ILIKE $%d OR b.roastery ILIKE $%d OR b.note ILIKE $%d)", argIdx, argIdx+1, argIdx+2))
-		s := "%" + f.Search + "%"
+		s := "%" + strings.NewReplacer(`\`, `\\`, "%", `\%`, "_", `\_`).Replace(f.Search) + "%"
 		args = append(args, s, s, s)
 		argIdx += 3
 	}
@@ -165,8 +183,8 @@ func (h *BeanHandler) List(c *gin.Context) {
 		        b.score_aroma, b.score_acidity, b.score_body, b.score_sweetness,
 		        b.score_aftertaste, b.score_balance, b.purchase_source, b.price,
 		        b.weight_g, b.purchased_at, b.created_at, b.updated_at
-		 FROM beans b WHERE %s ORDER BY %s %s LIMIT %d OFFSET %d`,
-		whereClause, sortBy, sortOrder, f.Limit, offset,
+		 FROM beans b WHERE %s ORDER BY %s %s, b.id %s LIMIT %d OFFSET %d`,
+		whereClause, sortBy, sortOrder, sortOrder, f.Limit, offset,
 	)
 
 	rows, err := db.Query(c.Request.Context(), dataSQL, args...)
@@ -361,42 +379,43 @@ func (h *BeanHandler) GetByID(c *gin.Context) {
 // read via ->> and cast. Every field is present so the RPC's nullif/casts behave
 // predictably; nil pointers marshal to JSON null which the RPC treats as SQL NULL.
 type beanRecordPayload struct {
-	Name             string   `json:"name"`
-	Roastery         string   `json:"roastery"`
-	BeanType         string   `json:"bean_type"`
-	OriginCountry    *string  `json:"origin_country"`
-	OriginCountryID  *int64   `json:"origin_country_id"`
-	OriginRegion     *string  `json:"origin_region"`
-	OriginRegionID   *int64   `json:"origin_region_id"`
-	OriginSubregions []string `json:"origin_subregions"`
-	OriginLat        *float64 `json:"origin_lat"`
-	OriginLng        *float64 `json:"origin_lng"`
-	FarmProducer     *string  `json:"farm_producer"`
-	OriginEntityID   *int64   `json:"origin_entity_id"`
-	Varietal         *string  `json:"varietal"`
-	ProcessMethod    string   `json:"process_method"`
-	ProcessDetail    *string  `json:"process_detail"`
-	AltitudeM        *int     `json:"altitude_m"`
-	HarvestYear      *int     `json:"harvest_year"`
-	RoastLevel       string   `json:"roast_level"`
-	RoastDate        *string  `json:"roast_date"`
-	ConsumedAt       string   `json:"consumed_at"`
-	PlaceType        string   `json:"place_type"`
-	CafeName         *string  `json:"cafe_name"`
-	CafeLocation     *string  `json:"cafe_location"`
-	MenuName         *string  `json:"menu_name"`
-	OverallScore     float64  `json:"overall_score"`
-	Note             string   `json:"note"`
-	ScoreAroma       *int     `json:"score_aroma"`
-	ScoreAcidity     *int     `json:"score_acidity"`
-	ScoreBody        *int     `json:"score_body"`
-	ScoreSweetness   *int     `json:"score_sweetness"`
-	ScoreAftertaste  *int     `json:"score_aftertaste"`
-	ScoreBalance     *int     `json:"score_balance"`
-	PurchaseSource   *string  `json:"purchase_source"`
-	Price            *int     `json:"price"`
-	WeightG          *int     `json:"weight_g"`
-	PurchasedAt      *string  `json:"purchased_at"`
+	ExpectedUpdatedAt *string  `json:"expected_updated_at,omitempty"`
+	Name              string   `json:"name"`
+	Roastery          string   `json:"roastery"`
+	BeanType          string   `json:"bean_type"`
+	OriginCountry     *string  `json:"origin_country"`
+	OriginCountryID   *int64   `json:"origin_country_id"`
+	OriginRegion      *string  `json:"origin_region"`
+	OriginRegionID    *int64   `json:"origin_region_id"`
+	OriginSubregions  []string `json:"origin_subregions"`
+	OriginLat         *float64 `json:"origin_lat"`
+	OriginLng         *float64 `json:"origin_lng"`
+	FarmProducer      *string  `json:"farm_producer"`
+	OriginEntityID    *int64   `json:"origin_entity_id"`
+	Varietal          *string  `json:"varietal"`
+	ProcessMethod     string   `json:"process_method"`
+	ProcessDetail     *string  `json:"process_detail"`
+	AltitudeM         *int     `json:"altitude_m"`
+	HarvestYear       *int     `json:"harvest_year"`
+	RoastLevel        string   `json:"roast_level"`
+	RoastDate         *string  `json:"roast_date"`
+	ConsumedAt        string   `json:"consumed_at"`
+	PlaceType         string   `json:"place_type"`
+	CafeName          *string  `json:"cafe_name"`
+	CafeLocation      *string  `json:"cafe_location"`
+	MenuName          *string  `json:"menu_name"`
+	OverallScore      float64  `json:"overall_score"`
+	Note              string   `json:"note"`
+	ScoreAroma        *int     `json:"score_aroma"`
+	ScoreAcidity      *int     `json:"score_acidity"`
+	ScoreBody         *int     `json:"score_body"`
+	ScoreSweetness    *int     `json:"score_sweetness"`
+	ScoreAftertaste   *int     `json:"score_aftertaste"`
+	ScoreBalance      *int     `json:"score_balance"`
+	PurchaseSource    *string  `json:"purchase_source"`
+	Price             *int     `json:"price"`
+	WeightG           *int     `json:"weight_g"`
+	PurchasedAt       *string  `json:"purchased_at"`
 }
 
 // normalizeConsumedAt returns an RFC3339 timestamp the RPC can cast to
@@ -417,13 +436,26 @@ func normalizeConsumedAt(raw *string) string {
 // into the three JSONB arguments the atomic bean RPCs expect. Blend component
 // sort_order is normalized to the array index, matching the frontend.
 func buildBeanRecordPayload(req *models.CreateBeanRequest, sel *originSelection) (string, string, string, error) {
+	if req.ExpectedUpdatedAt != nil {
+		if _, err := time.Parse(time.RFC3339Nano, *req.ExpectedUpdatedAt); err != nil {
+			return "", "", "", errors.New("invalid expected_updated_at")
+		}
+	}
+	canonicalText := func(value *string) *string {
+		if value == nil {
+			return nil
+		}
+		text := strings.Join(splitCanonicalVarietals(*value), ", ")
+		return &text
+	}
 	bean := beanRecordPayload{
-		Name: req.Name, Roastery: req.Roastery, BeanType: req.BeanType,
+		ExpectedUpdatedAt: req.ExpectedUpdatedAt,
+		Name:              req.Name, Roastery: req.Roastery, BeanType: req.BeanType,
 		OriginCountry: sel.OriginCountry, OriginCountryID: sel.OriginCountryID,
 		OriginRegion: sel.OriginRegion, OriginRegionID: sel.OriginRegionID,
 		OriginSubregions: sel.OriginSubregions, OriginLat: sel.OriginLat, OriginLng: sel.OriginLng,
 		FarmProducer: sel.FarmProducer, OriginEntityID: sel.OriginEntityID,
-		Varietal: req.Varietal, ProcessMethod: req.ProcessMethod, ProcessDetail: req.ProcessDetail,
+		Varietal: canonicalText(req.Varietal), ProcessMethod: req.ProcessMethod, ProcessDetail: req.ProcessDetail,
 		AltitudeM: req.AltitudeM, HarvestYear: req.HarvestYear, RoastLevel: req.RoastLevel,
 		RoastDate: req.RoastDate, ConsumedAt: normalizeConsumedAt(req.ConsumedAt), PlaceType: req.PlaceType,
 		CafeName: req.CafeName, CafeLocation: req.CafeLocation, MenuName: req.MenuName,
@@ -476,7 +508,7 @@ func buildBeanRecordPayload(req *models.CreateBeanRequest, sel *originSelection)
 		components = append(components, componentPayload{
 			OriginCountry: comp.OriginCountry, OriginRegion: comp.OriginRegion,
 			OriginSubregions: comp.OriginSubregions, FarmProducer: comp.FarmProducer,
-			Varietal: comp.Varietal, ProcessMethod: comp.ProcessMethod,
+			Varietal: canonicalText(comp.Varietal), ProcessMethod: comp.ProcessMethod,
 			ProcessDetail: comp.ProcessDetail, Percentage: comp.Percentage, SortOrder: i,
 		})
 	}
@@ -618,7 +650,15 @@ func (h *BeanHandler) FilterOptions(c *gin.Context) {
 	userID := c.GetString(middleware.UserIDKey)
 
 	rows, err := db.Query(c.Request.Context(),
-		"SELECT origin_country, roastery, COALESCE(varietal,'') FROM beans WHERE user_id = $1 LIMIT 5000",
+		`SELECT DISTINCT origin_country, roastery, varietal FROM (
+			SELECT CASE WHEN bean_type = 'single_origin' THEN origin_country END AS origin_country,
+				roastery, CASE WHEN bean_type = 'single_origin' THEN COALESCE(varietal, '') ELSE '' END AS varietal
+			FROM beans WHERE user_id = $1
+			UNION ALL
+			SELECT bc.origin_country, b.roastery, COALESCE(bc.varietal, '') AS varietal
+			FROM blend_components bc JOIN beans b ON b.id = bc.bean_id AND b.user_id = bc.user_id
+			WHERE b.user_id = $1 AND b.bean_type = 'blend'
+		) AS recorded_options`,
 		userID,
 	)
 	if err != nil {
@@ -642,9 +682,13 @@ func (h *BeanHandler) FilterOptions(c *gin.Context) {
 		if trimmed := strings.TrimSpace(roastery); trimmed != "" {
 			roasteries[trimmed] = struct{}{}
 		}
-		for _, v := range splitVarietals(varietal) {
+		for _, v := range splitCanonicalVarietals(varietal) {
 			varietals[v] = struct{}{}
 		}
+	}
+	if err := rows.Err(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to read filter options"})
+		return
 	}
 
 	c.JSON(http.StatusOK, models.BeanFilterOptions{

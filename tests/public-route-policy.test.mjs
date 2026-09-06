@@ -52,6 +52,8 @@ test("localized landing, account, legal, trial, and origin routes are public", (
       "login",
       "signup",
       "signup/check-email",
+      "forgot-password",
+      "reset-password",
       "privacy",
       "terms",
       "try",

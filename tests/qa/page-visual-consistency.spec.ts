@@ -84,7 +84,7 @@ test("all primary application tabs use the same compact unframed hierarchy", asy
     await expectCompactHeader(heading, { maxHeight: 180 });
     await expect(header.locator(".journal-kicker")).toHaveCount(1);
     await expect(header.locator("h1.app-page-title")).toHaveCount(1);
-    await expect(header.locator(".app-page-deck")).toHaveCount(1);
+    await expect(header.locator(".app-page-deck")).toHaveCount(0);
     await expect(header.locator(".folio-label")).toHaveCount(hasMeta ? 1 : 0);
     headingLeftEdges.push(
       await heading.evaluate((element) => element.getBoundingClientRect().left)

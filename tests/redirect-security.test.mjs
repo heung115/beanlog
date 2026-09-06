@@ -1,9 +1,23 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-const { resolveTrustedAppRedirect, resolvePostAuthPath, resolveAuthFailurePath, getOAuthFailureKind } = await import(
+const { resolveTrustedAppRedirect, resolvePostAuthPath, resolveAuthFailurePath, resolvePasswordRecoveryPath, getOAuthFailureKind } = await import(
   "../src/lib/security/redirect.ts"
 );
+
+test("password recovery callbacks preserve safe destinations without reflecting external URLs", () => {
+  const next = "/en/beans/new?draft=1";
+  const valid = new URL(resolvePasswordRecoveryPath(next, "en"), "https://beanmap.example");
+  assert.equal(valid.pathname, "/en/reset-password");
+  assert.equal(valid.searchParams.get("next"), next);
+  const expired = new URL(resolvePasswordRecoveryPath(next, undefined, true), "https://beanmap.example");
+  assert.equal(expired.pathname, "/en/forgot-password");
+  assert.equal(expired.searchParams.get("recoveryError"), "expired");
+  assert.equal(expired.searchParams.get("next"), next);
+  for (const malicious of ["https://attacker.example", "//attacker.example", "/en/reset-password", "/en/../../api/auth/callback", "/en/\\attacker.example"]) {
+    assert.equal(resolvePasswordRecoveryPath(malicious, "javascript:alert(1)"), "/ko/reset-password");
+  }
+});
 
 test("failed OAuth attempts offer a safe localized retry and retain the intended page", () => {
   assert.equal(getOAuthFailureKind("invalid_request", "bad_oauth_state"), "expired");

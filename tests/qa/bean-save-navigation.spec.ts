@@ -1,6 +1,7 @@
 import { randomBytes, randomUUID } from "node:crypto";
 import { expect, test } from "@playwright/test";
 import { admin, ensureUser, qaApiURL, signIn } from "./helpers";
+import { recentRoasteriesKey } from "../../src/lib/coffee/recent-roasteries";
 import ko from "../../src/i18n/ko.json" with { type: "json" };
 import en from "../../src/i18n/en.json" with { type: "json" };
 
@@ -56,7 +57,7 @@ for (const locale of ["ko", "en"] as const) {
           return;
         }
         const args = req.postDataJSON() as unknown[];
-        if (args.length === 2 && args[0] === bean.id) {
+        if (args.length === 3 && args[0] === bean.id && typeof args[2] === "string") {
           mutationSent = true;
           await route.continue();
           return;
@@ -88,7 +89,8 @@ for (const locale of ["ko", "en"] as const) {
       await expect(page.getByTestId("bean-card")).toHaveCount(1);
       await expect(page.getByTestId("bean-card")).toContainText("After save");
       await expect(page).toHaveURL(new RegExp(`/${locale}/explore$`));
-      expect(await page.evaluate(() => JSON.parse(localStorage.getItem("recent_roasteries") ?? "[]"))).toContain("After save");
+      expect(await page.evaluate((key) => JSON.parse(localStorage.getItem(key) ?? "[]"), recentRoasteriesKey(userId))).toContain("After save");
+      expect(await page.evaluate(() => localStorage.getItem("recent_roasteries"))).toBeNull();
       const stored = await request.get(`${qaApiURL}/api/beans/${bean.id}`, { headers });
       expect(stored.status()).toBe(200);
       expect(await stored.json()).toMatchObject({ roastery: "After save", note: "Keep this tasting note." });

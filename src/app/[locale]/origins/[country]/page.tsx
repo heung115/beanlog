@@ -136,9 +136,6 @@ export default async function OriginDetailPage({
           {countryName}
         </h1>
         <p className="mt-1 text-xs text-brown-light">{secondaryCountryName}</p>
-        <p className="mt-4 max-w-2xl text-sm leading-6 text-brown-medium md:text-base md:leading-7">
-          {t("intro", { country: countryName })}
-        </p>
       </header>
 
       <section
@@ -148,7 +145,6 @@ export default async function OriginDetailPage({
       >
         <div className="flex items-end justify-between gap-4">
           <h2 className="text-lg font-semibold tracking-[-0.015em] text-brown">{t("cupProfile")}</h2>
-          <p className="hidden text-xs text-brown-light sm:block">{t("cupProfileHint")}</p>
         </div>
         <ul className="mt-5 flex flex-wrap gap-x-8 gap-y-3" aria-label={t("cupProfile")}>
           {flavorNotes.map((note, index) => (
@@ -161,7 +157,6 @@ export default async function OriginDetailPage({
             </li>
           ))}
         </ul>
-        <p className="mt-4 text-xs text-brown-light sm:hidden">{t("cupProfileHint")}</p>
       </section>
 
       <section
@@ -197,7 +192,6 @@ export default async function OriginDetailPage({
         <div className="flex items-end justify-between gap-4 pb-4">
           <div>
             <h2 className="text-lg font-semibold tracking-[-0.015em] text-brown">{t("regions")}</h2>
-            <p className="mt-1 text-sm text-brown-light">{t("regionsHint")}</p>
           </div>
           <span className="shrink-0 text-xs tabular-nums text-brown-light">
             {t("regionCount", { count: preset.regions.length })}

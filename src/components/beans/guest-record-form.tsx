@@ -13,7 +13,8 @@ import {
   saveGuestBeanDraft,
 } from "@/lib/coffee/guest-draft";
 import type { BeanFormData, ProcessMethod, RoastLevel } from "@/types/database";
-import { formatDate } from "@/lib/utils";
+import { formatCalendarDate } from "@/lib/utils";
+import { isCalendarDate, MIN_CALENDAR_DATE, MAX_CALENDAR_DATE } from "@/lib/coffee/calendar-date";
 import { isGuestFormDraft } from "@/lib/coffee/record-draft-value";
 import { parseRecordDraft, RECORD_DRAFT_PREFIX } from "@/lib/coffee/record-draft";
 import { useRecordDraft } from "@/components/beans/use-record-draft";
@@ -51,6 +52,14 @@ export function GuestRecordForm() {
   const [error, setError] = useState("");
   const [errorField, setErrorField] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
+  const savedHeadingRef = useRef<HTMLHeadingElement>(null);
+  const nextFocus = useRef<"saved" | "form" | null>(null);
+  useEffect(() => {
+    if (nextFocus.current === "saved" && saved) savedHeadingRef.current?.focus({ preventScroll: true });
+    else if (nextFocus.current === "form" && !saved) formRef.current?.querySelector<HTMLInputElement>('[name="name"]')?.focus();
+    else return;
+    nextFocus.current = null;
+  }, [saved]);
   const draftRecovery = useRecordDraft({
     scope: "guest", value: form, validate: isGuestFormDraft, enabled: !saved,
     onRestore: (restored) => { setForm(restored); setError(""); setErrorField(null); },
@@ -91,6 +100,13 @@ export function GuestRecordForm() {
       return;
     }
 
+    if (!isCalendarDate(form.consumed_at)) {
+      setErrorField("consumed_at");
+      setError(tb("invalidDate", { field: tb("consumedAt") }));
+      formRef.current?.querySelector<HTMLInputElement>('[name="consumed_at"]')?.focus();
+      return;
+    }
+
     const result = saveGuestBeanDraft(form);
     if (result.status === "invalid") {
       setError(tb("fillRequired"));
@@ -103,6 +119,7 @@ export function GuestRecordForm() {
 
     setForm(result.draft.bean);
     draftRecovery.reset(result.draft.bean);
+    nextFocus.current = "saved";
     setSaved(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -111,9 +128,9 @@ export function GuestRecordForm() {
     return (
       <article className="paper-sheet min-w-0 p-5 [overflow-wrap:anywhere] md:p-8" aria-label={t("savedTitle")}>
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-          <h2 className="font-display text-2xl font-bold text-brown">{t("savedTitle")}</h2>
+          <h2 ref={savedHeadingRef} tabIndex={-1} className="font-display text-2xl font-bold text-brown focus:outline-none">{t("savedTitle")}</h2>
           <time className="folio-label" dateTime={form.consumed_at}>
-            {formatDate(form.consumed_at, locale)}
+            {formatCalendarDate(form.consumed_at, locale)}
           </time>
         </div>
 
@@ -140,8 +157,6 @@ export function GuestRecordForm() {
           </div>
         </div>
 
-        <p className="mt-5 text-sm leading-6 text-brown-light">{t("savedNotice")}</p>
-
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
           <Link
             href={`/${locale}/signup?draft=1`}
@@ -156,7 +171,7 @@ export function GuestRecordForm() {
             {t("loginToKeep")}
           </Link>
         </div>
-        <Button variant="ghost" className="mt-3 w-full" onClick={() => setSaved(false)}>
+        <Button variant="ghost" className="mt-3 w-full" onClick={() => { nextFocus.current = "form"; setSaved(false); }}>
           {t("edit")}
         </Button>
       </article>
@@ -164,7 +179,7 @@ export function GuestRecordForm() {
   }
 
   return (
-    <form ref={formRef} method="post" onSubmit={handleSubmit} className="flex flex-col gap-5">
+    <form ref={formRef} method="post" noValidate onSubmit={handleSubmit} className="flex flex-col gap-5">
       <noscript><p role="alert" className="rounded-md bg-surface-warm p-4 text-sm leading-6 text-brown">{t("javascriptRequired")} <Link href={`/${locale}/login`} className="underline underline-offset-4">{t("loginToKeep")}</Link></p></noscript>
       <p className="max-w-2xl px-1 text-sm leading-6 text-brown-medium">
         {t("storageNotice")}
@@ -248,6 +263,9 @@ export function GuestRecordForm() {
             label={`${tb("consumedAt")} *`}
             name="consumed_at"
             type="date"
+            min={MIN_CALENDAR_DATE}
+            max={MAX_CALENDAR_DATE}
+            {...errorProps("consumed_at")}
             value={form.consumed_at}
             onChange={(event) => set("consumed_at", event.target.value)}
             required

@@ -29,6 +29,17 @@ export function resolveAuthFailurePath(next: unknown, kind: OAuthFailureKind, pr
   return `${locale ? `/${locale}` : ""}/login?${query}`;
 }
 
+/** Recovery callbacks may only select a localized recovery screen and safe app destination. */
+export function resolvePasswordRecoveryPath(next: unknown, preferredLocale?: string, expired = false): string {
+  const destination = resolvePostAuthPath(next);
+  const locale = preferredLocale === "en" || preferredLocale === "ko" ? preferredLocale
+    : destination.match(/^\/(ko|en)\//)?.[1] ?? "ko";
+  const query = new URLSearchParams();
+  if (expired) query.set("recoveryError", "expired");
+  if (destination !== "/explore") query.set("next", destination);
+  return `/${locale}/${expired ? "forgot-password" : "reset-password"}${query.size ? `?${query}` : ""}`;
+}
+
 function trustedOrigin(configuredAppUrl: string): string {
   try {
     const url = new URL(configuredAppUrl);

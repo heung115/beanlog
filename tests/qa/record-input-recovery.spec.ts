@@ -1,6 +1,7 @@
 import { randomBytes, randomUUID } from "node:crypto";
 import { expect, test } from "@playwright/test";
 import { admin, ensureUser, qaApiURL, signIn } from "./helpers";
+import { recentRoasteriesKey } from "../../src/lib/coffee/recent-roasteries";
 import ko from "../../src/i18n/ko.json" with { type: "json" };
 import en from "../../src/i18n/en.json" with { type: "json" };
 
@@ -73,7 +74,7 @@ for (const locale of ["ko", "en"] as const) {
       await page.locator('[name="password"]').fill(user.password);
       await page.locator('button[type="submit"]').click();
       await expect(page).toHaveURL(new RegExp(`/${locale}/explore$`));
-      await page.evaluate(() => localStorage.setItem("recent_roasteries", JSON.stringify(["Keyboard roastery"])));
+      await page.evaluate((key) => localStorage.setItem(key, JSON.stringify(["Keyboard roastery"])), recentRoasteriesKey(id));
       await page.goto(`/${locale}/beans/new`);
       await page.locator('[name="name"]').fill("Recover this blend");
       const roastery = page.locator('[name="roastery"]');

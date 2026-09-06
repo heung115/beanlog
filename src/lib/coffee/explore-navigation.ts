@@ -1,6 +1,30 @@
 import type { BeanFilters } from "../../types/database";
+import { canonicalVarietal, trimCoffeeWhitespace } from "./canonical-varietals.ts";
 
 export const EXPLORE_PAGE_SIZE = 20;
+
+/** Re-read the visible prefix so inserts/deletes cannot shift an old cached page. */
+export async function loadExploreWindow<T extends { id: string }>(
+  page: number,
+  read: (page: number, limit: number) => Promise<{ beans: T[]; count: number; error?: string }>,
+  cancelled: () => boolean = () => false
+): Promise<{ beans: T[]; total: number }> {
+  const wanted = (page + 1) * EXPLORE_PAGE_SIZE;
+  const limit = Math.min(100, wanted);
+  const found = new Map<string, T>();
+  let total = 0;
+  for (let nextPage = 0; ; nextPage += 1) {
+    const result = await read(nextPage, limit);
+    if (cancelled()) return { beans: [], total: 0 };
+    if (result.error) throw new Error("Unable to load records");
+    total = result.count;
+    for (const bean of result.beans) found.set(bean.id, bean);
+    if (result.beans.length === 0 || found.size >= Math.min(wanted, total)) break;
+    // A continually changing collection must not lead to an unbounded request loop.
+    if ((nextPage + 1) * limit >= total) break;
+  }
+  return { beans: [...found.values()].slice(0, wanted), total };
+}
 
 export interface ExploreNavigationState {
   filters: BeanFilters;
@@ -18,8 +42,8 @@ const choices = {
 export function parseExploreQuery(query: Pick<URLSearchParams, "get">): ExploreNavigationState {
   const filters: BeanFilters = { sort_by: "consumed_at", sort_order: "desc" };
   for (const key of textFilters) {
-    const value = query.get(key)?.trim().slice(0, key === "roastery" ? 200 : 100);
-    if (value) filters[key] = value;
+    const value = trimCoffeeWhitespace(query.get(key) ?? "").slice(0, key === "roastery" ? 200 : 100);
+    if (value) filters[key] = key === "varietal" ? canonicalVarietal(value) : value;
   }
   for (const key of Object.keys(choices) as (keyof typeof choices)[]) {
     const value = query.get(key);

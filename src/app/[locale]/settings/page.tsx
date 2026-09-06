@@ -159,17 +159,15 @@ export default function SettingsPage() {
     const trigger = deleteTriggerRef.current;
     const previousOverflow = document.body.style.overflow;
     if (!dialog.open) dialog.showModal();
-    const focusFrame = window.requestAnimationFrame(() => {
-      cancelDeleteRef.current?.focus();
-    });
+    // Focus before yielding: a deferred focus must not undo the user's first Tab.
+    cancelDeleteRef.current?.focus();
 
     document.body.style.overflow = "hidden";
 
     return () => {
-      window.cancelAnimationFrame(focusFrame);
       document.body.style.overflow = previousOverflow;
       if (dialog.open) dialog.close();
-      window.requestAnimationFrame(() => trigger?.focus());
+      trigger?.focus();
     };
   }, [confirmOpen]);
 
@@ -336,7 +334,6 @@ export default function SettingsPage() {
       <PageIntro
         eyebrow={t("eyebrow")}
         title={t("title")}
-        description={t("description")}
         testId="settings-header"
       />
 

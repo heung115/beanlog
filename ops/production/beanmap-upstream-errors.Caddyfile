@@ -1,0 +1,40 @@
+# Import this file at Caddyfile top level, then add inside beanmap.site:
+#   import beanmap_upstream_errors /opt/beanmap-errors
+# This handles connection failures, not a 503 body deliberately returned by Next.
+(beanmap_upstream_errors) {
+	handle_errors 502 503 504 {
+		header {
+			Cache-Control "no-store"
+			Retry-After "5"
+			X-Content-Type-Options "nosniff"
+			X-Robots-Tag "noindex"
+		}
+		@english_navigation {
+			method GET HEAD
+			path /en /en/*
+			header Accept *text/html*
+		}
+		handle @english_navigation {
+			rewrite * /maintenance.en.html
+			file_server {
+				root {args[0]}
+				status 503
+			}
+		}
+		@html_navigation {
+			method GET HEAD
+			header Accept *text/html*
+		}
+		handle @html_navigation {
+			rewrite * /maintenance.ko.html
+			file_server {
+				root {args[0]}
+				status 503
+			}
+		}
+		# Never replay a form submission or return HTML to an API/Server Action.
+		handle {
+			respond "Service temporarily unavailable. Please retry in a few seconds." 503
+		}
+	}
+}
