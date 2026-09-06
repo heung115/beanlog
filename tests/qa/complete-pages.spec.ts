@@ -27,10 +27,7 @@ for (const locale of ["ko", "en"] as const) {
           await expect(page.getByRole("main")).toHaveCount(1);
         }
         if (route.includes("check-email")) {
-          const target = locale === "ko" ? "영어로 전환" : "Switch to Korean";
-          await page.getByRole("link", { name: target }).click();
-          const other = locale === "ko" ? "en" : "ko";
-          await expect(page.locator(`a[href^="/${other}/login?next="]`)).toHaveAttribute("href", `/${other}/login?next=${encodeURIComponent(`/${other}/stats`)}`);
+          await expect(page.locator(`a[href^="/${locale}/login?next="]`)).toHaveAttribute("href", `/${locale}/login?next=${encodeURIComponent(`/${locale}/stats`)}`);
         }
         evidence.push({ route, width: mobile ? 320 : 1366, overflow, seriousOrCritical: violations.length });
       }

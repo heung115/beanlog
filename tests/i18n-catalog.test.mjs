@@ -41,19 +41,3 @@ test("next-intl defers alternate metadata links to the page metadata", () => {
   );
   assert.match(routing, /alternateLinks:\s*false/);
 });
-
-test("the locale switch uses crawlable, language-annotated links", () => {
-  const localeSwitcher = fs.readFileSync(
-    new URL(
-      "../src/components/layout/locale-switcher.tsx",
-      import.meta.url
-    ),
-    "utf8"
-  );
-
-  assert.match(localeSwitcher, /<Link/);
-  assert.match(localeSwitcher, /hrefLang=\{locale\}/);
-  assert.match(localeSwitcher, /lang=\{locale\}/);
-  assert.match(localeSwitcher, /aria-label=\{labels\[locale\]\}/);
-  assert.match(localeSwitcher, /pathWithoutLocale === "\/" \? ""/);
-});

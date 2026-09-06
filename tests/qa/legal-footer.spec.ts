@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test("the landing footer links to the Korean legal pages", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/ko");
 
   const footer = page.getByRole("contentinfo");
   await expect(footer.getByRole("link", { name: "이용약관" })).toHaveAttribute(

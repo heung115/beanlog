@@ -13,7 +13,6 @@ import {
   navigationAriaCurrent,
   type PrimaryNavigationHref,
 } from "./navigation-state";
-import { LocaleSwitcher } from "./locale-switcher";
 
 interface TopBarProps {
   user: { displayName: string } | null;
@@ -69,7 +68,6 @@ export function TopBar({ user }: TopBarProps) {
                 )}
               />
             </Link>
-            <LocaleSwitcher locale={locale} />
             <Link
               href={`/${locale}/login${authQuery}`}
               className="inline-flex min-h-11 items-center whitespace-nowrap rounded-sm px-1.5 text-xs font-semibold text-brown-light transition-colors hover:bg-surface hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:px-2 sm:text-sm"

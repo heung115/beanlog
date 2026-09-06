@@ -41,9 +41,9 @@ async function expectNoSeriousA11yViolations(page: Page) {
 }
 
 test("public landing explains the product and uses the operator theme", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/ko");
 
-  await expect(page).toHaveURL(/\/$/);
+  await expect(page).toHaveURL(/\/ko$/);
   await expect(
     page.getByRole("heading", {
       level: 1,
@@ -94,8 +94,7 @@ test("public landing explains the product and uses the operator theme", async ({
   expect(typography.titleFontFamily).toBe(typography.bodyFontFamily);
   expect(typography.fontPreloads.length).toBeGreaterThan(0);
   expect(typography.fontPreloads.every((href) => href.startsWith(typography.origin))).toBe(true);
-  const englishLink = page.getByRole("link", { name: "영어로 전환" });
-  await expect(englishLink).toHaveAttribute("href", "/en");
+  await expect(page.getByRole("group", { name: "언어", exact: true })).toHaveCount(0);
   await expect(page.locator("html")).toHaveAttribute(
     "data-beanmap-theme",
     /^(mist|cream|contrast)$/
@@ -126,7 +125,7 @@ test("public landing explains the product and uses the operator theme", async ({
 
   await expectNoSeriousA11yViolations(page);
 
-  await englishLink.click();
+  await page.goto("/en");
   await expect(page).toHaveURL(/\/en$/);
   await expect(
     page.getByRole("heading", {
@@ -145,10 +144,7 @@ test("public landing explains the product and uses the operator theme", async ({
     "/en/try"
   );
   await expect(page.getByRole("article", { name: "Sample coffee entry in beanmap" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "Switch to Korean" })).toHaveAttribute(
-    "href",
-    "/ko"
-  );
+  await expect(page.getByRole("group", { name: "Language", exact: true })).toHaveCount(0);
   const englishTypography = await page.evaluate(() => {
     const title = document.querySelector<HTMLElement>("main h1");
     if (!title) throw new Error("Missing English landing title");
@@ -232,7 +228,7 @@ test("@mobile landing stays readable at 320px", async ({ page }) => {
 });
 
 test("guest record stays in the browser and loads after login", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/ko");
   await page.getByRole("link", { name: "비회원으로 기록하기" }).click();
 
   await expect(page).toHaveURL(/\/ko\/try$/);

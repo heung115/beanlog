@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { BeanmapMark } from "@/components/brand/beanmap-mark";
 import { OriginContours } from "@/components/brand/origin-contours";
-import { LocaleSwitcher } from "@/components/layout/locale-switcher";
 import { DocumentLocale } from "@/components/layout/document-locale";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { buttonClassName } from "@/components/ui/button";
@@ -51,7 +50,6 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
             aria-label={copy.navigation}
             className="order-2 flex w-full items-center justify-between gap-1 pt-2 sm:order-none sm:w-auto sm:justify-end sm:pt-0"
           >
-            <LocaleSwitcher locale={locale} />
             <Link
               href={`/${locale}/login`}
               className="inline-flex min-h-11 items-center whitespace-nowrap rounded-sm px-2 text-sm font-semibold text-brown-light transition-colors hover:bg-surface hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"

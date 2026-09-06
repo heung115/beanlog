@@ -10,31 +10,31 @@ async function openForm(page: Page, locale: "ko" | "en") {
   await page.goto(`/${locale}/beans/new`);
 }
 
-test("language switching preserves draft and localized return destination", async ({ page }) => {
-  await page.goto("/ko/login?draft=1");
-  await page.getByRole("link", { name: "영어로 전환" }).click();
-  await expect(page).toHaveURL(/\/en\/login\?draft=1$/);
-  await expect(page.locator('input[name="next"]')).toHaveValue("/en/beans/new?draft=1");
+for (const locale of ["ko", "en"] as const) {
+  test(`${locale} authentication links preserve drafts and the requested destination`, async ({ page }) => {
+    await page.goto(`/${locale}/login?draft=1`);
+    await expect(page.locator('input[name="next"]')).toHaveValue(`/${locale}/beans/new?draft=1`);
+    await expect(page.getByRole("banner").locator(`a[href="/${locale}/signup?draft=1"]`)).toBeVisible();
 
-  await page.goto(`/en/login?next=${encodeURIComponent("/en/stats?view=origins")}`);
-  await page.getByRole("link", { name: "Switch to Korean" }).click();
-  await expect(page.locator('input[name="next"]')).toHaveValue("/ko/stats?view=origins");
-  await page.locator('[name="email"]').fill(qaUser.email);
-  await page.locator('[name="password"]').fill(qaUser.password);
-  await page.locator('button[type="submit"]').click();
-  await expect(page).toHaveURL(/\/ko\/stats\?view=origins$/);
-});
+    const destination = `/${locale}/stats?view=origins`;
+    await page.goto(`/${locale}/login?next=${encodeURIComponent(destination)}`);
+    await expect(page.locator('input[name="next"]')).toHaveValue(destination);
+    await page.locator('[name="email"]').fill(qaUser.email);
+    await page.locator('[name="password"]').fill(qaUser.password);
+    await page.locator('button[type="submit"]').click();
+    await expect(page).toHaveURL(new RegExp(`/${locale}/stats\\?view=origins$`));
+  });
+}
 
-test("language switches update document language and typography in both directions", async ({ page }) => {
-  await page.goto("/en");
-  await page.getByRole("link", { name: "Switch to Korean" }).click();
+test("localized landing pages use matching document language and typography", async ({ page }) => {
+  await page.goto("/ko");
   await expect(page.locator("html")).toHaveAttribute("lang", "ko");
   const fonts = await page.evaluate(() => ({
     title: getComputedStyle(document.querySelector("h1")!).fontFamily,
     body: getComputedStyle(document.body).fontFamily,
   }));
   expect(fonts.title).toBe(fonts.body);
-  await page.getByRole("link", { name: "영어로 전환" }).click();
+  await page.goto("/en");
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
   expect(await page.locator("h1").evaluate((element) => getComputedStyle(element).fontFamily)).toContain("Georgia");
 });

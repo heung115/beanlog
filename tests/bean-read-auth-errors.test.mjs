@@ -24,7 +24,7 @@ function actionsWithAuth(response) {
       if (name === "@/lib/api/client") {
         return { apiFetch: async () => { apiCalls++; return null; } };
       }
-      if (name === "next/cache" || name === "next/navigation") return {};
+      if (["next/cache", "next/navigation", "next/headers", "@/i18n/routing"].includes(name)) return {};
       throw new Error(`Unexpected dependency: ${name}`);
     },
   });

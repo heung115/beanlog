@@ -2,7 +2,9 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { localeCookie } from "@/i18n/routing";
 import { z } from "zod";
 import type { BeanFormData, BeanWithTags } from "@/types/database";
 import type { OriginMapEntry } from "@/types/stats";
@@ -359,6 +361,9 @@ export async function updateProfile(displayName: string, locale: string) {
       method: "PUT",
       body: { display_name: parsed.data.displayName, locale: parsed.data.locale },
     });
+    // A settings choice must outlive this browser session and take precedence
+    // over automatic browser-language detection on the next visit.
+    (await cookies()).set(localeCookie.name, parsed.data.locale, localeCookie);
     revalidatePath("/", "layout");
     return { success: true };
   } catch {

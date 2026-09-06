@@ -234,7 +234,7 @@ for (const locale of ["ko", "en"] as const) {
     await expect(dialog).toHaveCount(0);
   });
 
-  test(`${locale} profile updates reach navigation and account deletion finishes`, async ({ page }) => {
+  test(`${locale} profile and language settings persist across visits and account deletion finishes`, async ({ page, browser }) => {
     test.setTimeout(90_000);
     const user = { email: `beanmap-qa-account-${randomUUID()}@local.test`, password: randomBytes(24).toString("hex") };
     const id = await ensureUser(user.email, user.password);
@@ -250,6 +250,22 @@ for (const locale of ["ko", "en"] as const) {
       const other = locale === "ko" ? "en" : "ko";
       await page.getByRole("radio", { name: locale === "ko" ? t.settings.english : t.settings.korean, exact: true }).click();
       await expect(page).toHaveURL(new RegExp(`/${other}/settings$`));
+      await expect(page.locator("html")).toHaveAttribute("lang", other);
+      const languageCookie = (await page.context().cookies()).find((cookie) => cookie.name === "NEXT_LOCALE");
+      expect(languageCookie?.value).toBe(other);
+      expect(languageCookie!.expires).toBeGreaterThan(Date.now() / 1000 + 60 * 60 * 24 * 300);
+      const revisit = await browser.newContext({ locale: locale === "ko" ? "ko-KR" : "en-US" });
+      try {
+        // Carry only the durable preference into a new browser session whose
+        // browser language disagrees, without copying authentication cookies.
+        await revisit.addCookies([languageCookie!]);
+        const revisitPage = await revisit.newPage();
+        await revisitPage.goto(new URL("/", page.url()).href);
+        await expect(revisitPage).toHaveURL(new RegExp(`/${other}$`));
+        await expect(revisitPage.locator("html")).toHaveAttribute("lang", other);
+      } finally {
+        await revisit.close();
+      }
       await page.reload();
       await expect(name).toHaveValue("새 이름 New name");
       const next = other === "ko" ? ko : en;

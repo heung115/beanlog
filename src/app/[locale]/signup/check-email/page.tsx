@@ -3,7 +3,6 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { buttonClassName } from "@/components/ui/button";
 import { resolvePostAuthPath } from "@/lib/security/redirect";
-import { LocaleSwitcher } from "@/components/layout/locale-switcher";
 import { brand } from "@/config/brand";
 
 type CheckEmailPageProps = {
@@ -43,10 +42,7 @@ export default async function CheckEmailPage({
   return (
     <section className="flex min-h-[70vh] items-center py-10">
       <div className="mx-auto w-full max-w-md">
-        <div className="mb-4 flex items-center justify-between gap-4">
-          <p className="journal-kicker">{brand.name}</p>
-          <LocaleSwitcher />
-        </div>
+        <p className="journal-kicker mb-4">{brand.name}</p>
         <MailIcon className="mt-5 h-6 w-6 text-accent" />
 
         <h1 className="mt-5 font-display text-2xl font-semibold tracking-[-0.025em] text-brown">
