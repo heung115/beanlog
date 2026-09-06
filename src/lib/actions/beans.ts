@@ -276,8 +276,9 @@ export async function getBeanFilterOptions() {
 
 export async function getBeanById(id: string) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
 
+  if (authError) throw new Error("Unable to verify session");
   if (!user) return null;
 
   const parsedId = beanIdSchema.safeParse(id);
@@ -293,8 +294,9 @@ export async function getBeanById(id: string) {
 
 export async function getBeanStats() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
 
+  if (authError) throw new Error("Unable to verify session");
   if (!user) return null;
 
   let stats: GoStats | null;
