@@ -35,6 +35,9 @@ interface ComboboxProps {
   /** Show every option when no search term is entered (use for short catalogs). */
   showAllOptions?: boolean;
   required?: boolean;
+  maxLength?: number;
+  "aria-invalid"?: boolean;
+  "aria-describedby"?: string;
   optional?: boolean;
   optionalLabel?: string;
   className?: string;
@@ -84,6 +87,9 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
       placeholder,
       showAllOptions = false,
       required,
+      maxLength,
+      "aria-invalid": ariaInvalid,
+      "aria-describedby": ariaDescribedBy,
       optional,
       optionalLabel = "선택",
       className,
@@ -223,6 +229,9 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
             value={text}
             placeholder={placeholder}
             required={required}
+            maxLength={maxLength}
+            aria-invalid={ariaInvalid}
+            aria-describedby={ariaDescribedBy}
             autoComplete="off"
             spellCheck={false}
             onChange={(e) => {

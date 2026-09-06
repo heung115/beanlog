@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
@@ -10,10 +10,24 @@ import { LoadError } from "@/components/ui/load-error";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
 import { deleteAccount, exportData, updateProfile } from "@/lib/actions/beans";
-import { signOut } from "@/lib/actions/auth";
+import { LogoutButton } from "@/components/auth/logout-button";
+import { RecordDraftNotice } from "@/components/beans/record-draft-notice";
+import { useRecordDraft } from "@/components/beans/use-record-draft";
 import { getProfile } from "@/lib/actions/profile";
 
 type Locale = "ko" | "en";
+
+const LOCALE_FOCUS_KEY = "beanmap-settings-language-focus";
+
+function rememberLocaleFocus(locale: Locale) {
+  // Locale routes can remount the page. This tab-only marker contains no
+  // account information and is consumed after the destination is ready.
+  try { sessionStorage.setItem(LOCALE_FOCUS_KEY, locale); } catch { /* Navigation still works without storage. */ }
+}
+
+function isDisplayNameDraft(value: unknown): value is string {
+  return typeof value === "string" && value.length <= 50;
+}
 
 function SectionCard({
   title,
@@ -59,32 +73,52 @@ const ICONS = {
   globe: "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Zm-9 9h18M12 3c2.5 2.4 3.8 5.6 3.8 9s-1.3 6.6-3.8 9c-2.5-2.4-3.8-5.6-3.8-9S9.5 5.4 12 3Z",
   download: "M12 4v11m0 0 4.5-4.5M12 15l-4.5-4.5M4 19h16",
   document: "M7 3h7l4 4v14H7V3Zm7 0v5h5M10 12h5m-5 4h5",
-  logout: "M14 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-2M9 12h11m0 0-3-3m3 3-3 3",
 };
 
 export default function SettingsPage() {
   const t = useTranslations("settings");
   const tAuth = useTranslations("auth");
   const tCommon = useTranslations("common");
+  const tDraft = useTranslations("draft");
   const locale = useLocale() as Locale;
   const pathname = usePathname();
   const router = useRouter();
   const toast = useToast();
 
   const [displayName, setDisplayName] = useState("");
+  const [savedName, setSavedName] = useState("");
+  const [profileId, setProfileId] = useState<string | null>(null);
   const [profileLoading, setProfileLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const savedNameRef = useRef("");
+  const [saveError, setSaveError] = useState<"nameRequired" | "saveError" | null>(null);
+  const displayNameRef = useRef<HTMLInputElement>(null);
+  const mutationRef = useRef(false);
   const [profileError, setProfileError] = useState(false);
   const [profileAttempt, setProfileAttempt] = useState(0);
   const [switchingLocale, setSwitchingLocale] = useState(false);
+  const [localePending, startLocaleTransition] = useTransition();
+  const [localeError, setLocaleError] = useState<Locale | null>(null);
+  const localeRefs = useRef<Partial<Record<Locale, HTMLButtonElement | null>>>({});
   const [deleteError, setDeleteError] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState<"connection" | "limit" | null>(null);
+  const exportPendingRef = useRef(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const deleteTriggerRef = useRef<HTMLButtonElement>(null);
   const deleteDialogRef = useRef<HTMLDialogElement>(null);
   const cancelDeleteRef = useRef<HTMLButtonElement>(null);
+  const draft = useRecordDraft({
+    scope: `settings:${profileId}`,
+    value: displayName,
+    baselineValue: savedName,
+    sourceVersion: savedName,
+    validate: isDisplayNameDraft,
+    onRestore: setDisplayName,
+    enabled: profileId !== null && !profileLoading && !profileError,
+  });
+  const profileUnavailable = profileLoading || profileError || !profileId || !draft.ready || draft.status === "conflict";
+  const profileBusy = saving || switchingLocale || localePending;
 
   useEffect(() => {
     let mounted = true;
@@ -92,7 +126,8 @@ export default function SettingsPage() {
       .then((p) => {
         if (!p) throw new Error("Unable to load profile");
         if (mounted) {
-          savedNameRef.current = p.display_name ?? "";
+          setProfileId(p.id);
+          setSavedName(p.display_name ?? "");
           setDisplayName(p.display_name ?? "");
         }
       })
@@ -104,6 +139,15 @@ export default function SettingsPage() {
       mounted = false;
     };
   }, [profileAttempt]);
+
+  useEffect(() => {
+    if (profileUnavailable || profileBusy) return;
+    try {
+      if (sessionStorage.getItem(LOCALE_FOCUS_KEY) !== locale) return;
+      localeRefs.current[locale]?.focus();
+      sessionStorage.removeItem(LOCALE_FOCUS_KEY);
+    } catch { /* Storage is optional for focus recovery. */ }
+  }, [locale, profileUnavailable, profileBusy]);
 
   useEffect(() => {
     if (!confirmOpen) return;
@@ -130,48 +174,76 @@ export default function SettingsPage() {
 
   async function handleSaveProfile(e: React.FormEvent) {
     e.preventDefault();
+    if (profileUnavailable || profileBusy || mutationRef.current) return;
+    const submittedName = displayName.trim();
+    if (!submittedName) {
+      setSaveError("nameRequired");
+      displayNameRef.current?.focus();
+      return;
+    }
+    mutationRef.current = true;
     setSaving(true);
+    setSaveError(null);
     try {
-      const result = await updateProfile(displayName.trim(), locale);
+      const result = await updateProfile(submittedName, locale);
       if (result?.error) {
-        toast.show(tCommon("error"));
+        setSaveError("saveError");
       } else {
-        savedNameRef.current = displayName.trim();
+        setSavedName(submittedName);
+        setDisplayName(submittedName);
+        draft.reset(submittedName);
         toast.show(t("saved"));
         router.refresh();
       }
     } catch {
-      toast.show(tCommon("error"));
+      setSaveError("saveError");
     } finally {
+      mutationRef.current = false;
       setSaving(false);
     }
   }
 
   async function switchLocale(next: Locale) {
-    if (next === locale || profileLoading || profileError) return;
+    if (next === locale || profileUnavailable || profileBusy || mutationRef.current) return;
+    if (!draft.confirmLeave(tDraft("leaveConfirm"))) return;
+    mutationRef.current = true;
     setSwitchingLocale(true);
+    setLocaleError(null);
     try {
-      const result = await updateProfile(savedNameRef.current, next);
+      const result = await updateProfile(savedName, next);
       if (result?.error) {
-        toast.show(tCommon("error"));
+        setLocaleError(next);
+        rememberLocaleFocus(locale);
         return;
       }
       const segments = pathname.split("/");
       segments[1] = next;
-      router.replace(segments.join("/") || `/${next}`);
+      rememberLocaleFocus(next);
+      startLocaleTransition(() => {
+        router.replace(segments.join("/") || `/${next}`);
+      });
     } catch {
-      toast.show(tCommon("error"));
+      setLocaleError(next);
+      rememberLocaleFocus(locale);
     } finally {
+      mutationRef.current = false;
       setSwitchingLocale(false);
     }
   }
 
   async function handleExport() {
+    if (exportPendingRef.current) return;
+    exportPendingRef.current = true;
     setExporting(true);
+    setExportError(null);
     try {
       const data = await exportData();
       if (!data) {
-        toast.show(tCommon("error"));
+        setExportError("connection");
+        return;
+      }
+      if ("error" in data) {
+        setExportError("limit");
         return;
       }
       const blob = new Blob([JSON.stringify(data, null, 2)], {
@@ -186,8 +258,9 @@ export default function SettingsPage() {
       a.remove();
       URL.revokeObjectURL(url);
     } catch {
-      toast.show(tCommon("error"));
+      setExportError("connection");
     } finally {
+      exportPendingRef.current = false;
       setExporting(false);
     }
   }
@@ -233,6 +306,20 @@ export default function SettingsPage() {
     { value: "en", label: t("english") },
   ];
 
+  function handleLocaleKeyDown(event: React.KeyboardEvent<HTMLButtonElement>, index: number) {
+    if (profileUnavailable || profileBusy) return;
+    let nextIndex: number;
+    if (event.key === "ArrowRight" || event.key === "ArrowDown") nextIndex = (index + 1) % locales.length;
+    else if (event.key === "ArrowLeft" || event.key === "ArrowUp") nextIndex = (index + locales.length - 1) % locales.length;
+    else if (event.key === "Home") nextIndex = 0;
+    else if (event.key === "End") nextIndex = locales.length - 1;
+    else return;
+    event.preventDefault();
+    const next = locales[nextIndex].value;
+    localeRefs.current[next]?.focus();
+    void switchLocale(next);
+  }
+
   return (
     <div className="mx-auto max-w-5xl">
       <style>{`
@@ -262,29 +349,43 @@ export default function SettingsPage() {
             setProfileAttempt((value) => value + 1);
           }} /> : <form
             onSubmit={handleSaveProfile}
-            aria-busy={profileLoading || saving}
-            className="flex flex-col gap-3 sm:flex-row sm:items-end"
+            noValidate
+            aria-busy={profileUnavailable || profileBusy}
+            className="space-y-3"
           >
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
             <div className="flex-1">
               <Input
+                ref={displayNameRef}
                 label={t("displayName")}
                 name="displayName"
                 value={displayName}
-                onChange={(e) => setDisplayName(e.target.value)}
+                onChange={(e) => {
+                  setDisplayName(e.target.value);
+                  if (saveError === "nameRequired" && e.target.value.trim()) setSaveError(null);
+                }}
                 placeholder={profileLoading ? tCommon("loading") : "beanmap"}
                 maxLength={50}
                 required
-                disabled={profileLoading || saving}
+                aria-invalid={saveError === "nameRequired" || undefined}
+                aria-describedby={saveError ? "profile-save-error" : undefined}
+                disabled={profileUnavailable || profileBusy}
               />
             </div>
             <Button
               type="submit"
               loading={saving}
-              disabled={profileLoading}
+              disabled={profileUnavailable || profileBusy}
               className="sm:shrink-0"
             >
-              {tCommon("confirm")}
+              {t("saveProfile")}
             </Button>
+            </div>
+            {saveError && <div>
+              <p id="profile-save-error" role="alert" className="text-sm leading-6 text-red-600">{t(saveError)}</p>
+              {saveError === "saveError" && <Button type="submit" variant="secondary" size="sm" className="mt-2" disabled={profileUnavailable || profileBusy}>{tCommon("retry")}</Button>}
+            </div>}
+            <RecordDraftNotice status={draft.status} onDiscard={() => { draft.discard(savedName); setSaveError(null); }} onRestore={draft.restoreConflict} disabled={profileLoading || profileError || !profileId || !draft.ready || profileBusy} />
           </form>}
         </SectionCard>
 
@@ -293,19 +394,24 @@ export default function SettingsPage() {
           <div
             role="radiogroup"
             aria-label={t("language")}
+            aria-busy={switchingLocale || localePending}
+            aria-describedby={localeError ? "language-save-error" : undefined}
             className="inline-flex rounded-md bg-cream-dark/60 p-1"
           >
-            {locales.map((l) => {
+            {locales.map((l, index) => {
               const active = l.value === locale;
               return (
                 <button
                   key={l.value}
+                  ref={(element) => { localeRefs.current[l.value] = element; }}
                   type="button"
                   role="radio"
                   aria-checked={active}
+                  tabIndex={active ? 0 : -1}
                   onClick={() => switchLocale(l.value)}
-                  disabled={profileLoading || profileError || switchingLocale || saving}
-                  className={`min-h-11 rounded-sm border border-transparent px-5 py-2 text-sm font-semibold transition-all duration-150 ${
+                  onKeyDown={(event) => handleLocaleKeyDown(event, index)}
+                  disabled={profileUnavailable || profileBusy}
+                  className={`min-h-11 rounded-sm border border-transparent px-5 py-2 text-sm font-semibold transition-all duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${
                     active
                       ? "bg-brown text-cream"
                       : "text-brown-light hover:bg-surface hover:text-brown"
@@ -316,6 +422,10 @@ export default function SettingsPage() {
               );
             })}
           </div>
+          {localeError && <div className="mt-3">
+            <p id="language-save-error" role="alert" className="text-sm leading-6 text-red-600">{t("languageError")}</p>
+            <Button type="button" variant="secondary" size="sm" className="mt-2" onClick={() => switchLocale(localeError)} disabled={profileUnavailable || profileBusy}>{tCommon("retry")}</Button>
+          </div>}
         </SectionCard>
 
         {/* ---------- export ---------- */}
@@ -334,6 +444,10 @@ export default function SettingsPage() {
               {exporting ? t("exporting") : t("export")}
             </Button>
           </div>
+          {exportError && <div className="mt-3">
+            <p role="alert" className="text-sm leading-6 text-red-600">{t(exportError === "limit" ? "exportLimit" : "exportError")}</p>
+            {exportError === "connection" && <Button type="button" variant="secondary" size="sm" className="mt-2" onClick={handleExport} disabled={exporting}>{tCommon("retry")}</Button>}
+          </div>}
         </SectionCard>
 
         {/* ---------- legal ---------- */}
@@ -358,10 +472,7 @@ export default function SettingsPage() {
 
         {/* ---------- logout ---------- */}
         <SectionCard title={tAuth("logout")} delay={300}>
-          <Button variant="secondary" onClick={() => signOut(locale)} className="w-full sm:w-auto">
-            <Icon path={ICONS.logout} className="mr-2 h-4 w-4" />
-            {tAuth("logout")}
-          </Button>
+          <LogoutButton />
         </SectionCard>
 
         {/* ---------- account deletion ---------- */}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { BeanForm } from "@/components/beans/bean-form";
@@ -10,6 +10,7 @@ import { buttonClassName } from "@/components/ui/button";
 import { getBeanById } from "@/lib/actions/beans";
 import { LoadError } from "@/components/ui/load-error";
 import type { BeanWithTags } from "@/types/database";
+import { resolveExploreReturnPath } from "@/lib/coffee/explore-navigation";
 
 function FormSkeleton() {
   return (
@@ -24,6 +25,8 @@ function FormSkeleton() {
 export default function EditBeanPage() {
   const params = useParams<{ id: string }>();
   const locale = useLocale();
+  const searchParams = useSearchParams();
+  const returnTo = resolveExploreReturnPath(searchParams.get("returnTo"), locale);
   const t = useTranslations("beans");
 
   const [bean, setBean] = useState<BeanWithTags | null>(null);
@@ -74,7 +77,7 @@ export default function EditBeanPage() {
             <p className="text-xl font-semibold text-brown">{t("notFound")}</p>
             <p className="mt-2 text-sm text-brown-light">{t("notFoundSub")}</p>
             <Link
-              href={`/${locale}/explore`}
+              href={returnTo}
               prefetch={false}
               className={buttonClassName({ variant: "secondary", className: "mt-6" })}
             >

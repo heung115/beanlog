@@ -4,6 +4,9 @@ import { useId, useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface SubregionInputProps {
+  name?: string;
+  "aria-invalid"?: boolean;
+  "aria-describedby"?: string;
   label: string;
   placeholder: string;
   value: string[];
@@ -50,6 +53,9 @@ export function nextSubregionSuggestions(
 }
 
 export function SubregionInput({
+  name,
+  "aria-invalid": ariaInvalid,
+  "aria-describedby": ariaDescribedBy,
   label,
   placeholder,
   value,
@@ -114,8 +120,11 @@ export function SubregionInput({
       )}
       <input
         id={inputId}
+        name={name}
         type="text"
         aria-label={label}
+        aria-invalid={ariaInvalid}
+        aria-describedby={ariaDescribedBy}
         value={text}
         onChange={(e) => updateText(e.target.value)}
         onKeyDown={(event) => {

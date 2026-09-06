@@ -8,7 +8,20 @@ const UNRECOVERABLE_REFRESH_CODES = new Set([
 type AuthFailure = {
   code?: unknown;
   message?: unknown;
+  name?: unknown;
+  status?: unknown;
 };
+
+/** A temporary verification failure is not evidence that a user signed out. */
+export function isTemporaryAuthError(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const { code, name, status } = error as AuthFailure;
+  return name === "AuthRetryableFetchError"
+    || name === "TypeError"
+    || code === "over_request_rate_limit"
+    || code === "request_timeout"
+    || (typeof status === "number" && (status === 0 || status === 429 || status >= 500));
+}
 
 export function isUnrecoverableRefreshError(error: unknown): boolean {
   if (!error || typeof error !== "object") return false;

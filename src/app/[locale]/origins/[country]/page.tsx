@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { notFound } from "next/navigation";
+import { NotFoundContent } from "@/components/layout/not-found-content";
 import {
   findCountryPresetBySlug,
   originSlug,
@@ -21,7 +21,12 @@ export async function generateMetadata({
   const { locale, country } = await params;
   const preset = findCountryPresetBySlug(country);
 
-  if (!preset) notFound();
+  if (!preset) {
+    return {
+      title: locale === "en" ? "Page not found" : "페이지를 찾을 수 없습니다.",
+      robots: { index: false, follow: false },
+    };
+  }
 
   return buildOriginDetailMetadata(locale, preset, originSlug(preset.country));
 }
@@ -34,7 +39,11 @@ export default async function OriginDetailPage({
   const { locale, country } = await params;
   const preset = findCountryPresetBySlug(country);
 
-  if (!preset) notFound();
+  if (!preset) {
+    // The proxy sets 404 before rendering. Returning the recovery content avoids
+    // Next's script-only SSR error shell when a matched dynamic route throws.
+    return <div className="flex min-h-[65dvh] items-center py-8"><NotFoundContent locale={locale} /></div>;
+  }
 
   const t = await getTranslations({ locale, namespace: "origins" });
   const seoLocale = toSeoLocale(locale);

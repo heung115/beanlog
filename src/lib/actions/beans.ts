@@ -1,9 +1,9 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/server";
+import { createClient, clearSessionCookies } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+import { redirect, RedirectType } from "next/navigation";
 import { localeCookie } from "@/i18n/routing";
 import { z } from "zod";
 import type { BeanFormData, BeanWithTags } from "@/types/database";
@@ -28,6 +28,9 @@ const nativeBeanSchema = z.object({
   origin_region: z.string().trim().max(100).optional(),
   farm_producer: z.string().trim().max(200).optional(),
   varietal: z.string().trim().max(100).optional(),
+  origin_subregions: z.array(z.string().trim().min(1).max(100)).max(10).optional(),
+  altitude_m: z.coerce.number().int().min(0).max(5000).optional(),
+  harvest_year: z.coerce.number().int().min(1900).max(2100).optional(),
   process_method: z.enum(["washed", "natural", "honey", "anaerobic", "carbonic", "decaf", "other"]),
   process_detail: z.string().trim().max(200).optional(),
   roast_level: z.enum(["light", "medium", "dark"]),
@@ -123,6 +126,11 @@ export async function createBeanFromForm(formData: FormData) {
     origin_region: formData.get("origin_region") || undefined,
     farm_producer: formData.get("farm_producer") || undefined,
     varietal: formData.get("varietal") || undefined,
+    origin_subregions: typeof formData.get("origin_subregions") === "string"
+      ? String(formData.get("origin_subregions")).split(/[,，]/).map((part) => part.trim()).filter(Boolean)
+      : undefined,
+    altitude_m: formData.get("altitude_m") || undefined,
+    harvest_year: formData.get("harvest_year") || undefined,
     process_method: formData.get("process_method"),
     process_detail: formData.get("process_detail") || undefined,
     roast_level: formData.get("roast_level"),
@@ -227,9 +235,11 @@ export async function getBeans(filters?: {
   limit?: number;
 }) {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-  if (!user) return { beans: [], count: 0 };
+  if (authError || !user) {
+    return { beans: [], count: 0, error: "Unable to verify session" };
+  }
 
   const parsed = beanFiltersSchema.safeParse(filters ?? {});
   if (!parsed.success) return { beans: [], count: 0, error: "Invalid filters" };
@@ -262,17 +272,20 @@ export async function getBeans(filters?: {
   }
 }
 
-export async function getBeanFilterOptions() {
+export async function getBeanFilterOptions(): Promise<{
+  origins: string[]; roasteries: string[]; varietals: string[]; error?: string;
+}> {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { origins: [], roasteries: [], varietals: [] };
+  const { data: { user }, error } = await supabase.auth.getUser();
+  const unavailable = { origins: [], roasteries: [], varietals: [], error: "Unable to load filter options" };
+  if (error || !user) return unavailable;
 
   try {
     return await apiFetch<{ origins: string[]; roasteries: string[]; varietals: string[] }>(
       "/api/beans/filter-options"
     );
   } catch {
-    return { origins: [], roasteries: [], varietals: [] };
+    return unavailable;
   }
 }
 
@@ -342,7 +355,8 @@ export async function exportData() {
       profile: unknown;
       beans: BeanWithTags[];
     }>("/api/export");
-  } catch {
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 413) return { error: "export_limit" as const };
     return null;
   }
 }
@@ -379,7 +393,12 @@ export async function deleteAccount(locale = "ko") {
 
   const { error } = await supabase.rpc("delete_current_account");
   if (error) return { error: "Unable to delete account" };
-  await supabase.auth.signOut();
+  try {
+    await supabase.auth.signOut({ scope: "local" });
+  } catch {
+    // The account is already deleted. Always clear this browser's credentials.
+  }
+  await clearSessionCookies();
 
-  redirect(`/${locale === "en" ? "en" : "ko"}/login`);
+  redirect(`/${locale === "en" ? "en" : "ko"}?accountDeleted=1`, RedirectType.replace);
 }

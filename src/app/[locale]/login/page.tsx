@@ -1,12 +1,12 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useRef, useState, useTransition } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { unstable_rethrow, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { signInAction } from "@/lib/actions/auth";
+import { signInAction, type SignInState } from "@/lib/actions/auth";
 import { resolvePostAuthPath } from "@/lib/security/redirect";
 import { SocialSignInButtons } from "@/components/auth/social-sign-in-buttons";
 import { AuthShell } from "@/components/auth/auth-shell";
@@ -22,12 +22,43 @@ export default function LoginPage() {
     : requestedNext !== "/explore" ? requestedNext : `/${locale}/explore`;
   const authQuery = hasGuestDraft ? "?draft=1"
     : requestedNext !== "/explore" ? `?${new URLSearchParams({ next: requestedNext })}` : "";
-  const [state, formAction, pending] = useActionState(signInAction, {});
+  // Keep the actual server action here so the rendered form can POST before
+  // hydration or with JavaScript disabled. A client wrapper loses that metadata.
+  const [serverState, formAction, serverPending] = useActionState(signInAction, {});
+  const [clientState, setClientState] = useState<SignInState | null>(null);
+  const [clientPending, startTransition] = useTransition();
+  const submittingRef = useRef(false);
+  const state = clientState ?? serverState;
+  const pending = serverPending || clientPending;
   const [socialTermsAccepted, setSocialTermsAccepted] = useSocialAuthConsent();
   const oauthError = searchParams.get("authError");
   const oauthMessage = oauthError === "expired" ? "socialExpired"
     : oauthError === "cancelled" ? "socialCancelled"
     : oauthError === "failed" ? "socialError" : null;
+  const loginErrorMessage = state.error === "email_not_confirmed" ? "emailNotConfirmed"
+    : state.error === "rate_limited" ? "loginRateLimited"
+    : state.error === "temporarily_unavailable" ? "loginUnavailable"
+    : "loginError";
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (submittingRef.current || serverPending) return;
+    const formData = new FormData(event.currentTarget);
+    submittingRef.current = true;
+    setClientState({});
+    startTransition(async () => {
+      try {
+        setClientState(await signInAction(state, formData));
+      } catch (error) {
+        unstable_rethrow(error);
+        // Hydrated submissions can recover from a browser-to-app failure
+        // without replacing the native form or losing its entered values.
+        setClientState({ error: "temporarily_unavailable" });
+      } finally {
+        submittingRef.current = false;
+      }
+    });
+  }
 
   return (
     <AuthShell>
@@ -41,6 +72,7 @@ export default function LoginPage() {
 
         <form
           action={formAction}
+          onSubmit={handleSubmit}
           // Failed actions must preserve input and the session preference.
           // Successful sign-in redirects and unmounts this form.
           onReset={(event) => event.preventDefault()}
@@ -76,9 +108,7 @@ export default function LoginPage() {
 
           {state.error && (
             <p role="alert" className="text-sm text-red-600">
-              {state.error === "email_not_confirmed"
-                ? t("emailNotConfirmed")
-                : t("loginError")}
+              {t(loginErrorMessage)}
             </p>
           )}
 

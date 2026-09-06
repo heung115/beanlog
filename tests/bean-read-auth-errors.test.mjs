@@ -36,9 +36,18 @@ for (const status of [429, 503]) {
     const { actions, apiCalls } = actionsWithAuth({ data: { user: null }, error: { status } });
     await assert.rejects(actions.getBeanStats(), /Unable to verify session/);
     await assert.rejects(actions.getBeanById("7cf5684a-aea4-4c57-b5c6-06e37053b3dc"), /Unable to verify session/);
+    assert.equal((await actions.getBeans()).error, "Unable to verify session");
+    assert.equal((await actions.getBeanFilterOptions()).error, "Unable to load filter options");
     assert.equal(apiCalls(), 0);
   });
 }
+
+test("a missing session cannot appear as an empty journal", async () => {
+  const { actions, apiCalls } = actionsWithAuth({ data: { user: null }, error: null });
+  assert.equal((await actions.getBeans()).error, "Unable to verify session");
+  assert.equal((await actions.getBeanFilterOptions()).error, "Unable to load filter options");
+  assert.equal(apiCalls(), 0);
+});
 
 test("a verified user with no records still receives empty statistics", async () => {
   const { actions, apiCalls } = actionsWithAuth({ data: { user: { id: "test-user" } }, error: null });

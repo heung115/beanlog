@@ -56,6 +56,7 @@ test("localized landing, account, legal, trial, and origin routes are public", (
       "terms",
       "try",
       "origins",
+      "session-unavailable",
     ]) {
       publicPaths.push(`/${locale}/${route}`, `/${locale}/${route}/`);
     }

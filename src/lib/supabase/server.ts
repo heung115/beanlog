@@ -60,6 +60,17 @@ export async function createPublicClient(options?: ClientOptions) {
   );
 }
 
+/** After confirmed account deletion, local credentials must not survive a remote logout outage. */
+export async function clearSessionCookies() {
+  const cookieStore = await cookies();
+  for (const { name } of cookieStore.getAll()) {
+    if (name === supabaseCookieOptions.name || name.startsWith(`${supabaseCookieOptions.name}.`)) {
+      cookieStore.delete(name);
+    }
+  }
+  await setSessionPersistencePreference(true);
+}
+
 export async function setSessionPersistencePreference(
   persistSession: boolean
 ) {

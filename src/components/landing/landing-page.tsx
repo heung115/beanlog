@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { Suspense } from "react";
+import { LogoutNotice } from "@/components/auth/logout-notice";
 import { BeanmapMark } from "@/components/brand/beanmap-mark";
 import { OriginContours } from "@/components/brand/origin-contours";
 import { DocumentLocale } from "@/components/layout/document-locale";
@@ -67,6 +69,9 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
       </header>
 
       <main id="main-content">
+        <Suspense fallback={null}>
+          <LogoutNotice message={copy.logoutComplete} deletedMessage={copy.accountDeleted} />
+        </Suspense>
         <section data-landing-section="hero" className="relative">
           <OriginContours className="pointer-events-none absolute -right-56 -top-28 h-[42rem] w-[52rem] opacity-35 md:-right-24 md:-top-16 md:opacity-60" />
           <div className="relative mx-auto grid w-full max-w-6xl gap-10 px-4 pb-14 pt-10 md:px-6 md:pb-20 md:pt-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)] lg:items-center lg:gap-14">

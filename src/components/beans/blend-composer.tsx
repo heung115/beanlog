@@ -26,9 +26,10 @@ import type {
 interface BlendComposerProps {
   value: BlendComponent[];
   onChange: (components: BlendComponent[]) => void;
+  errorProps?: (name: string) => { "aria-invalid"?: boolean; "aria-describedby"?: string };
 }
 
-export function BlendComposer({ value, onChange }: BlendComposerProps) {
+export function BlendComposer({ value, onChange, errorProps }: BlendComposerProps) {
   const locale = useLocale();
   const t = useTranslations("beans");
   const tp = useTranslations("process");
@@ -226,6 +227,7 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
   }
 
   function addComponent() {
+    if (value.length >= 20) return;
     onChange([
       ...value,
       { origin_country: "", percentage: 0, sort_order: value.length },
@@ -250,6 +252,15 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
 
   function handleCountryPick(index: number, option: ComboboxOption) {
     const country = originCountries.find((item) => item.name_en === option.value);
+    const comp = value[index];
+    if (!comp) return;
+    // Committing the unchanged country on blur must retain its region/farm.
+    if (comp.origin_country === option.value || (country && countryIdFor(comp) === country.id)) {
+      if (comp.origin_country !== option.value || comp.origin_country_id !== country?.id) {
+        updateComponent(index, { origin_country: option.value, origin_country_id: country?.id });
+      }
+      return;
+    }
     updateComponent(index, {
       origin_country: option.value,
       origin_country_id: country?.id,
@@ -276,6 +287,12 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
     const region = countryId
       ? regionsByCountry[countryId]?.find((item) => item.name === option.value)
       : undefined;
+    if (comp.origin_region === option.value || (region && regionIdFor(comp) === region.id)) {
+      if (comp.origin_region !== option.value || comp.origin_region_id !== region?.id) {
+        updateComponent(index, { origin_region: option.value, origin_region_id: region?.id });
+      }
+      return;
+    }
     updateComponent(index, {
       origin_region: option.value,
       origin_region_id: region?.id,
@@ -353,6 +370,8 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
                 <Combobox
                   ariaLabel={t("componentOrigin")}
                   name={`blend_origin_${i}`}
+                  maxLength={100}
+                  {...errorProps?.(`blend_origin_${i}`)}
                   value={comp.origin_country}
                   options={countryOptions}
                   showAllOptions
@@ -368,8 +387,11 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
                 <div className="relative">
                   <Input
                     aria-label={t("componentPercentage")}
+                    name={`blend_percentage_${i}`}
+                    {...errorProps?.(`blend_percentage_${i}`)}
                     type="number"
-                    inputMode="numeric"
+                    inputMode="decimal"
+                    step={0.01}
                     min={0}
                     max={100}
                     value={comp.percentage || ""}
@@ -391,6 +413,8 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
                 <Combobox
                   ariaLabel={t("originRegion")}
                   name={`blend_region_${i}`}
+                  maxLength={100}
+                  {...errorProps?.(`blend_region_${i}`)}
                   value={comp.origin_region ?? ""}
                   options={regionOptionsFor(comp)}
                   onTextChange={(text) => handleRegionText(i, text)}
@@ -403,6 +427,8 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
                   inputClassName="py-2 text-xs"
                 />
                 <SubregionInput
+                  name={`blend_origin_subregions_${i}`}
+                  {...errorProps?.(`blend_origin_subregions_${i}`)}
                   label={t("originSubregion")}
                   placeholder={t("originSubregionPlaceholder")}
                   value={comp.origin_subregions ?? []}
@@ -417,6 +443,8 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
                 <Combobox
                   ariaLabel={t("farmProducer")}
                   name={`blend_farm_producer_${i}`}
+                  maxLength={200}
+                  {...errorProps?.(`blend_farm_producer_${i}`)}
                   value={comp.farm_producer ?? ""}
                   options={entityOptionsFor(comp)}
                   onTextChange={(text) =>
@@ -449,6 +477,8 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
                 <Combobox
                   ariaLabel={t("varietal")}
                   name={`blend_varietal_${i}`}
+                  maxLength={100}
+                  {...errorProps?.(`blend_varietal_${i}`)}
                   value={comp.varietal ?? ""}
                   options={varietalOptions(locale, findCountryPreset(comp.origin_country))}
                   onTextChange={(text) =>
@@ -482,6 +512,8 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
               <Input
                 aria-label={t("processDetail")}
                 name={`blend_process_detail_${i}`}
+                  maxLength={200}
+                  {...errorProps?.(`blend_process_detail_${i}`)}
                 value={comp.process_detail ?? ""}
                 onChange={(e) =>
                   updateComponent(i, { process_detail: e.target.value || undefined })
@@ -514,6 +546,7 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
       <button
         type="button"
         onClick={addComponent}
+        disabled={value.length >= 20}
         className={cn(
           "flex items-center justify-center gap-1.5 rounded-md border border-dashed border-border-light py-2.5",
           "text-sm font-medium text-brown-light transition-all hover:border-border hover:bg-surface hover:text-brown"
@@ -524,6 +557,8 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
         </svg>
         {t("addComponent")}
       </button>
+
+      {value.length >= 20 && <p className="text-center text-xs text-brown-medium">{t("componentLimit")}</p>}
 
       {!isComplete && value.length > 0 && (
         <p className="text-center text-xs text-brown-medium">{t("percentageHint")}</p>

@@ -22,6 +22,7 @@ import { EmptyJournalGuide } from "@/components/beans/empty-journal-guide";
 import { PageIntro } from "@/components/layout/page-intro";
 import { ScoreDisplay } from "@/components/ui/score-display";
 import { OriginMapSection } from "@/components/stats/origin-map-section";
+import { ChartData } from "@/components/stats/chart-data";
 import { chartColors } from "@/config/chart-colors";
 import type { BeanStats } from "@/types/stats";
 
@@ -218,7 +219,7 @@ export default function StatsPage() {
 
   /* ---------- chart data ---------- */
   const varietalData = summarizeCategories(stats.byVarietal, t("otherCategories")).map(
-    ([name, count]) => ({ name, count })
+    ([name, count]) => ({ name, label: name, count })
   );
   const processData = stats.byProcess.map(([method, count]) => ({
     name: processLabel(method),
@@ -234,6 +235,7 @@ export default function StatsPage() {
   const distMap = new Map(stats.scoreDist);
   const scoreData = Array.from({ length: 10 }, (_, i) => ({
     name: `${i + 1}`,
+    label: i === 9 ? t("scorePerfect") : t("scoreRange", { from: i + 1, to: i + 2 }),
     count: Number(distMap.get(`${i + 1}`) ?? 0),
   }));
   const mapTopOrigin = stats.originMap[0];
@@ -249,7 +251,7 @@ export default function StatsPage() {
       : null;
 
   const varietalHeight = Math.max(200, varietalData.length * 40 + 40);
-  const cupsSuffix = `${locale === "en" ? " " : ""}${tCommon("cups")}`;
+  const recordsSuffix = `${locale === "en" ? " " : ""}${t("recordUnit")}`;
 
   return (
     <div className="mx-auto max-w-5xl space-y-10">
@@ -267,7 +269,7 @@ export default function StatsPage() {
           </p>
           <p className="data-value mt-2 text-3xl font-semibold tabular-nums tracking-[-0.03em] text-brown">
             {stats.total}
-            <span className="ml-1.5 text-sm font-normal text-brown-light">{cupsSuffix}</span>
+            <span className="ml-1.5 text-sm font-normal text-brown-light">{recordsSuffix}</span>
           </p>
         </div>
         <div className="rounded-md bg-surface/55 p-5 md:p-6">
@@ -307,7 +309,7 @@ export default function StatsPage() {
             {displayedTopOrigin && (
               <p className="mt-1 text-xs text-brown-light">
                 {displayedTopOrigin.count}
-                {cupsSuffix}
+                {recordsSuffix}
               </p>
             )}
           </div>
@@ -327,7 +329,7 @@ export default function StatsPage() {
             {stats.topProcess && (
               <p className="mt-1 text-xs text-brown-light">
                 {stats.topProcess[1]}
-                {cupsSuffix}
+                {recordsSuffix}
               </p>
             )}
           </div>
@@ -358,14 +360,14 @@ export default function StatsPage() {
                       <Cell key={i} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip content={<ChartTooltip suffix={cupsSuffix} />} />
+                  <Tooltip content={<ChartTooltip suffix={recordsSuffix} />} />
                 </PieChart>
               </ResponsiveContainer>
               <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
                 <span className="data-value text-3xl font-bold tabular-nums text-brown">
                   {stats.total}
                 </span>
-                <span className="text-[10px] text-brown-light">{cupsSuffix}</span>
+                <span className="text-[10px] text-brown-light">{recordsSuffix}</span>
               </div>
             </div>
             <ul className="w-full flex-1 space-y-2.5">
@@ -380,7 +382,7 @@ export default function StatsPage() {
                       </span>
                       <span className="tabular-nums text-xs text-brown-light">
                         {p.value}
-                        {cupsSuffix} · {pct}%
+                        {recordsSuffix} · {pct}%
                       </span>
                     </div>
                     <div className="mt-1.5 h-1 overflow-hidden bg-border-light">
@@ -416,7 +418,7 @@ export default function StatsPage() {
                 />
                 <Tooltip
                   cursor={{ fill: chartColors.accentWash }}
-                  content={<ChartTooltip suffix={cupsSuffix} />}
+                  content={<ChartTooltip suffix={recordsSuffix} />}
                 />
                 <Bar dataKey="count" barSize={18} radius={[0, 4, 4, 0]}>
                   {varietalData.map((_, i) => (
@@ -425,6 +427,7 @@ export default function StatsPage() {
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
+            <ChartData title={t("byVarietal")} rows={stats.byVarietal} />
           </ChartCard>
         </section>
       )}
@@ -444,7 +447,7 @@ export default function StatsPage() {
                 tickFormatter={(v: string) => formatMonth(v, locale)}
               />
               <YAxis allowDecimals={false} tickLine={false} axisLine={false} tick={AXIS_TICK} />
-              <Tooltip cursor={{ stroke: chartColors.accentSoft }} content={<ChartTooltip suffix={cupsSuffix} />} />
+              <Tooltip cursor={{ stroke: chartColors.accentSoft }} content={<ChartTooltip suffix={recordsSuffix} />} />
               <Line
                 type="monotone"
                 dataKey="count"
@@ -455,22 +458,25 @@ export default function StatsPage() {
               />
             </LineChart>
           </ResponsiveContainer>
+          <ChartData title={t("monthlyTrend")} rows={monthData.map((entry) => [entry.label, entry.count])} />
         </ChartCard>
       </section>
 
       {/* ---------- score distribution ---------- */}
       <section className="animate-rise" style={{ animationDelay: "420ms" }}>
         <SectionHeading index="06" title={t("scoreDistribution")} />
+        <p className="mb-4 text-sm leading-6 text-brown-light">{t("scoreRangeHelp")}</p>
         <ChartCard>
           <ResponsiveContainer width="100%" height={220}>
             <BarChart data={scoreData} margin={{ left: -18, right: 8, top: 8, bottom: 0 }}>
               <CartesianGrid vertical={false} stroke={GRID_STROKE} />
               <XAxis dataKey="name" tickLine={false} axisLine={{ stroke: GRID_STROKE }} tick={AXIS_TICK} />
               <YAxis allowDecimals={false} tickLine={false} axisLine={false} tick={AXIS_TICK} />
-              <Tooltip cursor={{ fill: chartColors.accentWash }} content={<ChartTooltip suffix={cupsSuffix} />} />
+              <Tooltip cursor={{ fill: chartColors.accentWash }} content={<ChartTooltip suffix={recordsSuffix} />} />
               <Bar dataKey="count" fill={chartColors.primarySoft} radius={[4, 4, 0, 0]} maxBarSize={36} />
             </BarChart>
           </ResponsiveContainer>
+          <ChartData title={t("scoreDistribution")} rows={scoreData.map((entry) => [entry.label, entry.count])} />
         </ChartCard>
       </section>
     </div>

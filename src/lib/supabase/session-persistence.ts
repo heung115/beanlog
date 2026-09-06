@@ -18,7 +18,12 @@ export function applySessionPersistence<T extends CookieOptions>(
   options: T,
   persistSession: boolean
 ): T {
-  if (persistSession) return options;
+  // Expiry is also how SSR deletes an auth cookie on sign-out or chunk
+  // rotation. Removing that expiry would recreate an empty session cookie.
+  const deletesCookie = options.maxAge !== undefined
+    ? options.maxAge <= 0
+    : options.expires !== undefined && options.expires.getTime() <= Date.now();
+  if (persistSession || deletesCookie) return options;
 
   const sessionOptions = { ...options };
   delete sessionOptions.expires;

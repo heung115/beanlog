@@ -39,7 +39,7 @@ const blendComponentSchema = z.object({
   varietal: optionalText(100),
   process_method: processMethodSchema.optional(),
   process_detail: optionalText(200),
-  percentage: z.number().finite().positive().max(100),
+  percentage: z.number().finite().positive().max(100).multipleOf(0.01),
   sort_order: z.number().int().min(0).max(100).optional(),
 });
 

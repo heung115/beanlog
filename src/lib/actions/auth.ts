@@ -5,13 +5,30 @@ import {
   createPublicClient,
   setSessionPersistencePreference,
 } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
+import { redirect, RedirectType } from "next/navigation";
 import { z } from "zod";
 import { resolvePostAuthPath } from "@/lib/security/redirect";
 
 export type SignInState = {
-  error?: "invalid_credentials" | "email_not_confirmed";
+  error?: "invalid_credentials" | "email_not_confirmed" | "rate_limited" | "temporarily_unavailable";
 };
+
+function signInError(error: unknown): SignInState {
+  if (error && typeof error === "object") {
+    const failure = error as { code?: string; status?: number; name?: string };
+    if (failure.status === 429 || failure.code === "over_request_rate_limit") {
+      return { error: "rate_limited" };
+    }
+    if ((failure.status ?? 0) >= 500 || failure.name === "AuthRetryableFetchError") {
+      return { error: "temporarily_unavailable" };
+    }
+    if (failure.code === "email_not_confirmed" || failure.code === "invalid_credentials") {
+      return { error: failure.code };
+    }
+  }
+  // A failed request does not establish that the supplied password is wrong.
+  return { error: "temporarily_unavailable" };
+}
 
 const signInSchema = z.object({
   email: z.string().trim().email(),
@@ -68,20 +85,15 @@ export async function signInAction(
 
   const persistSession = formData.get("remember") === "on";
   const nextPath = resolvePostAuthPath(formData.get("next"));
-  const supabase = await createClient({ persistSession });
-
-  const { error } = await supabase.auth.signInWithPassword({
-    email: credentials.data.email,
-    password: credentials.data.password,
-  });
-
-  if (error) {
-    return {
-      error:
-        error.code === "email_not_confirmed"
-          ? "email_not_confirmed"
-          : "invalid_credentials",
-    };
+  try {
+    const supabase = await createClient({ persistSession });
+    const { error } = await supabase.auth.signInWithPassword({
+      email: credentials.data.email,
+      password: credentials.data.password,
+    });
+    if (error) return signInError(error);
+  } catch (error) {
+    return signInError(error);
   }
 
   await setSessionPersistencePreference(persistSession);
@@ -126,7 +138,8 @@ export async function signOut(locale = "ko") {
   // A normal sign-out should revoke only the current browser session. The SSR
   // storage adapter removes every chunk of the auth cookie even when the
   // remote session has already expired.
-  await supabase.auth.signOut({ scope: "local" });
+  const { error } = await supabase.auth.signOut({ scope: "local" });
+  if (error) return { error: "sign_out_failed" as const };
   await setSessionPersistencePreference(true);
-  redirect(`/${locale === "en" ? "en" : "ko"}/login`);
+  redirect(`/${locale === "en" ? "en" : "ko"}?loggedOut=1`, RedirectType.replace);
 }

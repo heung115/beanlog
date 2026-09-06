@@ -4,6 +4,8 @@ interface LandingCopy {
   navigation: string;
   login: string;
   signup: string;
+  logoutComplete: string;
+  accountDeleted: string;
   title: string;
   description: string;
   primaryAction: string;
@@ -49,6 +51,8 @@ export const landingCopy: Record<LandingLocale, LandingCopy> = {
     navigation: "계정 메뉴",
     login: "로그인",
     signup: "회원가입",
+    logoutComplete: "로그아웃했습니다. 저장한 커피 기록은 계정에 그대로 보관되어 있습니다.",
+    accountDeleted: "계정과 저장한 커피 기록을 삭제했습니다.",
     title: "beanmap",
     description:
       "beanmap은 로스터리·산지·품종·가공 방식·테이스팅 노트·점수를 한곳에 남기고, 필요할 때 다시 찾는 커피 원두 기록장입니다.",
@@ -134,6 +138,8 @@ export const landingCopy: Record<LandingLocale, LandingCopy> = {
     navigation: "Account menu",
     login: "Log in",
     signup: "Sign up",
+    logoutComplete: "You’re logged out. Your saved coffee records are still in your account.",
+    accountDeleted: "Your account and saved coffee records have been deleted.",
     title: "beanmap",
     description:
       "beanmap is a coffee bean journal for saving roasters, origins, varieties, processing methods, tasting notes, and scores—then finding them when you need them.",

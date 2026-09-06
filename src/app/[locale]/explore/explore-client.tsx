@@ -2,14 +2,17 @@
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { useSearchParams } from "next/navigation";
 import { getBeans } from "@/lib/actions/beans";
 import { BeanCard } from "@/components/beans/bean-card";
+import { FilterOptionsRecovery } from "@/components/beans/filter-options-recovery";
 import { Button } from "@/components/ui/button";
 import { EmptyJournalGuide } from "@/components/beans/empty-journal-guide";
 import { PageIntro } from "@/components/layout/page-intro";
 import { cn } from "@/lib/utils";
 import { splitVarietals } from "@/lib/coffee/varietals";
 import { originPresets } from "@/data/origin-presets";
+import { EXPLORE_PAGE_SIZE, exploreHref, exploreQuery, parseExploreQuery, type ExploreNavigationState } from "@/lib/coffee/explore-navigation";
 import type {
   BeanFilters,
   BeanType,
@@ -18,7 +21,7 @@ import type {
   RoastLevel,
 } from "@/types/database";
 
-const PAGE_SIZE = 20;
+const PAGE_SIZE = EXPLORE_PAGE_SIZE;
 const VIEW_STORAGE_KEY = "beanmap:explore-view";
 const VIEW_CHANGE_EVENT = "beanmap:explore-view-change";
 const subscribeToHydration = () => () => {};
@@ -214,6 +217,7 @@ export function ExploreClient({
   initialTotal,
   initialFilterOptions,
   initialLoadError,
+  initialState,
 }: {
   initialBeans: BeanWithTags[];
   initialTotal: number;
@@ -221,22 +225,30 @@ export function ExploreClient({
     origins: string[];
     roasteries: string[];
     varietals: string[];
+    error?: string;
   };
   initialLoadError: boolean;
+  initialState: ExploreNavigationState;
 }) {
   const t = useTranslations("explore");
   const tBeans = useTranslations("beans");
+  const tCommon = useTranslations("common");
   const tProcess = useTranslations("process");
   const tRoast = useTranslations("roast");
   const locale = useLocale();
-
-  const [searchInput, setSearchInput] = useState("");
+  const searchParams = useSearchParams();
+  const queryKey = searchParams.toString();
+  const navigationState = useMemo(() => parseExploreQuery(new URLSearchParams(queryKey)), [queryKey]);
+  const { filters, page } = navigationState;
+  const filterKey = exploreQuery({ filters, page: 0 });
+  const [searchDraft, setSearchDraft] = useState({ queryKey, value: filters.search ?? "" });
+  // Browser back/forward restores the input together with the URL controls.
+  if (searchDraft.queryKey !== queryKey) {
+    setSearchDraft({ queryKey, value: filters.search ?? "" });
+  }
+  const searchInput = searchDraft.queryKey === queryKey ? searchDraft.value : filters.search ?? "";
+  const setSearchInput = (value: string) => setSearchDraft({ queryKey, value });
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [filters, setFilters] = useState<BeanFilters>({
-    sort_by: "consumed_at",
-    sort_order: "desc",
-  });
-  const [page, setPage] = useState(0);
   const [beans, setBeans] = useState<BeanWithTags[]>(initialBeans);
   const [total, setTotal] = useState(initialTotal);
   const [loading, setLoading] = useState(false);
@@ -244,7 +256,8 @@ export function ExploreClient({
   const [loadError, setLoadError] = useState(initialLoadError);
   const [retryKey, setRetryKey] = useState(0);
   const [hasJournalEntries, setHasJournalEntries] = useState(
-    initialTotal > 0 || initialBeans.length > 0
+    initialTotal > 0 || initialBeans.length > 0 || initialFilterOptions.roasteries.length > 0 ||
+    Object.keys(initialState.filters).some((key) => !key.startsWith("sort_"))
   );
   const viewMode = useSyncExternalStore(
     subscribeToViewMode,
@@ -261,8 +274,18 @@ export function ExploreClient({
     roasteries: string[];
     varietals: string[];
   }>(initialFilterOptions);
-  const initialFetch = useRef(!initialLoadError);
-  const appliedSearch = useRef<string | undefined>(undefined);
+  const cachedResults = useRef({
+    filterKey: exploreQuery({ filters: initialState.filters, page: 0 }),
+    beans: initialBeans,
+    total: initialTotal,
+    nextPage: initialLoadError ? 0 : 1,
+  });
+
+  function updateNavigation(next: ExploreNavigationState, replace = false) {
+    const href = exploreHref(locale, next);
+    if (href === `${window.location.pathname}${window.location.search}`) return;
+    window.history[replace ? "replaceState" : "pushState"](null, "", href);
+  }
 
   const changeView = (nextView: ViewMode) => storeViewMode(nextView);
 
@@ -270,75 +293,62 @@ export function ExploreClient({
   useEffect(() => {
     const timer = setTimeout(() => {
       const term = searchInput.trim() || undefined;
-      if (appliedSearch.current === term) return;
-      appliedSearch.current = term;
-      setFilters((prev) => ({ ...prev, search: term }));
-      setPage(0);
+      if (filters.search === term) return;
+      updateNavigation({ filters: { ...filters, search: term }, page: 0 }, true);
     }, 300);
     return () => clearTimeout(timer);
-  }, [searchInput]);
+  }, [searchInput, filterKey, queryKey, locale]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Fetch whenever filters or page change
+  // A restored URL includes all pages previously revealed by “Load more”.
+  // Fetch only missing pages, stopping at the server count even for a large URL page.
   useEffect(() => {
-    // The server component already supplied page zero. Re-fetching it on mount
-    // can race with an immediate search or "load more" interaction.
-    const isServerSeededRequest =
-      page === 0 &&
-      filters.sort_by === "consumed_at" &&
-      filters.sort_order === "desc" &&
-      !filters.origin_country &&
-      !filters.process_method &&
-      !filters.varietal &&
-      !filters.roastery &&
-      !filters.bean_type &&
-      !filters.roast_level &&
-      !filters.search;
-    if (initialFetch.current && isServerSeededRequest) {
-      initialFetch.current = false;
-      return;
-    }
-    initialFetch.current = false;
     let cancelled = false;
+    const requestedFilters = parseExploreQuery(new URLSearchParams(filterKey)).filters;
 
     async function load() {
-      if (page === 0) setLoading(true);
-      else setLoadingMore(true);
-
-      const res = await getBeans({ ...filters, page, limit: PAGE_SIZE });
-      if (cancelled) return;
-
-      if (res.error) {
-        setLoadError(true);
-        setLoading(false);
-        setLoadingMore(false);
-        return;
+      let cache = cachedResults.current;
+      if (cache.filterKey !== filterKey) {
+        cache = { filterKey, beans: [], total: 0, nextPage: 0 };
+      }
+      const needsFetch = cache.nextPage === 0 ||
+        (cache.nextPage <= page && cache.beans.length < cache.total);
+      if (needsFetch) {
+        if (cache.nextPage === 0) setLoading(true);
+        else setLoadingMore(true);
       }
 
-      const fetched = (res.beans ?? []) as BeanWithTags[];
-      setLoadError(false);
-      setBeans((prev) => (page === 0 ? fetched : [...prev, ...fetched]));
-      setTotal(res.count);
-      if (res.count > 0 || fetched.length > 0) setHasJournalEntries(true);
-
-      // Grow filter option pool from everything we've seen
-      setOptionPool((prev) => {
-        const origins = new Set(prev.origins);
-        const roasteries = new Set(prev.roasteries);
-        const varietals = new Set(prev.varietals);
-        fetched.forEach((b) => {
-          if (b.origin_country) origins.add(b.origin_country);
-          if (b.roastery) roasteries.add(b.roastery.trim());
-          for (const varietal of splitVarietals(b.varietal)) {
-            varietals.add(varietal);
-          }
-        });
-        return {
-          origins: [...origins].sort(),
-          roasteries: [...roasteries].sort(),
-          varietals: [...varietals].sort(),
+      while (cache.nextPage <= page &&
+        (cache.nextPage === 0 || cache.beans.length < cache.total)) {
+        const result = await getBeans({ ...requestedFilters, page: cache.nextPage, limit: PAGE_SIZE });
+        if (cancelled) return;
+        if (result.error) throw new Error("Unable to load records");
+        const fetched = (result.beans ?? []) as BeanWithTags[];
+        cache = {
+          filterKey,
+          beans: [...cache.beans, ...fetched],
+          total: result.count,
+          nextPage: cache.nextPage + 1,
         };
+        cachedResults.current = cache;
+        // An empty page must terminate restoration if records changed concurrently.
+        if (fetched.length === 0) break;
+      }
+      if (cancelled) return;
+      setLoadError(false);
+      setBeans(cache.beans.slice(0, (page + 1) * PAGE_SIZE));
+      setTotal(cache.total);
+      if (cache.total > 0) setHasJournalEntries(true);
+      setOptionPool((previous) => {
+        const origins = new Set(previous.origins);
+        const roasteries = new Set(previous.roasteries);
+        const varietals = new Set(previous.varietals);
+        cache.beans.forEach((bean) => {
+          if (bean.origin_country) origins.add(bean.origin_country);
+          if (bean.roastery) roasteries.add(bean.roastery.trim());
+          for (const varietal of splitVarietals(bean.varietal)) varietals.add(varietal);
+        });
+        return { origins: [...origins].sort(), roasteries: [...roasteries].sort(), varietals: [...varietals].sort() };
       });
-
       setLoading(false);
       setLoadingMore(false);
     }
@@ -349,14 +359,22 @@ export function ExploreClient({
       setLoading(false);
       setLoadingMore(false);
     });
-    return () => {
-      cancelled = true;
-    };
-  }, [filters, page, retryKey]);
+    return () => { cancelled = true; };
+  }, [filterKey, page, retryKey]);
+
+  useEffect(() => {
+    if (loading || loadingMore || !/^#bean-[0-9a-f-]{36}$/i.test(window.location.hash)) return;
+    const frame = window.requestAnimationFrame(() => {
+      const card = document.getElementById(window.location.hash.slice(1));
+      if (!card) return;
+      card.scrollIntoView({ block: "start" });
+      card.focus({ preventScroll: true });
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [beans, loading, loadingMore]);
 
   const updateFilter = <K extends keyof BeanFilters>(key: K, value: BeanFilters[K]) => {
-    setFilters((prev) => ({ ...prev, [key]: value }));
-    setPage(0);
+    updateNavigation({ filters: { ...filters, search: searchInput.trim() || undefined, [key]: value }, page: 0 });
   };
 
   const hasActiveFilters = Boolean(
@@ -370,26 +388,22 @@ export function ExploreClient({
   );
   const clearFilters = () => {
     setSearchInput("");
-    setFilters((prev) => ({
-      sort_by: prev.sort_by,
-      sort_order: prev.sort_order,
-    }));
-    setPage(0);
+    updateNavigation({ filters: { sort_by: filters.sort_by, sort_order: filters.sort_order }, page: 0 });
   };
 
   const sortValue =
     filters.sort_by === "overall_score" ? "score" : filters.sort_by === "name" ? "name" : "newest";
 
   const handleSortChange = (value: string) => {
-    setFilters((prev) => ({
-      ...prev,
+    updateNavigation({ filters: {
+      ...filters,
+      search: searchInput.trim() || undefined,
       ...(value === "score"
         ? { sort_by: "overall_score", sort_order: "desc" }
         : value === "name"
           ? { sort_by: "name", sort_order: "asc" }
           : { sort_by: "consumed_at", sort_order: "desc" }),
-    }));
-    setPage(0);
+    }, page: 0 });
   };
 
   // Origin options: presets (localized) + anything extra seen in the data
@@ -502,9 +516,9 @@ export function ExploreClient({
       title={t("title")}
       description={t("description")}
       testId="explore-header"
-      meta={(
+      meta={!loadError && (
         <p role="status" aria-live="polite" className="folio-label">
-          {t("results", { count: total })}
+          {loading ? tCommon("loading") : t("results", { count: total })}
         </p>
       )}
     />
@@ -557,6 +571,7 @@ export function ExploreClient({
             type="search"
             disabled={!hydrated}
             value={searchInput}
+            maxLength={100}
             onChange={(e) => setSearchInput(e.target.value)}
             placeholder={t("searchPlaceholder")}
             aria-label={t("search")}
@@ -616,6 +631,8 @@ export function ExploreClient({
           </svg>
         </div>
       </div>
+
+      <FilterOptionsRecovery initialError={initialFilterOptions.error} onRecovered={setOptionPool} />
 
       {filtersOpen && (
         <div id="explore-filter-panel" className="mt-4 rounded-lg bg-surface-warm p-4">
@@ -765,7 +782,7 @@ export function ExploreClient({
         ) : beans.length === 0 ? (
           <EmptyState hasFilters={hasActiveFilters} onClear={clearFilters} />
         ) : (
-          beans.map((bean) => <BeanCard key={bean.id} bean={bean} view={viewMode} />)
+          beans.map((bean) => <BeanCard key={bean.id} bean={bean} view={viewMode} returnTo={`${exploreHref(locale, navigationState)}#bean-${bean.id}`} />)
         )}
       </div>
 
@@ -776,7 +793,7 @@ export function ExploreClient({
             variant="secondary"
             onClick={() => {
               if (loadError) setRetryKey((key) => key + 1);
-              else setPage((p) => p + 1);
+              else updateNavigation({ filters: { ...filters, search: searchInput.trim() || undefined }, page: (searchInput.trim() || undefined) === filters.search ? page + 1 : 0 });
             }}
             loading={loadingMore}
             disabled={!hydrated}

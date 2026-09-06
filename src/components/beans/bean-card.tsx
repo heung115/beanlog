@@ -7,13 +7,15 @@ import { ScoreDisplay } from "@/components/ui/score-display";
 import { tagDisplayName } from "@/components/beans/tag-input";
 import { findCountryPreset } from "@/data/origin-presets";
 import { cn, formatDate } from "@/lib/utils";
+import { beanDetailHref } from "@/lib/coffee/explore-navigation";
 
 interface BeanCardProps {
   bean: BeanWithTags;
   view?: "grid" | "list";
+  returnTo?: string;
 }
 
-export function BeanCard({ bean, view = "grid" }: BeanCardProps) {
+export function BeanCard({ bean, view = "grid", returnTo }: BeanCardProps) {
   const t = useTranslations("beans");
   const tProcess = useTranslations("process");
   const tRoast = useTranslations("roast");
@@ -32,15 +34,17 @@ export function BeanCard({ bean, view = "grid" }: BeanCardProps) {
 
   return (
     <article
+      id={`bean-${bean.id}`}
+      tabIndex={-1}
       data-bean-card
       data-testid="bean-card"
       data-view={view}
       className={cn(
-        "journal-panel pressable group relative flex flex-col overflow-hidden px-5 py-4 hover:bg-surface-warm md:px-5 md:py-5",
+        "journal-panel pressable group relative flex scroll-mt-32 flex-col overflow-hidden px-5 py-4 hover:bg-surface-warm focus-within:ring-2 focus-within:ring-accent md:px-5 md:py-5",
         view === "grid" ? "min-h-60" : "min-h-0"
       )}
     >
-      <div className="relative z-10 flex h-full flex-1 flex-col">
+      <div className="flex h-full flex-1 flex-col">
         <div className="mb-3 flex items-center justify-end">
           <time className="folio-label" dateTime={bean.consumed_at}>
             {formatDate(bean.consumed_at, locale)}
@@ -51,9 +55,9 @@ export function BeanCard({ bean, view = "grid" }: BeanCardProps) {
           <div className="min-w-0">
             <h3 className="line-clamp-2 font-display text-xl font-bold leading-[1.15] tracking-[-0.025em] text-brown transition-colors duration-150 group-hover:text-accent">
               <Link
-                href={`/${locale}/beans/${bean.id}`}
+                href={beanDetailHref(bean.id, locale, returnTo ?? `/${locale}/explore`)}
                 prefetch={false}
-                className="rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+                className="rounded-sm after:absolute after:inset-0 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
               >
                 {bean.name}
               </Link>
@@ -113,7 +117,7 @@ export function BeanCard({ bean, view = "grid" }: BeanCardProps) {
           <span className="folio-label">
             {bean.place_type === "cafe" ? t("cafe") : t("home")}
           </span>
-          <span aria-hidden="true" className="font-display text-lg text-accent transition-transform group-hover:translate-x-1">→</span>
+          <span aria-hidden="true" className="pointer-events-none font-display text-lg text-accent transition-transform group-hover:translate-x-1">→</span>
         </div>
       </div>
     </article>

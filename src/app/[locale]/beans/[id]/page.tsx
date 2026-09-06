@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import {
@@ -22,6 +22,7 @@ import { chartColors } from "@/config/chart-colors";
 import { cn, formatDate } from "@/lib/utils";
 import { LoadError } from "@/components/ui/load-error";
 import type { BeanWithTags } from "@/types/database";
+import { beanDetailHref, resolveExploreReturnPath } from "@/lib/coffee/explore-navigation";
 
 function InfoRow({
   label,
@@ -87,6 +88,8 @@ export default function BeanDetailPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
   const locale = useLocale();
+  const searchParams = useSearchParams();
+  const returnTo = resolveExploreReturnPath(searchParams.get("returnTo"), locale);
   const toast = useToast();
   const t = useTranslations("beans");
   const tp = useTranslations("process");
@@ -105,6 +108,25 @@ export default function BeanDetailPage() {
   }
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState(false);
+  const deleteTriggerRef = useRef<HTMLButtonElement>(null);
+  const cancelDeleteRef = useRef<HTMLButtonElement>(null);
+  const deletePendingRef = useRef(false);
+
+  useEffect(() => {
+    if (!confirming) return;
+    const frame = window.requestAnimationFrame(() => cancelDeleteRef.current?.focus());
+    return () => window.cancelAnimationFrame(frame);
+  }, [confirming]);
+
+  useEffect(() => {
+    if (deleteError && !deleting) cancelDeleteRef.current?.focus();
+  }, [deleteError, deleting]);
+
+  function closeDeleteConfirmation() {
+    setConfirming(false);
+    window.requestAnimationFrame(() => deleteTriggerRef.current?.focus());
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -125,19 +147,22 @@ export default function BeanDetailPage() {
   }, [params.id, attempt]);
 
   async function handleDelete() {
-    if (!bean) return;
+    if (!bean || deletePendingRef.current) return;
+    deletePendingRef.current = true;
     setDeleting(true);
+    setDeleteError(false);
     try {
       const result = await deleteBean(bean.id);
       if (result?.error) {
-        toast.show(tc("error"));
-        setDeleting(false);
+        setDeleteError(true);
         return;
       }
       toast.show(t("deleted"));
-      router.push(`/${locale}/explore`);
+      router.push(returnTo);
     } catch {
-      toast.show(tc("error"));
+      setDeleteError(true);
+    } finally {
+      deletePendingRef.current = false;
       setDeleting(false);
     }
   }
@@ -163,7 +188,7 @@ export default function BeanDetailPage() {
           </p>
           <p className="mt-2 text-sm text-brown-light">{t("notFoundSub")}</p>
           <Link
-            href={`/${locale}/explore`}
+            href={returnTo}
             prefetch={false}
             className={buttonClassName({ variant: "secondary", className: "mt-6" })}
           >
@@ -224,7 +249,7 @@ export default function BeanDetailPage() {
       {/* Toolbar */}
       <div className="animate-rise mb-6 flex flex-wrap items-center justify-between gap-3">
         <Link
-          href={`/${locale}/explore`}
+          href={returnTo}
           prefetch={false}
           className="group inline-flex items-center gap-1.5 text-sm font-medium text-brown-light transition-colors hover:text-brown"
         >
@@ -247,14 +272,26 @@ export default function BeanDetailPage() {
         </Link>
 
         {confirming ? (
-          <div className="flex flex-wrap items-center gap-2 rounded-sm border border-red-200 bg-red-50 py-1.5 pl-3 pr-1.5">
-            <span className="text-xs font-medium text-red-800">
+          <div
+            role="group"
+            aria-labelledby="delete-record-prompt"
+            aria-busy={deleting}
+            onKeyDown={(event) => {
+              if (event.key === "Escape" && !deletePendingRef.current) {
+                event.preventDefault();
+                closeDeleteConfirmation();
+              }
+            }}
+            className="flex flex-wrap items-center gap-2 rounded-sm border border-red-200 bg-red-50 py-1.5 pl-3 pr-1.5"
+          >
+            <span id="delete-record-prompt" className="text-xs font-medium text-red-800">
               {t("deleteConfirm")}
             </span>
             <Button
+              ref={cancelDeleteRef}
               variant="ghost"
               size="sm"
-              onClick={() => setConfirming(false)}
+              onClick={closeDeleteConfirmation}
               disabled={deleting}
             >
               {tc("cancel")}
@@ -267,21 +304,23 @@ export default function BeanDetailPage() {
             >
               {t("delete")}
             </Button>
+            {deleteError && <p role="alert" className="w-full px-1 pb-2 text-sm leading-6 text-red-800">{t("deleteFailed")}</p>}
           </div>
         ) : (
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => router.push(`/${locale}/beans/${bean.id}/edit`)}
+              onClick={() => router.push(beanDetailHref(bean.id, locale, returnTo, true))}
             >
               {t("edit")}
             </Button>
             <Button
+              ref={deleteTriggerRef}
               variant="ghost"
               size="sm"
               className="text-red-700 hover:bg-red-50 hover:text-red-800"
-              onClick={() => setConfirming(true)}
+              onClick={() => { setDeleteError(false); setConfirming(true); }}
             >
               {t("delete")}
             </Button>

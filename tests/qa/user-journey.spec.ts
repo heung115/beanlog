@@ -47,14 +47,15 @@ for (const locale of ["ko", "en"] as const) {
         await fits(page);
         const save = page.locator('button[type="submit"]:not([name="continue"])');
         await save.click();
-        await expect(page.getByRole("status").filter({ hasText: t.beans.invalidBlend })).toBeVisible();
+        await expect(page.locator("#bean-form-errors")).toHaveAttribute("role", "alert");
+        await expect(page.locator("#bean-form-errors")).toContainText(t.beans.invalidBlend);
         await page.getByLabel(t.beans.componentPercentage, { exact: true }).nth(1).fill("40");
         await page.route("**/*", async (route) => {
           if (route.request().method() === "POST") await route.abort("failed");
           else await route.continue();
         });
         await save.click();
-        await expect(page.getByRole("status").filter({ hasText: t.common.error })).toBeVisible();
+        await expect(page.locator("#bean-form-errors")).toContainText(t.beans.saveFailed);
         await expect(page.locator('[name="name"]')).toHaveValue("블렌드 Blend journey");
         // Measure errors during the simulated outage. WebKit can report a
         // native access-control error for a fetch canceled by a later full
@@ -162,7 +163,9 @@ for (const locale of ["ko", "en"] as const) {
     await login(page, locale);
     const link = page.getByTestId("bean-card").first().locator('h3 a');
     const path = (await link.getAttribute("href"))!;
-    for (const route of [path, `${path}/edit`, `/${locale}/stats`, `/${locale}/settings`]) {
+    const editUrl = new URL(path, page.url());
+    editUrl.pathname += "/edit";
+    for (const route of [path, editUrl.href, `/${locale}/stats`, `/${locale}/settings`]) {
       await page.route("**/*", async (request) => {
         if (request.request().method() === "POST" && request.request().headers()["next-action"]) await request.abort("failed");
         else await request.continue();
@@ -173,9 +176,10 @@ for (const locale of ["ko", "en"] as const) {
       await page.unroute("**/*");
       await page.getByRole("button", { name: t.common.retry, exact: true }).click();
       await expect(page.locator("main").getByRole("alert")).toHaveCount(0);
-      if (route.endsWith("/stats")) await expect(page.getByTestId("stats-summary")).toBeVisible();
-      else if (route.endsWith("/settings")) await expect(page.locator('[name="displayName"]')).toBeEnabled();
-      else if (route.endsWith("/edit")) await expect(page.locator('[name="name"]')).toBeVisible();
+      const pathname = new URL(route, page.url()).pathname;
+      if (pathname.endsWith("/stats")) await expect(page.getByTestId("stats-summary")).toBeVisible();
+      else if (pathname.endsWith("/settings")) await expect(page.locator('[name="displayName"]')).toBeEnabled();
+      else if (pathname.endsWith("/edit")) await expect(page.locator('[name="name"]')).toBeVisible();
       else await expect(page.getByTestId("bean-overall-score")).toBeVisible();
     }
     await page.goto(`/${locale}/beans/${randomUUID()}`);
@@ -267,16 +271,20 @@ for (const locale of ["ko", "en"] as const) {
         await revisit.close();
       }
       await page.reload();
-      await expect(name).toHaveValue("새 이름 New name");
       const next = other === "ko" ? ko : en;
+      await expect(name).toHaveValue("저장하지 않은 이름 Unsaved");
+      await expect(page.getByTestId("record-draft-notice")).toContainText(next.draft.recovered);
+      await page.getByRole("button", { name: next.draft.discard, exact: true }).click();
+      await page.getByRole("button", { name: next.draft.discardYes, exact: true }).click();
+      await expect(name).toHaveValue("새 이름 New name");
       await page.getByRole("button", { name: next.auth.logout, exact: true }).click();
-      await expect(page).toHaveURL(new RegExp(`/${other}/login$`));
+      await expect(page).toHaveURL(new RegExp(`/${other}$`));
       await login(page, other, user);
       await page.goto(`/${other}/settings`);
       await expect(name).toHaveValue("새 이름 New name");
       await page.getByRole("button", { name: next.settings.deleteAccount, exact: true }).click();
       await page.getByRole("dialog").getByRole("button", { name: next.common.confirm, exact: true }).click();
-      await expect(page).toHaveURL(new RegExp(`/${other}/login$`));
+      await expect(page).toHaveURL(new RegExp(`/${other}$`));
       const result = await admin.auth.admin.getUserById(id);
       expect(result.data.user).toBeNull();
     } finally {

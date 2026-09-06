@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
 	"net/http"
 	"sort"
 	"strings"
@@ -466,6 +467,12 @@ func buildBeanRecordPayload(req *models.CreateBeanRequest, sel *originSelection)
 	}
 	components := make([]componentPayload, 0, len(req.BlendComponents))
 	for i, comp := range req.BlendComponents {
+		// numeric(5,2) would silently round extra decimal places. Allow only
+		// float representation noise around exact hundredths before the RPC.
+		scaledPercentage := comp.Percentage * 100
+		if math.Abs(scaledPercentage-math.Round(scaledPercentage)) > 1e-8 {
+			return "", "", "", errors.New("blend percentages must have at most two decimal places")
+		}
 		components = append(components, componentPayload{
 			OriginCountry: comp.OriginCountry, OriginRegion: comp.OriginRegion,
 			OriginSubregions: comp.OriginSubregions, FarmProducer: comp.FarmProducer,
@@ -482,7 +489,7 @@ func buildBeanRecordPayload(req *models.CreateBeanRequest, sel *originSelection)
 }
 
 // Create persists a bean and its dependent rows through the atomic
-// create_bean_record function, so blend validation, RLS, and rollback all live
+// create_bean_record function, so blend totals, RLS, and rollback all live
 // in one database-side unit rather than being re-implemented here.
 func (h *BeanHandler) Create(c *gin.Context) {
 	db := middleware.RequestDB(c)

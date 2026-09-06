@@ -79,7 +79,7 @@ test("protected and high-density links avoid auth prefetch fan-out without losin
     source("src/app/[locale]/beans/[id]/page.tsx")
   );
   const protectedLinks = detailLinks.filter((link) =>
-    /\/explore/.test(link)
+    /\/explore|href=\{returnTo\}/.test(link)
   );
   const publicOriginLinks = detailLinks.filter((link) =>
     /\/origins\//.test(link)

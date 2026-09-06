@@ -1,9 +1,18 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-const { clearAuthCookies, isUnrecoverableRefreshError } = await import(
+const { clearAuthCookies, isUnrecoverableRefreshError, isTemporaryAuthError } = await import(
   "../src/lib/supabase/auth-recovery.ts"
 );
+
+test("rate limits, outages, and network failures require a retry without signing out", () => {
+  for (const error of [{ status: 429 }, { status: 503 }, { status: 0 }, { name: "AuthRetryableFetchError" }, new TypeError("fetch failed"), { code: "over_request_rate_limit" }]) {
+    assert.equal(isTemporaryAuthError(error), true);
+  }
+  for (const error of [null, { name: "AuthSessionMissingError", status: 400 }, { status: 401 }, { code: "refresh_token_not_found" }]) {
+    assert.equal(isTemporaryAuthError(error), false);
+  }
+});
 
 test("missing and already-used refresh tokens require local recovery", () => {
   assert.equal(

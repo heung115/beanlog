@@ -44,6 +44,13 @@ test("only the explicit session-only preference disables persistence", () => {
   assert.equal(shouldPersistSession(SESSION_ONLY_COOKIE_VALUE), false);
 });
 
+test("session-only preferences preserve cookie deletion on sign-out and chunk rotation", () => {
+  for (const lifetime of [{ maxAge: 0 }, { maxAge: -1 }, { expires: new Date(0) }]) {
+    const options = { ...lifetime, httpOnly: true, path: "/", sameSite: "lax", secure: true };
+    assert.deepEqual(applySessionPersistence(options, false), options);
+  }
+});
+
 test("production cookies stay secure except on explicit HTTP loopback URLs", () => {
   assert.equal(
     shouldUseSecureCookies("production", "https://beanmap.site", "1"),

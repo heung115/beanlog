@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
 import {
   flavorCategories,
   flavorPresets,
@@ -18,6 +18,19 @@ export interface TagValue {
 interface TagInputProps {
   value: TagValue[];
   onChange: (tags: TagValue[]) => void;
+  draft: string;
+  "aria-invalid"?: boolean;
+  "aria-describedby"?: string;
+  onDraftChange: (draft: string) => void;
+}
+
+export function tagsWithDraft(value: TagValue[], draft: string): TagValue[] {
+  const text = draft.trim();
+  const normalized = normalizeTag(text);
+  const preset = flavorPresets.find((item) => item.tag === normalized || item.tagKo === text);
+  const tag = preset?.tag ?? text.toLowerCase().replace(/\s+/g, "-");
+  if (!tag || value.some((item) => item.tag === tag)) return value;
+  return [...value, { tag, category: preset?.category ?? "other" }];
 }
 
 /** Locale-aware display name for a stored tag (falls back to the raw tag). */
@@ -31,34 +44,25 @@ function presetLabel(preset: FlavorTag, locale: string): string {
   return locale === "ko" ? preset.tagKo : preset.tag;
 }
 
-export function TagInput({ value, onChange }: TagInputProps) {
+export function TagInput({ value, onChange, draft, onDraftChange, "aria-invalid": ariaInvalid, "aria-describedby": ariaDescribedBy }: TagInputProps) {
   const t = useTranslations("beans");
   const locale = useLocale();
-  const [draft, setDraft] = useState("");
 
   const selectedTags = new Set(value.map((v) => v.tag));
 
   function togglePreset(preset: FlavorTag) {
     if (selectedTags.has(preset.tag)) {
       onChange(value.filter((v) => v.tag !== preset.tag));
-    } else {
+    } else if (value.length < 30) {
       onChange([...value, { tag: preset.tag, category: preset.category }]);
     }
   }
 
   function addCustom() {
-    const tag = normalizeTag(draft);
-    if (!tag) return;
-    setDraft("");
-    if (selectedTags.has(tag)) return;
-
-    const preset = flavorPresets.find((p) => p.tag === tag);
-    onChange([
-      ...value,
-      preset
-        ? { tag: preset.tag, category: preset.category }
-        : { tag, category: "other" },
-    ]);
+    const tags = tagsWithDraft(value, draft);
+    if (tags.length > 30) return;
+    onChange(tags);
+    onDraftChange("");
   }
 
   function removeTag(tag: string) {
@@ -102,23 +106,35 @@ export function TagInput({ value, onChange }: TagInputProps) {
       )}
 
       {/* Custom tag input */}
-      <input
-        type="text"
-        aria-label={t("tastingNotesPlaceholder")}
-        value={draft}
-        onChange={(e) => setDraft(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter" && !e.nativeEvent.isComposing) {
-            e.preventDefault();
-            addCustom();
-          }
-        }}
-        placeholder={t("tastingNotesPlaceholder")}
-        className={cn(
-          "min-h-12 w-full rounded-md border border-border-light bg-surface px-3.5 py-2.5 text-sm text-brown placeholder:text-brown-light/60",
-          "transition-colors duration-150 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15"
-        )}
-      />
+      <div className="flex items-start gap-2">
+        <input
+          type="text"
+          name="tasting_tags_draft"
+          aria-label={t("tastingNotesPlaceholder")}
+          aria-describedby={ariaDescribedBy ? `tasting-tag-hint ${ariaDescribedBy}` : "tasting-tag-hint"}
+          aria-invalid={ariaInvalid}
+          maxLength={50}
+          value={draft}
+          onChange={(e) => onDraftChange(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.nativeEvent.isComposing && e.nativeEvent.keyCode !== 229) {
+              e.preventDefault();
+              addCustom();
+            }
+          }}
+          placeholder={t("tastingNotesPlaceholder")}
+          className={cn(
+            "min-h-12 min-w-0 flex-1 rounded-md border border-border-light bg-surface px-3.5 py-2.5 text-sm text-brown placeholder:text-brown-light/60",
+            "transition-colors duration-150 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15"
+          )}
+        />
+        <Button type="button" variant="secondary" className="shrink-0" onClick={addCustom} disabled={!draft.trim() || value.length >= 30}>
+          {t("addTag")}
+        </Button>
+      </div>
+      <p id="tasting-tag-hint" className="text-xs text-brown-medium">
+        {value.length >= 30 ? t("tagLimit") : t("tagInputHint")}
+      </p>
 
       {/* Flavor wheel presets */}
       <div className="flex flex-col gap-3.5">
@@ -140,6 +156,7 @@ export function TagInput({ value, onChange }: TagInputProps) {
                       key={preset.tag}
                       type="button"
                       onClick={() => togglePreset(preset)}
+                      disabled={!selected && value.length >= 30}
                       aria-pressed={selected}
                       className={cn(
                         "rounded-sm border px-2.5 py-1 text-xs transition-all duration-150",

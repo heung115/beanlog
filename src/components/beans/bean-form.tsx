@@ -1,6 +1,7 @@
 "use client";
 
-import { startTransition, useEffect, useMemo, useState } from "react";
+import { startTransition, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import type { ZodIssue } from "zod";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
@@ -11,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/components/ui/toast";
 import { ScoreSlider } from "@/components/beans/score-slider";
 import { DetailScoreInput } from "@/components/beans/detail-score-input";
-import { TagInput, type TagValue } from "@/components/beans/tag-input";
+import { TagInput, tagsWithDraft, type TagValue } from "@/components/beans/tag-input";
 import { BlendComposer } from "@/components/beans/blend-composer";
 import {
   SubregionInput,
@@ -31,6 +32,12 @@ import {
   getUserOriginSubregions,
 } from "@/lib/actions/origins";
 import { cn } from "@/lib/utils";
+import { beanFormSchema } from "@/lib/validation/beans";
+import { parseRecordDraft, RECORD_DRAFT_PREFIX, recordDraftScope } from "@/lib/coffee/record-draft";
+import { isBeanDraftValue, type BeanDraftValue } from "@/lib/coffee/record-draft-value";
+import { beanDetailHref, resolveExploreReturnPath } from "@/lib/coffee/explore-navigation";
+import { useRecordDraft } from "@/components/beans/use-record-draft";
+import { RecordDraftNotice } from "@/components/beans/record-draft-notice";
 import type {
   BeanFormData,
   BeanType,
@@ -191,7 +198,20 @@ function Segmented<T extends string>({
           type="button"
           role="radio"
           aria-checked={value === option.value}
+          tabIndex={value === option.value ? 0 : -1}
           onClick={() => onChange(option.value)}
+          onKeyDown={(event) => {
+            const index = options.findIndex((item) => item.value === option.value);
+            const next = event.key === "Home" ? 0
+              : event.key === "End" ? options.length - 1
+                : ["ArrowRight", "ArrowDown"].includes(event.key) ? (index + 1) % options.length
+                  : ["ArrowLeft", "ArrowUp"].includes(event.key) ? (index - 1 + options.length) % options.length
+                    : undefined;
+            if (next === undefined) return;
+            event.preventDefault();
+            onChange(options[next].value);
+            event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="radio"]')[next]?.focus();
+          }}
           className={cn(
             "min-h-11 rounded-sm border border-transparent px-3 py-2 text-sm font-semibold transition-all duration-150",
             "focus:outline-none focus-visible:ring-2 focus-visible:ring-accent",
@@ -218,9 +238,11 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 export function BeanForm({
   mode,
   initial,
+  draftOwnerId,
 }: {
   mode: "create" | "edit";
   initial?: BeanWithTags;
+  draftOwnerId?: string;
 }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -231,6 +253,8 @@ export function BeanForm({
   const tr = useTranslations("roast");
   const tc = useTranslations("common");
   const tg = useTranslations("guest");
+  const td = useTranslations("draft");
+  const returnTo = resolveExploreReturnPath(searchParams.get("returnTo"), locale);
   const importingGuestDraft = mode === "create" && searchParams.get("draft") === "1";
 
   const [form, setForm] = useState<BeanFormData>(() =>
@@ -245,7 +269,31 @@ export function BeanForm({
     initial ? hasDetails(beanToForm(initial)) : false
   );
   const [submitting, setSubmitting] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  const errorRef = useRef<HTMLDivElement>(null);
+  const [focusRequest, setFocusRequest] = useState<{ name: string } | null>(null);
+  const focusedRequest = useRef<{ name: string } | null>(null);
+  const [formErrors, setFormErrors] = useState<{ name: string; message: string }[]>([]);
+  const [tagDraft, setTagDraft] = useState("");
   const [guestDraftLoaded, setGuestDraftLoaded] = useState(false);
+  const [draftBaseline, setDraftBaseline] = useState<BeanDraftValue>(() => ({ form, tagDraft: "", showDetails }));
+  const ownerId = draftOwnerId ?? initial?.user_id;
+  const draftScope = recordDraftScope(ownerId ?? "unavailable", mode === "edit" ? initial?.id : undefined);
+  const draftValue = useMemo(() => ({ form, tagDraft, showDetails }), [form, tagDraft, showDetails]);
+  const draftRecovery = useRecordDraft({
+    scope: draftScope,
+    value: draftValue,
+    baselineValue: draftBaseline,
+    sourceVersion: initial?.updated_at ?? null,
+    enabled: Boolean(ownerId),
+    validate: isBeanDraftValue,
+    onRestore: (restored) => {
+      setForm(restored.form);
+      setTagDraft(restored.tagDraft);
+      setShowDetails(restored.showDetails);
+      setFormErrors([]);
+    },
+  });
 
   const isBlend = form.bean_type === "blend";
 
@@ -271,6 +319,10 @@ export function BeanForm({
   useEffect(() => {
     if (!importingGuestDraft) return;
 
+    try {
+      if (parseRecordDraft(sessionStorage.getItem(RECORD_DRAFT_PREFIX + draftScope), isBeanDraftValue)) return;
+    } catch { /* The recovery notice explains browser storage failures. */ }
+
     const draft = loadGuestBeanDraft();
     if (!draft) return;
 
@@ -279,7 +331,7 @@ export function BeanForm({
       setShowDetails(hasDetails(draft.bean));
       setGuestDraftLoaded(true);
     });
-  }, [importingGuestDraft]);
+  }, [draftScope, importingGuestDraft]);
 
   useEffect(() => {
     let active = true;
@@ -546,41 +598,83 @@ export function BeanForm({
     set("blend_components", components);
   }
 
+  function focusField(name: string) {
+    if (name === "tasting_tags_draft" || ["process_detail", "roast_date", "price", "weight_g", "purchased_at"].includes(name)) {
+      setShowDetails(true);
+    }
+    setFocusRequest({ name });
+  }
+
+  useLayoutEffect(() => {
+    if (!focusRequest || focusedRequest.current === focusRequest || submitting) return;
+    // An async save failure can schedule a frame before its error panel has
+    // committed. Focus only after React mounts the target and unlocks the form.
+    const field = formRef.current?.querySelector<HTMLElement>(`[name="${CSS.escape(focusRequest.name)}"]`);
+    const target = field ?? errorRef.current;
+    if (!target) return;
+    target.focus({ preventScroll: true });
+    target.scrollIntoView({ block: "center", behavior: "smooth" });
+    focusedRequest.current = focusRequest;
+  }, [focusRequest, showDetails, submitting]);
+
+  function validationError(issue: ZodIssue) {
+    const key = String(issue.path[0]);
+    const labels: Record<string, string> = {
+      name: t("name"), roastery: t("roastery"), origin_country: t("originCountry"),
+      origin_region: t("originRegion"), origin_subregions: t("originSubregion"),
+      farm_producer: t("farmProducer"), varietal: t("varietal"), process_detail: t("processDetail"),
+      altitude_m: t("altitude"), harvest_year: t("harvestYear"), roast_date: t("roastDate"),
+      consumed_at: t("consumedAt"), cafe_name: t("cafeName"), overall_score: t("overallScore"),
+      note: t("note"), price: t("price"), weight_g: t("weight"), purchased_at: t("purchasedAt"),
+      tags: t("tastingNotes"), blend_components: t("blendComposition"),
+    };
+    const label = labels[key] ?? t("basicInfo");
+    const name = key === "tags" ? "tasting_tags_draft"
+      : key === "blend_components"
+        ? `blend_${issue.path[2] === "origin_country" ? "origin" : issue.path[2] === "origin_region" ? "region" : String(issue.path[2] ?? "origin")}_${String(issue.path[1] ?? 0)}`
+        : key;
+    let message = t("invalidField", { field: label });
+    if (issue.code === "too_small") {
+      message = issue.origin === "string" ? t("requiredField", { field: label })
+        : t("minimumField", { field: label, min: Number(issue.minimum) + (key === "weight_g" && !issue.inclusive ? 1 : 0) });
+      if (key === "blend_components" && issue.path[2] === "percentage") message = t("invalidBlend");
+    } else if (issue.code === "too_big") {
+      message = issue.origin === "string" ? t("textLimitField", { field: label, max: Number(issue.maximum) })
+        : issue.origin === "array" ? t("itemLimitField", { field: label, max: Number(issue.maximum) })
+          : t("maximumField", { field: label, max: Number(issue.maximum) });
+    } else if (issue.code === "custom") {
+      message = key === "blend_components" ? t("invalidBlend") : t("requiredField", { field: label });
+    } else if (issue.code === "invalid_type" && issue.expected === "int") {
+      message = t("integerField", { field: label });
+    } else if (issue.code === "not_multiple_of" && key === "blend_components") {
+      message = t("percentagePrecision");
+    } else if (issue.code === "invalid_format" && ["consumed_at", "roast_date", "purchased_at"].includes(key)) {
+      message = t("dateField", { field: label });
+    }
+    return { name, message };
+  }
+
+  function showFormErrors(errors: { name: string; message: string }[]) {
+    setFormErrors(errors);
+    focusField(errors[0]?.name ?? "");
+  }
+
+  function errorProps(name: string) {
+    return formErrors.some((error) => error.name === name)
+      ? { "aria-invalid": true as const, "aria-describedby": "bean-form-errors" }
+      : {};
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (submitting || draftRecovery.status === "conflict") return;
 
     const submitter = (e.nativeEvent as SubmitEvent).submitter;
     const continueAdding =
       mode === "create" &&
       submitter?.getAttribute("name") === "continue";
 
-    const blendTotal = (form.blend_components ?? []).reduce(
-      (s, c) => s + (c.percentage || 0),
-      0
-    );
-
-    if (!form.name.trim() || !form.roastery.trim() || !form.note.trim()) {
-      toast.show(t("fillRequired"));
-      return;
-    }
-    if (isBlend) {
-      const comps = form.blend_components ?? [];
-      if (
-        comps.length === 0 ||
-        comps.some((c) => !c.origin_country.trim() || !(c.percentage > 0)) ||
-        Math.abs(blendTotal - 100) > 0.01
-      ) {
-        toast.show(t("invalidBlend"));
-        return;
-      }
-    } else if (!form.origin_country?.trim()) {
-      toast.show(t("fillRequired"));
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      const submission: BeanFormData = isBlend
+    const submission: BeanFormData = isBlend
         ? {
             ...form,
             origin_country: "",
@@ -597,31 +691,58 @@ export function BeanForm({
             harvest_year: undefined,
           }
         : { ...form, blend_components: [] };
+    submission.roast_date ||= undefined;
+    submission.purchased_at ||= undefined;
+    submission.cafe_name = form.place_type === "cafe" ? form.cafe_name : undefined;
+    submission.tags = tagsWithDraft(form.tags ?? [], tagDraft);
+
+    const invalidInput = Array.from(formRef.current?.querySelectorAll<HTMLInputElement>('input') ?? [])
+      .find((input) => input.validity.badInput);
+    if (invalidInput) {
+      showFormErrors([{ name: invalidInput.name, message: t("invalidField", { field: invalidInput.labels?.[0]?.textContent ?? invalidInput.getAttribute("aria-label") ?? t("basicInfo") }) }]);
+      return;
+    }
+    const parsed = beanFormSchema.safeParse(submission);
+    if (!parsed.success) {
+      showFormErrors(parsed.error.issues.map(validationError));
+      return;
+    }
+
+    setFormErrors([]);
+    setSubmitting(true);
+    try {
       const result =
         mode === "edit" && initial
-          ? await updateBean(initial.id, submission)
-          : await createBean(submission);
+          ? await updateBean(initial.id, parsed.data)
+          : await createBean(parsed.data);
 
       if (result?.error) {
-        toast.show(tc("error"));
+        showFormErrors([{ name: "", message: t("saveFailed") }]);
         return;
       }
 
       const nextRecents = saveRecentRoastery(form.roastery);
       if (nextRecents) setRecentRoasteries(nextRecents);
       if (importingGuestDraft) clearGuestBeanDraft();
-      toast.show(t("saved"));
       if (continueAdding) {
-        setForm({ ...defaultForm(), roastery: form.roastery });
+        toast.show(t("saved"));
+        const nextForm = { ...defaultForm(), roastery: form.roastery };
+        setDraftBaseline({ form: nextForm, tagDraft: "", showDetails: false });
+        draftRecovery.reset({ form: nextForm, tagDraft: "", showDetails: false });
+        setForm(nextForm);
+        setTagDraft("");
+        setGuestDraftLoaded(false);
         setShowDetails(false);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        focusField("name");
       } else {
+        draftRecovery.reset(draftValue);
+        toast.showAfterNavigation(t("saved"));
         // A fresh document abandons queued origin Server Actions, whose late
         // router-state updates can otherwise restore the saved edit screen.
-        window.location.assign(`/${locale}/explore`);
+        window.location.assign(returnTo);
       }
     } catch {
-      toast.show(tc("error"));
+      showFormErrors([{ name: "", message: t("saveFailed") }]);
     } finally {
       setSubmitting(false);
     }
@@ -634,6 +755,7 @@ export function BeanForm({
       e.key === "Enter" &&
       !e.defaultPrevented &&
       !e.nativeEvent.isComposing &&
+      e.nativeEvent.keyCode !== 229 &&
       e.target instanceof HTMLInputElement
     ) {
       e.preventDefault();
@@ -678,11 +800,22 @@ export function BeanForm({
 
   return (
     <form
+      ref={(node) => {
+        formRef.current = node;
+        // Keep native checks available until the client validation is attached.
+        if (node) node.noValidate = true;
+      }}
       action={mode === "create" ? createBeanFromForm : undefined}
       onSubmit={handleSubmit}
       onKeyDown={handleFormKeyDown}
       className="flex flex-col gap-6"
     >
+      <RecordDraftNotice
+        status={draftRecovery.status}
+        onDiscard={() => { draftRecovery.discard(draftBaseline); focusField("name"); }}
+        onRestore={draftRecovery.restoreConflict}
+        disabled={submitting}
+      />
       {guestDraftLoaded && (
         <p className="journal-panel-quiet px-4 py-3 text-sm leading-6 text-brown-medium">
           {tg("draftLoaded")}
@@ -692,6 +825,19 @@ export function BeanForm({
       <input type="hidden" name="bean_type" value={form.bean_type} />
       <input type="hidden" name="place_type" value={form.place_type} />
       <input type="hidden" name="overall_score" value={form.overall_score} />
+      {formErrors.length > 0 && (
+        <div id="bean-form-errors" ref={errorRef} role="alert" tabIndex={-1} className="rounded-md border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+          <p className="font-semibold">{t("checkFields")}</p>
+          <ul className="mt-2 space-y-1">
+            {formErrors.map((error, index) => (
+              <li key={`${error.name}-${index}`}>
+                {error.name ? <button type="button" onClick={() => focusField(error.name)} className="text-left underline underline-offset-2">{error.message}</button> : error.message}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <fieldset disabled={submitting || draftRecovery.status === "conflict"} aria-busy={submitting} className="contents">
       {/* ── Quick section ─────────────────────────────── */}
       <section className="paper-sheet animate-rise p-5 md:p-8">
         <div className="mb-7 flex items-center justify-between">
@@ -718,6 +864,8 @@ export function BeanForm({
           <Input
             label={req(t("name"))}
             name="name"
+            maxLength={200}
+            {...errorProps("name")}
             value={form.name}
             onChange={(e) => set("name", e.target.value)}
             placeholder={t("namePlaceholder")}
@@ -725,14 +873,24 @@ export function BeanForm({
           />
 
           {/* Roastery with recent autocomplete */}
-          <div className="relative">
+          <div className="relative" onBlur={(event) => {
+            if (!event.currentTarget.contains(event.relatedTarget)) setRoasteryOpen(false);
+          }}>
             <Input
               label={req(t("roastery"))}
               name="roastery"
+              maxLength={200}
+              {...errorProps("roastery")}
               value={form.roastery}
               onChange={(e) => set("roastery", e.target.value)}
               onFocus={() => setRoasteryOpen(true)}
-              onBlur={() => setTimeout(() => setRoasteryOpen(false), 120)}
+              onKeyDown={(event) => {
+                if (event.key === "Escape") setRoasteryOpen(false);
+                if (event.key === "ArrowDown" && roasterySuggestions.length > 0) {
+                  event.preventDefault();
+                  formRef.current?.querySelector<HTMLButtonElement>('[data-roastery-option]')?.focus();
+                }
+              }}
               placeholder={t("roasteryPlaceholder")}
               required
               autoComplete="off"
@@ -743,9 +901,13 @@ export function BeanForm({
                   <li key={r}>
                     <button
                       type="button"
+                      data-roastery-option
                       onMouseDown={(e) => {
                         e.preventDefault();
+                      }}
+                      onClick={() => {
                         set("roastery", r);
+                        formRef.current?.querySelector<HTMLInputElement>('[name="roastery"]')?.focus();
                         setRoasteryOpen(false);
                       }}
                       className="flex w-full items-center gap-2 px-3 py-2.5 text-left text-sm text-brown transition-colors hover:bg-cream-dark"
@@ -775,6 +937,7 @@ export function BeanForm({
               <BlendComposer
                 value={form.blend_components ?? []}
                 onChange={handleBlendChange}
+                errorProps={errorProps}
               />
               {processSelect}
             </div>
@@ -792,6 +955,8 @@ export function BeanForm({
               <Combobox
                 label={req(t("originCountry"))}
                 name="origin_country"
+                maxLength={100}
+                {...errorProps("origin_country")}
                 value={form.origin_country ?? ""}
                 options={countryOptions}
                 showAllOptions
@@ -805,6 +970,8 @@ export function BeanForm({
               <Combobox
                 label={t("originRegion")}
                 name="origin_region"
+                maxLength={100}
+                {...errorProps("origin_region")}
                 value={form.origin_region ?? ""}
                 options={regionOptions}
                 onTextChange={handleRegionChange}
@@ -817,6 +984,8 @@ export function BeanForm({
             </div>
 
             <SubregionInput
+              name="origin_subregions"
+              {...errorProps("origin_subregions")}
               label={t("originSubregion")}
               placeholder={t("originSubregionPlaceholder")}
               value={form.origin_subregions ?? []}
@@ -833,6 +1002,8 @@ export function BeanForm({
             <Combobox
               label={t("farmProducer")}
               name="farm_producer"
+              maxLength={200}
+              {...errorProps("farm_producer")}
               value={form.farm_producer ?? ""}
               options={entityOptions}
               onTextChange={handleEntityText}
@@ -847,6 +1018,8 @@ export function BeanForm({
               <Combobox
                 label={t("varietal")}
                 name="varietal"
+                maxLength={100}
+                {...errorProps("varietal")}
                 value={form.varietal ?? ""}
                 options={varietalOpts}
                 onTextChange={(text) => set("varietal", text)}
@@ -862,6 +1035,10 @@ export function BeanForm({
               <Input
                 label={t("altitude")}
                 name="altitude_m"
+                min={0}
+                max={5000}
+                step={1}
+                {...errorProps("altitude_m")}
                 type="number"
                 inputMode="numeric"
                 value={form.altitude_m ?? ""}
@@ -878,6 +1055,10 @@ export function BeanForm({
               <Input
                 label={t("harvestYear")}
                 name="harvest_year"
+                min={1900}
+                max={2100}
+                step={1}
+                {...errorProps("harvest_year")}
                 type="number"
                 inputMode="numeric"
                 value={form.harvest_year ?? ""}
@@ -953,6 +1134,7 @@ export function BeanForm({
             <Input
               label={req(t("consumedAt"))}
               name="consumed_at"
+              {...errorProps("consumed_at")}
               type="date"
               value={form.consumed_at}
               onChange={(e) => set("consumed_at", e.target.value)}
@@ -971,7 +1153,6 @@ export function BeanForm({
                 setForm((f) => ({
                   ...f,
                   place_type: v,
-                  cafe_name: v === "home" ? undefined : f.cafe_name,
                 }))
               }
               options={[
@@ -986,6 +1167,8 @@ export function BeanForm({
               <Input
                 label={t("cafeName")}
                 name="cafe_name"
+                maxLength={200}
+                {...errorProps("cafe_name")}
                 value={form.cafe_name ?? ""}
                 onChange={(e) => set("cafe_name", e.target.value)}
                 placeholder={t("cafeNamePlaceholder")}
@@ -1011,6 +1194,8 @@ export function BeanForm({
           <Textarea
             label={req(t("note"))}
             name="note"
+            maxLength={2000}
+            {...errorProps("note")}
             rows={3}
             value={form.note}
             onChange={(e) => set("note", e.target.value)}
@@ -1065,6 +1250,8 @@ export function BeanForm({
               <Input
                 label={t("processDetail")}
                 name="process_detail"
+                maxLength={200}
+                {...errorProps("process_detail")}
                 value={form.process_detail ?? ""}
                 onChange={(e) => set("process_detail", e.target.value)}
                 placeholder={t("processDetailPlaceholder")}
@@ -1074,9 +1261,10 @@ export function BeanForm({
               <Input
                 label={t("roastDate")}
                 name="roast_date"
+                {...errorProps("roast_date")}
                 type="date"
                 value={form.roast_date ?? ""}
-                onChange={(e) => set("roast_date", e.target.value)}
+                onChange={(e) => set("roast_date", e.target.value || undefined)}
                 optional
                 optionalLabel={tc("optional")}
               />
@@ -1085,7 +1273,7 @@ export function BeanForm({
             {/* Tasting tags */}
             <div className="mt-8 flex flex-col gap-3">
               <SectionLabel>{t("tastingNotes")}</SectionLabel>
-              <TagInput value={form.tags ?? []} onChange={handleTagsChange} />
+              <TagInput value={form.tags ?? []} onChange={handleTagsChange} draft={tagDraft} onDraftChange={setTagDraft} {...errorProps("tasting_tags_draft")} />
             </div>
 
             {/* Detail scores */}
@@ -1133,6 +1321,7 @@ export function BeanForm({
                 <Input
                   label={t("price")}
                   name="price"
+                  {...errorProps("price")}
                   min={0}
                   max={10000000}
                   type="number"
@@ -1147,6 +1336,10 @@ export function BeanForm({
                 <Input
                   label={t("weight")}
                   name="weight_g"
+                  min={1}
+                  max={100000}
+                  step={1}
+                  {...errorProps("weight_g")}
                   type="number"
                   inputMode="numeric"
                   value={form.weight_g ?? ""}
@@ -1159,9 +1352,10 @@ export function BeanForm({
                 <Input
                   label={t("purchasedAt")}
                   name="purchased_at"
+                  {...errorProps("purchased_at")}
                   type="date"
                   value={form.purchased_at ?? ""}
-                  onChange={(e) => set("purchased_at", e.target.value)}
+                  onChange={(e) => set("purchased_at", e.target.value || undefined)}
                   optional
                   optionalLabel={tc("optional")}
                 />
@@ -1178,7 +1372,10 @@ export function BeanForm({
         <Button
           type="button"
           variant="ghost"
-          onClick={() => router.back()}
+          onClick={() => {
+            if (!draftRecovery.confirmLeave(td("leaveConfirm"))) return;
+            router.push(mode === "edit" && initial ? beanDetailHref(initial.id, locale, returnTo) : returnTo);
+          }}
           disabled={submitting}
         >
           {tc("cancel")}
@@ -1200,6 +1397,7 @@ export function BeanForm({
           {submitting ? t("saving") : t("save")}
         </Button>
       </div>
+      </fieldset>
     </form>
   );
 }

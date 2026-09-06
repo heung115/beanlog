@@ -172,7 +172,9 @@ test("record detail and edit pages avoid split heroes and repeated elevation", a
   });
   await expectNoHorizontalOverflow(page);
 
-  await page.goto(`${href}/edit`);
+  const editUrl = new URL(href, page.url());
+  editUrl.pathname += "/edit";
+  await page.goto(editUrl.href);
   await expectCompactHeader(page.getByRole("heading", { level: 1, name: "기록 수정" }), {
     maxHeight: 180,
   });

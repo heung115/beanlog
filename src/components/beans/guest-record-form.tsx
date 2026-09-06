@@ -1,6 +1,6 @@
 "use client";
 
-import { startTransition, useEffect, useState } from "react";
+import { startTransition, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { Button, buttonClassName } from "@/components/ui/button";
@@ -14,6 +14,10 @@ import {
 } from "@/lib/coffee/guest-draft";
 import type { BeanFormData, ProcessMethod, RoastLevel } from "@/types/database";
 import { formatDate } from "@/lib/utils";
+import { isGuestFormDraft } from "@/lib/coffee/record-draft-value";
+import { parseRecordDraft, RECORD_DRAFT_PREFIX } from "@/lib/coffee/record-draft";
+import { useRecordDraft } from "@/components/beans/use-record-draft";
+import { RecordDraftNotice } from "@/components/beans/record-draft-notice";
 
 function todayString() {
   return new Date().toLocaleDateString("sv");
@@ -45,8 +49,18 @@ export function GuestRecordForm() {
   const [form, setForm] = useState<BeanFormData>(emptyDraft);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
+  const [errorField, setErrorField] = useState<string | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const draftRecovery = useRecordDraft({
+    scope: "guest", value: form, validate: isGuestFormDraft, enabled: !saved,
+    onRestore: (restored) => { setForm(restored); setError(""); setErrorField(null); },
+  });
 
   useEffect(() => {
+    // A newer unfinished edit takes precedence over the explicit signup copy.
+    try {
+      if (parseRecordDraft(sessionStorage.getItem(RECORD_DRAFT_PREFIX + "guest"), isGuestFormDraft)) return;
+    } catch { /* The hook explains unavailable browser storage while editing. */ }
     const draft = loadGuestBeanDraft();
     if (!draft) return;
     startTransition(() => {
@@ -57,11 +71,25 @@ export function GuestRecordForm() {
 
   function set<K extends keyof BeanFormData>(key: K, value: BeanFormData[K]) {
     setForm((current) => ({ ...current, [key]: value }));
+    if (key === errorField) { setErrorField(null); setError(""); }
+  }
+
+  function errorProps(name: string) {
+    return { "aria-invalid": errorField === name || undefined, "aria-describedby": errorField === name ? "guest-form-error" : undefined };
   }
 
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!draftRecovery.ready) return;
     setError("");
+    setErrorField(null);
+    const missing = (["name", "roastery", "origin_country", "note"] as const).find((key) => !form[key]?.trim());
+    if (missing) {
+      setErrorField(missing);
+      setError(tb("requiredField", { field: tb(missing === "origin_country" ? "originCountry" : missing) }));
+      formRef.current?.querySelector<HTMLElement>(`[name="${missing}"]`)?.focus();
+      return;
+    }
 
     const result = saveGuestBeanDraft(form);
     if (result.status === "invalid") {
@@ -74,6 +102,7 @@ export function GuestRecordForm() {
     }
 
     setForm(result.draft.bean);
+    draftRecovery.reset(result.draft.bean);
     setSaved(true);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
@@ -135,11 +164,24 @@ export function GuestRecordForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+    <form ref={formRef} method="post" onSubmit={handleSubmit} className="flex flex-col gap-5">
+      <noscript><p role="alert" className="rounded-md bg-surface-warm p-4 text-sm leading-6 text-brown">{t("javascriptRequired")} <Link href={`/${locale}/login`} className="underline underline-offset-4">{t("loginToKeep")}</Link></p></noscript>
       <p className="max-w-2xl px-1 text-sm leading-6 text-brown-medium">
         {t("storageNotice")}
       </p>
 
+      <RecordDraftNotice
+        status={draftRecovery.status}
+        onDiscard={() => {
+          const savedDraft = loadGuestBeanDraft();
+          draftRecovery.discard(savedDraft?.bean ?? emptyDraft());
+          if (savedDraft) setSaved(true);
+          else formRef.current?.querySelector<HTMLInputElement>('[name="name"]')?.focus();
+        }}
+        onRestore={draftRecovery.restoreConflict}
+      />
+
+      <fieldset disabled={!draftRecovery.ready} className="contents">
       <section className="paper-sheet p-5 md:p-8">
         <div className="mb-7 flex items-center justify-between">
           <p className="journal-kicker">{tb("basicInfo")}</p>
@@ -149,6 +191,7 @@ export function GuestRecordForm() {
           <Input
             label={`${tb("name")} *`}
             name="name"
+            {...errorProps("name")}
             value={form.name}
             onChange={(event) => set("name", event.target.value)}
             placeholder={tb("namePlaceholder")}
@@ -158,6 +201,7 @@ export function GuestRecordForm() {
           <Input
             label={`${tb("roastery")} *`}
             name="roastery"
+            {...errorProps("roastery")}
             value={form.roastery}
             onChange={(event) => set("roastery", event.target.value)}
             placeholder={tb("roasteryPlaceholder")}
@@ -167,6 +211,7 @@ export function GuestRecordForm() {
           <Input
             label={`${tb("originCountry")} *`}
             name="origin_country"
+            {...errorProps("origin_country")}
             value={form.origin_country ?? ""}
             onChange={(event) => set("origin_country", event.target.value)}
             placeholder={tb("originCountryPlaceholder")}
@@ -221,6 +266,7 @@ export function GuestRecordForm() {
               <Textarea
                 label={`${tb("note")} *`}
                 name="note"
+                {...errorProps("note")}
                 value={form.note}
                 onChange={(event) => set("note", event.target.value)}
                 placeholder={tb("notePlaceholder")}
@@ -233,11 +279,12 @@ export function GuestRecordForm() {
         </div>
       </section>
 
-      {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
+      {error && <p id="guest-form-error" role="alert" className="text-sm text-red-700">{error}</p>}
 
       <Button type="submit" size="lg" className="w-full">
         {t("temporarySave")}
       </Button>
+      </fieldset>
     </form>
   );
 }
