@@ -269,6 +269,85 @@ async function openRecognizedText(panel: Locator, label: string) {
   return panel.locator("pre");
 }
 
+async function compactLabelPhoto(page: Page) {
+  const png = await page.evaluate(() => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 640;
+    canvas.height = 800;
+    const context = canvas.getContext("2d")!;
+    for (let x = 0; x < canvas.width; x += 1) {
+      const shade = 150 + Math.floor(x / canvas.width * 50);
+      context.fillStyle = `rgb(${shade}, ${shade}, ${shade})`;
+      context.fillRect(x, 0, 1, canvas.height);
+    }
+    // A compact block of hollow glyphs deterministically creates real crop and full-image passes.
+    // Match the geometry exercised by the image-region tests without relying on installed fonts.
+    for (let line = 0; line < 3; line += 1) {
+      for (let character = 0; character < 30; character += 1) {
+        const left = 120 + character * 12;
+        const top = 400 + line * 34;
+        context.fillStyle = "rgb(75, 75, 75)";
+        context.fillRect(left, top, 8, 14);
+        context.fillStyle = "rgb(185, 185, 185)";
+        context.fillRect(left + 2, top + 2, 4, 10);
+      }
+    }
+    return canvas.toDataURL("image/png").split(",")[1];
+  });
+  return { name: "compact-label-two-views.png", mimeType: "image/png", buffer: Buffer.from(png, "base64") };
+}
+
+for (const mobile of [false, true]) {
+  test(`${mobile ? "@mobile " : ""}ko blend name survives a later scan missing its closing parenthesis`, async ({ page }) => {
+    test.setTimeout(90_000);
+    const t = ko;
+    const label = t.beans.labelImport;
+    const missingParenthesis = requestedBlend.name.slice(0, -1);
+    await withLabelForm(page, "ko", async () => {
+      const ocr = await mockBrowserOcr(page, [
+        { text: requestedBlendText },
+        { text: requestedBlendText.replace(requestedBlend.name, missingParenthesis), deferred: true },
+      ]);
+      await page.getByLabel(label.choose, { exact: true }).setInputFiles(await compactLabelPhoto(page));
+      await expect.poll(async () => (await ocr.snapshot()).reads).toBe(2);
+      const panel = page.getByRole("region", { name: label.sectionTitle, exact: true });
+      const review = page.getByRole("group", { name: label.review, exact: true });
+      const heading = review.getByTestId("label-result-summary").getByRole("heading");
+      const apply = review.getByRole("button", { name: label.apply, exact: true });
+      await expect(panel).toHaveAttribute("aria-busy", "true");
+      await expect(review.getByText(label.partialResult, { exact: true })).toBeVisible();
+      await expect(heading).toHaveText(requestedBlend.name);
+      await expect(apply).toHaveCount(0);
+      await expect(page.locator('[name="name"]')).toHaveValue("");
+      const note = "My note typed while the full photo is still being read";
+      await page.locator('[name="note"]').fill(note);
+      const score = await page.getByRole("slider").inputValue();
+
+      await ocr.release(1);
+      await expect(panel).toHaveAttribute("aria-busy", "false");
+      await expect(heading).toHaveText(requestedBlend.name);
+      await expect(apply).toBeEnabled();
+      const state = await ocr.snapshot();
+      expect(state.reads).toBe(2);
+      expect(state.completions).toBe(2);
+      expect(state.images[0].bytes).not.toEqual(state.images[1].bytes);
+      const raw = await openRecognizedText(panel, label.rawText);
+      const lines = (await raw.innerText()).split("\n");
+      expect(lines).toContain(requestedBlend.name);
+      expect(lines).toContain(missingParenthesis);
+      await ocr.expectBrowserOnly();
+
+      await apply.click();
+      await expect(page.locator('[name="name"]')).toHaveValue(requestedBlend.name);
+      await expect(heading).toHaveText(requestedBlend.name);
+      await expect(page.locator('[name="note"]')).toHaveValue(note);
+      await expect(page.getByRole("slider")).toHaveValue(score);
+      await expect(page.locator('[name="weight_g"]')).toHaveValue("200");
+      await expect(page).toHaveURL(/\/ko\/beans\/new$/u);
+    });
+  });
+}
+
 for (const locale of ["ko", "en"] as const) {
   test(`${locale} manual dependent edits invalidate selected OCR parent fields`, async ({ page }) => {
     const t = locale === "ko" ? ko : en;

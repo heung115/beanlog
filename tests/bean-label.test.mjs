@@ -229,6 +229,23 @@ test("independent OCR views fill missing facts without duplicating lots or resol
   assert.equal(conflict.fields.roastery, "Printed Brand");
 });
 
+test("name readings tolerate missing brackets and OCR spacing while retaining a complete printed source", () => {
+  const name = "Morning Blend (Apple Garden)";
+  const complete = extraction({ name });
+  const truncated = extraction({ name: "Morning Blend (Apple Garden" });
+  const spaced = extraction({ name: "MorningBlend（Apple Garden）" });
+  for (const readings of [[complete, truncated, spaced], [truncated, complete, spaced]]) {
+    const merged = mergeLabelExtractions(readings);
+    assert.equal(merged.fields.name, name);
+    assert.equal(merged.evidence.name, complete.evidence.name);
+  }
+  for (const other of ["Morning Blend (Apple Gardens)", "Morning Blend (Apple Garden 2)", "Morning Blend / Apple Garden"]) {
+    assert.equal(mergeLabelExtractions([complete, extraction({ name: other })]).fields.name, undefined);
+  }
+  // A package weight must still agree exactly across readings.
+  assert.equal(mergeLabelExtractions([extraction({ weight_g: 200 }), extraction({ weight_g: 250 })]).fields.weight_g, undefined);
+});
+
 test("display metadata preserves printed descriptions without changing personal tasting fields", () => {
   const base = extraction({ blend_components: [{ origin_country: "Ethiopia", percentage: 60 }, { origin_country: "Ethiopia", percentage: 40 }] }, "blend");
   const result = mergeLabelExtractions([{ ...base,

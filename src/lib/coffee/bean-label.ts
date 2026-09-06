@@ -195,6 +195,16 @@ function validatedExtraction(extraction: LabelExtraction): LabelExtraction {
   });
 }
 
+function hasCompleteNameBrackets(value: string): boolean {
+  const closing: Record<string, string> = { "(": ")", "[": "]", "{": "}" };
+  const expected: string[] = [];
+  for (const character of value.normalize("NFKC")) {
+    if (closing[character]) expected.push(closing[character]);
+    else if (")]}".includes(character) && expected.pop() !== character) return false;
+  }
+  return expected.length === 0;
+}
+
 /** Independent views may fill missing facts, but conflicting readings stay unselected. */
 export function mergeLabelExtractions(extractions: LabelExtraction[]): LabelExtraction {
   const safe = extractions.map(validatedExtraction);
@@ -204,6 +214,11 @@ export function mergeLabelExtractions(extractions: LabelExtraction[]): LabelExtr
   const textKey = (value: unknown) => JSON.stringify(value).normalize("NFKC").replace(/\s+/gu, " ").toLowerCase();
   const key = (field: LabelField, result: LabelExtraction) => {
     const value = result.fields[field];
+    // A sparse pass can omit a title's closing bracket or spaces. Compare the
+    // same printed letters/digits without erasing an earlier complete reading.
+    if (field === "name" && typeof value === "string") {
+      return value.normalize("NFKC").toLowerCase().replace(/[\s()[\]{}]/gu, "");
+    }
     // Sparse OCR can swap printed lines. Compare lots as a multiset while
     // retaining the preferred block scan's original display order.
     if (field === "blend_components" && Array.isArray(value)) {
@@ -218,7 +233,10 @@ export function mergeLabelExtractions(extractions: LabelExtraction[]): LabelExtr
   for (const field of LABEL_FIELDS) {
     const candidates = safe.filter(result => result.fields[field] !== undefined);
     if (candidates.length && new Set(candidates.map(result => key(field, result))).size === 1) {
-      fields[field] = { value: candidates[0].fields[field], evidence: candidates[0].evidence[field] };
+      const preferred = field === "name"
+        ? candidates.find(result => hasCompleteNameBrackets(result.fields.name!)) ?? candidates[0]
+        : candidates[0];
+      fields[field] = { value: preferred.fields[field], evidence: preferred.evidence[field] };
     }
   }
   const componentKey = (component: unknown) => isRecord(component)

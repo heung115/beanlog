@@ -521,3 +521,47 @@ for (const body of ["Dose: 20g", "Protein: 30g", "Brew recipe\n20g", "Date\n2026
     assert.equal(worker.requests.filter(request => request.action === "recognize").length, 1);
   });
 }
+
+test("a later full scan missing a closing parenthesis preserves the complete partial bean name", async (t) => {
+  const { reader, workers } = harness(t);
+  const completeName = "지에이 블렌드(그린애플쥬스 블렌드)";
+  const component = "Ethiopia Gedeb Chorso 74110, Kurume Washed 60%";
+  // These two views reconstruct the conflicting readings visible in the combined
+  // browser OCR text. A shared composition line is deduplicated in that display.
+  const textView = [completeName, component, "Ethiopie Bursa Main Station 74 158 White Honey 40%"].join("\n");
+  const fullView = ["COFFEE ROASTERS", "FROM. MALIC", "FAVORITE COFFEE", completeName.slice(0, -1),
+    component, "Ethiopie Bursa Main Station 74158 White Honey 40%"].join("\n");
+  const snapshots = [];
+  const read = reader.recognize([{ image, psm: "6", kind: "text" }, { image, psm: "11", kind: "full" }], {
+    ...emptyOptions(), onPartial: result => snapshots.push(result),
+  });
+  const worker = workers[0]; await initialize(worker);
+  await complete(worker, textView);
+  const sparse = await worker.waitFor("setParameters");
+  assert.equal(snapshots.length, 1);
+  assert.equal(snapshots[0].extraction.fields.name, completeName);
+  assert.equal(sparse.payload.params.tessedit_pageseg_mode, "11"); worker.respond(sparse);
+  await complete(worker, fullView);
+  const result = await read;
+  assert.equal(snapshots.length, 2);
+  assert.equal(snapshots[1].extraction.fields.name, completeName);
+  assert.equal(result.extraction.fields.name, completeName);
+  assert.equal(result.extraction.evidence.name, completeName);
+});
+
+test("a full scan with genuinely different name letters remains an unresolved conflict", async (t) => {
+  const { reader, workers } = harness(t);
+  const snapshots = [];
+  const read = reader.recognize([{ image, psm: "6", kind: "text" }, { image, psm: "11", kind: "full" }], {
+    ...emptyOptions(), onPartial: result => snapshots.push(result),
+  });
+  const worker = workers[0]; await initialize(worker);
+  await complete(worker, "Product: 지에이 블렌드(그린애플쥬스 블렌드)");
+  const sparse = await worker.waitFor("setParameters"); worker.respond(sparse);
+  await complete(worker, "Product: Other Blend");
+  const result = await read;
+  assert.equal(snapshots[0].extraction.fields.name, "지에이 블렌드(그린애플쥬스 블렌드)");
+  assert.equal(snapshots[1].extraction.fields.name, undefined);
+  assert.equal(result.extraction.fields.name, undefined);
+  assert.equal(result.extraction.evidence.name, undefined);
+});
