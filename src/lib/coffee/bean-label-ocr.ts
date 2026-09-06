@@ -1,6 +1,6 @@
 "use client";
 
-import { parseBeanLabelText } from "./bean-label-parser.ts";
+import { hasUnreadableLabelWeight, parseBeanLabelText } from "./bean-label-parser.ts";
 import { mergeLabelExtractions, type LabelExtraction } from "./bean-label.ts";
 
 export interface LabelImageVariant {
@@ -17,6 +17,7 @@ export interface LabelReadProgress {
 interface ReadOptions {
   signal: AbortSignal;
   onProgress: (progress: LabelReadProgress) => void;
+  prepareWeightRetry?: () => Promise<Blob>;
 }
 
 interface PendingJob {
@@ -115,8 +116,9 @@ export function createBrowserLabelReader() {
       const currentGeneration = generation;
       let pass = 0;
       let reading = false;
+      const plannedPasses = variants.length + (options.prepareWeightRetry ? 1 : 0);
       progress = value => onProgress(reading
-        ? { phase: "reading", progress: (pass + (value.phase === "reading" ? value.progress : 0)) / variants.length }
+        ? { phase: "reading", progress: (pass + (value.phase === "reading" ? value.progress : 0)) / plannedPasses }
         : value);
       const abort = () => { if (generation === currentGeneration) stop(); };
       const assertCurrent = () => {
@@ -147,27 +149,41 @@ export function createBrowserLabelReader() {
         assertCurrent();
         const texts: string[] = [];
         const extractions: LabelExtraction[] = [];
-        for (pass = 0; pass < variants.length; pass++) {
-          const variant = variants[pass];
-          if (psm !== variant.psm) {
-            await job("setParameters", { params: { tessedit_pageseg_mode: variant.psm, preserve_interword_spaces: "1", user_defined_dpi: "300" } });
+        async function readPixels(image: Blob, mode: string) {
+          if (psm !== mode) {
+            await job("setParameters", { params: { tessedit_pageseg_mode: mode, preserve_interword_spaces: "1", user_defined_dpi: "300" } });
             assertCurrent();
-            psm = variant.psm;
+            psm = mode;
           }
-          const pixels = new Uint8Array(await variant.image.arrayBuffer());
+          const pixels = new Uint8Array(await image.arrayBuffer());
           assertCurrent();
           const result = await job("recognize", { image: pixels, options: {}, output: { text: true } }, [pixels.buffer]);
           assertCurrent();
           if (!result || typeof result !== "object" || !("text" in result) || typeof result.text !== "string") throw new Error("recognition_failed");
-          const text = result.text.slice(0, MAX_TEXT_LENGTH).trim();
+          return result.text.slice(0, MAX_TEXT_LENGTH).trim();
+        }
+        for (pass = 0; pass < variants.length; pass++) {
+          const variant = variants[pass];
+          const text = await readPixels(variant.image, variant.psm);
           texts.push(text);
           extractions.push(parseBeanLabelText(text));
+        }
+        if (options.prepareWeightRetry && extractions.every(result => result.fields.weight_g === undefined)
+          && texts.some(hasUnreadableLabelWeight)) {
+          const enlarged = await options.prepareWeightRetry();
+          assertCurrent();
+          const text = await readPixels(enlarged, "6");
+          texts.push(text);
+          const retry = parseBeanLabelText(text);
+          // Enlarging a unit may damage other glyphs. Only its explicitly read
+          // package weight can supplement the original, never names or origins.
+          extractions.push({ bean_type: "unknown", fields: { weight_g: retry.fields.weight_g }, evidence: { weight_g: retry.evidence.weight_g } });
         }
         // Parse each view independently so repeated scans cannot double blend shares.
         const text = [...new Set(texts.flatMap(value => value.split("\n")).map(line => line.trim()).filter(Boolean))].join("\n").slice(0, MAX_TEXT_LENGTH);
         onProgress({ phase: "reading", progress: 1 });
         assertCurrent();
-        const preferred = extractions.map((extraction, index) => ({ extraction, kind: variants[index].kind }))
+        const preferred = extractions.map((extraction, index) => ({ extraction, kind: variants[index]?.kind }))
           .sort((left, right) => Number(right.kind === "text") - Number(left.kind === "text"));
         return { text, extraction: mergeLabelExtractions(preferred.map(result => result.extraction)) };
       } catch (error) {

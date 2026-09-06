@@ -81,16 +81,10 @@ for (const locale of ["ko", "en"] as const) {
         await expect(page.locator("[name=roastery]")).toHaveValue(expected.roastery);
         await expect(page.locator("[name=note]")).toHaveValue(note);
         await expect(page.getByRole("slider")).toHaveValue("8.5");
-        // A g misread as 0 is deliberately not guessed. The reviewer supplies
-        // that missing optional field from the visible package before saving.
-        const manualFields: string[] = [];
         if (await page.getByRole("button", { name: t.beans.moreDetails, exact: true }).count()) {
           await page.getByRole("button", { name: t.beans.moreDetails, exact: true }).click();
         }
-        if (await page.locator("[name=weight_g]").inputValue() === "") {
-          manualFields.push("weight_g");
-          await page.locator("[name=weight_g]").fill(String(expected.weight_g));
-        }
+        await expect(page.locator("[name=weight_g]")).toHaveValue(String(expected.weight_g));
         const unsaved = await context.newPage();
         try {
           await unsaved.goto(`/${locale}/explore`);
@@ -112,7 +106,7 @@ for (const locale of ["ko", "en"] as const) {
         expect(saved.beans).toHaveLength(1);
         expect(saved.beans[0]).toMatchObject({ ...expected, note, overall_score: 8.5 });
         expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(1);
-        await writeFile(info.outputPath("verification.json"), JSON.stringify({ locale, mobile, elapsedSeconds, requests, expected, manualFields }, null, 2));
+        await writeFile(info.outputPath("verification.json"), JSON.stringify({ locale, mobile, elapsedSeconds, requests, expected }, null, 2));
       } finally {
         await context.setOffline(false);
         const { error } = await admin.auth.admin.deleteUser(id);

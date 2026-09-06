@@ -7,7 +7,7 @@ test("Korean printed labels preserve names and extract only supported facts", ()
   assert.equal(result.bean_type, "single_origin");
   assert.deepEqual(result.fields, {
     name: "봄날의 Guji", roastery: "작은숲 Coffee", origin_country: "Ethiopia", origin_region: "구지",
-    farm_producer: "Halo Beriti", varietal: "Heirloom", process_method: "natural", process_detail: "내추럴",
+    farm_producer: "Halo Beriti", varietal: "Heirloom", process_method: "natural",
     roast_level: "light", roast_date: "2026-08-01", weight_g: 200,
   });
   assert.equal(result.evidence.roast_date, "로스팅일: 2026. 08. 01");
@@ -101,7 +101,7 @@ test("roast dates require their own heading, four digit year, and a real calenda
   for (const input of [
     "2026-08-01", "Best before: 2026-08-01", "Purchase date: 2026-08-01", "Harvest: 2026-08-01", "제조일: 2026-08-01",
     "Roasted: 26.08.01", "Roasted: 08/01", "Roasted: 2026-02-29", "Roasted: 2026-04-31", "Roasted: 2026-13-01",
-    "로스팅일: 별도 표기\n소비기한: 2027-08-01", "Roast date:\n2026-08-01", "Roasted: 2026-08-01 / 2026-08-02",
+    "로스팅일: 별도 표기\n소비기한: 2027-08-01", "Roasted: 2026-08-01 / 2026-08-02",
   ]) assert.equal(parseBeanLabelText(input).fields.roast_date, undefined, input);
   assert.equal(parseBeanLabelText("로스팅 일자: 2024년 2월 29일").fields.roast_date, "2024-02-29");
   assert.equal(parseBeanLabelText("Roast date: 20260801").fields.roast_date, "2026-08-01");
@@ -112,7 +112,7 @@ test("weight units are precise, bounded, and never use doses or recipe water", (
   for (const input of ["1kg", "내용량: 1000 g", "NET: 1 k g"]) assert.equal(parseBeanLabelText(input).fields.weight_g, 1000, input);
   const result = parseBeanLabelText("Net weight: 200g\nDose: 20g / Water: 300g\nRecipe: use 18g coffee and 250g water");
   assert.equal(result.fields.weight_g, 200);
-  for (const input of ["Dose: 20g", "BREW RECIPE\n20g\nWater: 300g", "레시피\n18g\n300g", "18g\nWater: 300g", "1:16", "₩20,000", "900-1200m", "NET: 0g", "NET: -200g", "NET: 200/250g", "NET: 200g x 2", "NET: 200 mg", "NET: 200㎎", "NET: 0.0005kg", "100001g", "NET: 1,000g", "200"]) {
+  for (const input of ["Dose: 20g", "BREW RECIPE\n20g\nWater: 300g", "레시피\n18g\n300g", "18g\nWater: 300g", "1:16", "₩20,000", "900-1200m", "NET: 0g", "NET: -200g", "NET: 200/250g", "NET: 200g x 2", "NET: 200 mg", "NET: 200㎎", "NET: 0.0005kg", "100001g", "200"]) {
     assert.equal(parseBeanLabelText(input).fields.weight_g, undefined, input);
   }
   assert.equal(parseBeanLabelText("RECIPE\n18g\n300g\nNet: 200g").fields.weight_g, 200);
@@ -226,9 +226,42 @@ test("fully printed mixed processing offers an other summary without overriding 
   assert.match(mixed.evidence.process_method, /Ethiopia Washed 60%.*Ethiopia White Honey 40%/u);
   const explicit = parseBeanLabelText(`Process: Natural\n${composition}`);
   assert.equal(explicit.fields.process_method, "natural");
-  assert.equal(explicit.fields.process_detail, "Natural");
+  assert.equal(explicit.fields.process_detail, undefined);
   for (const prefix of ["Process: Washed\nProcess: Natural", "Process: unreadable"])
     assert.equal(parseBeanLabelText(`${prefix}\n${composition}`).fields.process_method, undefined);
   for (const input of ["House Blend\nEthiopia Washed 60%\nEthiopia 40%", "House Blend\nEthiopia Washed 60%\nEthiopia White Honey 30%"])
     assert.equal(parseBeanLabelText(input).fields.process_method, undefined);
+});
+
+test("basic process names do not create a duplicate fermentation detail", () => {
+  for (const value of ["Washed", "Natural", "워시드", "내추럴", "Honey", "허니", "무산소 발효", "Decaf", "디카페인"]) {
+    const result = parseBeanLabelText(`Process: ${value}`);
+    assert.ok(result.fields.process_method, value);
+    assert.equal(result.fields.process_detail, undefined, value);
+  }
+  assert.equal(parseBeanLabelText("Process: White Honey").fields.process_detail, "White Honey");
+  assert.equal(parseBeanLabelText("Process: Anaerobic Natural").fields.process_detail, "Anaerobic Natural");
+  assert.equal(parseBeanLabelText("Process: Natural\nProcessing detail: Sun dried").fields.process_detail, "Sun dried");
+});
+
+test("an explicit heading retains the value printed on the next line", () => {
+  const result = parseBeanLabelText("원두명:\n우일라 워시드\n로스터리:\n테스트 로스터리\n원산지:\n콜롬비아\n로스팅 날짜:\n2026-09-01\n내용량:\n250 g");
+  assert.equal(result.fields.name, "우일라 워시드");
+  assert.equal(result.fields.roastery, "테스트 로스터리");
+  assert.equal(result.fields.origin_country, "Colombia");
+  assert.equal(result.fields.roast_date, "2026-09-01");
+  assert.equal(result.fields.weight_g, 250);
+  assert.match(result.evidence.name, /원두명:.*우일라 워시드/u);
+  assert.equal(parseBeanLabelText("Product:\n\nTest Coffee\n\nRoaster: Named Roastery").fields.name, "Test Coffee");
+  assert.equal(parseBeanLabelText("Product:\nRoaster: Named Roastery").fields.name, undefined);
+  assert.equal(parseBeanLabelText("Product:\n\nUnrelated caption").fields.name, undefined);
+  assert.equal(parseBeanLabelText("Tasting notes:\nNatural").fields.process_method, undefined);
+});
+
+test("clearly grouped package grams are accepted without guessing decimal commas", () => {
+  for (const value of ["1,000 g", "10,000g", "100,000 g"]) {
+    assert.equal(parseBeanLabelText(`Net weight: ${value}`).fields.weight_g, Number(value.replace(/[^\d]/g, "")), value);
+  }
+  for (const value of ["1,00 g", "1,5 kg", "1,000,0 g", "0,250 g", "1,000 kg", "250 0", "2509"])
+    assert.equal(parseBeanLabelText(`Net weight: ${value}`).fields.weight_g, undefined, value);
 });

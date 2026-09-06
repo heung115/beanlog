@@ -114,10 +114,10 @@ function parseBlendComponent(value: string): BlendComponent | undefined {
 }
 
 function parseWeight(value: string): number | undefined {
-  const match = /^(\d+(?:\.\d+)?)\s*(kg|k\s*g|g|㎏|㎎|그램|킬로그램)\.?$/iu.exec(value.trim());
+  const match = /^([1-9]\d{0,2}(?:,\d{3})+|\d+(?:\.\d+)?)\s*(kg|k\s*g|g|㎏|㎎|그램|킬로그램)\.?$/iu.exec(value.trim());
   if (!match || match[2] === "㎎") return undefined;
   const unit = key(match[2]);
-  const grams = Number(match[1]) * (unit === "kg" || unit === "㎏" || unit === "킬로그램" ? 1000 : 1);
+  const grams = Number(match[1].replaceAll(",", "")) * (unit === "kg" || unit === "㎏" || unit === "킬로그램" ? 1000 : 1);
   return Number.isInteger(grams) && grams > 0 && grams <= 100_000 ? grams : undefined;
 }
 
@@ -150,6 +150,15 @@ function parseProcess(value: string): string | undefined {
   return processes.get(key(value.replace(/\s+(?:process(?:ed|ing)?|프로세스)$/iu, "")));
 }
 
+const genericProcessNames = new Set([
+  "washed", "natural", "honey", "anaerobic", "anaerobic fermentation", "carbonic", "carbonic maceration", "decaf", "decaffeinated",
+  "워시드", "수세식", "수세", "내추럴", "네추럴", "건식", "비수세식", "허니", "무산소", "무산소 발효", "카보닉", "카보닉 매서레이션", "탄소 침용", "디카페인",
+].map(key));
+
+function hasSpecificProcessDetail(value: string) {
+  return !genericProcessNames.has(key(value.replace(/\s+(?:process(?:ed|ing)?|프로세스)$/iu, "")));
+}
+
 function segments(line: string): { field: ParserField; value: string }[] {
   const first = firstLabel.exec(line);
   if (!first) return [];
@@ -164,6 +173,12 @@ function segments(line: string): { field: ParserField; value: string }[] {
   }
   found.push({ field, value: line.slice(start).trim() });
   return found;
+}
+
+/** A failed printed weight is eligible for another pixel reading, never a guessed unit. */
+export function hasUnreadableLabelWeight(text: string): boolean {
+  return text.split(/\r?\n/u).some((line) => segments(line.trim())
+    .some(({ field, value }) => field === "weight_g" && /^\d/u.test(value) && parseWeight(value) === undefined));
 }
 
 /** Parse printed facts locally. OCR text is data; no instructions or code in it are executed. */
@@ -214,7 +229,7 @@ export function parseBeanLabelText(text: string): LabelExtraction {
       const method = parseProcess(value);
       if (!method) blocked.add(field);
       add(field, method, evidence);
-      impliedProcessDetails.push({ value, evidence });
+      if (hasSpecificProcessDetail(value)) impliedProcessDetails.push({ value, evidence });
     } else {
       add(field, value, evidence);
     }
@@ -239,13 +254,29 @@ export function parseBeanLabelText(text: string): LabelExtraction {
   }
 
   for (let index = 0; index < lines.length; index += 1) {
-    const line = lines[index];
+    let line = lines[index];
     if (!line) {
       excludedSection = false;
       continue;
     }
     // Evidence must remain a short, readable original line, including OCR spacing.
     if (line.length > 500 || /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2066-\u2069\ufeff]/u.test(line)) continue;
+    // OCR can put a heading on its own line. A single extra OCR blank is
+    // crossed only when the next heading bounds this value as a label column.
+    const heading = segments(line);
+    let valueIndex = index + 1;
+    if (lines[valueIndex] === "") {
+      const nextHeading = lines[valueIndex + 2] || lines[valueIndex + 3] || "";
+      if (firstLabel.test(nextHeading)) valueIndex += 1;
+    }
+    const following = lines[valueIndex] ?? "";
+    if (heading.length === 1 && heading[0].field !== "ignore" && !heading[0].value
+      && following && !firstLabel.test(following) && !recipePattern.test(following) && !nutritionPattern.test(following)
+      && line.length + following.length < 500
+      && !/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2066-\u2069\ufeff]/u.test(following)) {
+      line = `${line} ${following}`;
+      index = valueIndex;
+    }
     // Unlabelled fragments after a heading remain in that heading's value.
     const parts = firstLabel.test(line) ? [line] : line.split(/[|¦;]/u).map((part) => part.trim()).filter(Boolean);
     for (const part of parts) {
@@ -277,7 +308,7 @@ export function parseBeanLabelText(text: string): LabelExtraction {
       if (!recipeNearby) add("weight_g", parseWeight(part), line);
       const method = parseProcess(part);
       add("process_method", method, line);
-      if (method) impliedProcessDetails.push({ value: part, evidence: line });
+      if (method && hasSpecificProcessDetail(part)) impliedProcessDetails.push({ value: part, evidence: line });
       add("roast_level", roastLevels.get(key(part)), line);
       if (!country) standalone.push({ text: part, evidence: line });
     }

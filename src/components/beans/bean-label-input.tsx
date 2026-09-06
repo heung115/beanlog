@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { eligibleLabelFields, LABEL_FIELDS, type LabelExtraction, type LabelField } from "@/lib/coffee/bean-label";
 import { createBrowserLabelReader, type LabelReadProgress } from "@/lib/coffee/bean-label-ocr";
-import { prepareLabelImages } from "@/lib/coffee/bean-label-image";
+import { prepareLabelImages, prepareLabelWeightRetry } from "@/lib/coffee/bean-label-image";
 import type { BeanFormData } from "@/types/database";
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
@@ -159,6 +159,7 @@ export function BeanLabelInput({ form, onApply, disabled = false }: BeanLabelInp
       setPhase("loading");
       const { text, extraction: result } = await reader.recognize(image, {
         signal: controller.signal,
+        prepareWeightRetry: () => prepareLabelWeightRetry(photo.file, controller.signal),
         onProgress: ({ phase: nextPhase, progress: nextProgress }) => {
           if (sequence !== request.current.sequence || controller.signal.aborted) return;
           setPhase(nextPhase);

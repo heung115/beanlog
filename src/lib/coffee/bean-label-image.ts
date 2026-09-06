@@ -143,3 +143,28 @@ export async function prepareLabelImages(image: Blob, signal: AbortSignal): Prom
     URL.revokeObjectURL(url);
   }
 }
+
+/** A bounded second pixel reading for a printed weight whose unit was unreadable. */
+export async function prepareLabelWeightRetry(image: Blob, signal: AbortSignal): Promise<Blob> {
+  signal.throwIfAborted();
+  const url = URL.createObjectURL(image);
+  const picture = new Image();
+  const abort = () => { picture.src = ""; };
+  signal.addEventListener("abort", abort, { once: true });
+  try {
+    picture.src = url;
+    try { await picture.decode(); }
+    catch { signal.throwIfAborted(); throw new Error("invalid_image"); }
+    signal.throwIfAborted();
+    const width = picture.naturalWidth;
+    const height = picture.naturalHeight;
+    if (!width || !height || width * height > 100_000_000) throw new Error("invalid_image");
+    const scale = scaleFor(width, height, 1.5, MAX_FULL_PIXELS);
+    const enlarged = scaledPhoto(picture, { x: 0, y: 0, width, height }, width * scale, height * scale);
+    return await encodeCanvas(enlarged.element, signal);
+  } finally {
+    signal.removeEventListener("abort", abort);
+    picture.src = "";
+    URL.revokeObjectURL(url);
+  }
+}

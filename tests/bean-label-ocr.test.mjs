@@ -345,3 +345,52 @@ for (const action of ["loadLanguage", "recognize"]) {
     await retrySuccessfully(reader, workers);
   });
 }
+
+test("a failed printed weight is reread from pixels without replacing other recognized facts", async (t) => {
+  const { reader, workers } = harness(t);
+  let preparations = 0;
+  const read = reader.recognize(image, { ...emptyOptions(), prepareWeightRetry: async () => { preparations += 1; return image; } });
+  const worker = workers[0]; await initialize(worker);
+  await complete(worker, "Product: Original Coffee\n내용량: 250 0");
+  await complete(worker, "Product: Garbled Alternate\n내용량: 250 g");
+  const result = await read;
+  assert.equal(preparations, 1);
+  assert.equal(result.extraction.fields.name, "Original Coffee");
+  assert.equal(result.extraction.fields.weight_g, 250);
+  assert.equal(result.extraction.evidence.weight_g, "내용량: 250 g");
+  assert.match(result.text, /내용량: 250 0/u);
+  assert.match(result.text, /내용량: 250 g/u);
+});
+
+for (const text of ["Net weight: 250 g", "Product: 250 0", "Product: Test Coffee"]) {
+  test(`weight retry does not run for valid or absent package weights: ${text}`, async (t) => {
+    const { reader, workers } = harness(t);
+    const read = reader.recognize(image, { ...emptyOptions(), prepareWeightRetry: async () => assert.fail("unneeded retry") });
+    await initialize(workers[0]); await complete(workers[0], text); await read;
+    assert.equal(workers[0].requests.filter(r => r.action === "recognize").length, 1);
+  });
+}
+
+test("another unreadable unit remains empty after the weight retry", async (t) => {
+  const { reader, workers } = harness(t);
+  const read = reader.recognize(image, { ...emptyOptions(), prepareWeightRetry: async () => image });
+  await initialize(workers[0]); await complete(workers[0], "내용량: 250 0"); await complete(workers[0], "내용량: 2509");
+  assert.equal((await read).extraction.fields.weight_g, undefined);
+});
+
+test("cancelling a pending weight enlargement cannot publish the earlier partial read", async (t) => {
+  const { reader, workers } = harness(t);
+  const controller = new AbortController();
+  let release;
+  let started;
+  const preparing = new Promise(resolve => { started = resolve; });
+  const read = reader.recognize(image, { signal: controller.signal, onProgress() {}, prepareWeightRetry: () => {
+    started(); return new Promise(resolve => { release = resolve; });
+  } });
+  const rejected = assert.rejects(read, { name: "AbortError" });
+  await initialize(workers[0]); await complete(workers[0], "Product: Original Coffee\n내용량: 250 0");
+  await preparing; controller.abort(); release(image); await rejected;
+  assert.equal(workers[0].requests.filter(r => r.action === "recognize").length, 1);
+  assert.equal(workers[0].terminateCalls, 1);
+  await retrySuccessfully(reader, workers);
+});
