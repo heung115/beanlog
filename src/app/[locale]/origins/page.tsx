@@ -121,11 +121,12 @@ export default async function OriginsPage({ params }: { params: Promise<{ locale
                   return (
                     <li key={preset.country} className="ledger-row">
                       <Link
+                        id={`origin-${originSlug(preset.country)}`}
                         href={`/${locale}/origins/${originSlug(preset.country)}`}
                         prefetch={false}
                         aria-label={t("viewCountry", { country: countryName })}
                         data-origin-row
-                        className="group -mx-2 grid min-h-24 grid-cols-[1.5rem_minmax(0,1fr)_1rem] gap-x-3 rounded-md px-2 py-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent md:grid-cols-[2rem_minmax(8rem,0.7fr)_minmax(0,1.3fr)_6.5rem_1rem] md:items-center md:gap-x-4 md:py-5"
+                        className="group -mx-2 grid min-h-24 scroll-mt-28 grid-cols-[1.5rem_minmax(0,1fr)_1rem] gap-x-3 rounded-md px-2 py-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent md:scroll-mt-44 md:grid-cols-[2rem_minmax(8rem,0.7fr)_minmax(0,1.3fr)_6.5rem_1rem] md:items-center md:gap-x-4 md:py-5"
                       >
                         <span className="folio-label pt-1 md:pt-0">{String(itemIndex + 1).padStart(2, "0")}</span>
                         <span data-origin-name className="min-w-0">

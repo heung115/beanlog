@@ -43,6 +43,34 @@ async function hoverMap(page: Page, map: Locator) {
   await waitForScrollToSettle(page);
 }
 
+for (const viewport of ["desktop", "@mobile"]) {
+  for (const locale of ["ko", "en"]) {
+    test(`${viewport} ${locale} origin finder searches countries and their subregions in both languages`, async ({ page }) => {
+      await login(page);
+      await page.goto(`/${locale}/stats`);
+      await page.getByRole("button", {
+        name: locale === "ko" ? "산지 찾기" : "Find origin",
+        exact: true,
+      }).click();
+      const dialog = page.locator("dialog[open]");
+      const search = dialog.getByRole("searchbox");
+      const countryName = locale === "ko" ? "에티오피아" : "Ethiopia";
+
+      for (const query of ["Ethiopia", "에티오피아", "sIdAmA", "시다마"]) {
+        await search.fill(query);
+        await expect(dialog.getByRole("button", { name: new RegExp(countryName) })).toBeVisible();
+      }
+
+      await dialog.getByRole("button", { name: new RegExp(countryName) }).click();
+      await expect(dialog.getByText(locale === "ko" ? "시다마" : "Sidama", { exact: true })).toBeVisible();
+      await dialog.getByRole("button", { name: locale === "ko" ? "전체" : "All", exact: true }).click();
+      await expect(search).toHaveValue("시다마");
+      await search.fill("no-such-origin");
+      await expect(dialog.getByText(locale === "ko" ? "일치하는 산지가 없습니다" : "No matching origins", { exact: true })).toBeVisible();
+    });
+  }
+}
+
 test("stats origin map stays legible, searchable, and smoothly zoomable", async ({
   page,
 }) => {

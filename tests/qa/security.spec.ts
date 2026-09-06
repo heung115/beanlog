@@ -57,13 +57,14 @@ test("security headers and unauthenticated route protection are enforced", async
         Host: "attacker.example",
         "X-Forwarded-Host": "attacker.example",
         "X-Forwarded-Proto": "https",
+        Cookie: "NEXT_LOCALE=en",
       },
       maxRedirects: 0,
     }
   );
   expect(poisonedCallback.status()).toBeGreaterThanOrEqual(300);
   expect(poisonedCallback.status()).toBeLessThan(400);
-  expect(poisonedCallback.headers().location).toBe(new URL("/login", qaBaseURL).toString());
+  expect(poisonedCallback.headers().location).toBe(new URL("/en/login?authError=failed", qaBaseURL).toString());
 });
 
 test("RLS and table privileges prevent cross-user access and direct writes", async () => {

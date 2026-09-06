@@ -68,6 +68,7 @@ export function OriginInspector({
       [
         entry.nameEn,
         entry.nameKo ?? "",
+        ...entry.regions.flatMap((region) => [region.name, region.nameKo ?? ""]),
         !isOriginPlottable(entry) ? t("unmappedOrigin") : "",
       ]
         .some((name) => name.toLocaleLowerCase(locale).includes(normalized))

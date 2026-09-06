@@ -50,8 +50,7 @@ for (const [theme, colors] of Object.entries(tokens.themeOverrides ?? {})) {
 const sourceRoot = path.join(root, "src");
 const allowedRawColorFiles = new Map([
   ["app/globals.css", "generated design-token declarations and color-mix recipes"],
-  ["app/[locale]/login/page.tsx", "official Google and Kakao brand colors"],
-  ["app/[locale]/signup/page.tsx", "official Google and Kakao brand colors"],
+  ["components/auth/social-sign-in-buttons.tsx", "official Google and Kakao brand colors"],
 ]);
 
 function walk(directory) {

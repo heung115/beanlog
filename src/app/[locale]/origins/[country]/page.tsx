@@ -99,7 +99,7 @@ export default async function OriginDetailPage({
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
       <Link
-        href={`/${locale}/origins`}
+        href={`/${locale}/origins#origin-${canonicalSlug}`}
         className="group inline-flex min-h-11 items-center gap-1.5 text-sm font-medium text-brown-light transition-colors hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
       >
         <svg

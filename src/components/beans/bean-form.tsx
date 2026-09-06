@@ -382,22 +382,11 @@ export function BeanForm({
     setForm((f) => ({
       ...f,
       bean_type: v,
-      // 블렌드로 전환 시 단일 산지 필드 초기화
-      ...(v === "blend"
+      // Keep both sets of inputs while the user compares or corrects the type.
+      // Only the active type's fields are included when saving.
+      ...(v === "blend" && !f.blend_components?.length
         ? {
-            origin_country: "",
-            origin_country_id: undefined,
-            origin_region: undefined,
-            origin_region_id: undefined,
-            origin_subregions: undefined,
-            origin_lat: undefined,
-            origin_lng: undefined,
-            farm_producer: undefined,
-            origin_entity_id: undefined,
-            blend_components:
-              f.blend_components && f.blend_components.length > 0
-                ? f.blend_components
-                : [{ origin_country: "", percentage: 0 }],
+            blend_components: [{ origin_country: "", percentage: 0 }],
           }
         : {}),
     }));
@@ -591,10 +580,27 @@ export function BeanForm({
 
     setSubmitting(true);
     try {
+      const submission: BeanFormData = isBlend
+        ? {
+            ...form,
+            origin_country: "",
+            origin_country_id: undefined,
+            origin_region: undefined,
+            origin_region_id: undefined,
+            origin_subregions: undefined,
+            origin_lat: undefined,
+            origin_lng: undefined,
+            farm_producer: undefined,
+            origin_entity_id: undefined,
+            varietal: undefined,
+            altitude_m: undefined,
+            harvest_year: undefined,
+          }
+        : { ...form, blend_components: [] };
       const result =
         mode === "edit" && initial
-          ? await updateBean(initial.id, form)
-          : await createBean(form);
+          ? await updateBean(initial.id, submission)
+          : await createBean(submission);
 
       if (result?.error) {
         toast.show(tc("error"));

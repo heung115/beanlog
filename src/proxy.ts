@@ -5,6 +5,7 @@ import {
 } from "@/lib/supabase/middleware";
 import createIntlMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
+import { getOAuthFailureKind, resolveAuthFailurePath } from "@/lib/security/redirect";
 
 const intlMiddleware = createIntlMiddleware(routing);
 
@@ -20,6 +21,21 @@ export async function proxy(request: NextRequest) {
       status: 405,
       headers: { Allow: "GET, HEAD, POST" },
     });
+  }
+
+  // Expired provider state can return to SITE_URL instead of our callback.
+  // Give the user a clean retry screen rather than silently showing the home page.
+  const home = request.nextUrl.pathname.match(/^\/(?:(ko|en)\/?)?$/);
+  if (request.method === "GET" && home && request.nextUrl.searchParams.has("error")) {
+    const query = request.nextUrl.searchParams;
+    const retry = resolveAuthFailurePath(
+      query.get("next"),
+      getOAuthFailureKind(query.get("error"), query.get("error_code")),
+      home[1] ?? request.cookies.get("NEXT_LOCALE")?.value
+    );
+    const response = NextResponse.redirect(new URL(retry, request.url));
+    response.headers.set("Cache-Control", "no-store");
+    return response;
   }
 
   const response = await updateSession(request);

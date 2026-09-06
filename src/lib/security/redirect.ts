@@ -12,6 +12,23 @@ export function resolvePostAuthPath(value: unknown): string {
     : "/explore";
 }
 
+export type OAuthFailureKind = "expired" | "cancelled" | "failed";
+
+export function getOAuthFailureKind(error: string | null, code: string | null): OAuthFailureKind {
+  if (["bad_oauth_state", "flow_state_expired", "flow_state_not_found"].includes(code ?? "")) return "expired";
+  return error === "access_denied" ? "cancelled" : "failed";
+}
+
+/** Keep retries localized and never reflect provider descriptions or external destinations. */
+export function resolveAuthFailurePath(next: unknown, kind: OAuthFailureKind, preferredLocale?: string): string {
+  const destination = resolvePostAuthPath(next);
+  const locale = destination.match(/^\/(ko|en)\//)?.[1]
+    ?? (preferredLocale === "ko" || preferredLocale === "en" ? preferredLocale : undefined);
+  const query = new URLSearchParams({ authError: kind });
+  if (destination !== "/explore") query.set("next", destination);
+  return `${locale ? `/${locale}` : ""}/login?${query}`;
+}
+
 function trustedOrigin(configuredAppUrl: string): string {
   try {
     const url = new URL(configuredAppUrl);
