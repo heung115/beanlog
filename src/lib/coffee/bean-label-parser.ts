@@ -42,15 +42,24 @@ const nutritionPattern = /\b(?:nutrition(?:al)?|per serving|protein|fat|sodium|c
 const knownNotes = new Set([
   ...flavorPresets.flatMap((flavor) => [flavor.tag.replaceAll("-", " "), flavor.tagKo]),
   "green apple", "red apple", "yellow apple", "candy", "sugar", "nuts", "black tea", "milk chocolate",
-  "청사과", "풋사과", "빨간사과", "적사과", "캔디", "사탕", "블랙티", "밀크초콜릿", "견과류",
+  "berry", "berries", "white chocolate", "청사과", "풋사과", "빨간사과", "적사과", "캔디", "사탕", "블랙티", "밀크초콜릿", "견과류",
 ].map(key));
 const trailingWeight = /(?:^|\s)([1-9]\d{0,2}(?:,\d{3})+\s*(?:kg|g|그램)|\d+(?:\.\d+)?\s*(?:kg|k\s*g|g|㎏|그램|킬로그램))\.?$/iu;
 
 function noteTokens(value: string): string[] {
-  return value.split(/[,，;；|¦•·/]+|\s+[&+]\s+|\.\s+/u).map((note) => note.trim())
+  return value.split(/[,，;；|¦•·/]+|\s+(?:and|[&+])\s+|\.\s+/iu).map((note) => note.trim())
     .filter((note) => note.length <= 80 && /^[\p{L}][\p{L}\s'’()\-]*$/u.test(note)
       && (/[가-힣]/u.test(note) || note.replace(/[^a-z]/giu, "").length >= 2)
       && note.split(/\s+/u).length <= 6);
+}
+
+function isFlavorPhrase(value: string): boolean {
+  if (knownNotes.has(key(value))) return true;
+  // Descriptive words classify a printed flavor phrase; the stored wording is
+  // untouched. They cannot turn a full marketing sentence into a flavor list.
+  const flavor = value.replace(/^(?:sweet|creamy|ripe|dried|juicy|fresh|tart)\s+/iu, "")
+    .replace(/\s+(?:juice|jam|mousse)$/iu, "");
+  return knownNotes.has(key(flavor));
 }
 
 function key(value: string): string {
@@ -62,6 +71,9 @@ const countries = originPresets.map((preset) => ({
   aliases: [preset.country, preset.countryKo],
   patterns: [preset.country, preset.countryKo].map((alias) => new RegExp(`(?<![\\p{L}\\p{N}])${spaced(alias)}(?![\\p{L}\\p{N}])`, "giu")),
 }));
+const originPlaceNames = new Set(originPresets.flatMap((preset) => [
+  preset.country, preset.countryKo, ...preset.regions.flatMap((region) => [region.name, region.nameKo]),
+]).map(key));
 
 function countriesIn(value: string) {
   return countries.filter(({ patterns }) => patterns.some((pattern) => {
@@ -128,7 +140,7 @@ function parseBlendComponent(value: string): BlendComponent | undefined {
 }
 
 function parseWeight(value: string): number | undefined {
-  const match = /^([1-9]\d{0,2}(?:,\d{3})+|\d+(?:\.\d+)?)\s*(kg|k\s*g|g|㎏|㎎|그램|킬로그램)\.?$/iu.exec(value.trim());
+  const match = /^([1-9]\d{0,2}(?:,\d{3})+|\d+(?:\.\d+)?)\s*(kg|k\s*g|g|㎏|㎎|그램|킬로그램)\.?(?:\s+NET)?$/iu.exec(value.trim());
   if (!match || match[2] === "㎎") return undefined;
   const unit = key(match[2]);
   const grams = Number(match[1].replaceAll(",", "")) * (unit === "kg" || unit === "㎏" || unit === "킬로그램" ? 1000 : 1);
@@ -147,7 +159,7 @@ const processAliases: Record<string, string[]> = {
   honey: ["honey", "black honey", "red honey", "yellow honey", "white honey", "허니", "블랙 허니", "레드 허니", "옐로우 허니", "화이트 허니"],
   anaerobic: ["anaerobic", "anaerobic fermentation", "anaerobic natural", "anaerobic washed", "무산소", "무산소 발효", "무산소 내추럴", "무산소 워시드"],
   carbonic: ["carbonic", "carbonic maceration", "카보닉", "카보닉 매서레이션", "탄소 침용"],
-  decaf: ["decaf", "decaffeinated", "swiss water decaf", "sugarcane decaf", "디카페인"],
+  decaf: ["decaf", "decaffeinated", "decaf coffee", "decaffeinated coffee", "swiss water decaf", "sugarcane decaf", "디카페인", "디카페인 커피"],
 };
 const processes = new Map(Object.entries(processAliases).flatMap(([method, aliases]) => aliases.map((alias) => [key(alias), method])));
 const componentProcessPattern = Object.values(processAliases).flat().sort((left, right) => right.length - left.length).map(spaced).join("|");
@@ -165,7 +177,7 @@ function parseProcess(value: string): string | undefined {
 }
 
 const genericProcessNames = new Set([
-  "washed", "natural", "honey", "anaerobic", "anaerobic fermentation", "carbonic", "carbonic maceration", "decaf", "decaffeinated",
+  "washed", "natural", "honey", "anaerobic", "anaerobic fermentation", "carbonic", "carbonic maceration", "decaf", "decaffeinated", "decaf coffee", "decaffeinated coffee", "디카페인 커피",
   "워시드", "수세식", "수세", "내추럴", "네추럴", "건식", "비수세식", "허니", "무산소", "무산소 발효", "카보닉", "카보닉 매서레이션", "탄소 침용", "디카페인",
 ].map(key));
 
@@ -199,7 +211,7 @@ export function hasUnreadableLabelWeight(text: string): boolean {
 export function parseBeanLabelText(text: string): LabelExtraction {
   const candidates = new Map<LabelField, Map<string, Candidate>>();
   const blocked = new Set<LabelField>();
-  const standalone: { text: string; evidence: string }[] = [];
+  const standalone: { text: string; evidence: string; lineIndex: number }[] = [];
   const impliedProcessDetails: Candidate[] = [];
   const componentRows: { value: BlendComponent; evidence: string; printedText: string }[] = [];
   const tastingNotes: { en: string[]; ko: string[] } = { en: [], ko: [] };
@@ -329,8 +341,23 @@ export function parseBeanLabelText(text: string): LabelExtraction {
       add("process_method", method, line);
       if (method && hasSpecificProcessDetail(part)) impliedProcessDetails.push({ value: part, evidence: line });
       add("roast_level", roastLevels.get(key(part)), line);
-      if (!country) standalone.push({ text: part, evidence: line });
+      if (!country) standalone.push({ text: part, evidence: line, lineIndex: index });
     }
+  }
+
+  const columnShares = standalone.flatMap(item => {
+    const match = /^(\d+(?:\.\d+)?)\s*%\s+\p{L}/u.exec(item.text);
+    const share = match ? Number(match[1]) : 0;
+    return share > 0 && share < 100 && !/\b(?:off|discount|sale)\b|할인/iu.test(item.text) ? [share] : [];
+  });
+  if (columnShares.length >= 2 && columnShares.length <= 10 && columnShares.reduce((sum, value) => sum + value, 0) <= 100
+    && (candidates.has("origin_country") || standalone.some(item => countriesIn(item.text).length > 0))
+    && candidates.has("process_method")) {
+    blend = true;
+    // In a column layout each processing label belongs to one lot. A readable
+    // first lot cannot establish a processing method for the entire blend.
+    blocked.add("process_method");
+    blocked.add("process_detail");
   }
 
   if (componentRows.length > 0) {
@@ -345,25 +372,48 @@ export function parseBeanLabelText(text: string): LabelExtraction {
     if (titles.length === 1) {
       const title = titles[0];
       if (!candidates.has("name")) add("name", title.text, title.evidence);
-      const titleIndex = lines.indexOf(title.evidence);
-      const context = lines.slice(0, titleIndex).filter(Boolean).slice(-5);
-      const descriptor = /^(?:(.+?)\s+)?(coffee\s+roasters?|커피\s*로스터스)$/iu;
-      const brandReadable = (brand: string) => Boolean(brand && brand.length <= 80 && !firstLabel.test(brand) && countriesIn(brand).length === 0
-        && !blendPattern.test(brand) && /^[\p{L}\p{N} .&'’\-]+$/u.test(brand));
-      const fromMarks = context.map((line) => ({ line, match: /^from[.：:\-\s]+(.+)$/iu.exec(line) }))
-        .filter((item) => item.match && brandReadable(item.match[1]) && !/[a-z]/u.test(item.match[1])
-          && !/^(?:our|the|your|their|a|an|fresh|selected|local|best|farms?|farmers|source|origin|beans?)\b/iu.test(item.match[1]));
-      const coffeeContext = context.filter((line) => /\bcoffee\b|커피/iu.test(line));
-      if (fromMarks.length && (coffeeContext.length >= 2 || context.some((line) => descriptor.test(line)))) {
-        for (const item of fromMarks) add("roastery", item.match![1], [...coffeeContext, item.line].join(" / "));
-      }
-      for (let index = 0; !fromMarks.length && index < context.length; index += 1) {
-        const wordmark = descriptor.exec(context[index]);
-        if (!wordmark) continue;
-        const brand = wordmark[1] ?? context[index - 1] ?? "";
-        if (!brandReadable(brand)) continue;
-        const evidence = wordmark[1] ? context[index] : `${brand} / ${context[index]}`;
-        add("roastery", brand, evidence);
+    }
+  }
+
+  // A printed roaster descriptor identifies its brand independently of whether
+  // the product is a blend. Excluded sections never enter the standalone list.
+  if (!candidates.has("roastery")) {
+    const descriptor = /^(?:(.+?)\s+)?(coffee\s+roasters?|커피\s*로스터스)$/iu;
+    const brandReadable = (brand: string) => Boolean(brand && brand.length <= 80 && !firstLabel.test(brand)
+      && countriesIn(brand).length === 0 && !originPlaceNames.has(key(brand))
+      && !blendPattern.test(brand) && !singlePattern.test(brand) && !parseProcess(brand)
+      && !roastLevels.has(key(brand)) && parseWeight(brand) === undefined && !/^from(?:\b|[.：:\-])/iu.test(brand)
+      && !/\b(?:finca|hacienda|farms?|farmers?|source|origin|station|estate|cooperative|region|province|city|village|district|street|avenue|road|address)\b|농장|생산지|산지|주소/iu.test(brand)
+      && !brand.split(/[\s.&'’\-]+/u).every(word => /^(?:coffee|coffees|specialty|roaster|roasters|roastery|company|co|cafe|beans?|커피|스페셜티|로스터스)$/iu.test(word))
+      && ![...(candidates.get("name")?.values() ?? [])].some(candidate => typeof candidate.value === "string" && key(candidate.value) === key(brand))
+      && /\p{L}/u.test(brand) && /^[\p{L}\p{N} .&'’\-]+$/u.test(brand));
+    for (let index = 0; index < standalone.length; index += 1) {
+      const item = standalone[index];
+      const wordmark = descriptor.exec(item.text);
+      if (!wordmark) continue;
+      const previous = standalone[index - 1];
+      const adjacent = previous && previous.lineIndex < item.lineIndex
+        && lines.slice(previous.lineIndex + 1, item.lineIndex).every((line) => !line);
+      const brand = wordmark[1] ?? (adjacent ? previous.text : "");
+      if (!brandReadable(brand)) continue;
+      add("roastery", brand, wordmark[1] ? item.evidence : `${previous.evidence} / ${item.evidence}`);
+    }
+
+    // FROM is weaker evidence than an explicit wordmark. Require a nearby named
+    // product, printed composition and coffee text; source places stay excluded.
+    const name = candidates.get("name");
+    if (!candidates.has("roastery") && name?.size === 1 && componentRows.length > 0) {
+      const titleIndex = lines.indexOf([...name.values()][0].evidence);
+      const context = standalone.filter((item) => item.lineIndex < titleIndex).slice(-5);
+      const coffeeContext = context.filter((item) => /\bcoffee\b|커피/iu.test(item.text));
+      if (titleIndex >= 0 && coffeeContext.length > 0) {
+        for (const item of context) {
+          const mark = /^from[.：:\-\s]+(.+)$/iu.exec(item.text);
+          if (!mark || !brandReadable(mark[1]) || /[a-z]/u.test(mark[1])
+            || /^(?:our|the|your|their|a|an|fresh|selected|local|best|beans?)\b/iu.test(mark[1])
+            || /\b(?:farms?|farmers?|source|origin|station|estate|cooperative|region|province|city|village|district)\b|농장|생산지|산지/iu.test(mark[1])) continue;
+          add("roastery", mark[1], [...coffeeContext.map((entry) => entry.evidence), item.evidence].join(" / "));
+        }
       }
     }
   }
@@ -378,7 +428,7 @@ export function parseBeanLabelText(text: string): LabelExtraction {
       // A Korean list can contain Latin OCR noise. Its Korean vocabulary is
       // evidence only for Korean notes, not for unrelated Latin fragments.
       const anchored = (language: "en" | "ko") => tokens.filter(note => (/[가-힣]/u.test(note) ? "ko" : "en") === language)
-        .filter(note => knownNotes.has(key(note))).length >= 2;
+        .filter(isFlavorPhrase).length >= 2;
       const en = anchored("en");
       const ko = anchored("ko");
       tokens = tokens.filter(note => /[가-힣]/u.test(note) ? ko : en);
@@ -420,7 +470,23 @@ export function parseBeanLabelText(text: string): LabelExtraction {
       notesSection = false;
       continue;
     }
-    if (!readNotes(line, line, notesSection)) notesSection = false;
+    let noteLine = line;
+    let noteEvidence = line;
+    // A trailing list separator can wrap a printed cup-note list across OCR
+    // blocks. Join only another list, never an unrelated following heading.
+    if (/[,，;；|¦/]+\s*$/u.test(line)) {
+      let next = index + 1;
+      while (next < lines.length && !lines[next] && next <= index + 3) next++;
+      const continuation = lines[next] ?? "";
+      if (next <= index + 3 && /[,，;；|¦/]/u.test(continuation) && !segments(continuation).length
+        && !recipePattern.test(continuation) && !nutritionPattern.test(continuation)
+        && noteTokens(continuation).length >= 2 && !/[:：=%\d]/u.test(continuation)) {
+        noteLine += ` ${continuation}`;
+        noteEvidence += `\n${continuation}`;
+        index = next;
+      }
+    }
+    if (!readNotes(noteLine, noteEvidence, notesSection)) notesSection = false;
   }
 
   const origin = candidates.get("origin_country");

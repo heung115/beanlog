@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { eligibleLabelFields, LABEL_FIELDS, type LabelExtraction, type LabelField } from "@/lib/coffee/bean-label";
 import { createBrowserLabelReader, type LabelReadProgress } from "@/lib/coffee/bean-label-ocr";
 import { prepareLabelImages, prepareLabelWeightRetry } from "@/lib/coffee/bean-label-image";
+import { prepareLabelDetailRetries } from "@/lib/coffee/bean-label-detail-image";
 import type { BeanFormData } from "@/types/database";
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024;
@@ -195,6 +196,7 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
       const { text, extraction: result } = await reader.recognize(image, {
         signal: controller.signal,
         prepareWeightRetry: () => prepareLabelWeightRetry(selectedPhoto.file, controller.signal),
+        prepareDetailRetries: options => prepareLabelDetailRetries(selectedPhoto.file, controller.signal, options),
         onPartial: ({ text: partialText, extraction: partialExtraction }) => {
           if (sequence !== request.current.sequence || controller.signal.aborted) return;
           // A retry only replaces a completed review after it succeeds. Its

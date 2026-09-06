@@ -648,7 +648,11 @@ for (const scenario of [
     await withLabelForm(page, scenario.locale, async () => {
       const reply = scenario.outcome === "failure" ? { error: "QA rescan failure", deferred: true }
         : { text: scenario.outcome === "no_fields" ? "" : "Product: Late cancelled coffee", deferred: true };
-      const ocr = await mockBrowserOcr(page, [{ text: retainedLabelText }, reply], scenario.outcome === "cancel");
+      // After the deferred empty first pass, optional native/contrast rereads
+      // must also complete empty so this exercises exhaustion of the real reader.
+      const ocr = await mockBrowserOcr(page, [{ text: retainedLabelText }, reply,
+        ...(scenario.outcome === "no_fields" ? [{ text: "" }] : []),
+      ], scenario.outcome === "cancel");
       await page.getByLabel(label.choose, { exact: true }).setInputFiles(photo);
       const panel = page.getByRole("region", { name: label.sectionTitle, exact: true });
       const review = page.getByRole("group", { name: label.review, exact: true });
@@ -684,6 +688,7 @@ for (const scenario of [
         await ocr.release(1);
         const expectedError = scenario.outcome === "failure" ? label.errors.recognition_failed : label.errors.no_fields;
         await expect(panel.getByRole("status")).toHaveText(expectedError);
+        if (scenario.outcome === "no_fields") expect((await ocr.snapshot()).reads).toBeGreaterThanOrEqual(4);
       }
       await expect(panel).toHaveAttribute("aria-busy", "false");
       await expect(review.getByText(label.previousResult, { exact: true })).toBeVisible();

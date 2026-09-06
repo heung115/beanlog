@@ -2,6 +2,49 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { parseBeanLabelText } from "../src/lib/coffee/bean-label-parser.ts";
 
+test("source estates, street addresses and generic coffee headings are not roaster wordmarks", () => {
+  for (const text of [
+    "COFFEE\nFROM FINCA EL PARAISO\nMorning Blend\nColombia 60%\nBrazil 40%",
+    "COFFEE\nFROM HACIENDA LA ESMERALDA\nMorning Blend\nColombia 60%\nBrazil 40%",
+    "Farm address:\n123 BEAN STREET\nCoffee Roasters\nProduct: Morning Coffee\n250g",
+    "COFFEE\nCOFFEE ROASTERS\n250g",
+    "SPECIALTY COFFEE\nCOFFEE ROASTERS\nCountry: Ethiopia\n250g",
+    "Product: Morning Coffee\nMorning Coffee\nCoffee Roasters\nCountry: Ethiopia",
+  ]) assert.equal(parseBeanLabelText(text).fields.roastery, undefined, text);
+});
+
+test("a printed decaffeinated coffee designation supplies processing without inventing an origin", () => {
+  for (const text of ["DECAFFEINATED COFFEE", "Decaf Coffee", "디카페인 커피"]) {
+    const result = parseBeanLabelText(text);
+    assert.equal(result.fields.process_method, "decaf");
+    assert.equal(result.fields.origin_country, undefined);
+    assert.equal(result.fields.roastery, undefined);
+  }
+});
+
+test("printed flavor phrases retain their adjectives and are kept separate from product names and marketing", () => {
+  const result = parseBeanLabelText("Product: Test Coffee\nSweet berries and creamy white chocolate\n200g");
+  assert.deepEqual(result.tasting_notes.en, ["Sweet berries", "creamy white chocolate"]);
+  assert.equal(result.fields.name, "Test Coffee");
+  assert.deepEqual(parseBeanLabelText("Ripe peach / Chocolate mousse / Caramel").tasting_notes.en, ["Ripe peach", "Chocolate mousse", "Caramel"]);
+  for (const source of ["Product: Sweet berries and creamy white chocolate", "Enjoy our sweet berries and creamy white chocolate", "Ingredients: Sweet berries and creamy white chocolate"])
+    assert.equal(parseBeanLabelText(source).tasting_notes, undefined, source);
+});
+
+test("a visibly wrapped flavor list spans OCR blocks without swallowing following metadata", () => {
+  const result = parseBeanLabelText("CHERRY / CHOCOLATE MOUSSE /\n\nCARAMEL / SMOOTH\n\n350G NET");
+  assert.deepEqual(result.tasting_notes.en, ["CHERRY", "CHOCOLATE MOUSSE", "CARAMEL", "SMOOTH"]);
+  assert.equal(result.fields.weight_g, 350);
+  assert.deepEqual(parseBeanLabelText("Apple, Honey,\nOrigin: Ethiopia / Brazil").tasting_notes.en, ["Apple", "Honey"]);
+});
+
+test("a partially read column blend does not apply one lot's processing to the whole package", () => {
+  const result = parseBeanLabelText("RED BRICK\n50% First Lot\nGuatemata\nProcess: Washed\n50% Second Lot\nCosta Rica\nrocess: White Honey");
+  assert.equal(result.bean_type, "blend");
+  for (const field of ["origin_country", "process_method", "process_detail", "blend_components"]) assert.equal(result.fields[field], undefined, field);
+  assert.equal(parseBeanLabelText("DECAFFEINATED COFFEE").fields.process_detail, undefined);
+});
+
 test("Korean printed labels preserve names and extract only supported facts", () => {
   const result = parseBeanLabelText(`상품명: 봄날의 Guji\n로스터리: 작은숲 Coffee\n싱글 오리진\n원산지: 에티오피아\n지역: 구지\n농장: Halo Beriti\n품종: Heirloom\n가공 방식: 내추럴\n배전도: 약배전\n로스팅일: 2026. 08. 01\n내용량: 200 g\n향미: 복숭아, 홍차`);
   assert.equal(result.bean_type, "single_origin");
@@ -208,6 +251,58 @@ test("FROM wordmarks allow punctuation separators without accepting longer words
   assert.equal(prose.fields.roastery, undefined);
 });
 
+test("roaster wordmarks do not depend on an unlabelled blend title or printed shares", () => {
+  for (const wordmark of ["RIDGE Coffee Roasters", "RIDGE\nCoffee Roasters", "작은숲\n커피 로스터스"]) {
+    for (const product of ["Product: Ethiopia Guji\nCountry: Ethiopia", "Morning Blend", "Colombia\nHuila\nWashed"]) {
+      const result = parseBeanLabelText(`${wordmark}\n${product}\n250g`);
+      assert.equal(result.fields.roastery, wordmark.startsWith("작은숲") ? "작은숲" : "RIDGE", `${wordmark} / ${product}`);
+      assert.match(result.evidence.roastery, /(?:Coffee Roasters|커피 로스터스)/u);
+      assert.equal(result.fields.weight_g, 250);
+    }
+  }
+});
+
+test("direct roaster descriptors outrank an unrelated FROM fragment and conflicting descriptors stay empty", () => {
+  const composition = "Morning Blend\nBrazil 60%\nColombia 40%";
+  assert.equal(parseBeanLabelText(`RIDGE Coffee Roasters\nFROM. OTHER\n${composition}`).fields.roastery, "RIDGE");
+  assert.equal(parseBeanLabelText(`RIDGE Coffee Roasters\nRIVER Coffee Roasters\nFROM. RIDGE\n${composition}`).fields.roastery, undefined);
+  assert.equal(parseBeanLabelText(`Roaster: Printed Roaster\nRIDGE Coffee Roasters\n${composition}`).fields.roastery, "Printed Roaster");
+});
+
+test("a FROM wordmark needs coffee and product composition context, not two repeated coffee slogans", () => {
+  const result = parseBeanLabelText("COFFEE ROBS\nFROM. RIDGE\nMorning Blend\nBrazil 60%\nColombia 40%");
+  assert.equal(result.fields.roastery, "RIDGE");
+  assert.match(result.evidence.roastery, /COFFEE ROBS.*FROM\. RIDGE/u);
+  for (const input of [
+    "COFFEE\nFROM. RIDGE\nA wonderful morning",
+    "FROM. RIDGE\nMorning Blend\nBrazil 60%\nColombia 40%",
+    "COFFEE\nFROM. RIDGE\nMorning Blend",
+  ]) assert.equal(parseBeanLabelText(input).fields.roastery, undefined, input);
+});
+
+test("known origin places and source prose are not FROM roastery wordmarks", () => {
+  for (const place of ["ETHIOPIA", "GUJI", "HUILA", "에티오피아", "구지", "THE FARM", "OUR FARMS", "COFFEE FARMS"]) {
+    const result = parseBeanLabelText(`COFFEE ROASTERS\nFROM. ${place}\nFAVORITE COFFEE\nMorning Blend\nBrazil 60%\nColombia 40%`);
+    assert.equal(result.fields.roastery, undefined, place);
+  }
+  const ambiguous = parseBeanLabelText("COFFEE\nFROM. RIDGE\nFROM. RIVER\nMorning Blend\nBrazil 60%\nColombia 40%");
+  assert.equal(ambiguous.fields.roastery, undefined);
+});
+
+test("wordmark scanning cannot consume excluded text or standalone coffee facts as a brand", () => {
+  for (const input of [
+    "Tasting notes:\nRIDGE Coffee Roasters",
+    "Roastery address:\nRIDGE Coffee Roasters",
+    "Nutrition facts\nRIDGE Coffee Roasters",
+    "Brew recipe\nRIDGE Coffee Roasters",
+    "Product: RIDGE Coffee Roasters",
+    "Natural\nCoffee Roasters",
+    "250g\nCoffee Roasters",
+    "GUJI\nCoffee Roasters",
+    "FROM. RIDGE\nCoffee Roasters",
+  ]) assert.equal(parseBeanLabelText(input).fields.roastery, undefined, input);
+});
+
 test("nutrition grams and FROM prose are not package weight or a roastery", () => {
   for (const line of ["Nutrition per serving: fat 1g, protein 2g", "영양 정보: 지방 1g, 단백질 2g", "Delivery: ordered 250g, received 200g"]) {
     assert.equal(parseBeanLabelText(`Country: Ethiopia\n${line}`).fields.weight_g, undefined, line);
@@ -264,6 +359,16 @@ test("clearly grouped package grams are accepted without guessing decimal commas
   }
   for (const value of ["1,00 g", "1,5 kg", "1,000,0 g", "0,250 g", "1,000 kg", "250 0", "2509"])
     assert.equal(parseBeanLabelText(`Net weight: ${value}`).fields.weight_g, undefined, value);
+});
+
+test("an explicit trailing NET marker preserves printed grams without turning OCR digits or recipe amounts into weight", () => {
+  for (const value of ["350G NET", "내용량: 350g NET", "NET WT: 0.35kg NET"]) {
+    const result = parseBeanLabelText(`Product: Morning Coffee\n${value}`);
+    assert.equal(result.fields.weight_g, 350, value);
+    assert.equal(result.evidence.weight_g, value);
+  }
+  for (const value of ["3506 NET", "3509 NET", "350 NET", "Brew recipe\n18g NET", "Nutrition facts\n3g NET"])
+    assert.equal(parseBeanLabelText(value).fields.weight_g, undefined, value);
 });
 
 test("the full printed blend preserves lot descriptions and bilingual cup notes as display metadata", () => {

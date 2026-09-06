@@ -3,7 +3,9 @@
 import { prepareLabelWordRetry } from "./bean-label-image.ts";
 import { findLabelWeightRegions, type LabelTextRegion } from "./bean-label-image-regions.ts";
 import { hasUnreadableLabelWeight, parseBeanLabelText } from "./bean-label-parser.ts";
-import { mergeLabelExtractions, type LabelExtraction } from "./bean-label.ts";
+import { extractLabelLayout } from "./bean-label-layout.ts";
+import { findLabelRoasteryRegions, parseLabelRoasteryRetry, prepareLabelRoasteryRetry, type LabelRoasteryRegion } from "./bean-label-roastery.ts";
+import { LABEL_FIELDS, mergeLabelExtractions, type LabelExtraction } from "./bean-label.ts";
 
 export interface LabelImageVariant {
   image: Blob;
@@ -21,6 +23,7 @@ interface ReadOptions {
   onProgress: (progress: LabelReadProgress) => void;
   onPartial?: (result: { text: string; extraction: LabelExtraction }) => void;
   prepareWeightRetry?: () => Promise<Blob>;
+  prepareDetailRetries?: (options: { includeColor: boolean }) => Promise<LabelImageVariant[]>;
 }
 
 interface PendingJob {
@@ -33,6 +36,25 @@ const ASSETS = "/ocr/tesseract-7.0.0";
 const MAX_TEXT_LENGTH = 30_000;
 
 const abortError = () => new DOMException("Reading cancelled", "AbortError");
+
+function sameBrandReading(observed: string, refined: string, before: number, after: number) {
+  const compact = (text: string) => text.toLocaleLowerCase("en").replace(/[\s.]+/gu, "");
+  const left = compact(observed);
+  const right = compact(refined);
+  if (after < 30) return false;
+  if (left === right) return true;
+  if (Math.min(left.length, right.length) < 3 || Math.abs(left.length - right.length) > 1 || after < before + 10) return false;
+  // This selects between actual readings of the same pixels; it does not repair
+  // strings or look up a brand. A substantially different word stays unresolved.
+  let i = 0; let j = 0; let differences = 0;
+  while (i < left.length && j < right.length) {
+    if (left[i] === right[j]) { i++; j++; continue; }
+    if (++differences > 1) return false;
+    if (left.length >= right.length) i++;
+    if (right.length >= left.length) j++;
+  }
+  return differences + Number(i < left.length || j < right.length) <= 1;
+}
 
 /**
  * Tesseract 7's pinned worker protocol, kept inside one disposable browser worker.
@@ -165,6 +187,7 @@ export function createBrowserLabelReader() {
         const texts: string[] = [];
         const extractions: { extraction: LabelExtraction; kind?: LabelImageVariant["kind"] }[] = [];
         const wordRegions: { image: Blob; kind: LabelImageVariant["kind"]; region: LabelTextRegion }[] = [];
+        const roasteryRegions: { image: Blob; index: number; candidate: LabelRoasteryRegion }[] = [];
         const combined = () => ({
           text: [...new Set(texts.flatMap(value => value.split("\n")).map(line => line.trim()).filter(Boolean))].join("\n").slice(0, MAX_TEXT_LENGTH),
           extraction: mergeLabelExtractions([...extractions]
@@ -184,13 +207,14 @@ export function createBrowserLabelReader() {
           assertCurrent();
           if (!result || typeof result !== "object" || !("text" in result) || typeof result.text !== "string") throw new Error("recognition_failed");
           const text = result.text.slice(0, MAX_TEXT_LENGTH).trim();
-          const extraction = parseBeanLabelText(text);
+          const extraction = extractLabelLayout("blocks" in result ? result.blocks : undefined, parseBeanLabelText(text));
           const hasLabelContext = [extraction, ...extractions.map(result => result.extraction)].some(result =>
             Boolean(result.fields.name || result.fields.roastery || result.fields.origin_country || result.fields.blend_components?.length));
           return {
             text,
             extraction,
             regions: findLabelWeightRegions("blocks" in result ? result.blocks : undefined, hasLabelContext),
+            roasteryRegions: findLabelRoasteryRegions("blocks" in result ? result.blocks : undefined, hasLabelContext),
             confidence: "confidence" in result && typeof result.confidence === "number" ? result.confidence : 0,
           };
         }
@@ -200,7 +224,48 @@ export function createBrowserLabelReader() {
           texts.push(result.text);
           extractions.push({ extraction: result.extraction, kind: variant.kind });
           wordRegions.push(...result.regions.map(region => ({ image: variant.image, kind: variant.kind, region })));
+          const explicitRoaster = /^(?:roastery|roasters?|roasted\s+by|로스터리|로스터|로스팅\s*업체)\s*[:：=]/imu.test(result.text);
+          if (variant.kind === "full" && !explicitRoaster) {
+            roasteryRegions.push(...result.roasteryRegions.map(candidate => ({ image: variant.image, index: extractions.length - 1, candidate })));
+          }
           partial();
+        }
+        const firstReading = combined().extraction;
+        if (options.prepareDetailRetries && (!firstReading.fields.name
+          || (!firstReading.fields.roastery && firstReading.fields.weight_g === undefined))) {
+          const missing = new Set(LABEL_FIELDS.filter(field => extractions.every(result => result.extraction.fields[field] === undefined)));
+          // Missing due to an explicit disagreement is different from absent ink.
+          if (texts.some(text => /^(?:product(?:\s+name)?|coffee\s+name|bean\s+name|상품명|제품명|원두명|커피명)\s*[:：=]/imu.test(text))) missing.delete("name");
+          if (texts.some(text => /^(?:roastery|roasters?|roasted\s+by|로스터리|로스터|로스팅\s*업체)\s*[:：=]/imu.test(text))) missing.delete("roastery");
+          async function addDetail(variant: LabelImageVariant) {
+            const result = await readPixels(variant.image, variant.psm, true);
+            // A successful detail reading becomes the baseline for later retries.
+            // Enlarging the same text must not erase a title just recovered at its native size.
+            for (const field of missing) if (extractions.some(result => result.extraction.fields[field] !== undefined)) missing.delete(field);
+            const supplement: LabelExtraction = { ...result.extraction,
+              bean_type: firstReading.bean_type !== "unknown" ? firstReading.bean_type
+                : firstReading.fields.origin_country ? "unknown" : result.extraction.bean_type,
+              fields: Object.fromEntries(Object.entries(result.extraction.fields).filter(([field]) => missing.has(field as typeof LABEL_FIELDS[number]))),
+              evidence: Object.fromEntries(Object.entries(result.extraction.evidence).filter(([field]) => missing.has(field as typeof LABEL_FIELDS[number]))),
+              tasting_notes: {
+                en: firstReading.tasting_notes?.en.length ? [] : result.extraction.tasting_notes?.en ?? [],
+                ko: firstReading.tasting_notes?.ko.length ? [] : result.extraction.tasting_notes?.ko ?? [],
+              },
+            };
+            texts.push(result.text);
+            extractions.push({ extraction: supplement, kind: variant.kind });
+            wordRegions.push(...result.regions.map(region => ({ image: variant.image, kind: variant.kind, region })));
+            partial();
+          }
+          const needsColor = !variants.some(variant => variant.kind === "full" && variant.psm === "11");
+          if (needsColor && variants.length === 1) await addDetail({ ...variants[0], psm: "11" });
+          const native = combined().extraction;
+          if (!native.fields.name || (!native.fields.roastery && native.fields.weight_g === undefined)) {
+            const details = await options.prepareDetailRetries({ includeColor: needsColor });
+            assertCurrent();
+            if (!Array.isArray(details) || details.length > 3) throw new Error("recognition_failed");
+            for (const variant of details) await addDetail(variant);
+          }
         }
         if (options.prepareWeightRetry && extractions.every(result => result.extraction.fields.weight_g === undefined)
           && texts.some(hasUnreadableLabelWeight)) {
@@ -243,6 +308,35 @@ export function createBrowserLabelReader() {
             }
             if (extractions.some(result => result.extraction.fields.weight_g !== undefined)) break;
           }
+        }
+        for (const { image, index, candidate } of roasteryRegions.slice(0, 2)) {
+          const base = extractions[index].extraction;
+          const existing = base.fields.roastery;
+          // A FROM wordmark is weaker evidence than an explicit roaster field.
+          if (existing && !base.evidence.roastery?.includes(candidate.evidence.trim())) continue;
+          if (language !== "eng") {
+            await job("initialize", { langs: "eng", oem: 1, config: {} });
+            assertCurrent(); language = "eng"; psm = "";
+          }
+          let cropped: Blob;
+          try { cropped = await prepareLabelRoasteryRetry(image, candidate.region, signal); }
+          catch (error) {
+            assertCurrent();
+            if (error instanceof Error && error.message === "invalid_image") continue;
+            throw error;
+          }
+          assertCurrent();
+          const result = await readPixels(cropped, "7");
+          const brand = parseLabelRoasteryRetry(result.text);
+          if (!brand || !sameBrandReading(candidate.text, brand, candidate.confidence, result.confidence)) continue;
+          texts.push(result.text);
+          // Replace only this view's matching coarse wordmark. Appending the
+          // refined brand as a new view would turn a corrected glyph into a conflict.
+          extractions[index].extraction = { ...base,
+            fields: { ...base.fields, roastery: brand },
+            evidence: { ...base.evidence, roastery: `${candidate.evidence.trim()} / ${result.text}`.slice(0, 500) },
+          };
+          partial();
         }
         // Parse views separately so repeated scans cannot double blend shares.
         onProgress({ phase: "reading", progress: 1 });

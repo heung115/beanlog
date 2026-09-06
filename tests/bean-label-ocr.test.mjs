@@ -565,3 +565,151 @@ test("a full scan with genuinely different name letters remains an unresolved co
   assert.equal(result.extraction.fields.name, undefined);
   assert.equal(result.extraction.evidence.name, undefined);
 });
+
+function brandPixels(t) {
+  localPixels(t);
+  const descriptor = Object.getOwnPropertyDescriptor(globalThis, "createImageBitmap");
+  Object.defineProperty(globalThis, "createImageBitmap", { configurable: true, value: async () => ({ width: 400, height: 400, close() {} }) });
+  t.after(() => {
+    if (descriptor) Object.defineProperty(globalThis, "createImageBitmap", descriptor);
+    else delete globalThis.createImageBitmap;
+  });
+}
+
+function brandOutput(marker = "FROM.", word = "NRIVER", confidence = 20) {
+  return { text: `COFFEE ROASTERS\n${marker} ${word}\nFAVORITE COFFEE\nEvening Blend\nBrazil 70%\nPeru 30%\n250g`,
+    blocks: [{ paragraphs: [{ lines: [{ text: `${marker} ${word}`, words: [
+      { text: marker, confidence: 30, bbox: { x0: 20, y0: 20, x1: 80, y1: 40 } },
+      { text: word, confidence, bbox: { x0: 90, y0: 20, x1: 180, y1: 40 } },
+    ] }] }] }],
+  };
+}
+
+for (const [marker, observed, reread, confidence, expected] of [
+  ["FROM.", "NRIVER", "RIVER", 55, "RIVER"],
+  ["FYROM.", "RIVER", "RIVER", 40, "RIVER"],
+  ["FROM.", "NRIVER", "RIVER", 25, "NRIVER"],
+  ["FROM.", "NRIVER", "OTHER", 95, "NRIVER"],
+  ["FROM.", "NRIVER", "", 95, "NRIVER"],
+]) {
+  test(`same-image brand refinement preserves all other fields (${marker} ${observed} → ${reread || "empty"}, ${confidence})`, async t => {
+    const { reader, workers } = harness(t); brandPixels(t);
+    const partials = [];
+    const read = reader.recognize(image, { ...emptyOptions(), onPartial: result => partials.push(result) });
+    const worker = workers[0]; await initialize(worker);
+    worker.respond(await worker.waitFor("recognize"), brandOutput(marker, observed));
+    const english = await worker.waitFor("initialize");
+    assert.equal(english.payload.langs, "eng"); worker.respond(english);
+    const line = await worker.waitFor("setParameters");
+    assert.equal(line.payload.params.tessedit_pageseg_mode, "7"); worker.respond(line);
+    worker.respond(await worker.waitFor("recognize"), { text: reread, confidence });
+    const result = await read;
+    assert.equal(result.extraction.fields.roastery, expected);
+    assert.equal(result.extraction.fields.name, "Evening Blend");
+    assert.equal(result.extraction.fields.weight_g, 250);
+    assert.deepEqual(result.extraction.fields.blend_components.map(row => row.percentage), [70, 30]);
+    assert.ok(partials.every(result => result.extraction.fields.name === "Evening Blend"));
+    assert.equal(worker.requests.filter(request => request.action === "loadLanguage").length, 1);
+  });
+}
+
+test("an explicit conflicting roastery cannot be filled by a weaker FROM region", async t => {
+  const { reader, workers } = harness(t);
+  const read = reader.recognize(image, emptyOptions());
+  const worker = workers[0]; await initialize(worker);
+  const output = brandOutput();
+  output.text += "\nRoaster: First Roastery\nRoaster: Second Roastery";
+  worker.respond(await worker.waitFor("recognize"), output);
+  assert.equal((await read).extraction.fields.roastery, undefined);
+  assert.equal(worker.requests.filter(request => request.action === "recognize").length, 1);
+});
+
+test("cancelling a brand reread stops its worker before a late result and permits retry", async t => {
+  const { reader, workers } = harness(t); brandPixels(t);
+  const controller = new AbortController();
+  const read = reader.recognize(image, { ...emptyOptions(), signal: controller.signal });
+  const rejected = assert.rejects(read, { name: "AbortError" });
+  const worker = workers[0]; await initialize(worker);
+  worker.respond(await worker.waitFor("recognize"), brandOutput());
+  worker.respond(await worker.waitFor("initialize"));
+  worker.respond(await worker.waitFor("setParameters"));
+  const request = await worker.waitFor("recognize");
+  controller.abort(); worker.respond(request, { text: "RIVER", confidence: 90 });
+  await rejected;
+  assert.equal(worker.terminateCalls, 1);
+  await retrySuccessfully(reader, workers);
+});
+
+test("detail rereads fill missing facts while preserving names, cup notes and known origins", async t => {
+  const { reader, workers } = harness(t);
+  const snapshots = [];
+  const read = reader.recognize(image, { ...emptyOptions(), onPartial: result => snapshots.push(result),
+    prepareDetailRetries: async () => [{ image, kind: "full", psm: "11" }],
+  });
+  const worker = workers[0]; await initialize(worker);
+  await complete(worker, "Product: Original Coffee\nOrigin: Ethiopia\nCup notes: Apple, Honey");
+  const sparse = await worker.waitFor("setParameters"); worker.respond(sparse);
+  await complete(worker, "Product: Different Coffee");
+  await complete(worker, "Product: Different Coffee\nRoaster: River\nBrazil 60%\nPeru 40%\n250g\nCup notes: Cherry, Chocolate, Caramel");
+  const result = (await read).extraction;
+  assert.equal(result.fields.name, "Original Coffee");
+  assert.equal(result.fields.roastery, "River");
+  assert.equal(result.fields.weight_g, 250);
+  assert.equal(result.fields.origin_country, "Ethiopia");
+  assert.equal(result.fields.blend_components, undefined);
+  assert.deepEqual(result.tasting_notes.en, ["Apple", "Honey"]);
+  assert.ok(snapshots.every(result => result.extraction.fields.name === "Original Coffee"));
+});
+
+test("complete basic information avoids extra contrast reads", async t => {
+  const { reader, workers } = harness(t);
+  const read = reader.recognize(image, { ...emptyOptions(), prepareDetailRetries: () => assert.fail("unnecessary detail read") });
+  await initialize(workers[0]); await complete(workers[0], "Product: Daily Coffee\n250g");
+  assert.equal((await read).extraction.fields.name, "Daily Coffee");
+  assert.equal(workers[0].requests.filter(request => request.action === "recognize").length, 1);
+});
+
+test("a recovered native-size title survives an enlarged reading with a damaged final letter", async t => {
+  const { reader, workers } = harness(t);
+  const read = reader.recognize(image, { ...emptyOptions(), prepareDetailRetries: async options => {
+    assert.equal(options.includeColor, true);
+    return [{ image, kind: "full", psm: "11" }];
+  } });
+  const worker = workers[0]; await initialize(worker); await complete(worker, "COFFEE");
+  worker.respond(await worker.waitFor("setParameters"));
+  await complete(worker, "Product: Everyday Espresso");
+  await complete(worker, "Product: Everyday Espress\n1kg");
+  const result = (await read).extraction;
+  assert.equal(result.fields.name, "Everyday Espresso");
+  assert.equal(result.fields.weight_g, 1000);
+});
+
+test("an explicit name disagreement stays unresolved after a detail reread", async t => {
+  const { reader, workers } = harness(t);
+  const read = reader.recognize(image, { ...emptyOptions(), prepareDetailRetries: async () => [{ image, kind: "full", psm: "6" }] });
+  await initialize(workers[0]); await complete(workers[0], "Product: First Coffee\nProduct: Second Coffee");
+  workers[0].respond(await workers[0].waitFor("setParameters"));
+  await complete(workers[0], "Product: Third Coffee");
+  workers[0].respond(await workers[0].waitFor("setParameters"));
+  await complete(workers[0], "Product: Third Coffee\n250g");
+  const result = (await read).extraction;
+  assert.equal(result.fields.name, undefined);
+  assert.equal(result.fields.weight_g, 250);
+});
+
+test("cancelling a pending detail preparation prevents later pixel reads", async t => {
+  const { reader, workers } = harness(t);
+  const controller = new AbortController(); let release; let prepared;
+  const ready = new Promise(resolve => { prepared = resolve; });
+  const read = reader.recognize(image, { ...emptyOptions(), signal: controller.signal,
+    prepareDetailRetries: () => { prepared(); return new Promise(resolve => { release = resolve; }); },
+  });
+  const rejected = assert.rejects(read, { name: "AbortError" });
+  await initialize(workers[0]); await complete(workers[0], "COFFEE");
+  workers[0].respond(await workers[0].waitFor("setParameters"));
+  await complete(workers[0], "COFFEE");
+  await ready; controller.abort(); release([{ image, psm: "11", kind: "full" }]);
+  await rejected;
+  assert.equal(workers[0].requests.filter(request => request.action === "recognize").length, 2);
+  await retrySuccessfully(reader, workers);
+});
