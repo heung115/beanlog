@@ -46,7 +46,7 @@ interface LandingCopy {
 
 export const landingCopy: Record<LandingLocale, LandingCopy> = {
   ko: {
-    navigation: "언어 및 계정",
+    navigation: "계정 메뉴",
     login: "로그인",
     signup: "회원가입",
     title: "beanmap",
@@ -131,7 +131,7 @@ export const landingCopy: Record<LandingLocale, LandingCopy> = {
     },
   },
   en: {
-    navigation: "Language and account",
+    navigation: "Account menu",
     login: "Log in",
     signup: "Sign up",
     title: "beanmap",

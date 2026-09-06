@@ -165,7 +165,7 @@ test("@mobile landing stays readable at 320px", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 });
   await page.goto("/ko");
 
-  const navigation = page.getByRole("navigation", { name: "언어 및 계정" });
+  const navigation = page.getByRole("navigation", { name: "계정 메뉴" });
   const loginLink = navigation.getByRole("link", { name: "로그인" });
   const signupLink = navigation.getByRole("link", { name: "회원가입" });
   await expect(loginLink).toBeVisible();
