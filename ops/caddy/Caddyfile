@@ -74,7 +74,10 @@ api.beanmap.site {
 	encode zstd gzip
 	request_header -X-Beanmap-Admin-Secret
 	@private_admin_rpc path /rest/v1/rpc/beanmap_is_admin /rest/v1/rpc/beanmap_admin_overview /rest/v1/rpc/beanmap_admin_update_catalog /rest/v1/rpc/beanmap_admin_audit
-	respond @private_admin_rpc 404
+	handle @private_admin_rpc {
+		header Cache-Control "no-store"
+		respond 404
+	}
 	# Kong's bundled dashboard and /pg routes must never become public when
 	# operator tools join the container network. Admit only the application APIs.
 	@application_api path /auth/v1 /auth/v1/* /rest/v1 /rest/v1/* /graphql/v1 /graphql/v1/* /storage/v1 /storage/v1/* /functions/v1 /functions/v1/* /realtime/v1 /realtime/v1/*
