@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
+import { resolvePostAuthPath } from "@/lib/security/redirect";
 import { cn } from "@/lib/utils";
 import { buttonClassName } from "@/components/ui/button";
 import { BeanmapMark } from "@/components/brand/beanmap-mark";
@@ -20,6 +21,10 @@ interface TopBarProps {
 
 export function TopBar({ user }: TopBarProps) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const requestedNext = resolvePostAuthPath(searchParams.get("next"));
+  const authQuery = searchParams.get("draft") === "1" ? "?draft=1"
+    : requestedNext !== "/explore" ? `?${new URLSearchParams({ next: requestedNext })}` : "";
   const locale = useLocale() as "ko" | "en";
   const appPathname = getAppPathname(pathname);
   const t = useTranslations("nav");
@@ -66,13 +71,13 @@ export function TopBar({ user }: TopBarProps) {
             </Link>
             <LocaleSwitcher locale={locale} />
             <Link
-              href={`/${locale}/login`}
+              href={`/${locale}/login${authQuery}`}
               className="inline-flex min-h-11 items-center whitespace-nowrap rounded-sm px-1.5 text-xs font-semibold text-brown-light transition-colors hover:bg-surface hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:px-2 sm:text-sm"
             >
               {tAuth("login")}
             </Link>
             <Link
-              href={`/${locale}/signup`}
+              href={`/${locale}/signup${authQuery}`}
               className={buttonClassName({ size: "sm", className: "whitespace-nowrap" })}
             >
               {tAuth("signup")}

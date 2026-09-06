@@ -16,6 +16,8 @@
     "switchToEnglish": "영어로 전환"
   },
   "auth": {
+    "journalPromise": "좋았던 커피를 다시 찾을 수 있게.",
+    "journalPromiseDescription": "원두와 마신 날, 기억하고 싶은 맛을 한곳에 남겨두세요.",
     "login": "로그인",
     "signup": "회원가입",
     "logout": "로그아웃",
@@ -46,7 +48,9 @@
     "checkEmailMissingDescription": "스팸함과 프로모션함도 확인해주세요. 발신자는 BeanMap입니다.",
     "checkEmailGoLogin": "인증 완료 후 로그인",
     "legalAgreement": "만 14세 이상이며 <terms>이용약관</terms>에 동의하고 <privacy>개인정보 처리방침</privacy>을 확인했습니다.",
-    "socialLegalAgreement": "소셜 로그인으로 계속하면 만 14세 이상이며 <terms>이용약관</terms>에 동의하고 <privacy>개인정보 처리방침</privacy>을 확인합니다."
+    "socialLegalAgreement": "소셜 로그인으로 계속하면 만 14세 이상이며 <terms>이용약관</terms>에 동의하고 <privacy>개인정보 처리방침</privacy>을 확인합니다.",
+    "passwordMismatch": "비밀번호가 일치하지 않아요. 다시 확인해 주세요.",
+    "displayNamePlaceholder": "커피를 좋아하는 사람"
   },
   "guest": {
     "title": "로그인 없이 기록하기",
@@ -157,7 +161,9 @@
     "componentPercentage": "비율 (%)",
     "percentageTotal": "합계",
     "percentageHint": "100%가 되도록 맞춰주세요",
-    "blendOriginNote": "블렌드 구성은 아래에서 선택해주세요"
+    "blendOriginNote": "블렌드 구성은 아래에서 선택해주세요",
+    "invalidBlend": "각 원두의 산지와 0보다 큰 비율을 입력하고, 합계를 100%로 맞춰 주세요.",
+    "removeComponent": "원두 {index} 삭제"
   },
   "process": {
     "washed": "워시드",
@@ -298,7 +304,8 @@
     "saved": "저장되었습니다",
     "legal": "법적 안내",
     "terms": "서비스 이용약관",
-    "privacy": "개인정보 처리방침"
+    "privacy": "개인정보 처리방침",
+    "deleteError": "계정을 삭제하지 못했어요. 다시 시도하거나 취소할 수 있어요."
   },
   "common": {
     "cancel": "취소",
@@ -310,6 +317,8 @@
     "optional": "선택",
     "required": "필수",
     "score": "점",
-    "cups": "잔"
+    "cups": "잔",
+    "loadError": "정보를 불러오지 못했어요",
+    "loadErrorHelp": "연결 상태를 확인하고 다시 시도해 주세요."
   }
 }

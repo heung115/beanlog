@@ -8,6 +8,7 @@ import { BeanForm } from "@/components/beans/bean-form";
 import { PageIntro } from "@/components/layout/page-intro";
 import { buttonClassName } from "@/components/ui/button";
 import { getBeanById } from "@/lib/actions/beans";
+import { LoadError } from "@/components/ui/load-error";
 import type { BeanWithTags } from "@/types/database";
 
 function FormSkeleton() {
@@ -27,6 +28,14 @@ export default function EditBeanPage() {
 
   const [bean, setBean] = useState<BeanWithTags | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [attempt, setAttempt] = useState(0);
+
+  function retry() {
+    setLoadError(false);
+    setLoading(true);
+    setAttempt((value) => value + 1);
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -36,7 +45,7 @@ export default function EditBeanPage() {
         setBean((data as BeanWithTags | null) ?? null);
       })
       .catch(() => {
-        /* auth/network not ready — treat as not found */
+        if (!cancelled) setLoadError(true);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -44,7 +53,7 @@ export default function EditBeanPage() {
     return () => {
       cancelled = true;
     };
-  }, [params.id]);
+  }, [params.id, attempt]);
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -58,6 +67,8 @@ export default function EditBeanPage() {
       <div className="mt-8 max-w-4xl md:mt-10">
         {loading ? (
           <FormSkeleton />
+        ) : loadError ? (
+          <LoadError onRetry={retry} />
         ) : !bean ? (
           <div className="paper-sheet animate-rise px-6 py-16 text-center">
             <p className="text-xl font-semibold text-brown">{t("notFound")}</p>

@@ -107,7 +107,7 @@ export const landingCopy: Record<LandingLocale, LandingCopy> = {
       title: "시작하기",
       items: [
         ["비회원 기록", "첫 기록은 현재 브라우저에 임시 저장됩니다."],
-        ["계정 저장", "회원가입하거나 로그인하면 임시 기록이 계정으로 이동합니다."],
+        ["계정 저장", "회원가입 또는 로그인 후, 불러온 임시 기록을 확인하고 저장하세요."],
         ["검색과 통계", "저장한 기록은 검색·필터·통계에서 확인할 수 있습니다."],
       ],
     },
@@ -192,7 +192,7 @@ export const landingCopy: Record<LandingLocale, LandingCopy> = {
       title: "Getting started",
       items: [
         ["Guest record", "Your first draft stays temporarily in this browser."],
-        ["Account storage", "Sign up or log in to move the draft into your account."],
+        ["Account storage", "Sign up or log in, then review and save the loaded draft to your account."],
         ["Search and statistics", "Saved records are available through search, filters, and statistics."],
       ],
     },

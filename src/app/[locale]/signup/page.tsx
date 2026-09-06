@@ -7,6 +7,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { signUp, signInWithOAuth } from "@/lib/actions/auth";
+import { resolvePostAuthPath } from "@/lib/security/redirect";
 import { AuthShell } from "@/components/auth/auth-shell";
 
 export default function SignupPage() {
@@ -15,7 +16,11 @@ export default function SignupPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const hasGuestDraft = searchParams.get("draft") === "1";
-  const nextPath = hasGuestDraft ? `/${locale}/beans/new?draft=1` : undefined;
+  const requestedNext = resolvePostAuthPath(searchParams.get("next"));
+  const nextPath = hasGuestDraft ? `/${locale}/beans/new?draft=1`
+    : requestedNext !== "/explore" ? requestedNext : `/${locale}/explore`;
+  const authQuery = hasGuestDraft ? "?draft=1"
+    : requestedNext !== "/explore" ? `?${new URLSearchParams({ next: requestedNext })}` : "";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordConfirm, setPasswordConfirm] = useState("");
@@ -36,7 +41,7 @@ export default function SignupPage() {
     }
 
     if (password !== passwordConfirm) {
-      setError(t("signupError"));
+      setError(t("passwordMismatch"));
       return;
     }
 
@@ -47,7 +52,7 @@ export default function SignupPage() {
         setError(t("signupError"));
       } else {
         router.replace(
-          `/${locale}/signup/check-email${hasGuestDraft ? "?draft=1" : ""}`
+          `/${locale}/signup/check-email${authQuery}`
         );
       }
     } catch {
@@ -73,7 +78,8 @@ export default function SignupPage() {
             name="displayName"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            placeholder="Coffee Lover"
+            placeholder={t("displayNamePlaceholder")}
+            maxLength={50}
             required
           />
           <Input
@@ -85,6 +91,7 @@ export default function SignupPage() {
             placeholder="you@example.com"
             required
             autoComplete="email"
+            maxLength={320}
           />
           <Input
             label={t("password")}
@@ -95,6 +102,7 @@ export default function SignupPage() {
             placeholder="••••••••"
             required
             minLength={6}
+            maxLength={128}
             autoComplete="new-password"
           />
 
@@ -107,6 +115,7 @@ export default function SignupPage() {
             placeholder="••••••••"
             required
             minLength={6}
+            maxLength={128}
             autoComplete="new-password"
           />
 
@@ -188,7 +197,7 @@ export default function SignupPage() {
         <p className="mt-8 text-center text-sm text-brown-light">
           {t("hasAccount")}{" "}
           <Link
-            href={`/${locale}/login${hasGuestDraft ? "?draft=1" : ""}`}
+            href={`/${locale}/login${authQuery}`}
             className="font-medium text-accent hover:underline"
           >
             {t("goLogin")}

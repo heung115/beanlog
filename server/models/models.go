@@ -16,7 +16,7 @@ type Bean struct {
 	Name             string           `json:"name" db:"name"`
 	Roastery         string           `json:"roastery" db:"roastery"`
 	BeanType         string           `json:"bean_type" db:"bean_type"`
-	OriginCountry    string           `json:"origin_country" db:"origin_country"`
+	OriginCountry    *string          `json:"origin_country" db:"origin_country"`
 	OriginCountryID  *int64           `json:"origin_country_id" db:"origin_country_id"`
 	OriginRegion     *string          `json:"origin_region" db:"origin_region"`
 	OriginRegionID   *int64           `json:"origin_region_id" db:"origin_region_id"`

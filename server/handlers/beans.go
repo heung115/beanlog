@@ -190,7 +190,8 @@ func (h *BeanHandler) List(c *gin.Context) {
 			&b.ScoreAftertaste, &b.ScoreBalance, &b.PurchaseSource, &b.Price,
 			&b.WeightG, &purchasedAt, &b.CreatedAt, &b.UpdatedAt,
 		); err != nil {
-			continue
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to read beans"})
+			return
 		}
 		if roastDate != nil {
 			s := roastDate.Format("2006-01-02")
@@ -201,6 +202,11 @@ func (h *BeanHandler) List(c *gin.Context) {
 			b.PurchasedAt = &s
 		}
 		beans = append(beans, b)
+	}
+
+	if err := rows.Err(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to read beans"})
+		return
 	}
 
 	// Load tags for all beans
@@ -324,8 +330,12 @@ func (h *BeanHandler) GetByID(c *gin.Context) {
 		&b.ScoreAftertaste, &b.ScoreBalance, &b.PurchaseSource, &b.Price,
 		&b.WeightG, &purchasedAt, &b.CreatedAt, &b.UpdatedAt,
 	)
-	if err != nil {
+	if errors.Is(err, pgx.ErrNoRows) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "bean not found"})
+		return
+	}
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to read bean"})
 		return
 	}
 	if roastDate != nil {

@@ -20,6 +20,7 @@ import { deleteBean, getBeanById } from "@/lib/actions/beans";
 import { findCountryPreset, originSlug } from "@/data/origin-presets";
 import { chartColors } from "@/config/chart-colors";
 import { cn, formatDate } from "@/lib/utils";
+import { LoadError } from "@/components/ui/load-error";
 import type { BeanWithTags } from "@/types/database";
 
 function InfoRow({
@@ -94,6 +95,14 @@ export default function BeanDetailPage() {
 
   const [bean, setBean] = useState<BeanWithTags | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [attempt, setAttempt] = useState(0);
+
+  function retry() {
+    setLoadError(false);
+    setLoading(true);
+    setAttempt((value) => value + 1);
+  }
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -105,7 +114,7 @@ export default function BeanDetailPage() {
         setBean((data as BeanWithTags | null) ?? null);
       })
       .catch(() => {
-        /* auth/network not ready — treat as not found */
+        if (!cancelled) setLoadError(true);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -113,7 +122,7 @@ export default function BeanDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [params.id]);
+  }, [params.id, attempt]);
 
   async function handleDelete() {
     if (!bean) return;
@@ -139,6 +148,10 @@ export default function BeanDetailPage() {
         <DetailSkeleton />
       </div>
     );
+  }
+
+  if (loadError) {
+    return <div className="mx-auto max-w-2xl"><LoadError onRetry={retry} /></div>;
   }
 
   if (!bean) {
@@ -182,12 +195,12 @@ export default function BeanDetailPage() {
 
   const tags = bean.tasting_tags ?? [];
   const hasPurchase =
-    bean.purchase_source || bean.price || bean.weight_g || bean.purchased_at;
+    bean.purchase_source || bean.price != null || bean.weight_g || bean.purchased_at;
 
-  const priceLabel = bean.price
+  const priceLabel = bean.price != null
     ? locale === "ko"
       ? `${bean.price.toLocaleString("ko-KR")}원`
-      : `$${bean.price.toLocaleString("en-US")}`
+      : `KRW ${bean.price.toLocaleString("en-US")}`
     : null;
 
   const purchaseSourceLabel = bean.purchase_source
@@ -205,7 +218,7 @@ export default function BeanDetailPage() {
   return (
     <div className="mx-auto max-w-4xl">
       {/* Toolbar */}
-      <div className="animate-rise mb-6 flex items-center justify-between gap-3">
+      <div className="animate-rise mb-6 flex flex-wrap items-center justify-between gap-3">
         <Link
           href={`/${locale}/explore`}
           prefetch={false}
@@ -230,7 +243,7 @@ export default function BeanDetailPage() {
         </Link>
 
         {confirming ? (
-          <div className="flex items-center gap-2 rounded-sm border border-red-200 bg-red-50 py-1.5 pl-3 pr-1.5">
+          <div className="flex flex-wrap items-center gap-2 rounded-sm border border-red-200 bg-red-50 py-1.5 pl-3 pr-1.5">
             <span className="text-xs font-medium text-red-800">
               {t("deleteConfirm")}
             </span>

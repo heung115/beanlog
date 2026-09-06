@@ -1,5 +1,17 @@
 const localDevelopmentOrigin = "http://localhost:3100";
 
+/** Only real, localized application pages may be post-login destinations. */
+export function resolvePostAuthPath(value: unknown): string {
+  if (typeof value !== "string" || !/^\/(ko|en)\//.test(value) || value.includes("\\")) {
+    return "/explore";
+  }
+  const destination = new URL(value, localDevelopmentOrigin);
+  const allowed = /^\/(ko|en)\/(explore|stats|settings|beans\/(new|[0-9a-f-]{36}(\/edit)?))\/?$/i;
+  return destination.origin === localDevelopmentOrigin && allowed.test(destination.pathname)
+    ? `${destination.pathname}${destination.search}${destination.hash}`
+    : "/explore";
+}
+
 function trustedOrigin(configuredAppUrl: string): string {
   try {
     const url = new URL(configuredAppUrl);

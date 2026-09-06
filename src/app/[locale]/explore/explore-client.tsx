@@ -343,7 +343,12 @@ export function ExploreClient({
       setLoadingMore(false);
     }
 
-    load();
+    load().catch(() => {
+      if (cancelled) return;
+      setLoadError(true);
+      setLoading(false);
+      setLoadingMore(false);
+    });
     return () => {
       cancelled = true;
     };
@@ -769,7 +774,10 @@ export function ExploreClient({
         <div className="mt-6 flex justify-center pb-4">
           <Button
             variant="secondary"
-            onClick={() => setPage((p) => p + 1)}
+            onClick={() => {
+              if (loadError) setRetryKey((key) => key + 1);
+              else setPage((p) => p + 1);
+            }}
             loading={loadingMore}
             disabled={!hydrated}
             className="min-w-40"

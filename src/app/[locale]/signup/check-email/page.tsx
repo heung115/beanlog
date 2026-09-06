@@ -2,11 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { buttonClassName } from "@/components/ui/button";
+import { resolvePostAuthPath } from "@/lib/security/redirect";
+import { LocaleSwitcher } from "@/components/layout/locale-switcher";
 import { brand } from "@/config/brand";
 
 type CheckEmailPageProps = {
   params: Promise<{ locale: string }>;
-  searchParams: Promise<{ draft?: string }>;
+  searchParams: Promise<{ draft?: string; next?: string }>;
 };
 
 export async function generateMetadata({
@@ -30,15 +32,21 @@ export default async function CheckEmailPage({
   searchParams,
 }: CheckEmailPageProps) {
   const { locale: rawLocale } = await params;
-  const { draft } = await searchParams;
+  const { draft, next } = await searchParams;
   const locale = rawLocale === "en" ? "en" : "ko";
   const t = await getTranslations({ locale, namespace: "auth" });
-  const loginHref = `/${locale}/login${draft === "1" ? "?draft=1" : ""}`;
+  const destination = resolvePostAuthPath(next);
+  const authQuery = draft === "1" ? "?draft=1"
+    : destination !== "/explore" ? `?${new URLSearchParams({ next: destination })}` : "";
+  const loginHref = `/${locale}/login${authQuery}`;
 
   return (
     <section className="flex min-h-[70vh] items-center py-10">
       <div className="mx-auto w-full max-w-md">
-        <p className="journal-kicker mb-4">{brand.name}</p>
+        <div className="mb-4 flex items-center justify-between gap-4">
+          <p className="journal-kicker">{brand.name}</p>
+          <LocaleSwitcher />
+        </div>
         <MailIcon className="mt-5 h-6 w-6 text-accent" />
 
         <h1 className="mt-5 font-display text-2xl font-semibold tracking-[-0.025em] text-brown">

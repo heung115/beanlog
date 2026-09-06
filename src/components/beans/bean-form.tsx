@@ -286,7 +286,7 @@ export function BeanForm({
     startTransition(() => {
       void getOriginCountries().then((countries) => {
         if (active) setOriginCountries(countries);
-      });
+      }).catch(() => undefined);
     });
     return () => {
       active = false;
@@ -306,7 +306,7 @@ export function BeanForm({
     startTransition(() => {
       void getOriginRegions(countryId).then((regions) => {
         if (active) setOriginRegions(regions);
-      });
+      }).catch(() => undefined);
     });
     return () => {
       active = false;
@@ -329,7 +329,7 @@ export function BeanForm({
         (entities) => {
           if (active) setOriginEntities(entities);
         }
-      );
+      ).catch(() => undefined);
     });
     return () => {
       active = false;
@@ -351,7 +351,7 @@ export function BeanForm({
         region: form.origin_region?.trim() || undefined,
       }).then((chains) => {
         if (active) setSingleSubregionChains(chains);
-      });
+      }).catch(() => undefined);
     });
 
     return () => {
@@ -578,10 +578,10 @@ export function BeanForm({
       const comps = form.blend_components ?? [];
       if (
         comps.length === 0 ||
-        comps.some((c) => !c.origin_country.trim()) ||
+        comps.some((c) => !c.origin_country.trim() || !(c.percentage > 0)) ||
         Math.abs(blendTotal - 100) > 0.01
       ) {
-        toast.show(t("fillRequired"));
+        toast.show(t("invalidBlend"));
         return;
       }
     } else if (!form.origin_country?.trim()) {
@@ -1125,6 +1125,8 @@ export function BeanForm({
                 <Input
                   label={t("price")}
                   name="price"
+                  min={0}
+                  max={10000000}
                   type="number"
                   inputMode="numeric"
                   value={form.price ?? ""}

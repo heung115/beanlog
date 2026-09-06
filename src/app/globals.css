@@ -259,6 +259,11 @@ html[lang="en"] .app-page-title,
   text-wrap: balance;
 }
 
+.landing-section-title {
+  font-size: clamp(2rem, 1.4rem + 1.6vw, 2.75rem);
+  line-height: 1.15;
+}
+
 html[lang="en"] .display-title,
 [data-locale="en"] .display-title {
   font-weight: 600;

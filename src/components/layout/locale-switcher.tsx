@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 type SupportedLocale = "ko" | "en";
@@ -41,6 +41,7 @@ export function LocaleSwitcher({
   className?: string;
 }) {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const pathnameLocale = pathname.split("/")[1];
   const currentLocale =
     localeProp ?? (pathnameLocale === "en" ? "en" : "ko");
@@ -57,11 +58,19 @@ export function LocaleSwitcher({
     >
       {localeOptions.map(({ locale, label }) => {
         const isCurrent = locale === currentLocale;
+        const query = new URLSearchParams(searchParams.toString());
+        const next = query.get("next");
+        // Keep the login destination in the chosen language as well as the
+        // current page. Only rewrite explicit local, locale-prefixed paths.
+        if (next && /^\/(?:ko|en)(?=\/|\?|#|$)/.test(next) && !next.includes("\\")) {
+          query.set("next", next.replace(/^\/(?:ko|en)/, `/${locale}`));
+        }
+        const suffix = query.size ? `?${query.toString()}` : "";
 
         return (
           <Link
             key={locale}
-            href={localizedPathname(pathname, locale)}
+            href={`${localizedPathname(pathname, locale)}${suffix}`}
             hrefLang={locale}
             lang={locale}
             aria-label={labels[locale]}

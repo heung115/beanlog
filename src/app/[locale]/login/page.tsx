@@ -7,6 +7,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { signInAction, signInWithOAuth } from "@/lib/actions/auth";
+import { resolvePostAuthPath } from "@/lib/security/redirect";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { useSocialAuthConsent } from "@/components/auth/use-social-auth-consent";
 
@@ -15,14 +16,11 @@ export default function LoginPage() {
   const locale = useLocale();
   const searchParams = useSearchParams();
   const hasGuestDraft = searchParams.get("draft") === "1";
-  const requestedNext = searchParams.get("next");
-  const safeRequestedNext =
-    requestedNext?.startsWith(`/${locale}/`) && !requestedNext.startsWith("//")
-      ? requestedNext
-      : null;
-  const nextPath = hasGuestDraft
-    ? `/${locale}/beans/new?draft=1`
-    : safeRequestedNext ?? `/${locale}/explore`;
+  const requestedNext = resolvePostAuthPath(searchParams.get("next"));
+  const nextPath = hasGuestDraft ? `/${locale}/beans/new?draft=1`
+    : requestedNext !== "/explore" ? requestedNext : `/${locale}/explore`;
+  const authQuery = hasGuestDraft ? "?draft=1"
+    : requestedNext !== "/explore" ? `?${new URLSearchParams({ next: requestedNext })}` : "";
   const [state, formAction, pending] = useActionState(signInAction, {});
   const [socialTermsAccepted, setSocialTermsAccepted] = useSocialAuthConsent();
 
@@ -137,7 +135,7 @@ export default function LoginPage() {
         <p className="mt-8 text-center text-sm text-brown-light">
           {t("noAccount")}{" "}
           <Link
-            href={`/${locale}/signup${hasGuestDraft ? "?draft=1" : ""}`}
+            href={`/${locale}/signup${authQuery}`}
             className="font-medium text-accent hover:underline"
           >
             {t("goSignup")}

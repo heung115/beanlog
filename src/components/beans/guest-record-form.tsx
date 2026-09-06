@@ -13,6 +13,7 @@ import {
   saveGuestBeanDraft,
 } from "@/lib/coffee/guest-draft";
 import type { BeanFormData, ProcessMethod, RoastLevel } from "@/types/database";
+import { formatDate } from "@/lib/utils";
 
 function todayString() {
   return new Date().toLocaleDateString("sv");
@@ -79,11 +80,11 @@ export function GuestRecordForm() {
 
   if (saved) {
     return (
-      <article className="paper-sheet p-5 md:p-8" aria-label={t("savedTitle")}>
-        <div className="flex items-center justify-between">
+      <article className="paper-sheet min-w-0 p-5 [overflow-wrap:anywhere] md:p-8" aria-label={t("savedTitle")}>
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
           <h2 className="font-display text-2xl font-bold text-brown">{t("savedTitle")}</h2>
           <time className="folio-label" dateTime={form.consumed_at}>
-            {form.consumed_at.replaceAll("-", ". ")}
+            {formatDate(form.consumed_at, locale)}
           </time>
         </div>
 
@@ -98,9 +99,9 @@ export function GuestRecordForm() {
         </div>
 
         <div className="flex items-end justify-between gap-6 py-5">
-          <div>
+          <div className="min-w-0 flex-1">
             <p className="text-xs text-brown-light">{tb("note")}</p>
-            <p className="mt-2 text-sm leading-6 text-brown">{form.note}</p>
+            <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-brown">{form.note}</p>
           </div>
           <div className="shrink-0 text-right">
             <p className="text-xs text-brown-light">{tb("overallScore")}</p>
@@ -232,7 +233,7 @@ export function GuestRecordForm() {
         </div>
       </section>
 
-      {error && <p className="text-sm text-red-700">{error}</p>}
+      {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
 
       <Button type="submit" size="lg" className="w-full">
         {t("temporarySave")}

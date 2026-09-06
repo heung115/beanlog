@@ -96,7 +96,6 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
     const innerRef = useRef<HTMLInputElement | null>(null);
     const listRef = useRef<HTMLUListElement | null>(null);
     const lastEmitted = useRef(value);
-    const selectAfterComposition = useRef(false);
 
     const [text, setText] = useState(() => displayFor(value, options));
     const [open, setOpen] = useState(false);
@@ -165,8 +164,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
     function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
       // In Korean/Japanese IME, Enter first commits the composing text. It must
       // not select before that text has reached React state.
-      if (e.nativeEvent.isComposing) {
-        if (e.key === "Enter") selectAfterComposition.current = true;
+      if (e.nativeEvent.isComposing || e.nativeEvent.keyCode === 229) {
         return;
       }
 
@@ -175,7 +173,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
         if (filtered.length === 0) return;
         setOpen(true);
         setActive((i) =>
-          e.key === "ArrowDown"
+          !open ? (e.key === "ArrowDown" ? 0 : filtered.length - 1) : e.key === "ArrowDown"
             ? (i + 1) % filtered.length
             : (i - 1 + filtered.length) % filtered.length
         );
@@ -236,31 +234,8 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
               setOpen(true);
             }}
             onBlur={() => {
-              selectAfterComposition.current = false;
               setOpen(false);
               onCommit?.(text);
-            }}
-            onCompositionStart={() => {
-              selectAfterComposition.current = false;
-            }}
-            onKeyUp={(e) => {
-              if (e.key !== "Enter" || !selectAfterComposition.current) return;
-
-              selectAfterComposition.current = false;
-              const query = e.currentTarget.value.trim().toLowerCase();
-              const matches = query
-                ? options.filter(
-                    (option) =>
-                      option.label.toLowerCase().includes(query) ||
-                      (option.sublabel ?? "").toLowerCase().includes(query) ||
-                      option.value.toLowerCase().includes(query)
-                  )
-                : options;
-              const visibleMatches = showAllOptions
-                ? matches
-                : matches.slice(0, MAX_SUGGESTIONS);
-
-              if (visibleMatches.length > 0) pick(visibleMatches[0]);
             }}
             onKeyDown={handleKeyDown}
             className={cn(
@@ -317,7 +292,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
               id={listId}
               role="listbox"
               aria-label={ariaLabel ?? label}
-              className="absolute z-20 mt-1 max-h-60 w-full min-w-72 overflow-y-auto rounded-md border border-border-light bg-surface py-1 shadow-lg"
+              className="absolute z-20 mt-1 max-h-60 w-full min-w-0 overflow-y-auto rounded-md border border-border-light bg-surface py-1 shadow-lg"
             >
               {filtered.map((option, i) => (
                 <li
@@ -329,13 +304,14 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
                 >
                   <button
                     type="button"
+                    tabIndex={-1}
                     onMouseDown={(e) => {
                       e.preventDefault();
-                      pick(option);
                     }}
+                    onClick={() => pick(option)}
                     onMouseEnter={() => setActive(i)}
                     className={cn(
-                      "grid w-full grid-cols-[minmax(0,1fr)_auto] items-baseline gap-3 px-3 py-2.5 text-left text-sm transition-colors",
+                      "grid w-full grid-cols-1 items-baseline gap-x-3 gap-y-0.5 px-3 py-2.5 text-left text-sm transition-colors sm:grid-cols-[minmax(0,1fr)_auto]",
                       i === active ? "bg-cream-dark text-brown" : "text-brown"
                     )}
                   >

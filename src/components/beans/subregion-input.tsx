@@ -1,6 +1,6 @@
 "use client";
 
-import { useId } from "react";
+import { useId, useState } from "react";
 import { cn } from "@/lib/utils";
 
 interface SubregionInputProps {
@@ -61,9 +61,17 @@ export function SubregionInput({
   optionalLabel = "선택",
 }: SubregionInputProps) {
   const inputId = useId();
-  const text = value.join(", ");
+  const canonical = value.join(", ");
+  const [draft, setDraft] = useState({ text: canonical, canonical });
+  const [focused, setFocused] = useState(false);
+  // Preserve incomplete separators and IME text while editing; external
+  // changes (such as selecting another country) still reset this field.
+  if (draft.canonical !== canonical) {
+    setDraft({ text: canonical, canonical });
+  }
+  const text = draft.canonical === canonical ? draft.text : canonical;
   const currentParts = parseSubregionText(text);
-  const lastPart = currentParts.at(-1) ?? "";
+  const lastPart = text.split(",").at(-1)?.trim() ?? "";
   const filteredSuggestions = suggestions.filter(
     (suggestion) =>
       suggestion.toLowerCase().includes(lastPart.toLowerCase()) &&
@@ -71,7 +79,9 @@ export function SubregionInput({
   );
 
   function updateText(next: string) {
-    onChange(parseSubregionText(next));
+    const parsed = parseSubregionText(next);
+    setDraft({ text: next, canonical: parsed.join(", ") });
+    onChange(parsed);
   }
 
   function pickSuggestion(suggestion: string) {
@@ -83,7 +93,15 @@ export function SubregionInput({
   }
 
   return (
-    <div className="relative flex flex-col gap-1.5">
+    <div
+      className="relative flex flex-col gap-1.5"
+      onFocus={() => setFocused(true)}
+      onBlur={(event) => {
+        if (event.currentTarget.contains(event.relatedTarget)) return;
+        setFocused(false);
+        setDraft({ text: canonical, canonical });
+      }}
+    >
       {showLabel && (
         <label htmlFor={inputId} className="text-sm font-medium text-brown-medium">
           {label}
@@ -100,6 +118,9 @@ export function SubregionInput({
         aria-label={label}
         value={text}
         onChange={(e) => updateText(e.target.value)}
+        onKeyDown={(event) => {
+          if (event.key === "Escape") setFocused(false);
+        }}
         placeholder={placeholder}
         className={cn(
           "w-full rounded-md border border-border-light bg-surface px-3 py-2 text-xs text-brown placeholder:text-brown-light/40",
@@ -107,7 +128,7 @@ export function SubregionInput({
           inputClassName
         )}
       />
-      {filteredSuggestions.length > 0 && (
+      {focused && filteredSuggestions.length > 0 && (
         <div className="absolute left-0 right-0 top-full z-20 mt-1 overflow-hidden rounded-md border border-border-light bg-surface py-1 shadow-lg">
           {filteredSuggestions.slice(0, 5).map((suggestion) => (
             <button
@@ -115,8 +136,8 @@ export function SubregionInput({
               type="button"
               onMouseDown={(e) => {
                 e.preventDefault();
-                pickSuggestion(suggestion);
               }}
+              onClick={() => pickSuggestion(suggestion)}
               className="block w-full truncate px-3 py-2 text-left text-xs font-medium text-brown transition-colors hover:bg-cream-dark"
             >
               {suggestion}

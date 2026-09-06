@@ -8,6 +8,9 @@ export function cn(...inputs: ClassValue[]) {
 export function formatDate(dateStr: string, locale: string = "ko"): string {
   const date = new Date(dateStr);
   return date.toLocaleDateString(locale === "ko" ? "ko-KR" : "en-US", {
+    // Calendar dates are not instants: UTC parsing must not shift them to the
+    // previous day for users west of UTC. Timestamps keep local-time behavior.
+    ...(/^\d{4}-\d{2}-\d{2}$/.test(dateStr) ? { timeZone: "UTC" } : {}),
     year: "numeric",
     month: "short",
     day: "numeric",

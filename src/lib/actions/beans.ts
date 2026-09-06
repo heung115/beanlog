@@ -11,7 +11,7 @@ import {
   beanFormSchema,
   beanIdSchema,
 } from "@/lib/validation/beans";
-import { apiFetch } from "@/lib/api/client";
+import { ApiError, apiFetch } from "@/lib/api/client";
 
 const profileUpdateSchema = z.object({
   displayName: z.string().trim().min(1).max(50),
@@ -285,8 +285,9 @@ export async function getBeanById(id: string) {
 
   try {
     return await apiFetch<BeanWithTags>(`/api/beans/${parsedId.data}`);
-  } catch {
-    return null;
+  } catch (error) {
+    if (error instanceof ApiError && error.status === 404) return null;
+    throw new Error("Unable to load bean");
   }
 }
 
@@ -300,7 +301,7 @@ export async function getBeanStats() {
   try {
     stats = await apiFetch<GoStats | null>("/api/stats");
   } catch {
-    return null;
+    throw new Error("Unable to load stats");
   }
   if (!stats || stats.total === 0) return null;
 
@@ -356,13 +357,14 @@ export async function updateProfile(displayName: string, locale: string) {
       method: "PUT",
       body: { display_name: parsed.data.displayName, locale: parsed.data.locale },
     });
+    revalidatePath("/", "layout");
     return { success: true };
   } catch {
     return { error: "Unable to update profile" };
   }
 }
 
-export async function deleteAccount() {
+export async function deleteAccount(locale = "ko") {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -372,5 +374,5 @@ export async function deleteAccount() {
   if (error) return { error: "Unable to delete account" };
   await supabase.auth.signOut();
 
-  redirect("/login");
+  redirect(`/${locale === "en" ? "en" : "ko"}/login`);
 }

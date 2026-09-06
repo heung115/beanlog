@@ -7,6 +7,7 @@ import {
 } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { z } from "zod";
+import { resolvePostAuthPath } from "@/lib/security/redirect";
 
 export type SignInState = {
   error?: "invalid_credentials" | "email_not_confirmed";
@@ -23,16 +24,6 @@ const signUpSchema = z.object({
   displayName: z.string().trim().min(1).max(50),
   acceptedTerms: z.literal(true),
 });
-
-const guestDraftDestinationSchema = z.enum([
-  "/ko/beans/new?draft=1",
-  "/en/beans/new?draft=1",
-]);
-
-function resolvePostAuthPath(value: FormDataEntryValue | string | null | undefined) {
-  const parsed = guestDraftDestinationSchema.safeParse(value);
-  return parsed.success ? parsed.data : "/explore";
-}
 
 export async function signUp(
   email: string,
@@ -130,12 +121,12 @@ export async function signInWithOAuth(
   }
 }
 
-export async function signOut() {
+export async function signOut(locale = "ko") {
   const supabase = await createClient();
   // A normal sign-out should revoke only the current browser session. The SSR
   // storage adapter removes every chunk of the auth cookie even when the
   // remote session has already expired.
   await supabase.auth.signOut({ scope: "local" });
   await setSessionPersistencePreference(true);
-  redirect("/login");
+  redirect(`/${locale === "en" ? "en" : "ko"}/login`);
 }

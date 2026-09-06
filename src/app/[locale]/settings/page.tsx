@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { PageIntro } from "@/components/layout/page-intro";
 import { Button } from "@/components/ui/button";
+import { LoadError } from "@/components/ui/load-error";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
 import { deleteAccount, exportData, updateProfile } from "@/lib/actions/beans";
@@ -73,6 +74,11 @@ export default function SettingsPage() {
   const [displayName, setDisplayName] = useState("");
   const [profileLoading, setProfileLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const savedNameRef = useRef("");
+  const [profileError, setProfileError] = useState(false);
+  const [profileAttempt, setProfileAttempt] = useState(0);
+  const [switchingLocale, setSwitchingLocale] = useState(false);
+  const [deleteError, setDeleteError] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -84,16 +90,20 @@ export default function SettingsPage() {
     let mounted = true;
     getProfile()
       .then((p) => {
-        if (mounted && p?.display_name) setDisplayName(p.display_name);
+        if (!p) throw new Error("Unable to load profile");
+        if (mounted) {
+          savedNameRef.current = p.display_name ?? "";
+          setDisplayName(p.display_name ?? "");
+        }
       })
-      .catch(() => {})
+      .catch(() => { if (mounted) setProfileError(true); })
       .finally(() => {
         if (mounted) setProfileLoading(false);
       });
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [profileAttempt]);
 
   useEffect(() => {
     if (!confirmOpen) return;
@@ -126,7 +136,9 @@ export default function SettingsPage() {
       if (result?.error) {
         toast.show(tCommon("error"));
       } else {
+        savedNameRef.current = displayName.trim();
         toast.show(t("saved"));
+        router.refresh();
       }
     } catch {
       toast.show(tCommon("error"));
@@ -135,13 +147,23 @@ export default function SettingsPage() {
     }
   }
 
-  function switchLocale(next: Locale) {
-    if (next === locale) return;
-    // Persist the preference, then swap the locale segment in the URL.
-    updateProfile(displayName.trim(), next).catch(() => {});
-    const segments = pathname.split("/");
-    segments[1] = next;
-    router.replace(segments.join("/") || `/${next}`);
+  async function switchLocale(next: Locale) {
+    if (next === locale || profileLoading || profileError) return;
+    setSwitchingLocale(true);
+    try {
+      const result = await updateProfile(savedNameRef.current, next);
+      if (result?.error) {
+        toast.show(tCommon("error"));
+        return;
+      }
+      const segments = pathname.split("/");
+      segments[1] = next;
+      router.replace(segments.join("/") || `/${next}`);
+    } catch {
+      toast.show(tCommon("error"));
+    } finally {
+      setSwitchingLocale(false);
+    }
   }
 
   async function handleExport() {
@@ -172,10 +194,14 @@ export default function SettingsPage() {
 
   async function handleDeleteAccount() {
     setDeleting(true);
+    setDeleteError(false);
     try {
-      await deleteAccount();
+      const result = await deleteAccount(locale);
+      if (result?.error) setDeleteError(true);
     } catch {
-      // deleteAccount redirects on success; ignore navigation errors
+      setDeleteError(true);
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -230,7 +256,11 @@ export default function SettingsPage() {
 
         {/* ---------- profile ---------- */}
         <SectionCard title={t("profile")} delay={60}>
-          <form
+          {profileError ? <LoadError onRetry={() => {
+            setProfileError(false);
+            setProfileLoading(true);
+            setProfileAttempt((value) => value + 1);
+          }} /> : <form
             onSubmit={handleSaveProfile}
             aria-busy={profileLoading || saving}
             className="flex flex-col gap-3 sm:flex-row sm:items-end"
@@ -242,7 +272,7 @@ export default function SettingsPage() {
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
                 placeholder={profileLoading ? tCommon("loading") : "beanmap"}
-                maxLength={30}
+                maxLength={50}
                 required
                 disabled={profileLoading || saving}
               />
@@ -255,7 +285,7 @@ export default function SettingsPage() {
             >
               {tCommon("confirm")}
             </Button>
-          </form>
+          </form>}
         </SectionCard>
 
         {/* ---------- language ---------- */}
@@ -274,6 +304,7 @@ export default function SettingsPage() {
                   role="radio"
                   aria-checked={active}
                   onClick={() => switchLocale(l.value)}
+                  disabled={profileLoading || profileError || switchingLocale || saving}
                   className={`min-h-11 rounded-sm border border-transparent px-5 py-2 text-sm font-semibold transition-all duration-150 ${
                     active
                       ? "bg-brown text-cream"
@@ -327,7 +358,7 @@ export default function SettingsPage() {
 
         {/* ---------- logout ---------- */}
         <SectionCard title={tAuth("logout")} delay={300}>
-          <Button variant="secondary" onClick={() => signOut()} className="w-full sm:w-auto">
+          <Button variant="secondary" onClick={() => signOut(locale)} className="w-full sm:w-auto">
             <Icon path={ICONS.logout} className="mr-2 h-4 w-4" />
             {tAuth("logout")}
           </Button>
@@ -349,7 +380,7 @@ export default function SettingsPage() {
             <Button
               ref={deleteTriggerRef}
               variant="ghost"
-              onClick={() => setConfirmOpen(true)}
+              onClick={() => { setDeleteError(false); setConfirmOpen(true); }}
               className="self-start sm:shrink-0"
             >
               {t("deleteAccount")}
@@ -392,7 +423,8 @@ export default function SettingsPage() {
             >
               {t("deleteAccountConfirm")}
             </p>
-            <div className="mt-6 flex justify-end gap-3">
+            {deleteError && <p role="alert" className="mt-4 text-sm leading-6 text-red-600">{t("deleteError")}</p>}
+            <div className="mt-6 flex flex-wrap justify-end gap-3">
               <Button
                 ref={cancelDeleteRef}
                 variant="ghost"

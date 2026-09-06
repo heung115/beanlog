@@ -17,6 +17,7 @@ import {
   YAxis,
 } from "recharts";
 import { getBeanStats } from "@/lib/actions/beans";
+import { LoadError } from "@/components/ui/load-error";
 import { EmptyJournalGuide } from "@/components/beans/empty-journal-guide";
 import { PageIntro } from "@/components/layout/page-intro";
 import { ScoreDisplay } from "@/components/ui/score-display";
@@ -119,6 +120,8 @@ export default function StatsPage() {
 
   const [stats, setStats] = useState<BeanStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
     let mounted = true;
@@ -126,14 +129,14 @@ export default function StatsPage() {
       .then((s) => {
         if (mounted) setStats(s as BeanStats | null);
       })
-      .catch(() => {})
+      .catch(() => { if (mounted) setLoadError(true); })
       .finally(() => {
         if (mounted) setLoading(false);
       });
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [attempt]);
 
   const processLabel = (method: string) =>
     tProcess.has(method as "washed") ? tProcess(method as "washed") : method;
@@ -144,7 +147,7 @@ export default function StatsPage() {
       title={t("title")}
       description={t("description")}
       testId="stats-header"
-      meta={(
+      meta={!loadError && (
         <p role="status" aria-live="polite" className="folio-label">
           {recordCount === undefined
             ? tCommon("loading")
@@ -165,6 +168,19 @@ export default function StatsPage() {
           ))}
         </div>
         <div className="h-56 animate-pulse rounded-lg bg-surface/70" />
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div className="mx-auto max-w-5xl space-y-8">
+        {pageIntro()}
+        <LoadError onRetry={() => {
+          setLoadError(false);
+          setLoading(true);
+          setAttempt((value) => value + 1);
+        }} />
       </div>
     );
   }
@@ -233,7 +249,7 @@ export default function StatsPage() {
       : null;
 
   const varietalHeight = Math.max(200, varietalData.length * 40 + 40);
-  const cupsSuffix = tCommon("cups");
+  const cupsSuffix = `${locale === "en" ? " " : ""}${tCommon("cups")}`;
 
   return (
     <div className="mx-auto max-w-5xl space-y-10">
@@ -242,7 +258,7 @@ export default function StatsPage() {
       {/* ---------- summary cards ---------- */}
       <section
         data-testid="stats-summary"
-        className="animate-rise grid gap-3 sm:grid-cols-3"
+        className="animate-rise grid grid-cols-1 gap-3 sm:grid-cols-3"
         style={{ animationDelay: "60ms" }}
       >
         <div className="rounded-md bg-surface/55 p-5 md:p-6">
@@ -266,11 +282,12 @@ export default function StatsPage() {
           <p className="text-xs font-medium text-brown-light">
             {t("bestBean")}
           </p>
-          <p className="mt-2 truncate text-base font-semibold leading-snug text-brown">
+          <p title={stats.best.name} className="mt-2 line-clamp-2 break-words text-base font-semibold leading-snug text-brown">
             {stats.best.name}
           </p>
           <p className="truncate text-xs text-brown-light">
             {stats.best.roastery} · {Number(stats.best.score).toFixed(1)}
+            {locale === "en" ? " " : ""}
             {tCommon("score")}
           </p>
         </div>

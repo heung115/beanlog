@@ -7,6 +7,7 @@ import { TopBar } from "@/components/layout/top-bar";
 import { BottomNav } from "@/components/layout/bottom-nav";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { Toast } from "@/components/ui/toast";
+import { DocumentLocale } from "@/components/layout/document-locale";
 import { getCurrentUserIdentity } from "@/lib/actions/profile";
 import { buildLocaleDefaultMetadata } from "@/lib/seo";
 
@@ -42,6 +43,7 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider messages={messages}>
+      <DocumentLocale locale={locale} />
       <div lang={locale} data-locale={locale} className="flex min-h-dvh flex-col">
         <TopBar user={user} />
         <main

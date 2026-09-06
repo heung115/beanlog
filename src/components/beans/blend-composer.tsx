@@ -110,7 +110,7 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
     startTransition(() => {
       void getOriginCountries().then((countries) => {
         if (active) setOriginCountries(countries);
-      });
+      }).catch(() => undefined);
     });
     return () => {
       active = false;
@@ -130,7 +130,7 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
         void getOriginRegions(countryId).then((regions) => {
           if (!active) return;
           setRegionsByCountry((prev) => ({ ...prev, [countryId]: regions }));
-        });
+        }).catch(() => undefined);
       });
     });
     return () => {
@@ -160,7 +160,7 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
         void getOriginEntities(countryId, regionId).then((entities) => {
           if (!active) return;
           setEntitiesByRegion((prev) => ({ ...prev, [key]: entities }));
-        });
+        }).catch(() => undefined);
       });
     });
     return () => {
@@ -190,7 +190,7 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
         void getUserOriginSubregions({ country, region: region || undefined }).then((chains) => {
           if (!active) return;
           setSubregionsByOrigin((prev) => ({ ...prev, [key]: chains }));
-        });
+        }).catch(() => undefined);
       });
     });
 
@@ -288,6 +288,10 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
   }
 
   function removeComponent(index: number) {
+    setExpandedEntityRows((rows) => Object.fromEntries(
+      Object.entries(rows).filter(([key]) => Number(key) !== index)
+        .map(([key, expanded]) => [Number(key) > index ? Number(key) - 1 : Number(key), expanded])
+    ));
     onChange(value.filter((_, i) => i !== index).map((c, i) => ({ ...c, sort_order: i })));
   }
 
@@ -331,8 +335,8 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
               {i + 1}
             </span>
 
-            <div className="flex flex-1 flex-col gap-2.5">
-              <div className="grid grid-cols-[1fr_84px] gap-2">
+            <div className="flex min-w-0 flex-1 flex-col gap-2.5">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_84px]">
                 <Combobox
                   ariaLabel={t("componentOrigin")}
                   name={`blend_origin_${i}`}
@@ -422,7 +426,7 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
                   onClick={() =>
                     setExpandedEntityRows((rows) => ({ ...rows, [i]: true }))
                   }
-                  className="self-start rounded px-1.5 py-0.5 text-[11px] font-medium text-brown-light/70 transition-colors hover:bg-brown/5 hover:text-brown"
+                  className="self-start rounded px-1.5 py-0.5 text-[11px] font-medium text-brown-medium transition-colors hover:bg-brown/5 hover:text-brown"
                 >
                   + {t("addFarmProducer")}
                 </button>
@@ -477,8 +481,8 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
             <button
               type="button"
               onClick={() => removeComponent(i)}
-              aria-label="remove"
-              className="mt-1.5 shrink-0 rounded p-1 text-brown-light/50 transition-colors hover:bg-red-50 hover:text-red-500"
+              aria-label={t("removeComponent", { index: i + 1 })}
+              className="mt-1.5 flex h-11 w-8 shrink-0 items-center justify-center rounded text-brown-medium transition-colors hover:bg-red-50 hover:text-red-500"
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <path
@@ -509,7 +513,7 @@ export function BlendComposer({ value, onChange }: BlendComposerProps) {
       </button>
 
       {!isComplete && value.length > 0 && (
-        <p className="text-center text-xs text-brown-light/70">{t("percentageHint")}</p>
+        <p className="text-center text-xs text-brown-medium">{t("percentageHint")}</p>
       )}
     </div>
   );

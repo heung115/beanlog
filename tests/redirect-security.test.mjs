@@ -1,9 +1,18 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-const { resolveTrustedAppRedirect } = await import(
+const { resolveTrustedAppRedirect, resolvePostAuthPath } = await import(
   "../src/lib/security/redirect.ts"
 );
+
+test("post-login destinations retain locale and accept only application pages", () => {
+  for (const next of ["/ko/explore", "/en/stats?view=origins", "/en/beans/new?draft=1", "/ko/beans/12345678-1234-1234-1234-123456789abc/edit"]) {
+    assert.equal(resolvePostAuthPath(next), next);
+  }
+  for (const next of [null, "https://attacker.example", "//attacker.example", "/en/\\attacker.example", "/en/../../api/auth/callback", "/en/login", "/en/stats-extra", "/en/%2f%2fattacker.example"]) {
+    assert.equal(resolvePostAuthPath(next), "/explore");
+  }
+});
 
 test("OAuth redirects stay on the configured application origin", () => {
   const appUrl = "https://beanmap.example/application-path";

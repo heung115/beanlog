@@ -154,6 +154,8 @@ Body and interface typography use the self-hosted **SUIT Variable** family with 
 
 Reserve bold display type for meaningful hierarchy. A screen should usually have one dominant title; avoid making every card label look like a headline.
 
+Landing section headings use a shared 2–2.75rem scale, below the hero title. At tablet widths, simplify nested columns before reducing reading width. Origin directories give the most width to flavor and region descriptions; elevation is a compact numeric column. Country names and descriptions must never be squeezed to preserve empty space.
+
 Keep scores, totals, dates, and numbered steps upright. Do not synthesize italic or oblique text from the normal SUIT face; italics require an intentionally loaded italic face and a rare editorial purpose. The English serif exception is for display hierarchy, not controls, metadata, or repeated interface data.
 
 ## Layout
