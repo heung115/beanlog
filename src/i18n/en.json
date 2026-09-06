@@ -101,7 +101,7 @@
       "preview": "Selected coffee package photo",
       "enlarge": "View full photo (new tab)",
       "remove": "Remove photo",
-      "retry": "Read again",
+      "retry": "Rescan photo",
       "preparing": "Preparing photo…",
       "loading": "Preparing text recognition…",
       "reading": "Reading text in photo…",
@@ -143,7 +143,9 @@
       "tastingNotes": "Label cup notes",
       "noSelectionHint": "Choose fields to fill.",
       "selectionDetails": "Choose fields",
-      "translatedNotes": "Korean equivalents"
+      "translatedNotes": "Korean equivalents",
+      "rereading": "Rescanning…",
+      "previousResult": "Previous result"
     },
     "nativeInvalid": "Your record was not saved. Use your browser’s Back button to return to the form, check the required fields, and save again.",
     "nativeSaveFailed": "Your record could not be saved. Use your browser’s Back button to return to the form, check your entries, and try again.",

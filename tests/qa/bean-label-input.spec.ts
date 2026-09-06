@@ -44,7 +44,7 @@ type OcrReply = { text?: string; error?: string; deferred?: boolean };
 type OcrSnapshot = {
   reads: number;
   completions: number;
-  images: { size: number; signature: string }[];
+  images: { size: number; signature: string; bytes: number[] }[];
   workerUrls: string[];
   corePaths: string[];
   langPaths: string[];
@@ -146,6 +146,8 @@ async function mockBrowserOcr(page: Page, replies: OcrReply[] = [{ text: labelTe
           state.images.push({
             size: image?.byteLength ?? 0,
             signature: Array.from(image?.slice(0, 8) ?? []).map((byte) => byte.toString(16).padStart(2, "0")).join(""),
+            // These worker mocks use tiny PNG fixtures, so retain every byte to verify same-photo rescans.
+            bytes: Array.from(image ?? []),
           });
           outgoing = { ...request, qa: { index, reply: replies[Math.min(index, replies.length - 1)] } };
         }
@@ -261,6 +263,12 @@ async function openFieldChoices(review: Locator) {
   return choices;
 }
 
+async function openRecognizedText(panel: Locator, label: string) {
+  const summary = panel.locator("summary").filter({ hasText: label });
+  if (await summary.locator("..").getAttribute("open") === null) await summary.click();
+  return panel.locator("pre");
+}
+
 for (const locale of ["ko", "en"] as const) {
   test(`${locale} manual dependent edits invalidate selected OCR parent fields`, async ({ page }) => {
     const t = locale === "ko" ? ko : en;
@@ -349,6 +357,7 @@ for (const locale of ["ko", "en"] as const) {
 
         // Re-reading does not silently override existing fields, even when they match the photo.
         await page.getByRole("button", { name: label.retry, exact: true }).click();
+        await expect(page.getByRole("region", { name: label.sectionTitle, exact: true })).toHaveAttribute("aria-busy", "false");
         await expect(review).toBeVisible();
         await openFieldChoices(review);
         await expect(review.getByRole("checkbox", { checked: true })).toHaveCount(0);
@@ -481,6 +490,194 @@ for (const locale of ["ko", "en"] as const) {
     });
   });
 }
+
+const retainedLabelText = "Product: Original coffee\nRoaster: Original roastery\nNet weight: 200 g";
+
+test("ko same-photo rescan keeps previous facts through partial reads and replaces them only on success", async ({ page }) => {
+  test.setTimeout(90_000);
+  const t = ko;
+  const label = t.beans.labelImport;
+  await withLabelForm(page, "ko", async () => {
+    const ocr = await mockBrowserOcr(page, [
+      { text: retainedLabelText },
+      { text: "Product: Rescanned coffee\nRoaster: Rescanned roastery\nNet weight: 250", deferred: true },
+      { text: "Net weight: 250 g", deferred: true },
+    ]);
+    await page.getByLabel(label.choose, { exact: true }).setInputFiles(photo);
+    const panel = page.getByRole("region", { name: label.sectionTitle, exact: true });
+    const review = page.getByRole("group", { name: label.review, exact: true });
+    const apply = review.getByRole("button", { name: label.apply, exact: true });
+    await expect(apply).toBeEnabled();
+    await expect(panel.getByRole("button", { name: label.retry, exact: true })).toHaveCount(1);
+    const rescan = review.getByRole("button", { name: label.retry, exact: true });
+    await expect(rescan).toBeVisible();
+    await openFieldChoices(review);
+    await review.getByRole("checkbox", { name: t.beans.roastery, exact: true }).uncheck();
+    const raw = await openRecognizedText(panel, label.rawText);
+    await expect(raw).toHaveText(retainedLabelText);
+    const source = await page.getByAltText(label.preview, { exact: true }).getAttribute("src");
+
+    await rescan.click();
+    await expect.poll(async () => (await ocr.snapshot()).reads).toBe(2);
+    await expect(panel).toHaveAttribute("aria-busy", "true");
+    await expect(review.getByText(label.previousResult, { exact: true })).toBeVisible();
+    await expect(review.getByTestId("label-result-summary")).toContainText("Original coffee");
+    await expect(apply).toBeDisabled();
+    for (const checkbox of await review.getByRole("checkbox").all()) await expect(checkbox).toBeDisabled();
+    await expect(raw).toBeVisible();
+    await expect(raw).toHaveText(retainedLabelText);
+    expect((await ocr.snapshot()).images[1].bytes).toEqual((await ocr.snapshot()).images[0].bytes);
+    await expect(page.getByAltText(label.preview, { exact: true })).toHaveAttribute("src", source!);
+
+    // The next pass emits a partial extraction; it must not displace a previous successful result.
+    await ocr.release(1);
+    await expect.poll(async () => (await ocr.snapshot()).reads).toBe(3);
+    await expect(panel).toHaveAttribute("aria-busy", "true");
+    await expect(review.getByTestId("label-result-summary")).toContainText("Original coffee");
+    await expect(review.getByTestId("label-result-summary")).not.toContainText("Rescanned coffee");
+    await expect(raw).toHaveText(retainedLabelText);
+    await expect(review.getByRole("checkbox", { name: t.beans.roastery, exact: true })).not.toBeChecked();
+    await expect(apply).toBeDisabled();
+    await page.locator('[name="name"]').fill("My name entered during rescan");
+
+    await ocr.release(2);
+    await expect(panel).toHaveAttribute("aria-busy", "false");
+    await expect(review.getByTestId("label-result-summary")).toContainText("Rescanned coffee");
+    await expect(review.getByTestId("label-result-summary")).toContainText("Rescanned roastery");
+    await expect(review.getByLabel(`${t.beans.weight}: 250 g`, { exact: true })).toBeVisible();
+    await expect(review.getByText(label.previousResult, { exact: true })).toHaveCount(0);
+    await expect(raw).toContainText("Product: Rescanned coffee");
+    await expect(raw).not.toContainText("Original coffee");
+    await openFieldChoices(review);
+    await expect(review.getByRole("checkbox", { name: t.beans.name, exact: true })).not.toBeChecked();
+    await apply.click();
+    await expect(page.locator('[name="name"]')).toHaveValue("My name entered during rescan");
+    await expect(page.locator('[name="roastery"]')).toHaveValue("Rescanned roastery");
+    await expect(page.locator('[name="weight_g"]')).toHaveValue("250");
+  });
+});
+
+for (const scenario of [
+  { locale: "en", outcome: "failure", mobile: false },
+  { locale: "ko", outcome: "no_fields", mobile: false },
+  { locale: "en", outcome: "cancel", mobile: true },
+] as const) {
+  test(`${scenario.mobile ? "@mobile " : ""}${scenario.locale} rescan ${scenario.outcome} preserves previous text, selected fields, and later manual edits`, async ({ page }) => {
+    test.setTimeout(90_000);
+    const t = scenario.locale === "ko" ? ko : en;
+    const label = t.beans.labelImport;
+    await withLabelForm(page, scenario.locale, async () => {
+      const reply = scenario.outcome === "failure" ? { error: "QA rescan failure", deferred: true }
+        : { text: scenario.outcome === "no_fields" ? "" : "Product: Late cancelled coffee", deferred: true };
+      const ocr = await mockBrowserOcr(page, [{ text: retainedLabelText }, reply], scenario.outcome === "cancel");
+      await page.getByLabel(label.choose, { exact: true }).setInputFiles(photo);
+      const panel = page.getByRole("region", { name: label.sectionTitle, exact: true });
+      const review = page.getByRole("group", { name: label.review, exact: true });
+      const apply = review.getByRole("button", { name: label.apply, exact: true });
+      await expect(apply).toBeEnabled();
+      await openFieldChoices(review);
+      const name = review.getByRole("checkbox", { name: t.beans.name, exact: true });
+      const roastery = review.getByRole("checkbox", { name: t.beans.roastery, exact: true });
+      const weight = review.getByRole("checkbox", { name: t.beans.weight, exact: true });
+      await roastery.uncheck();
+      await expect(name).toBeChecked();
+      await expect(weight).toBeChecked();
+      const raw = await openRecognizedText(panel, label.rawText);
+      await expect(raw).toHaveText(retainedLabelText);
+
+      await review.getByRole("button", { name: label.retry, exact: true }).click();
+      await expect.poll(async () => (await ocr.snapshot()).reads).toBe(2);
+      await expect(panel).toHaveAttribute("aria-busy", "true");
+      await expect(apply).toBeDisabled();
+      await expect(review.getByText(label.previousResult, { exact: true })).toBeVisible();
+      await expect(raw).toHaveText(retainedLabelText);
+      await page.locator('[name="name"]').fill("My coffee entered during rescan");
+      await page.locator('[name="note"]').fill("My own tasting note: peach and chocolate.");
+      await page.getByRole("slider").press("End");
+      for (let step = 0; step < 3; step += 1) await page.getByRole("slider").press("ArrowLeft");
+
+      if (scenario.outcome === "cancel") {
+        await panel.getByRole("button", { name: label.cancel, exact: true }).click();
+        await expect(panel.getByRole("status")).toHaveText(label.cancelled);
+        await ocr.release(1);
+        await expect.poll(async () => (await ocr.snapshot()).completions).toBe(2);
+      } else {
+        await ocr.release(1);
+        const expectedError = scenario.outcome === "failure" ? label.errors.recognition_failed : label.errors.no_fields;
+        await expect(panel.getByRole("status")).toHaveText(expectedError);
+      }
+      await expect(panel).toHaveAttribute("aria-busy", "false");
+      await expect(review.getByText(label.previousResult, { exact: true })).toBeVisible();
+      await expect(review.getByTestId("label-result-summary")).toContainText("Original coffee");
+      await expect(raw).toBeVisible();
+      await expect(raw).toHaveText(retainedLabelText);
+      await expect(name).not.toBeChecked();
+      await expect(roastery).not.toBeChecked();
+      await expect(weight).toBeChecked();
+      await expect(weight).toBeEnabled();
+      await expect(panel.getByRole("button", { name: label.retry, exact: true })).toHaveCount(1);
+      await expect(review.getByRole("button", { name: label.retry, exact: true })).toBeEnabled();
+      await expect(page.locator('[name="name"]')).toHaveValue("My coffee entered during rescan");
+      await expectTastingDetails(page);
+      await apply.click();
+      await expect(page.locator('[name="name"]')).toHaveValue("My coffee entered during rescan");
+      await expect(page.locator('[name="roastery"]')).toHaveValue("");
+      await expect(page.locator('[name="weight_g"]')).toHaveValue("200");
+      await expect(panel.getByRole("status")).toHaveText(label.applied);
+      await expect(panel.getByText(label.filledTitle, { exact: true })).toBeVisible();
+      await expectTastingDetails(page);
+      await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
+    });
+  });
+}
+
+test("ko replacing the photo during rescan clears old facts and rejects late responses", async ({ page }) => {
+  test.setTimeout(90_000);
+  const label = ko.beans.labelImport;
+  await withLabelForm(page, "ko", async () => {
+    const ocr = await mockBrowserOcr(page, [
+      { text: retainedLabelText },
+      { text: "Product: Stale rescan coffee", deferred: true },
+      { text: "Product: Replacement photo coffee\nNet weight: 250 g", deferred: true },
+    ], true);
+    const file = page.getByLabel(label.choose, { exact: true });
+    await file.setInputFiles(photo);
+    const panel = page.getByRole("region", { name: label.sectionTitle, exact: true });
+    const review = page.getByRole("group", { name: label.review, exact: true });
+    await expect(review.getByRole("button", { name: label.apply, exact: true })).toBeEnabled();
+    await openRecognizedText(panel, label.rawText);
+    await review.getByRole("button", { name: label.retry, exact: true }).click();
+    await expect.poll(async () => (await ocr.snapshot()).reads).toBe(2);
+    await expect(review.getByTestId("label-result-summary")).toContainText("Original coffee");
+    await page.locator('[name="note"]').fill("My note while replacing the photo");
+
+    await file.setInputFiles({ ...photo, name: "replacement-during-rescan.png" });
+    await expect.poll(async () => (await ocr.snapshot()).reads).toBe(3);
+    await expect(panel.getByText("replacement-during-rescan.png", { exact: true })).toBeVisible();
+    await expect(review).toHaveCount(0);
+    await expect(panel.locator("pre")).toHaveCount(0);
+    await ocr.release(1);
+    await expect.poll(async () => (await ocr.snapshot()).completions).toBe(2);
+    await expect(review).toHaveCount(0);
+    await expect(panel).not.toContainText("Stale rescan coffee");
+    await expect(panel).not.toContainText("Original coffee");
+    await ocr.release(2);
+    await expect(panel).toHaveAttribute("aria-busy", "false");
+    await expect(review.getByTestId("label-result-summary")).toContainText("Replacement photo coffee");
+    await expect(review.getByLabel(`${ko.beans.weight}: 250 g`, { exact: true })).toBeVisible();
+    const raw = await openRecognizedText(panel, label.rawText);
+    await expect(raw).toHaveText("Product: Replacement photo coffee\nNet weight: 250 g");
+    await expect(page.locator('[name="note"]')).toHaveValue("My note while replacing the photo");
+    await expect(page.locator('[name="name"]')).toHaveValue("");
+
+    await panel.getByRole("button", { name: label.remove, exact: true }).click();
+    await expect(page.getByAltText(label.preview, { exact: true })).toHaveCount(0);
+    await expect(review).toHaveCount(0);
+    await expect(panel.locator("pre")).toHaveCount(0);
+    await expect(panel.getByRole("button", { name: label.retry, exact: true })).toHaveCount(0);
+    await expect(page.locator('[name="note"]')).toHaveValue("My note while replacing the photo");
+  });
+});
 
 test("recognized country replaces previously loaded origin suggestions", async ({ page }) => {
   test.setTimeout(90_000);

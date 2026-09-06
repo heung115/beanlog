@@ -101,7 +101,7 @@
       "preview": "선택한 원두 포장지 사진",
       "enlarge": "사진 크게 보기 (새 탭)",
       "remove": "사진 지우기",
-      "retry": "다시 읽기",
+      "retry": "다시 인식",
       "preparing": "사진 준비 중…",
       "loading": "글자 인식 준비 중…",
       "reading": "사진 속 글자 읽는 중…",
@@ -143,7 +143,9 @@
       "tastingNotes": "포장지 컵노트",
       "noSelectionHint": "채울 항목을 선택하세요.",
       "selectionDetails": "채울 항목 선택",
-      "translatedNotes": "한국어 풀이"
+      "translatedNotes": "한국어 풀이",
+      "rereading": "다시 인식 중…",
+      "previousResult": "이전 결과"
     },
     "nativeInvalid": "저장되지 않았습니다. 브라우저의 뒤로가기로 입력 화면에 돌아가 필수 항목을 확인한 뒤 다시 저장해 주세요.",
     "nativeSaveFailed": "기록을 저장하지 못했습니다. 브라우저의 뒤로가기로 입력 화면에 돌아가 내용을 확인한 뒤 다시 시도해 주세요.",

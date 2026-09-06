@@ -118,6 +118,9 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
   const [extraction, setExtraction] = useState<LabelExtraction | null>(null);
   const [rawText, setRawText] = useState<string | null>(null);
   const [selections, setSelections] = useState<LabelSelection[]>([]);
+  const [hasCompletedResult, setHasCompletedResult] = useState(false);
+  const [retainingResult, setRetainingResult] = useState(false);
+  const [retrying, setRetrying] = useState(false);
   const busy = phase !== "idle";
 
   useEffect(() => { currentForm.current = form; }, [form]);
@@ -138,16 +141,19 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
     setExtraction(null);
     setRawText(null);
     setSelections([]);
+    setHasCompletedResult(false);
   }
 
-  function cancelRequest() {
+  function cancelRequest(keepResult = false) {
     request.current.sequence += 1;
     request.current.controller?.abort();
     request.current.controller = null;
     reader.dispose();
     setPhase("idle");
     setProgress(0);
-    clearResults();
+    setRetrying(false);
+    setRetainingResult(keepResult);
+    if (!keepResult) clearResults();
   }
 
   function choosePhoto(file?: File) {
@@ -163,8 +169,9 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
     void readPhoto(nextPhoto);
   }
 
-  async function readPhoto(selectedPhoto: LabelPhoto) {
+  async function readPhoto(selectedPhoto: LabelPhoto, retry = false) {
     if (disabled || request.current.controller) return;
+    const keepResult = retry && selectedPhoto === photo && hasCompletedResult;
     const sequence = ++request.current.sequence;
     const controller = new AbortController();
     request.current.controller = controller;
@@ -175,8 +182,12 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
     setPhase("preparing");
     setProgress(0);
     setError(null);
-    setNotice(null);
-    clearResults();
+    setRetrying(retry);
+    setRetainingResult(keepResult);
+    if (!keepResult) {
+      setNotice(null);
+      clearResults();
+    }
     try {
       const image = await prepareLabelImages(selectedPhoto.file, controller.signal);
       if (sequence !== request.current.sequence) return;
@@ -186,6 +197,9 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
         prepareWeightRetry: () => prepareLabelWeightRetry(selectedPhoto.file, controller.signal),
         onPartial: ({ text: partialText, extraction: partialExtraction }) => {
           if (sequence !== request.current.sequence || controller.signal.aborted) return;
+          // A retry only replaces a completed review after it succeeds. Its
+          // partials cannot discard the original text or replacement choices.
+          if (keepResult) return;
           setRawText(partialText.trim());
           setExtraction(partialExtraction);
         },
@@ -200,13 +214,20 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
       if (!result || !result.fields || !result.evidence || !["single_origin", "blend", "unknown"].includes(result.bean_type)) {
         throw new Error("recognition_failed");
       }
-      setRawText(text.trim());
-      setExtraction(result);
       const candidates = candidatesFor(result);
       if (!candidates.length) {
+        if (!keepResult) {
+          setRawText(text.trim());
+          setExtraction(result);
+        }
         setError("no_fields");
         return;
       }
+      setRawText(text.trim());
+      setExtraction(result);
+      setHasCompletedResult(true);
+      setRetainingResult(false);
+      setNotice(null);
       const latestForm = currentForm.current;
       const newBlend = candidates.includes("blend_components") && canSelectNewBlend(latestForm);
       const fillDefaultProcess = newBlend && currentDefaultProcessPermission.current;
@@ -228,6 +249,7 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
         request.current.controller = null;
         setElapsed(Math.floor((Date.now() - startedAt.current) / 1000));
         setPhase("idle");
+        setRetrying(false);
       }
     }
   }
@@ -336,7 +358,7 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
               <div className="min-w-0 flex-1">
                 <p className="truncate text-xs text-brown-medium" title={photo.name}>{photo.name}</p>
                 <div className="mt-1 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-                  <p className="text-sm font-semibold text-brown">{busy ? t(phase) : error ? t("needsReview") : notice === "applied" ? t("filledTitle") : extraction ? t("review") : t("cancelledTitle")}</p>
+                  <p className="text-sm font-semibold text-brown">{busy ? t(retrying ? "rereading" : phase) : error ? t("needsReview") : notice === "applied" ? t("filledTitle") : extraction ? t("review") : t("cancelledTitle")}</p>
                   <span className="text-xs tabular-nums text-brown-medium">{t("elapsed", { seconds: elapsed })}</span>
                 </div>
                 {busy && (
@@ -348,8 +370,8 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
                   </div>
                 )}
                 <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0">
-                  {busy && <Button type="button" variant="ghost" size="sm" className="-ml-3" disabled={disabled} onClick={() => { cancelRequest(); setNotice("cancelled"); }}>{t("cancel")}</Button>}
-                  {!busy && <Button type="button" variant="ghost" size="sm" className="-ml-3" disabled={disabled} onClick={() => void readPhoto(photo)}>{t("retry")}</Button>}
+                  {busy && <Button type="button" variant="ghost" size="sm" className="-ml-3" disabled={disabled} onClick={() => { cancelRequest(retainingResult); setNotice("cancelled"); }}>{t("cancel")}</Button>}
+                  {!busy && !hasCompletedResult && <Button type="button" variant="secondary" size="sm" disabled={disabled} onClick={() => void readPhoto(photo, true)}>{t("retry")}</Button>}
                   <Button type="button" variant="ghost" size="sm" className="" disabled={disabled} onClick={() => fileInput.current?.click()}>{t("replace")}</Button>
                   {!busy && <Button type="button" variant="ghost" size="sm" disabled={disabled} onClick={() => { cancelRequest(); setPhoto(null); setError(null); setNotice(null); }}>{t("remove")}</Button>}
                 </div>
@@ -357,7 +379,7 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
             </div>
             {resultVisible && extraction && (
               <div role="group" aria-label={t("review")} data-testid="label-result" className="min-w-0 border-t border-border-light bg-surface px-4 py-5 sm:px-5">
-                {busy && <p className="mb-3 text-xs font-medium text-brown-medium">{t("partialResult")}</p>}
+                {(busy || retainingResult) && <p className="mb-3 text-xs font-medium text-brown-medium">{t(retainingResult ? "previousResult" : "partialResult")}</p>}
                 <div data-testid="label-result-summary" className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
                     <p className="text-xs font-medium text-brown-medium">{extraction.fields.roastery || t("missingRoastery")}</p>
@@ -398,18 +420,27 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
                     {compactFields.map((field) => <div key={field} className="contents"><dt className="text-xs text-brown-medium">{tb(FIELD_LABELS[field])}</dt><dd className="min-w-0 break-words text-brown">{displayValue(field)}</dd></div>)}
                   </dl>
                 )}
-                {!busy && candidates.length > 0 && (
+                {(!busy || retainingResult) && candidates.length > 0 && (
                   <>
                     <div className="mt-5 border-t border-border-light pt-4">
-                      <Button type="button" className="w-full sm:w-auto" disabled={disabled || !applicable.length} onClick={() => {
-                        onApply(extraction, applicable); setSelections([]); setNotice("applied");
-                      }}>{t("apply")}</Button>
+                      <div className="flex flex-col gap-2 sm:flex-row">
+                        <Button type="button" className="w-full sm:w-auto" disabled={disabled || busy || !applicable.length} onClick={() => {
+                          onApply(extraction, applicable); setSelections([]); setError(null); setNotice("applied");
+                        }}>{t("apply")}</Button>
+                        {hasCompletedResult && <Button type="button" variant="secondary" className="w-full sm:w-auto" disabled={disabled || busy} onClick={() => void readPhoto(photo, true)}>
+                          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" className="mr-2 shrink-0">
+                            <path d="M20 7v5h-5M4 17v-5h5" />
+                            <path d="M6.1 7a7 7 0 0 1 11.8-1L20 9M4 15l2.1 3A7 7 0 0 0 17.9 17" />
+                          </svg>
+                          {t("retry")}
+                        </Button>}
+                      </div>
                       {!applicable.length && notice !== "applied" && <p className="mt-2 text-xs leading-5 text-brown-medium">{t("noSelectionHint")}</p>}
                       {replacesExisting && <p className="mt-1 text-xs leading-5 text-brown-medium">{t("replaceWarning")}</p>}
                     </div>
                     <details data-testid="label-field-choices" className="mt-2 min-w-0">
                       <summary className="min-h-11 cursor-pointer py-3 text-xs font-medium text-brown focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">{t("selectionDetails")}</summary>
-                      <fieldset disabled={disabled}>
+                      <fieldset disabled={disabled || busy}>
                         <legend className="sr-only">{t("selectionDetails")}</legend>
                         <div className="divide-y divide-border-light">
                           {candidates.map((field) => {
@@ -417,7 +448,7 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
                             return (
                               <label key={field} className="flex min-h-11 items-start gap-3 py-3">
                                 <input type="checkbox" className="mt-1 h-4 w-4 shrink-0 accent-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
-                                  aria-label={tb(FIELD_LABELS[field])} checked={applicable.includes(field)} disabled={disabled || Boolean(blocked)}
+                                  aria-label={tb(FIELD_LABELS[field])} checked={applicable.includes(field)} disabled={disabled || busy || Boolean(blocked)}
                                   onChange={(event) => {
                                     const checked = event.target.checked;
                                     setNotice(null);
@@ -452,7 +483,7 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
         )}
       </div>
       <div role="status" aria-live="polite" aria-atomic="true" className={error || notice === "cancelled" ? "mt-1 text-sm leading-6 text-brown-medium" : "sr-only"}>
-        {error ? t(`errors.${error}`) : notice ? t(notice) : busy ? t(phase) : extraction ? t("found", { count: candidates.length }) : ""}
+        {error ? t(`errors.${error}`) : busy ? t(retrying ? "rereading" : phase) : notice ? t(notice) : extraction ? t("found", { count: candidates.length }) : ""}
       </div>
     </section>
   );
