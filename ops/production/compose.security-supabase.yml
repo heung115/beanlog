@@ -2,6 +2,11 @@
 # Preserve existing images, secret files, DB data and all trusted-IP settings.
 services:
   kong:
+    logging: &bounded-logs
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     read_only: true
     tmpfs:
       - /tmp:rw,noexec,nosuid,nodev,size=32m,mode=1777
@@ -19,6 +24,7 @@ services:
       default: {}
       management: {}
   auth:
+    logging: *bounded-logs
     image: beanlog-auth@sha256:03e69310e42ff84de122215f344eb1ccf862a7ac120a319cdd7d9b0a7540383c
     read_only: true
     tmpfs:
@@ -35,6 +41,7 @@ services:
       GOTRUE_SESSIONS_INACTIVITY_TIMEOUT: "168h"
       GOTRUE_SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: "true"
   rest:
+    logging: *bounded-logs
     read_only: true
     tmpfs:
       - /tmp:rw,noexec,nosuid,nodev,size=16m,mode=1777
@@ -46,6 +53,8 @@ services:
     environment:
       PGRST_DB_SCHEMAS: public
   db:
+    image: beanlog-postgres@sha256:c61e973bda4604a04677fa7aeacc49928d5e0a5ef0eb66c9ca426723b3ae6bf3
+    logging: *bounded-logs
     # Existing initialized data only: rehearse against an isolated restore before use.
     # The reviewed image starts root, fixes ownership, then becomes postgres (100:101).
     read_only: true

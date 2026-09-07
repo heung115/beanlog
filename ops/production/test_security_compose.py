@@ -11,14 +11,26 @@ ROOT = Path(__file__).resolve().parent
 
 @unittest.skipUnless(shutil.which('docker'), 'Docker Compose CLI is required')
 class ComposeTests(unittest.TestCase):
-    def merged(self, fixture, overlay):
+    def merged(self, fixture, overlay, runtime_env_services=()):
         with tempfile.TemporaryDirectory() as temporary:
             base = Path(temporary) / 'compose.json'
             base.write_text(json.dumps({'name': 'boundary-test', **fixture}))
-            result = subprocess.run(['docker', 'compose', '-f', str(base), '-f', str(overlay),
-                                     'config', '--format', 'json', '--no-env-resolution'],
-                                    capture_output=True, text=True, check=True,
+            command = ['docker', 'compose', '-f', str(base), '-f', str(overlay)]
+            if runtime_env_services:
+                # Do not depend on how a Compose version validates raw env_file
+                # paths with --no-env-resolution. Remove only host-owned inputs in a
+                # final test override; keep the real service/network definitions.
+                env_override = Path(temporary) / 'without-runtime-env.yml'
+                env_override.write_text('services:\n' + ''.join(
+                    f'  {service}:\n    env_file: !reset []\n'
+                    for service in runtime_env_services))
+                command.extend(['-f', str(env_override)])
+            command.extend(['config', '--format', 'json', '--no-env-resolution'])
+            result = subprocess.run(command,
+                                    capture_output=True, text=True,
                                     env={**__import__('os').environ, 'BEANMAP_WEB_AUTH_IP': '172.31.240.2'})
+            self.assertEqual(result.returncode, 0,
+                             f'Compose configuration failed for {overlay.name}:\n{result.stderr}')
             return json.loads(result.stdout)
 
     def test_web_loses_database_network_but_retains_exact_trusted_ip(self):
@@ -58,8 +70,10 @@ class ComposeTests(unittest.TestCase):
         self.assertEqual(result['services']['rest']['environment']['PGRST_DB_SCHEMAS'], 'public')
 
     def test_private_console_has_no_app_runtime_network(self):
-        result = self.merged({'services': {}}, ROOT.parent / 'private-console/deploy/compose.yml')
+        result = self.merged({'services': {}}, ROOT.parent / 'private-console/deploy/compose.yml',
+                             runtime_env_services=('private-meta', 'private-studio'))
         for service in ['private-meta', 'private-studio']:
+            self.assertFalse(result['services'][service].get('env_file'))
             self.assertEqual(set(result['services'][service]['networks']), {'management'})
         self.assertEqual(result['networks']['management']['name'], 'beanmap-management')
 

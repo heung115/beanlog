@@ -4,7 +4,8 @@ Candidate: `beanlog-auth:v2.195.0-go1.26.6-p2`. This preserves Auth v2.195.0,
 its existing migrations, Alpine runtime and non-root user. Only the Auth executable
 is replaced. The Dockerfile pins the existing p1 image's local immutable ID.
 Image ID: `sha256:03e69310e42ff84de122215f344eb1ccf862a7ac120a319cdd7d9b0a7540383c`
-(43,054,478 bytes). Deployment and recovery integration verification are coordinated separately.
+(43,054,478 bytes). The 18-check isolated PostgreSQL17.11 runtime/recovery rehearsal passed.
+Production activation remains coordinated separately.
 
 Build source: `/srv/beanlog/vendor/auth-v2.195.0`, copied to
 `/private/tmp/beanmap-auth-security-p2` on the operator Mac. Full source archive:
@@ -39,8 +40,16 @@ non-root runtime user; the executable is owned by root and mode 0755.
   filesystem, all capabilities removed, no-new-privileges, noexec/nosuid /tmp tmpfs,
   512 MiB memory, 128 PID and one CPU limit. Version output is v2.195.0.
 - Auth crypto, security/PKCE, configuration, and rate-limit package tests pass.
+- Full runtime rehearsal against the verified PostgreSQL17.11 production clone
+  passed all 18 checks recorded in `rehearsal-results.json`: constrained startup,
+  disabled phone auth, login/refresh rotation, old-session reauthentication guard,
+  admin-generated recovery with no outbound mail, email OTP attestation, one-time
+  token rejection, password replacement, 30-day timebox, and seven-day inactivity.
+  Disposable users were deleted; the candidate container, internal network and
+  temporary credentials file were removed. Clone returned to network `none`.
 - Token package tests require a disposable PostgreSQL fixture and did not pass on
-  the Mac because localhost:5432 had no test database. They were not run on live data.
+  the Mac because localhost:5432 had no test database. They were not run on live data. The separate runtime rehearsal above verifies
+  the relevant login, refresh, recovery, and expiration behavior end to end.
 - Production-root `govulncheck -show verbose .` reports two remaining symbol
   findings: GO-2026-5004 (`pgx/v4` 4.18.2) and GO-2026-4518 (`pgproto3/v2` 2.3.3).
   It reports zero other imported-package findings and one module-only OpenPGP
