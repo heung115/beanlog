@@ -4,7 +4,7 @@ import { flavorPresets } from "../../data/flavor-wheel.ts";
 import { isLabelMetadataLine, parseBeanLabelText } from "./bean-label-parser.ts";
 
 type Box = { x0: number; y0: number; x1: number; y1: number };
-type Line = { text: string; box: Box; height: number; orientation: "horizontal" | "vertical"; confidence: number; wordConfidence: number; excluded: boolean; country?: string };
+type Line = { text: string; box: Box; height: number; orientation: "horizontal" | "vertical"; confidence: number; wordConfidence: number; excluded: boolean; country?: string; printedCountryPrefix?: string };
 type Title = { lines: Line[]; text: string; box: Box; height: number };
 type Brand = { lines: Line[]; text: string; descriptor: Line };
 const compact = (text: string) => text.toLowerCase().replace(/[\s-]+/gu, "");
@@ -53,6 +53,19 @@ function boundingBox(value: unknown): Box | undefined {
   return { x0, y0, x1, y1 };
 }
 
+function printedCountryPrefix(text: string, words: Record<string, unknown>[]): string | undefined {
+  const country = countryPrefixes.find(({ pattern }) => pattern.test(text))?.country;
+  if (!country) return undefined;
+  const prefix: string[] = [];
+  for (const word of words.slice(0, 4)) {
+    if (typeof word.text !== "string" || typeof word.confidence !== "number" || !Number.isFinite(word.confidence)
+      || word.confidence < 95 || word.confidence > 100 || !boundingBox(word.bbox)) return undefined;
+    prefix.push(word.text);
+    if (countryPrefixes.find(({ pattern }) => pattern.test(prefix.join(" ")))?.country === country) return country;
+  }
+  return undefined;
+}
+
 function readLines(blocks: unknown): { lines: Line[]; hasExplicitName: boolean; hasExplicitRoastery: boolean } {
   const lines: Line[] = [];
   if (!Array.isArray(blocks)) return { lines, hasExplicitName: false, hasExplicitRoastery: false };
@@ -88,6 +101,7 @@ function readLines(blocks: unknown): { lines: Line[]; hasExplicitName: boolean; 
         const wordConfidence = confidences.length ? Math.min(...confidences) : 0;
         lines.push({ text, box, height, orientation, confidence: value.confidence,
           wordConfidence, excluded: false,
+          printedCountryPrefix: printedCountryPrefix(text, words),
           country: value.confidence >= 85 && wordConfidence >= 80 ? parseBeanLabelText(text).fields.origin_country : undefined });
       }
     }
@@ -167,11 +181,34 @@ function countrySupportedTitles(titles: Title[], lines: Line[], base: LabelExtra
     });
   });
   if (!rows.length || rows.some(row => row.country !== country)) return titles;
+  const countryOf = (title: Title) => {
+    const ownCountry = titleCountry(title.text);
+    if (ownCountry) return ownCountry;
+    const first = title.lines[0];
+    // A damaged first caption row may be ineligible as a name, but its legible
+    // country still belongs to the directly adjoining continuation. Otherwise
+    // rejecting that row can turn its tail into an unrelated competing title.
+    const preceding = lines.filter(line => !title.lines.includes(line) && !line.excluded && line.printedCountryPrefix
+      && line.orientation === "horizontal" && first.orientation === "horizontal" && korean(line.text) === korean(first.text)
+      && !metadata.test(line.text) && !administrative.test(line.text) && !promotion.test(line.text)
+      && !/[%:：=]/u.test(line.text) && line.text.length <= 150
+      && first.box.y0 - line.box.y1 >= -Math.min(first.height, line.height) * .5
+      && first.box.y0 - line.box.y1 <= Math.min(first.height, line.height) * .75
+      && Math.max(first.height, line.height) / Math.min(first.height, line.height) <= 1.5
+      && overlap(first.box, line.box) >= .65
+      && !lines.some(other => other !== line && !title.lines.includes(other)
+        && overlap(other.box, first.box) >= .65
+        && (other.box.y0 >= line.box.y1 && other.box.y1 <= first.box.y0
+          || (metadata.test(other.text) || excludedSection.test(other.text) || packageWeight.test(other.text) || isLabelMetadataLine(other.text))
+            && other.box.y0 + other.box.y1 > line.box.y0 + line.box.y1
+            && other.box.y0 + other.box.y1 < first.box.y0 + first.box.y1)));
+    return preceding.length === 1 ? preceding[0].printedCountryPrefix : undefined;
+  };
   // Removing a conflicting country heading cannot manufacture support for an
   // unrelated heading whose country was never read (e.g. a longer word).
-  if (titles.some(title => titleCountry(title.text) && titleCountry(title.text) !== country)
+  if (titles.some(title => countryOf(title) && countryOf(title) !== country)
     && !titles.some(title => titleCountry(title.text) === country)) return [];
-  return titles.filter(title => !titleCountry(title.text) || titleCountry(title.text) === country
+  return titles.filter(title => !countryOf(title) || countryOf(title) === country
     || !rows.some(row => row.lines.every(line => nearby(title, line))));
 }
 

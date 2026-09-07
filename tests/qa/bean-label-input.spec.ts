@@ -661,6 +661,8 @@ for (const outcome of ["complete", "cancel"] as const) {
       await expect.poll(async () => (await ocr.snapshot()).reads).toBe(2);
       const panel = page.getByRole("region", { name: label.sectionTitle, exact: true });
       await expect(panel).toHaveAttribute("aria-busy", "true");
+      await expect(panel.getByRole("heading", { level: 3 })).toHaveText(label.readingName);
+      await expect(panel.getByText(label.missingName, { exact: true })).toHaveCount(0);
       const state = await ocr.snapshot();
       expect(state.workerUrls[1]).toContain(workerPath);
       expect(state.terminated).toContain(0);
@@ -1025,6 +1027,8 @@ test("recognized country replaces previously loaded origin suggestions", async (
     await page.getByLabel(label.choose, { exact: true }).setInputFiles(photo);
     const review = page.getByRole("group", { name: label.review, exact: true });
     await expect(review).toBeVisible();
+    await expect(page.getByRole("region", { name: label.sectionTitle, exact: true })).toHaveAttribute("aria-busy", "false");
+    await expect(review.getByRole("heading", { level: 3 })).toHaveText(label.missingName);
     await openFieldChoices(review);
     await review.getByRole("checkbox", { name: t.beans.originCountry, exact: true }).check();
     await review.getByRole("checkbox", { name: t.beans.originRegion, exact: true }).check();

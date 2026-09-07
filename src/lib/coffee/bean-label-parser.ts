@@ -109,6 +109,12 @@ function parseCountry(value: string): string | undefined {
   // Remove only complete origin qualifiers. This permits Korean typography
   // without spaces while a country-prefixed product title still is not a value.
   const countryValue = value.replace(singlePattern, " ").replace(/100\s*%/gu, " ");
+  // OCR can join a country's two printed language forms. Match the whole
+  // value against that country's exact aliases; never split arbitrary words.
+  const joined = key(countryValue);
+  const bilingual = countries.find(({ aliases: [english, korean] }) =>
+    joined === key(english + korean) || joined === key(korean + english));
+  if (bilingual) return bilingual.preset.country;
   const matches = countriesIn(countryValue);
   if (matches.length !== 1) return undefined;
   let remainder = countryValue;

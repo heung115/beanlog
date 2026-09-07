@@ -2,6 +2,20 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { isKnownLabelFlavor, isKnownLabelVariety, labelTitleClassifiers, parseBeanLabelText } from "../src/lib/coffee/bean-label-parser.ts";
 
+test("the same country in adjoining Korean and English stays one exact country value", () => {
+  for (const [english, korean] of [["Peru", "페루"], ["Kenya", "케냐"], ["Colombia", "콜롬비아"]]) {
+    for (const value of [`${english}${korean}`, `${korean}${english}`, `${english.toUpperCase()}${korean} 100%`]) {
+      const text = `Country: ${value}`;
+      const result = parseBeanLabelText(text);
+      assert.equal(result.fields.origin_country, english, value);
+      assert.equal(result.evidence.origin_country, text);
+    }
+  }
+  for (const value of ["Peru케냐", "케냐Peru", "PeruColombia", "SuperPeru페루", "Peru페루 Estate", "Peru페루50%", "Peru페루 + Kenya케냐"]) {
+    assert.equal(parseBeanLabelText(`Country: ${value}`).fields.origin_country, undefined, value);
+  }
+});
+
 test("title conflict vocabulary uses exact countries and longest processing aliases", () => {
   assert.deepEqual(labelTitleClassifiers("Peru Highland Anaerobic Washed"), { countries: ["Peru"], processes: ["anaerobic"] });
   assert.deepEqual(labelTitleClassifiers("콜롬비아 비수세식"), { countries: ["Colombia"], processes: ["natural"] });
