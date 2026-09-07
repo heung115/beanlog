@@ -53,6 +53,15 @@ export async function proxy(request: NextRequest) {
     return updateSession(request);
   }
 
+  // The root is an alias of the Korean landing, not a temporary locale chooser.
+  // Keep this after OAuth error recovery, and preserve campaign/query parameters.
+  // A stable permanent redirect agrees with /ko's canonical and the sitemap.
+  if (request.nextUrl.pathname === "/" && ["GET", "HEAD"].includes(request.method)) {
+    const canonical = new URL(request.url);
+    canonical.pathname = "/ko";
+    return NextResponse.redirect(canonical, 308);
+  }
+
   let preferredLocale: "ko" | "en" | undefined;
   if (isProtectedPath(request.nextUrl.pathname) && !/^\/(ko|en)(?:\/|$)/.test(request.nextUrl.pathname)) {
     // Let next-intl choose the locale from the saved preference/browser before
