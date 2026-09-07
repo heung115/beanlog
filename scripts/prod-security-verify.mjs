@@ -195,6 +195,48 @@ try {
   expect((await call(`/rest/v1/beans?id=eq.${beanId}&select=id`, tokenA)).data).toEqual([]);
   report(stage);
 
+  // These pages and Server Actions call the internal Go API, exercising its
+  // JWT, database middleware, request budgets, CRUD handlers and read paths.
+  stage = "application UI create and journal/detail reads through Go API";
+  const app = recovered.page;
+  const uiName = "Disposable application workflow";
+  await app.goto(site + "/ko/beans/new");
+  await app.locator('[name="name"]').fill(uiName);
+  await app.locator('[name="roastery"]').fill("Disposable roastery");
+  await app.locator('[name="origin_country"]').fill("Ethiopia");
+  await app.locator('[name="note"]').fill("Disposable application note");
+  await app.locator('button[type="submit"]:not([name="continue"])').click();
+  await expect(app).toHaveURL(/\/ko\/explore$/, { timeout: 30000 });
+  await expect(app.getByTestId("bean-card")).toHaveCount(1);
+  await app.getByTestId("bean-card").filter({ hasText: uiName }).locator("h3 a").click();
+  await expect(app.getByRole("heading", { level: 1 })).toHaveText(uiName);
+  await expect(app.getByTestId("bean-overall-score")).toBeVisible();
+  const uiId = new URL(app.url()).pathname.split("/").at(-1);
+  expect(uiId).toMatch(/^[a-f0-9-]{36}$/);
+  report(stage);
+
+  stage = "application UI edit and statistics through Go API";
+  await app.goto(`${site}/ko/beans/${uiId}/edit`);
+  await expect(app.locator('[name="note"]')).toHaveValue("Disposable application note");
+  await app.locator('[name="note"]').fill("Disposable application updated note");
+  await app.locator('button[type="submit"]').click();
+  await expect(app).toHaveURL(/\/ko\/explore$/, { timeout: 30000 });
+  await app.goto(`${site}/ko/beans/${uiId}`);
+  await expect(app.locator("main")).toContainText("Disposable application updated note");
+  await app.goto(site + "/ko/stats");
+  await expect(app.getByTestId("stats-summary")).toContainText(uiName);
+  report(stage);
+
+  stage = "application UI delete and empty journal/statistics through Go API";
+  await app.goto(`${site}/ko/beans/${uiId}`);
+  await app.getByRole("button", { name: ko.beans.delete, exact: true }).click();
+  await app.getByRole("button", { name: ko.beans.delete, exact: true }).click();
+  await expect(app).toHaveURL(/\/ko\/explore$/, { timeout: 30000 });
+  await expect(app.getByTestId("explore-empty-state")).toBeVisible();
+  await app.goto(site + "/ko/stats");
+  await expect(app.getByTestId("stats-empty-state")).toBeVisible();
+  report(stage);
+
   stage = "allowed profile PATCH and internal function ACL";
   const profile = await call(`/rest/v1/profiles?id=eq.${users[0].id}`, tokenA, "PATCH", { display_name: "Disposable verified profile", locale: "ko" });
   expect(profile.status).toBe(204);

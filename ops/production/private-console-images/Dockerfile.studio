@@ -1,12 +1,17 @@
 FROM supabase/studio:2026.08.03-sha-022b374@sha256:606aca9fdaa753b60968d5c304e2ada83869b76c9043684e63d5885aca9550e8
 USER root
 COPY package.json package-lock.json /opt/beanmap-security-tar/
-COPY replace-next-tar.cjs /tmp/replace-next-tar.cjs
+COPY replace-next-tar.cjs replace-fast-uri.cjs /tmp/
 RUN npm ci --prefix /opt/beanmap-security-tar --ignore-scripts --omit=dev --no-audit --no-fund \
  && node /tmp/replace-next-tar.cjs \
+ && node /tmp/replace-fast-uri.cjs /app/node_modules \
  && apt-get update \
- && apt-get install -y --no-install-recommends libgnutls30 \
+ && apt-get install -y --no-install-recommends libgnutls30 libssl3 openssl libcap2 libssh2-1 linux-libc-dev \
  && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' libgnutls30)" ge '3.7.9-2+deb12u7' \
+ && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' libssl3)" ge '3.0.20-1~deb12u2' \
+ && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' libcap2)" ge '1:2.66-4+deb12u3' \
+ && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' libssh2-1)" ge '1.10.0-3+deb12u1' \
+ && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' linux-libc-dev)" ge '6.1.180-1' \
  && rm -rf /var/lib/apt/lists/* /root/.npm /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/pnpm /usr/local/lib/node_modules/corepack \
- && rm -f /tmp/replace-next-tar.cjs /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/pnpm /usr/local/bin/pnpx /usr/local/bin/corepack
+ && rm -f /tmp/replace-fast-uri.cjs /tmp/replace-next-tar.cjs /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/pnpm /usr/local/bin/pnpx /usr/local/bin/corepack
 USER 1000:1000

@@ -1,23 +1,24 @@
 # Auth dependency rebuild — 2026-09-07
 
-Candidate: `beanlog-auth:v2.195.0-go1.26.6-p2`. This preserves Auth v2.195.0,
+Candidate: `beanlog-auth:v2.195.0-go1.26.6-p3`. This preserves Auth v2.195.0,
 its existing migrations, Alpine runtime and non-root user. Only the Auth executable
 is replaced. The Dockerfile pins the existing p1 image's local immutable ID.
-Image ID: `sha256:03e69310e42ff84de122215f344eb1ccf862a7ac120a319cdd7d9b0a7540383c`
-(43,054,478 bytes). The 18-check isolated PostgreSQL17.11 runtime/recovery rehearsal passed.
+Image ID: `sha256:09d3dfe25eb2c08a467605af397f8b2edb0d5505634468eba55d186308f9743a`
+The 18-check isolated PostgreSQL17.11 runtime/recovery rehearsal passed.
 Production activation remains coordinated separately.
 
 Build source: `/srv/beanlog/vendor/auth-v2.195.0`, copied to
 `/private/tmp/beanmap-auth-security-p2` on the operator Mac. Full source archive:
-`/srv/beanlog/security-auth-20260907/auth-source-p2.tar.gz`.
+`/srv/beanlog/security-auth-20260907/auth-source-p3.tar.gz`.
 Source archive SHA-256:
-`c4d6dc1a7e1bb6866f33a6f76e68234ca884b7fab926536353f300595b244fe2`.
+`84cdb61aee225bfabb9a9207de3d17423b3c97a25f53fdf241967502b6c970be`.
 The checked-in `auth.go.mod` and `auth.go.sum` record the final resolved graph.
 
 Official dependency updates:
 
 - `golang.org/x/crypto` 0.53.0 → 0.56.0 (including the audit's 0.55.0 minimum).
 - `github.com/go-chi/chi/v5` 5.2.4 → 5.3.0.
+- `google.golang.org/grpc` 1.82.1 → 1.83.1 (CVE-2026-84304 HTTP/2 fragment memory exhaustion).
 - Required Go submodules: x/net 0.57.0, x/sync 0.22.0, x/sys 0.47.0, x/text 0.41.0.
 - Go compiler remains 1.26.6; the dependency graph's minimum Go version becomes 1.26.0.
 
@@ -26,16 +27,19 @@ From the source directory, replace `go.mod` / `go.sum` with these recorded files
 ```sh
 GOTOOLCHAIN=go1.26.6 CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build \
   -trimpath -ldflags '-s -w -X github.com/supabase/auth/internal/utilities.Version=v2.195.0' \
-  -o auth-security-p2 .
+  -o auth-security-p3 .
 ```
 
 Binary SHA-256:
-`928b9caeef5692ac6cf0de4a702088903cd97be91593276160c3100d4d58591a`.
+`3d20a1dbff80dafd3e36932a999c25725f00fbc1dbacac8bdcc62b78bc199b39`.
 Build the candidate Dockerfile beside that executable. The image inherits a
 non-root runtime user; the executable is owned by root and mode 0755.
 
 ## Verification and residual findings
 
+- Latest Trivy database (updated 2026-09-07 07:11 UTC) reports zero **fixed**
+  Critical/High findings in the final p3 image. This excludes unfixed findings and
+  is not a claim that every vulnerability is absent.
 - Candidate `auth --help` and `auth version` pass with network disabled, read-only
   filesystem, all capabilities removed, no-new-privileges, noexec/nosuid /tmp tmpfs,
   512 MiB memory, 128 PID and one CPU limit. Version output is v2.195.0.

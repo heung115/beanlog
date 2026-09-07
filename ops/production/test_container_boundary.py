@@ -40,6 +40,38 @@ class Firewall:
 
 
 class BoundaryTests(unittest.TestCase):
+    def test_existing_imds_guard_upgrade_preserves_drop_and_adds_only_dns(self):
+        firewall = Firewall()
+        firewall.chains[boundary.CHAIN] = [
+            ['-d', '169.254.169.254/32', '-j', 'DROP'],
+            ['!', '-i', boundary.BRIDGE, '-o', boundary.BRIDGE, '-j', 'DROP'],
+        ]
+        firewall.chains['DOCKER-USER'] = [['-j', boundary.CHAIN]]
+        with patch.object(boundary, 'command', side_effect=firewall.run), patch.object(
+                boundary, 'inspect_network', return_value={}), patch.object(boundary.os, 'geteuid', return_value=0):
+            boundary.apply()
+            after_upgrade = firewall.mutations
+            boundary.apply()
+        self.assertEqual(firewall.mutations, after_upgrade)
+        self.assertEqual(after_upgrade, 2)
+        self.assertEqual(firewall.chains[boundary.CHAIN], boundary.RULES)
+
+    def test_oci_dns_exception_does_not_permit_metadata_or_other_ports(self):
+        def verdict(protocol, port):
+            for rule in boundary.RULES:
+                if '-d' not in rule or rule[rule.index('-d') + 1] != '169.254.169.254/32':
+                    continue
+                if '-p' in rule and rule[rule.index('-p') + 1] != protocol:
+                    continue
+                if '--dport' in rule and rule[rule.index('--dport') + 1] != str(port):
+                    continue
+                return rule[rule.index('-j') + 1]
+        for protocol in ['udp', 'tcp']:
+            self.assertEqual(verdict(protocol, 53), 'RETURN')
+            for port in [22, 80, 443, 853, 8080]:
+                self.assertEqual(verdict(protocol, port), 'DROP')
+        self.assertEqual(verdict('icmp', None), 'DROP')
+
     def test_repeat_application_preserves_other_rules_without_duplicates(self):
         firewall = Firewall()
         with patch.object(boundary, 'command', side_effect=firewall.run), patch.object(

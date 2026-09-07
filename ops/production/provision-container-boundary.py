@@ -17,6 +17,10 @@ CHAIN = 'BEANMAP-BOUNDARY'
 LABEL = 'site.beanmap.owner'
 OWNER = 'container-boundary'
 RULES = [
+    # OCI provides DNS and IMDS on the same IP. Return only DNS to Docker's
+    # remaining policy; HTTP/HTTPS and every other port remain blocked below.
+    ['-d', '169.254.169.254/32', '-p', 'udp', '-m', 'udp', '--dport', '53', '-j', 'RETURN'],
+    ['-d', '169.254.169.254/32', '-p', 'tcp', '-m', 'tcp', '--dport', '53', '-j', 'RETURN'],
     ['-d', '169.254.169.254/32', '-j', 'DROP'],
     ['!', '-i', BRIDGE, '-o', BRIDGE, '-j', 'DROP'],
 ]

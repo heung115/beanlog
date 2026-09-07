@@ -1,7 +1,7 @@
 # Public Auth account-update boundary
 
-This is a deployment candidate; the production Caddy configuration has not been
-changed. Application recovery proofs alone do not protect a public Supabase Auth
+Apply and verify this gateway policy together with the application change; editing
+the repository alone does not activate it. Application recovery proofs alone do not protect a public Supabase Auth
 `PUT /auth/v1/user` call. Secure password change also accepts sessions created
 within the last 24 hours, so the public gateway must enforce this boundary.
 

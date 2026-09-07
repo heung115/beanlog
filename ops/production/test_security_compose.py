@@ -28,7 +28,8 @@ class ComposeTests(unittest.TestCase):
             command.extend(['config', '--format', 'json', '--no-env-resolution'])
             result = subprocess.run(command,
                                     capture_output=True, text=True,
-                                    env={**__import__('os').environ, 'BEANMAP_WEB_AUTH_IP': '172.31.240.2'})
+                                    env={**__import__('os').environ, 'BEANMAP_WEB_AUTH_IP': '172.31.240.2',
+                                         'BEANMAP_STUDIO_IP': '172.19.0.5'})
             self.assertEqual(result.returncode, 0,
                              f'Compose configuration failed for {overlay.name}:\n{result.stderr}')
             return json.loads(result.stdout)
@@ -76,6 +77,8 @@ class ComposeTests(unittest.TestCase):
             self.assertFalse(result['services'][service].get('env_file'))
             self.assertEqual(set(result['services'][service]['networks']), {'management'})
         self.assertEqual(result['networks']['management']['name'], 'beanmap-management')
+        self.assertEqual(result['services']['private-studio']['networks']['management']['ipv4_address'], '172.19.0.5')
+        self.assertFalse(result['services']['private-studio'].get('ports'))
 
 
 if __name__ == '__main__':

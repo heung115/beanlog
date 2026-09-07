@@ -25,7 +25,7 @@ services:
       management: {}
   auth:
     logging: *bounded-logs
-    image: beanlog-auth@sha256:03e69310e42ff84de122215f344eb1ccf862a7ac120a319cdd7d9b0a7540383c
+    image: beanlog-auth@sha256:09d3dfe25eb2c08a467605af397f8b2edb0d5505634468eba55d186308f9743a
     read_only: true
     tmpfs:
       - /tmp:rw,noexec,nosuid,nodev,size=32m,mode=1777

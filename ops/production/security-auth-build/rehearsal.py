@@ -4,7 +4,7 @@ ROOT=Path('/srv/beanlog/security-auth-20260907')
 DB='beanmap-pg-security-restore'
 AUTH='beanmap-auth-security-rehearsal'
 NET='beanmap-auth-security-rehearsal'
-IMAGE='beanlog-auth:v2.195.0-go1.26.6-p2'
+IMAGE='beanlog-auth:v2.195.0-go1.26.6-p3'
 def run(args,input=None):
     return subprocess.check_output(args,input=input,text=True,stderr=subprocess.PIPE).strip()
 def docker(*a,input=None): return run(['docker',*a],input)

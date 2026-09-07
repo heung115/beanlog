@@ -6,7 +6,7 @@ services:
   # Do not use the names "meta" or "studio": Compose adds service names as DNS
   # aliases, and the existing public Kong has dormant routes to those aliases.
   private-meta:
-    image: beanmap-postgres-meta@sha256:9173c0b89189d02fb1623a40614ac1f45b291e37943569b6a608caab5553642b
+    image: beanmap-postgres-meta@sha256:855f489860828f8cdb6f4110a467d2670ba5a2cec1ef7d2c5b7f7fcd93601b0b
     container_name: beanmap-private-meta
     user: "1000:1000"
     read_only: true
@@ -43,7 +43,7 @@ services:
       - management
 
   private-studio:
-    image: beanmap-studio@sha256:3ce929ecc269b059adadf58a024d7b9e369c58c7c113933fa842bf2c8849f117
+    image: beanmap-studio@sha256:fbd09e43b4928bb4b3368808d2baa26ef7183dc4345b04c5ffe1e5a779927c42
     container_name: beanmap-private-studio
     user: "1000:1000"
     read_only: true
@@ -64,8 +64,6 @@ services:
       ENABLED_FEATURES_LOGS_ALL: "false"
       SNIPPETS_MANAGEMENT_FOLDER: /app/snippets
       EDGE_FUNCTIONS_MANAGEMENT_FOLDER: /app/edge-functions
-    ports:
-      - "127.0.0.1:4321:3000"
     volumes:
       - /var/lib/beanmap-private-studio/snippets:/app/snippets
       - /var/lib/beanmap-private-studio/functions:/app/edge-functions:ro
@@ -95,7 +93,10 @@ services:
         max-size: "5m"
         max-file: "2"
     networks:
-      - management
+      management:
+        # Host Caddy reaches this fixed address; an internal-only Docker network
+        # does not provide the former published loopback port.
+        ipv4_address: ${BEANMAP_STUDIO_IP:?Set the reserved Studio management IPv4 in the deployment .env}
 
 networks:
   management:
