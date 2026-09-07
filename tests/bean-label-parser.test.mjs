@@ -353,6 +353,56 @@ test("an explicit heading retains the value printed on the next line", () => {
   assert.equal(parseBeanLabelText("Tasting notes:\nNatural").fields.process_method, undefined);
 });
 
+test("sparse OCR region columns end at the printed growing-altitude heading", () => {
+  for (const altitudeHeading of ["재배고도", "재배 고도:", "고도", "Altitude:"]) {
+    const result = parseBeanLabelText(`생산자:\n\nTamiru Tadesse Tesema\n\n생산지역\n\nMorke, Bura, Sidama\n\n${altitudeHeading}\n\n2,330 ~ 2,480m\n\n가공방식\n\nNatural\n\n품종:\n\n74158\n\n청사과, 청포도, 리치, 복숭아`);
+    assert.equal(result.fields.origin_region, "Morke, Bura, Sidama", altitudeHeading);
+    assert.equal(result.evidence.origin_region, "생산지역 Morke, Bura, Sidama", altitudeHeading);
+    assert.equal(result.fields.farm_producer, "Tamiru Tadesse Tesema", altitudeHeading);
+    assert.equal(result.fields.process_method, "natural", altitudeHeading);
+    assert.equal(result.fields.weight_g, undefined, altitudeHeading);
+  }
+});
+
+test("an explicit varietal heading can identify one adjacent known value across an OCR block break", () => {
+  for (const [heading, value] of [["품종:", "74158"], ["Varietal", "74110"], ["Variety:", "Pink Bourbon"], ["품 종", "SL28"]]) {
+    const result = parseBeanLabelText(`${heading}\n\n${value}\n\n청사과, 청포도, 리치, 복숭아`);
+    assert.equal(result.fields.varietal, value, value);
+    assert.equal(result.evidence.varietal, `${heading} ${value}`, value);
+    assert.deepEqual(result.tasting_notes.ko, ["청사과", "청포도", "리치", "복숭아"], value);
+  }
+});
+
+test("a sparse heading does not jump multiple blank lines or prose to find a later value", () => {
+  for (const text of [
+    "품종:\n\n\n74158",
+    "품종:\n\nUnrelated caption\n\n74158",
+    "품종:\n\nOur special Pink Bourbon coffee",
+    "품종:\n\nUnrelated caption",
+    "품종:\n\n774199",
+    "“rg\n\n74158",
+    "74158",
+  ]) assert.equal(parseBeanLabelText(text).fields.varietal, undefined, text);
+  for (const text of [
+    "생산지역\n\n\nMorke, Bura, Sidama\n\n재배고도",
+    "생산지역\n\nMorke, Bura, Sidama\n\nUnrelated caption\n\n재배고도",
+    "생산지역\n재배고도\n\n2,330 ~ 2,480m",
+  ]) assert.equal(parseBeanLabelText(text).fields.origin_region, undefined, text);
+});
+
+test("only an explicit country value tolerates at most two repeated heading separators", () => {
+  for (const text of ["국가: : Ethiopia 에티오피아", "Country: ： = Colombia", "Origin::: Ethiopia"]) {
+    const result = parseBeanLabelText(text);
+    assert.equal(result.fields.origin_country, text.includes("Colombia") ? "Colombia" : "Ethiopia", text);
+    assert.equal(result.evidence.origin_country, text);
+  }
+  for (const text of ["국가: : : : Ethiopia", "Country: Ethiopia : 에티오피아", "Country: 1 Ethiopia", "Country: x Ethiopia", "Country: ; Ethiopia", ": Ethiopia"])
+    assert.equal(parseBeanLabelText(text).fields.origin_country, undefined, text);
+  assert.equal(parseBeanLabelText("Product: : Printed Coffee").fields.name, ": Printed Coffee");
+  assert.equal(parseBeanLabelText("Region: : Sidama").fields.origin_region, ": Sidama");
+  assert.equal(parseBeanLabelText("Weight: : 200g").fields.weight_g, undefined);
+});
+
 test("clearly grouped package grams are accepted without guessing decimal commas", () => {
   for (const value of ["1,000 g", "10,000g", "100,000 g"]) {
     assert.equal(parseBeanLabelText(`Net weight: ${value}`).fields.weight_g, Number(value.replace(/[^\d]/g, "")), value);

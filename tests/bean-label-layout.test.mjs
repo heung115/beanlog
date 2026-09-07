@@ -177,3 +177,85 @@ test("plain COFFEE needs trustworthy geometry and confidence before identifying 
     blocks(line("RIDGE", 20, 30), line("COFFEE", 68, 30), line("RIVER", 200, 30), line("COFFEE", 248, 30)),
   ]) assert.equal(extractLabelLayout(source, base).fields.roastery, undefined);
 });
+
+function countryBase(country = "Ethiopia", evidence = "Country: Ethiopia") {
+  return { ...empty(), fields: { origin_country: country }, evidence: { origin_country: evidence } };
+}
+
+function countryCard(first = ["에티오피아 알로 타미루", "몰케 네추럴"], second = ["Colombia La Esperanza", "Java Natural"], metadata = [line("Country: Ethiopia", 270, 16)]) {
+  return blocks(...[...first, ...second].map((text, index) => line(text, 50 + index * 50, 40)),
+    ...metadata, line("Process: Natural", 310, 16));
+}
+
+test("nearby explicit country metadata selects its complete printed title instead of joining conflicting headers", () => {
+  const base = countryBase("Ethiopia", "국가: Ethiopia 에티오피아");
+  const source = countryCard(undefined, undefined, [line("국가: Ethiopia 에티오피아", 270, 16)]);
+  const original = structuredClone({ source, base });
+  const result = extractLabelLayout(source, base);
+  assert.equal(result.fields.name, "에티오피아 알로 타미루 몰케 네추럴");
+  assert.equal(result.evidence.name, "에티오피아 알로 타미루\n몰케 네추럴");
+  assert.equal(result.fields.origin_country, "Ethiopia");
+  assert.deepEqual({ source, base }, original);
+});
+
+test("country agreement can select the English title without preferring Korean or reading order", () => {
+  const result = extractLabelLayout(countryCard(["콜롬비아 푸른산", "자바 내추럴"], ["Ethiopia Tamiru", "Morke Natural"]), countryBase());
+  assert.equal(result.fields.name, "Ethiopia Tamiru Morke Natural");
+  assert.equal(result.evidence.name, "Ethiopia Tamiru\nMorke Natural");
+});
+
+test("a new country-prefixed heading starts a separate title even when both titles use the same script", () => {
+  const result = extractLabelLayout(countryCard(["Ethiopia Tamiru", "Morke Natural"], ["Colombia La Esperanza", "Java Natural"]), countryBase());
+  assert.equal(result.fields.name, "Ethiopia Tamiru Morke Natural");
+});
+
+test("country-supported titles preserve a mixed-script continuation without inventing a translation", () => {
+  const result = extractLabelLayout(countryCard(["Ethiopia Tamiru", "몰케 Natural"], ["Colombia La Esperanza", "Java Natural"]), countryBase());
+  assert.equal(result.fields.name, "Ethiopia Tamiru 몰케 Natural");
+  assert.equal(result.evidence.name, "Ethiopia Tamiru\n몰케 Natural");
+});
+
+test("country selection needs both parsed evidence and the corresponding readable metadata line", () => {
+  for (const [base, metadata] of [
+    [empty(), []],
+    [countryBase(), []],
+    [{ ...empty(), fields: { origin_country: "Ethiopia" } }, [line("Country: Ethiopia", 270, 16)]],
+    [countryBase(), [line("Country: Ethiopla", 270, 16)]],
+    [countryBase(), [line("Country: Ethiopia", 270, 16, { confidence: 0, wordConfidence: 0 })]],
+    [countryBase("Ethiopia", "Ethiopia"), [line("Ethiopia", 270, 16)]],
+  ]) {
+    const result = extractLabelLayout(countryCard(undefined, undefined, metadata), base);
+    assert.equal(result.fields.name, undefined, JSON.stringify({ base, metadata }));
+    assert.deepEqual(result.fields, base.fields);
+  }
+});
+
+test("conflicting explicit country rows cannot break a title tie even if a previous pass supplied one country", () => {
+  const metadata = [line("Country: Ethiopia", 270, 16), line("Origin: Colombia", 290, 16)];
+  assert.equal(extractLabelLayout(countryCard(undefined, undefined, metadata), countryBase()).fields.name, undefined);
+  assert.equal(extractLabelLayout(countryCard(undefined, undefined, metadata), empty()).fields.name, undefined);
+});
+
+test("country metadata on another distant card cannot disambiguate these titles", () => {
+  for (const metadata of [
+    [line("Country: Ethiopia", 1000, 16)],
+    [line("Country: Ethiopia", 270, 16, { x: 1400 })],
+  ]) assert.equal(extractLabelLayout(countryCard(undefined, undefined, metadata), countryBase()).fields.name, undefined);
+});
+
+test("matching a country does not prove that distinct bilingual titles are translations", () => {
+  const source = countryCard(["에티오피아 푸른산", "워시드 커피"], ["Ethiopia Distant Valley", "Natural Coffee"]);
+  assert.equal(extractLabelLayout(source, countryBase()).fields.name, undefined);
+});
+
+test("country names embedded in longer title words cannot establish country agreement", () => {
+  const source = countryCard(["콜롬비아 푸른산", "자바 내추럴"], ["Ethiopiaway Morning", "Natural Coffee"]);
+  assert.equal(extractLabelLayout(source, countryBase()).fields.name, undefined);
+});
+
+test("varietal and producer values named after a country are not explicit origin evidence", () => {
+  for (const label of ["Varietal: Colombia", "Producer: Colombia"]) {
+    const source = countryCard(undefined, undefined, [line(label, 270, 16)]);
+    assert.equal(extractLabelLayout(source, countryBase("Colombia", label)).fields.name, undefined, label);
+  }
+});

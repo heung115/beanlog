@@ -26,7 +26,7 @@ const labels: [ParserField, string[]][] = [
   ["weight_g", ["내용량", "순중량", "중량", "net weight", "net wt.", "net wt", "net contents", "weight", "net"]],
   ["tasting_notes", ["tasting notes", "tasting note", "cup notes", "cup note", "flavor notes", "컵 노트", "컵노트", "맛", "향미"]],
   // Recognize other headings only to keep their text out of adjacent fields.
-  ["ignore", ["소비 기한", "유통 기한", "품질 유지 기한", "구매일", "수확일", "제조일", "포장일", "best before", "best by", "expiry date", "expiration date", "expires", "expiry", "purchased", "purchase date", "harvest date", "harvest", "packed on", "manufactured", "고도", "altitude", "roastery address", "address", "주소", "dose", "dosage", "water", "추출량", "물", "투입량", "사용량"]],
+  ["ignore", ["소비 기한", "유통 기한", "품질 유지 기한", "구매일", "수확일", "제조일", "포장일", "best before", "best by", "expiry date", "expiration date", "expires", "expiry", "purchased", "purchase date", "harvest date", "harvest", "packed on", "manufactured", "재배 고도", "고도", "altitude", "roastery address", "address", "주소", "dose", "dosage", "water", "추출량", "물", "투입량", "사용량"]],
 ];
 
 const labelEntries = labels.flatMap(([field, aliases]) => aliases.map((alias) => ({ field, alias, pattern: spaced(alias) })))
@@ -166,6 +166,7 @@ const componentProcessPattern = Object.values(processAliases).flat().sort((left,
 // These printed coffee accession names are vocabulary, not a rule that any five-digit number is a variety.
 const componentVarietyPattern = `(?:${[...varietalPresets.flatMap((preset) => [preset.en, preset.ko]), "74110", "74158"]
   .sort((left, right) => right.length - left.length).map(spaced).join("|")})`;
+const knownVarietyValue = new RegExp(`^${componentVarietyPattern}$`, "iu");
 const roastLevels = new Map(Object.entries({
   light: ["light", "light roast", "라이트", "라이트 로스트", "약배전"],
   medium: ["medium", "medium roast", "미디엄", "미디엄 로스트", "중배전"],
@@ -234,12 +235,15 @@ export function parseBeanLabelText(text: string): LabelExtraction {
   function read(field: ParserField, value: string, evidence: string) {
     if (!value || field === "ignore" || field === "tasting_notes") return;
     if (field === "origin_country") {
-      readComponents(value, evidence, true);
-      if (countriesIn(value).length > 1 || hasOriginShare(value) || blendPattern.test(value)) {
+      // A table rule can be read as an extra delimiter immediately after this
+      // heading. Only this country's prefix is tolerated; evidence stays printed.
+      const originValue = value.replace(/^(?:[:：=]\s*){1,2}/u, "");
+      readComponents(originValue, evidence, true);
+      if (countriesIn(originValue).length > 1 || hasOriginShare(originValue) || blendPattern.test(originValue)) {
         blend = true;
         blocked.add("origin_country");
       }
-      const country = parseCountry(value);
+      const country = parseCountry(originValue);
       if (!country) blocked.add("origin_country");
       add(field, country, evidence);
     } else if (field === "weight_g") {
@@ -290,13 +294,16 @@ export function parseBeanLabelText(text: string): LabelExtraction {
     }
     // Evidence must remain a short, readable original line, including OCR spacing.
     if (line.length > 500 || /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2066-\u2069\ufeff]/u.test(line)) continue;
-    // OCR can put a heading on its own line. A single extra OCR blank is
-    // crossed only when the next heading bounds this value as a label column.
+    // OCR can put a heading on its own line. One extra blank needs either a
+    // following heading or a complete known value under an explicit variety
+    // heading. Neither path skips prose or guesses a missing label.
     const heading = segments(line);
     let valueIndex = index + 1;
     if (lines[valueIndex] === "") {
       const nextHeading = lines[valueIndex + 2] || lines[valueIndex + 3] || "";
-      if (firstLabel.test(nextHeading)) valueIndex += 1;
+      const adjacentVariety = heading.length === 1 && heading[0].field === "varietal" && !heading[0].value
+        && knownVarietyValue.test(lines[valueIndex + 1] ?? "");
+      if (firstLabel.test(nextHeading) || adjacentVariety) valueIndex += 1;
     }
     const following = lines[valueIndex] ?? "";
     if (heading.length === 1 && heading[0].field !== "ignore" && !heading[0].value

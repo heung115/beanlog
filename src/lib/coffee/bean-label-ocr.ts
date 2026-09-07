@@ -4,6 +4,8 @@ import { prepareLabelWordRetry } from "./bean-label-image.ts";
 import { findLabelWeightRegions, type LabelTextRegion } from "./bean-label-image-regions.ts";
 import { hasUnreadableLabelWeight, parseBeanLabelText } from "./bean-label-parser.ts";
 import { extractLabelLayout } from "./bean-label-layout.ts";
+import { estimateLabelSkew } from "./bean-label-deskew.ts";
+import { extractLabelCountryEvidence, findLabelCountryRegions, reprojectLabelCountryEvidence } from "./bean-label-country-evidence.ts";
 import { findLabelRoasteryRegions, parseLabelRoasteryRetry, prepareLabelRoasteryRetry, type LabelRoasteryRegion } from "./bean-label-roastery.ts";
 import { LABEL_FIELDS, mergeLabelExtractions, type LabelExtraction } from "./bean-label.ts";
 
@@ -24,6 +26,7 @@ interface ReadOptions {
   onPartial?: (result: { text: string; extraction: LabelExtraction }) => void;
   prepareWeightRetry?: () => Promise<Blob>;
   prepareDetailRetries?: (options: { includeColor: boolean }) => Promise<LabelImageVariant[]>;
+  prepareDeskewRetry?: (angleDegrees: number) => Promise<Blob>;
 }
 
 interface PendingJob {
@@ -34,6 +37,7 @@ interface PendingJob {
 
 const ASSETS = "/ocr/tesseract-7.0.0";
 const MAX_TEXT_LENGTH = 30_000;
+const explicitCountryHeading = /^(?:country\s+of\s+origin|origin\s+country|country|origin|원\s*산\s*지|생\s*산\s*국|국\s*가|산\s*지)(?!\s+region)(?:\s*[:：=]|\s+|$)/imu;
 
 const abortError = () => new DOMException("Reading cancelled", "AbortError");
 
@@ -188,6 +192,7 @@ export function createBrowserLabelReader() {
         const extractions: { extraction: LabelExtraction; kind?: LabelImageVariant["kind"] }[] = [];
         const wordRegions: { image: Blob; kind: LabelImageVariant["kind"]; region: LabelTextRegion }[] = [];
         const roasteryRegions: { image: Blob; index: number; candidate: LabelRoasteryRegion }[] = [];
+        let deskewAttempted = false;
         const combined = () => ({
           text: [...new Set(texts.flatMap(value => value.split("\n")).map(line => line.trim()).filter(Boolean))].join("\n").slice(0, MAX_TEXT_LENGTH),
           extraction: mergeLabelExtractions([...extractions]
@@ -216,17 +221,62 @@ export function createBrowserLabelReader() {
             regions: findLabelWeightRegions("blocks" in result ? result.blocks : undefined, hasLabelContext),
             roasteryRegions: findLabelRoasteryRegions("blocks" in result ? result.blocks : undefined, hasLabelContext),
             confidence: "confidence" in result && typeof result.confidence === "number" ? result.confidence : 0,
+            skew: boxes ? estimateLabelSkew("blocks" in result ? result.blocks : undefined) : null,
+            blocks: "blocks" in result ? result.blocks : undefined,
           };
         }
         for (pass = 0; pass < variants.length; pass++) {
           const variant = variants[pass];
-          const result = await readPixels(variant.image, variant.psm, true);
+          let source = variant.image;
+          let result = await readPixels(source, variant.psm, true);
+          if (!deskewAttempted && options.prepareDeskewRetry && !result.extraction.fields.name && result.skew
+            && extractions.every(previous => !previous.extraction.fields.name)
+            && !/^(?:product(?:\s+name)?|coffee\s+name|bean\s+name|상품명|제품명|원두명|커피명)\s*[:：=]/imu.test(result.text)) {
+            deskewAttempted = true;
+            const corrected = await options.prepareDeskewRetry(result.skew.angleDegrees);
+            assertCurrent();
+            const refined = await readPixels(corrected, "11", true);
+            if (!refined.extraction.fields.name) {
+              const supplementCountry = (country: ReturnType<typeof extractLabelCountryEvidence>) => {
+                if (!country.text) return;
+                refined.extraction = extractLabelLayout([
+                  ...(Array.isArray(refined.blocks) ? refined.blocks : []), ...country.blocks,
+                ], parseBeanLabelText(`${country.text}\n${refined.text}`));
+                refined.text += `\n${country.text}`;
+              };
+              // A sparse pass can read the title and country value but miss its
+              // small heading. Re-read only that observed row, then put its exact
+              // evidence back at the original image coordinates for layout checks.
+              const regions = findLabelCountryRegions(refined.blocks);
+              for (const region of regions) {
+                const cropped = await prepareLabelWordRetry(corrected, region, signal, 2);
+                assertCurrent();
+                const confirmation = await readPixels(cropped, "7", true);
+                supplementCountry(reprojectLabelCountryEvidence(extractLabelCountryEvidence(confirmation.blocks), region, 2));
+                if (refined.extraction.fields.name) break;
+              }
+              if (!regions.length) {
+                const confirmation = await readPixels(corrected, "6", true);
+                supplementCountry(extractLabelCountryEvidence(confirmation.blocks));
+              }
+            }
+            // A clearer reading of the same photograph replaces its failed view
+            // before publishing a partial. Never merge a fragmented country word
+            // from the tilted read into the recovered title's metadata.
+            const hasExplicitCountry = explicitCountryHeading.test(result.text) || Boolean(extractLabelCountryEvidence(result.blocks).text);
+            const explicitCountryConflict = hasExplicitCountry && (!result.extraction.fields.origin_country
+              || result.extraction.fields.origin_country !== refined.extraction.fields.origin_country);
+            if (refined.extraction.fields.name && refined.confidence >= result.confidence + 10 && !explicitCountryConflict) {
+              source = corrected;
+              result = refined;
+            }
+          }
           texts.push(result.text);
           extractions.push({ extraction: result.extraction, kind: variant.kind });
-          wordRegions.push(...result.regions.map(region => ({ image: variant.image, kind: variant.kind, region })));
+          wordRegions.push(...result.regions.map(region => ({ image: source, kind: variant.kind, region })));
           const explicitRoaster = /^(?:roastery|roasters?|roasted\s+by|로스터리|로스터|로스팅\s*업체)\s*[:：=]/imu.test(result.text);
           if (variant.kind === "full" && !explicitRoaster) {
-            roasteryRegions.push(...result.roasteryRegions.map(candidate => ({ image: variant.image, index: extractions.length - 1, candidate })));
+            roasteryRegions.push(...result.roasteryRegions.map(candidate => ({ image: source, index: extractions.length - 1, candidate })));
           }
           partial();
         }

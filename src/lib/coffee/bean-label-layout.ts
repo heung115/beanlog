@@ -1,6 +1,7 @@
 import type { LabelExtraction } from "./bean-label.ts";
 import { originPresets } from "../../data/origin-presets.ts";
 import { flavorPresets } from "../../data/flavor-wheel.ts";
+import { parseBeanLabelText } from "./bean-label-parser.ts";
 
 type Box = { x0: number; y0: number; x1: number; y1: number };
 type Line = { text: string; box: Box; height: number; confidence: number; wordConfidence: number; excluded: boolean };
@@ -12,7 +13,13 @@ const flavorNames = new Set(flavorPresets.flatMap((entry) => [entry.tag, entry.t
 const controls = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2066-\u2069\ufeff]/u;
 const explicitName = /^(?:[-•]\s*)?(?:상\s*품\s*명|제\s*품\s*명|원\s*두\s*명|커\s*피\s*명|p\s*r\s*o\s*d\s*u\s*c\s*t(?:\s*n\s*a\s*m\s*e)?|coffee\s*name|bean\s*name)(?:\s*[:：=]|\s+|$)/iu;
 const explicitRoastery = /^(?:roaster(?:y|s)?|roasted\s*by|로\s*스\s*터\s*리|로\s*스\s*터)(?:\s*[:：=]|\s+|$)/iu;
-const metadata = /^(?:country|origin|region|farm|producer|varietals?|variet(?:y|ies)|cultivar|process(?:ing)?|roast(?:ed|ing)?|net|weight|altitude|harvest|packed|best\s*before|expiry|원산지|생산국|지역|농장|생산자|품종|가공|로스팅|내용량|중량|고도|수확|소비기한|유통기한)(?:\b|\s|[:：])/iu;
+const metadata = /^(?:country|origin|region|farm|producer|varietals?|variet(?:y|ies)|cultivar|process(?:ing)?|roast(?:ed|ing)?|net|weight|altitude|harvest|packed|best\s*before|expiry|원산지|생산국|국가|(?:생산|산지|재배)?\s*지역|농장|생산자|품종|가공(?:\s*방식|\s*방법|법)?|로스팅|내용량|중량|(?:재배)?\s*고도|수확|소비기한|유통기한)(?:\b|\s|[:：]|$)/iu;
+const countryHeading = /^(?:country(?:\s+of\s+origin)?|origin(?:\s+country)?|원\s*산\s*지|생\s*산\s*국|국\s*가|산\s*지)(?:\s*[:：=]|\s+|$)/iu;
+const countryPrefixes = originPresets.map(({ country, countryKo }) => ({ country,
+  pattern: new RegExp(`^(?:${[country, countryKo].map(alias => [...alias.replace(/\s+/gu, "")]
+    .map(character => character.replace(/[.*+?^${}()|[\]\\]/gu, "\\$&")).join("[ \\t]*")).join("|")})(?![\\p{L}\\p{N}])`, "iu"),
+}));
+const titleCountry = (text: string) => countryPrefixes.find(({ pattern }) => pattern.test(text))?.country;
 const excludedSection = /^(?:tasting\s*notes?|cup\s*notes?|flavo[u]?r\s*notes?|nutrition|ingredients|brew(?:ing)?|recipe|(?:roastery\s*)?address|컵\s*노트|향미|영양|원재료|레시피|추출|주소)(?:\b|\s|[:：])/iu;
 const roaster = /\broasters?\b|\broastery\b|로스터스|로스터리/iu;
 const promotion = /\b(?:business|price|sale|discount|wholesale|shipping|subscribe|enjoy|favorite|favourite|freshly|delicious|perfect|crafted|quality|our|your|instructions|ignore)\b|\bfor\s+you\b|\bevery\s+(?:day|cup)\b|특가|할인|무료배송|추천|즐기|신선한/iu;
@@ -89,7 +96,8 @@ function groupTitles(lines: Line[]): Title[] {
     const gap = preceding ? line.box.y0 - preceding.box.y1 : Infinity;
     const sameSize = preceding && Math.max(line.height, preceding.height) / Math.min(line.height, preceding.height) <= 1.25;
     if (last && preceding && last.lines.length < 3 && gap >= -Math.min(line.height, preceding.height) * 0.15 && gap <= Math.min(line.height, preceding.height) * 0.75
-      && sameSize && overlap(line.box, preceding.box) >= 0.65) {
+      && sameSize && overlap(line.box, preceding.box) >= 0.65
+      && !(titleCountry(last.text) && titleCountry(line.text))) {
       last.lines.push(line);
       last.text += ` ${line.text}`;
       last.box = { x0: Math.min(last.box.x0, line.box.x0), y0: last.box.y0, x1: Math.max(last.box.x1, line.box.x1), y1: line.box.y1 };
@@ -97,6 +105,30 @@ function groupTitles(lines: Line[]): Title[] {
     } else titles.push({ lines: [line], text: line.text, box: { ...line.box }, height: line.height });
   }
   return titles;
+}
+
+function countrySupportedTitles(titles: Title[], lines: Line[], base: LabelExtraction): Title[] {
+  const country = base.fields.origin_country;
+  const evidence = base.evidence.origin_country;
+  if (!country || !evidence || !countryHeading.test(evidence) || base.bean_type === "blend") return titles;
+  const headings = lines.filter(line => countryHeading.test(line.text));
+  const rows = headings.flatMap(heading => {
+    if (heading.confidence < 85 || heading.wordConfidence < 80) return [];
+    const inline = parseBeanLabelText(heading.text).fields.origin_country;
+    if (inline) return [{ country: inline, lines: [heading] }];
+    // Sparse OCR can return the heading and value as separate blocks on one row.
+    if (heading.text.replace(countryHeading, "").trim()) return [];
+    return lines.flatMap(value => {
+      if (value === heading || value.confidence < 85 || value.wordConfidence < 80 || value.box.x0 < heading.box.x1
+        || value.box.x0 - heading.box.x1 > heading.height * 8
+        || Math.abs((value.box.y0 + value.box.y1 - heading.box.y0 - heading.box.y1) / 2) > Math.max(value.height, heading.height) * 0.7) return [];
+      const parsed = parseBeanLabelText(`${heading.text}\n${value.text}`).fields.origin_country;
+      return parsed ? [{ country: parsed, lines: [heading, value] }] : [];
+    });
+  });
+  if (!rows.length || rows.some(row => row.country !== country)) return titles;
+  return titles.filter(title => !titleCountry(title.text) || titleCountry(title.text) === country
+    || !rows.some(row => row.lines.every(line => nearby(title, line))));
 }
 
 function stackedBrands(lines: Line[]): { brand: Line; descriptor: Line }[] {
@@ -136,7 +168,7 @@ export function extractLabelLayout(blocks: unknown, base: LabelExtraction): Labe
       && other.box.y0 >= line.box.y1 && other.box.y0 - line.box.y1 <= line.height * 0.8 && overlap(line.box, other.box) >= 0.5);
   });
   const hasBaseCoffee = Boolean(base.bean_type !== "unknown" || base.fields.roastery || base.fields.origin_country || base.fields.process_method || base.fields.varietal || base.fields.blend_components);
-  const titles = groupTitles(candidates).filter((title) => {
+  const titles = countrySupportedTitles(groupTitles(candidates).filter((title) => {
     if (title.text.length > 200 || flavorNames.has(compact(title.text)) || (!coffeeProduct.test(title.text) && title.text.split(/\s+/u).length < 2)) return false;
     // A clipped "Blend X" fragment is not evidence that a nearby category
     // heading is a complete product name either.
@@ -152,7 +184,7 @@ export function extractLabelLayout(blocks: unknown, base: LabelExtraction): Labe
     // Coffee-specific titles can sit below a larger bilingual title. Arbitrary
     // names must stand out from the nearby supporting label text.
     return coffeeProduct.test(title.text) || title.height >= Math.min(...anchors.map((line) => line.height)) * 1.25;
-  }).sort((left, right) => right.height - left.height);
+  }), lines, base).sort((left, right) => right.height - left.height);
   // A larger bilingual heading can itself contain OCR errors. Font size cannot
   // establish that its letters are a better product name than the other script.
   const competingLanguage = titles.some((title) => /[가-힣]/u.test(title.text) !== /[가-힣]/u.test(titles[0]?.text ?? ""));
