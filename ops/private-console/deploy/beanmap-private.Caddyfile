@@ -56,7 +56,7 @@ http://:9311 {
 		respond @unsafe_without_origin 403
 		@unsupported method TRACE CONNECT
 		respond @unsupported 405
-		reverse_proxy 127.0.0.1:4321 {
+		reverse_proxy {$BEANMAP_STUDIO_IP}:3000 {
 			header_up Host {$BEANMAP_TAILSCALE_DNS}:8443
 			header_up X-Forwarded-Host {$BEANMAP_TAILSCALE_DNS}:8443
 			header_up X-Forwarded-Proto https

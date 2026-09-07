@@ -65,6 +65,11 @@ func (h *BeanHandler) List(c *gin.Context) {
 	if f.Page < 0 {
 		f.Page = 0
 	}
+	// Divide first so even MaxInt page values cannot overflow.
+	if f.Page > 100000/f.Limit {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "pagination offset exceeds limit"})
+		return
+	}
 	offset := f.Page * f.Limit
 
 	// Build WHERE clauses

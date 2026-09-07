@@ -1,3 +1,4 @@
+import { validateLabelImageBeforeDecode } from "./bean-label-image-header.ts";
 import { originPresets } from "../../data/origin-presets.ts";
 
 export interface LabelRoasteryRegion {
@@ -153,6 +154,7 @@ async function decode(image: Blob, signal: AbortSignal): Promise<ImageBitmap> {
 export async function prepareLabelRoasteryRetry(image: Blob, region: LabelRoasteryRegion["region"], signal: AbortSignal): Promise<Blob> {
   signal.throwIfAborted();
   if (!validRegion(region) || typeof createImageBitmap !== "function" || typeof document === "undefined") throw invalidImage();
+  await validateLabelImageBeforeDecode(image, signal);
   const bitmap = await decode(image, signal);
   let canvas: HTMLCanvasElement | undefined;
   try {

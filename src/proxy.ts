@@ -10,10 +10,25 @@ import { getOAuthFailureKind, resolveAuthFailurePath } from "@/lib/security/redi
 import { isMissingOriginPath } from "@/lib/coffee/origin-route";
 import { isAdminPath } from "@/lib/security/admin-boundary";
 import { privateAdminContext } from "@/lib/admin/private-access";
+import { applyNonceHeaders, contentSecurityPolicy, createScriptNonce } from "@/lib/security/csp";
 
 const intlMiddleware = createIntlMiddleware(routing);
 
 export async function proxy(request: NextRequest) {
+  if (request.nextUrl.pathname.startsWith("/api") || request.nextUrl.pathname === "/opengraph-image") {
+    return routeRequest(request);
+  }
+  const nonce = createScriptNonce();
+  const policy = contentSecurityPolicy(nonce);
+  // Overwrite caller-supplied values before session and locale composition.
+  request.headers.set("x-nonce", nonce);
+  request.headers.set("Content-Security-Policy", policy);
+  const response = await routeRequest(request);
+  applyNonceHeaders(response.headers, nonce, policy, request.headers);
+  return response;
+}
+
+async function routeRequest(request: NextRequest) {
   // Next 16 Proxy runs on Node.js, so the secret can remain a mounted file.
   // Public requests do not learn whether an account has administrator access.
   if (isAdminPath(request.nextUrl.pathname) && !privateAdminContext(request.headers)) {

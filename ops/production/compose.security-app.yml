@@ -1,0 +1,21 @@
+# Apply LAST after docker-compose.yml and docker-compose.client-ip.yml.
+# Preserve the exact web /32 trusted by Kong (read it from the existing network).
+services:
+  web:
+    logging: &bounded-logs
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks: !override
+      app-runtime: {}
+      auth-client-ip:
+        ipv4_address: ${BEANMAP_WEB_AUTH_IP:?set the existing trusted web IPv4 address}
+  api:
+    logging: *bounded-logs
+    networks:
+      app-runtime: {}
+      supabase_net: {}
+networks:
+  app-runtime:
+    internal: true

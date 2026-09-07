@@ -9,6 +9,7 @@ Tailscale, or rotates existing credentials. Run as root on the deployment host.
 from __future__ import annotations
 
 import argparse
+import ipaddress
 import json
 import os
 from pathlib import Path
@@ -27,6 +28,19 @@ EXPECTED_DNS = "oracle-free.tail6e4bc0.ts.net"
 
 class ProvisionError(Exception):
     pass
+
+
+def studio_management_ip(text: str) -> str:
+    values = re.findall(r"^BEANMAP_STUDIO_IP=([^\r\n]+)$", text, re.MULTILINE)
+    if len(values) != 1:
+        raise ProvisionError("Set one BEANMAP_STUDIO_IP in the private-console deployment .env")
+    try:
+        address = ipaddress.IPv4Address(values[0].strip())
+    except ipaddress.AddressValueError as error:
+        raise ProvisionError("BEANMAP_STUDIO_IP must be a literal management IPv4 address") from error
+    if not address.is_private or address.is_loopback or address.is_link_local or address.is_unspecified:
+        raise ProvisionError("BEANMAP_STUDIO_IP must be a private bridge address")
+    return str(address)
 
 
 def command_json(args: list[str]) -> object:
@@ -147,6 +161,7 @@ def prepare() -> None:
     if os.geteuid() != 0:
         raise ProvisionError("Run this preparation command as root on the server")
     # Validate all inputs before creating any credentials.
+    studio_ip = studio_management_ip(Path(__file__).with_name(".env").read_text())
     db = container_env("supabase-db")
     gateway = container_env("supabase-kong")
     rest = container_env("supabase-rest")
@@ -193,6 +208,7 @@ def prepare() -> None:
     atomic_write(RUNTIME / "caddy.env", systemd_env({
         "BEANMAP_TAILSCALE_OWNER": owner,
         "BEANMAP_TAILSCALE_DNS": dns,
+        "BEANMAP_STUDIO_IP": studio_ip,
         "BEANMAP_ADMIN_INGRESS_SECRET": ingress_secret,
     }))
     ensure_directory(Path("/var/lib/beanmap-private-studio"), 0o750)

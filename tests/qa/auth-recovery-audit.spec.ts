@@ -18,6 +18,18 @@ test.beforeAll(() => {
   }
 });
 
+async function assertRecoveryClaims(page: Page, method: "recovery" | "otp" = "recovery") {
+  const cookies = await page.context().cookies();
+  const parts = cookies.filter((cookie) => /auth-token(?:\.\d+)?$/.test(cookie.name)).sort((a, b) => a.name.localeCompare(b.name));
+  const encoded = parts.map((cookie) => cookie.value).join("");
+  const session = JSON.parse(Buffer.from(encoded.replace(/^base64-/, ""), "base64url").toString("utf8"));
+  const claims = JSON.parse(Buffer.from(session.access_token.split(".")[1], "base64url").toString("utf8"));
+  // Assert only non-secret claim shape; never attach cookies/JWTs to reports.
+  expect(typeof claims.session_id === "string" && claims.session_id.length > 0).toBe(true);
+  expect(claims.amr.some((entry: { method: string }) => entry.method === method)).toBe(true);
+  expect(cookies.some((cookie) => cookie.name === "beanmap-recovery-proof" && cookie.httpOnly)).toBe(true);
+}
+
 async function fillSignup(page: Page, waitForHydration = true) {
   await page.locator('[name="displayName"]').fill("Recovery audit");
   await page.locator('[name="email"]').fill("beanmap-audit@local.test");
@@ -230,6 +242,7 @@ for (const locale of ["ko", "en"] as const) {
       await page.goto(callback.toString());
       await expect(page).toHaveURL(new RegExp(`/${locale}/reset-password\\?`));
       expect(new URL(page.url()).searchParams.get("next")).toBe(next);
+      await assertRecoveryClaims(page, "otp");
       await page.locator('[name="password"]').fill(newPassword);
       await page.locator('[name="passwordConfirm"]').fill("mismatching-confirmation");
       await page.locator('button[type="submit"]').click();
@@ -300,6 +313,7 @@ for (const locale of ["ko", "en"] as const) {
       await expect(page).toHaveURL(new RegExp(`/${locale}/reset-password\\?`));
       expect(pkceCallbackSeen).toBe(true);
       expect(new URL(page.url()).searchParams.get("next")).toBe(next);
+      await assertRecoveryClaims(page);
       await page.locator('[name="password"]').fill(newPassword);
       await page.locator('[name="passwordConfirm"]').fill(newPassword);
       await page.locator('button[type="submit"]').click();
@@ -314,3 +328,77 @@ for (const locale of ["ko", "en"] as const) {
     }
   });
 }
+
+
+test("recovery proof rejects an ordinary live session and replay after a rejected update", async ({ browser, page }) => {
+  const email = `beanmap-qa-proof-${randomUUID()}@local.test`;
+  const password = randomBytes(24).toString("hex");
+  const id = await ensureUser(email, password);
+  const ordinaryContext = await browser.newContext();
+  try {
+    const ordinary = await ordinaryContext.newPage();
+    await ordinary.goto(`${qaBaseURL}/ko/login`);
+    await ordinary.locator('[name="email"]').fill(email);
+    await ordinary.locator('[name="password"]').fill(password);
+    await ordinary.locator('button[type="submit"]').click();
+    await expect(ordinary).toHaveURL(/\/explore$/);
+    await ordinary.goto(`${qaBaseURL}/ko/reset-password`);
+    await expect(ordinary).toHaveURL(/\/ko\/forgot-password\?recoveryError=expired/);
+
+    const { data, error } = await admin.auth.admin.generateLink({ type: "recovery", email });
+    expect(error).toBeNull();
+    const callback = new URL("/api/auth/callback", qaBaseURL);
+    callback.search = new URLSearchParams({ type: "recovery", token_hash: data.properties!.hashed_token, locale: "ko" }).toString();
+    await page.goto(callback.toString());
+    await expect(page).toHaveURL(/\/ko\/reset-password/);
+    await assertRecoveryClaims(page, "otp");
+    const savedCookies = await page.context().cookies();
+    const actionRequest = page.waitForRequest((request) => request.method() === "POST" && Boolean(request.headers()["next-action"]));
+    // A same-password failure consumes proof while leaving Auth session valid.
+    await page.locator('[name="password"]').fill(password);
+    await page.locator('[name="passwordConfirm"]').fill(password);
+    await page.locator('button[type="submit"]').click();
+    const captured = await actionRequest;
+    await expect(page.locator("#password-reset-error")).toHaveText(ko.auth.passwordMustDiffer);
+    await expect(page.getByRole("link", { name: ko.auth.requestNewResetLink })).toBeVisible();
+    const replayOptions = { data: captured.postDataBuffer()!, headers: { "next-action": captured.headers()["next-action"], "content-type": captured.headers()["content-type"], origin: qaBaseURL } };
+    const ordinaryResult = await ordinaryContext.request.post(captured.url(), replayOptions);
+    expect((await ordinaryResult.text()).includes('"error":"expired"')).toBe(true);
+    await page.context().addCookies(savedCookies);
+    const replay = await page.context().request.post(captured.url(), replayOptions);
+    expect((await replay.text()).includes('"error":"expired"')).toBe(true);
+    await page.goto(`${qaBaseURL}/ko/reset-password`);
+    await expect(page).toHaveURL(/\/ko\/forgot-password\?recoveryError=expired/);
+  } finally {
+    await ordinaryContext.close();
+    await admin.auth.admin.deleteUser(id);
+  }
+});
+
+test("recovery proof accepts fresh email reauthentication and rejects email-token replay", async ({ page }) => {
+  const email = `beanmap-qa-wrong-recovery-${randomUUID()}@local.test`;
+  const id = await ensureUser(email, randomBytes(24).toString("hex"));
+  try {
+    const { data, error } = await admin.auth.admin.generateLink({ type: "magiclink", email });
+    expect(error).toBeNull();
+    const callback = new URL("/api/auth/callback", qaBaseURL);
+    callback.search = new URLSearchParams({ type: "recovery", token_hash: data.properties!.hashed_token, locale: "ko" }).toString();
+    await page.goto(callback.toString());
+    // Pinned Auth accepts this fresh email token for recovery. It proves email
+    // possession, so treat it as recent email reauthentication, never as proof
+    // derived from an arbitrary signed-in session.
+    await expect(page).toHaveURL(/\/ko\/reset-password/);
+    await assertRecoveryClaims(page, "otp");
+    const replayContext = await page.context().browser()!.newContext();
+    try {
+      const replay = await replayContext.newPage();
+      await replay.goto(callback.toString());
+      await expect(replay).toHaveURL(/\/ko\/forgot-password\?recoveryError=expired/);
+      expect((await replayContext.cookies()).some((cookie) => cookie.name === "beanmap-recovery-proof")).toBe(false);
+    } finally {
+      await replayContext.close();
+    }
+  } finally {
+    await admin.auth.admin.deleteUser(id);
+  }
+});

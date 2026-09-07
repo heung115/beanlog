@@ -6,6 +6,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"unicode/utf16"
 
 	"beanmap-server/middleware"
 	"beanmap-server/models"
@@ -252,6 +253,10 @@ func (h *OriginHandler) UserSubregions(c *gin.Context) {
 	userID := c.GetString(middleware.UserIDKey)
 	country := strings.TrimSpace(c.Query("country"))
 	region := strings.TrimSpace(c.Query("region"))
+	if len(utf16.Encode([]rune(country))) > 100 || len(utf16.Encode([]rune(region))) > 200 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "origin query exceeds length limit"})
+		return
+	}
 	if country == "" {
 		c.JSON(http.StatusOK, [][]string{})
 		return

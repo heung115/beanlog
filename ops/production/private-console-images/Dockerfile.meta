@@ -1,0 +1,16 @@
+FROM supabase/postgres-meta:v0.96.6@sha256:a84cc713585eea7b401e4a2561ec4a1e48c87083d1c7ecb4502f204bb4391300
+USER root
+COPY package.json package-lock.json /opt/beanmap-security-tar/
+COPY replace-fast-uri.cjs /tmp/replace-fast-uri.cjs
+# Keep the service release unchanged; patch the Debian TLS package and remove
+# package-manager tooling (the only vulnerable tar copy in the Meta image).
+RUN npm ci --prefix /opt/beanmap-security-tar --ignore-scripts --omit=dev --no-audit --no-fund \
+ && node /tmp/replace-fast-uri.cjs /usr/src/app/node_modules \
+ && apt-get update \
+ && apt-get install -y --no-install-recommends libgnutls30 libssl3 openssl libcap2 \
+ && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' libgnutls30)" ge '3.7.9-2+deb12u7' \
+ && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' libssl3)" ge '3.0.20-1~deb12u2' \
+ && dpkg --compare-versions "$(dpkg-query -W -f='${Version}' libcap2)" ge '1:2.66-4+deb12u3' \
+ && rm -rf /var/lib/apt/lists/* /usr/local/lib/node_modules/npm /usr/local/lib/node_modules/pnpm /usr/local/lib/node_modules/corepack \
+ && rm -f /tmp/replace-fast-uri.cjs /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/pnpm /usr/local/bin/pnpx /usr/local/bin/corepack
+USER 1000:1000

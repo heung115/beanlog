@@ -1,3 +1,13 @@
+-- HISTORICAL REFERENCE ONLY — NOT A DEPLOYMENT OR RESTORE SCRIPT.
+-- This snapshot omits later RLS, grants, private-admin and mutation safeguards.
+-- Initialize environments with supabase/migrations in numeric order instead.
+-- Stop before historical DDL, including psql without ON_ERROR_STOP.
+DO $$ BEGIN
+  RAISE EXCEPTION 'Non-deployable historical schema: apply supabase/migrations instead'
+    USING ERRCODE = '57P01';
+END $$;
+\quit
+
 -- profiles table
 create table public.profiles (
   id uuid references auth.users on delete cascade primary key,

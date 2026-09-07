@@ -14,6 +14,15 @@ SPEC.loader.exec_module(provision)
 
 
 class ProvisionTests(unittest.TestCase):
+    def test_studio_ip_is_a_single_literal_private_bridge_address(self):
+        self.assertEqual(provision.studio_management_ip('OTHER=preserved\nBEANMAP_STUDIO_IP=172.19.0.5\n'), '172.19.0.5')
+        for text in ['', 'BEANMAP_STUDIO_IP=8.8.8.8', 'BEANMAP_STUDIO_IP=127.0.0.1',
+                     'BEANMAP_STUDIO_IP=169.254.169.254', 'BEANMAP_STUDIO_IP=hostname',
+                     'BEANMAP_STUDIO_IP=172.19.0.5:3000',
+                     'BEANMAP_STUDIO_IP=172.19.0.5\nBEANMAP_STUDIO_IP=172.19.0.6']:
+            with self.subTest(text=text), self.assertRaises(provision.ProvisionError):
+                provision.studio_management_ip(text)
+
     def status(self):
         return {
             "BackendState": "Running",

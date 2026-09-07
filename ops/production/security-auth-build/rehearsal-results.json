@@ -1,0 +1,77 @@
+{
+  "database_version": 170011,
+  "checks": [
+    {
+      "check": "Auth17.11 startup with runtime restrictions",
+      "passed": true
+    },
+    {
+      "check": "phone auth disabled",
+      "passed": true
+    },
+    {
+      "check": "phone signup rejected",
+      "passed": true
+    },
+    {
+      "check": "disposable account creation",
+      "passed": true
+    },
+    {
+      "check": "password login",
+      "passed": true
+    },
+    {
+      "check": "refresh token rotation",
+      "passed": true
+    },
+    {
+      "check": "old ordinary session password change rejected",
+      "passed": true
+    },
+    {
+      "check": "recovery link generated without outbound mail",
+      "passed": true
+    },
+    {
+      "check": "recovery token verification",
+      "passed": true
+    },
+    {
+      "check": "verified email token AMR attestation",
+      "passed": true
+    },
+    {
+      "check": "recovery token replay rejected",
+      "passed": true
+    },
+    {
+      "check": "verified recovery password change",
+      "passed": true
+    },
+    {
+      "check": "old password rejected",
+      "passed": true
+    },
+    {
+      "check": "new password login",
+      "passed": true
+    },
+    {
+      "check": "30 day session timebox enforced",
+      "passed": true
+    },
+    {
+      "check": "fresh login after timebox expiry",
+      "passed": true
+    },
+    {
+      "check": "7 day inactivity expiry enforced",
+      "passed": true
+    },
+    {
+      "check": "disposable account cleanup",
+      "passed": true
+    }
+  ]
+}

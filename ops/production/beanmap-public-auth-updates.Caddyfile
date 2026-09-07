@@ -1,0 +1,13 @@
+# Import inside the public API gateway's handle, before reverse_proxy.
+# Auth password/email/metadata changes must use validated server actions and the
+# internal Auth gateway. Public PUT/PATCH is limited to canonical PostgREST table
+# paths. Match the request URI before any rewrite, not a decoded/cleaned path: encoded,
+# repeated-slash and traversal spellings must never reach Auth through a gateway
+# normalization difference. The query string does not select the upstream route.
+(beanmap_public_auth_updates) {
+	@disallowed_public_update {
+		method PUT PATCH
+		not expression `{http.request.uri}.matches('^/rest/v1/[A-Za-z_][A-Za-z0-9_]*([?].*)?$')`
+	}
+	respond @disallowed_public_update "Use the application to update account details." 405
+}

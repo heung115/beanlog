@@ -1,5 +1,7 @@
 "use client";
 
+import { validateLabelImageBeforeDecode } from "./bean-label-image-header.ts";
+
 import { detectLabelTextRegion, type LabelTextRegion } from "./bean-label-image-regions.ts";
 import { resizeLabelPixels } from "./bean-label-image-resample.ts";
 
@@ -78,6 +80,7 @@ async function encodeCanvas(element: HTMLCanvasElement, signal: AbortSignal): Pr
  * ordinary text labels retain one block pass. No OCR text or brand is consulted.
  */
 export async function prepareLabelImages(image: Blob, signal: AbortSignal): Promise<PreparedLabelImage[]> {
+  await validateLabelImageBeforeDecode(image, signal);
   signal.throwIfAborted();
   const url = URL.createObjectURL(image);
   const picture = new Image();
@@ -148,6 +151,7 @@ export async function prepareLabelImages(image: Blob, signal: AbortSignal): Prom
 
 /** Re-read a detected numeric word at its existing scale with room around its ink. */
 export async function prepareLabelWordRetry(image: Blob, region: LabelTextRegion, signal: AbortSignal, scale: 1 | 1.5 | 2 = 1): Promise<Blob> {
+  await validateLabelImageBeforeDecode(image, signal);
   signal.throwIfAborted();
   const url = URL.createObjectURL(image);
   const picture = new Image();
@@ -178,6 +182,7 @@ export async function prepareLabelWordRetry(image: Blob, region: LabelTextRegion
 
 /** A bounded second pixel reading for a printed weight whose unit was unreadable. */
 export async function prepareLabelWeightRetry(image: Blob, signal: AbortSignal): Promise<Blob> {
+  await validateLabelImageBeforeDecode(image, signal);
   signal.throwIfAborted();
   const url = URL.createObjectURL(image);
   const picture = new Image();

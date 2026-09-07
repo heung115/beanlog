@@ -142,3 +142,10 @@ Only after those checks, atomically replace the root-owned 0600 state file with
 the actually deployed commit. Changing only the state file is not a rollback.
 Keep automated entry stopped until the running version and state are synchronized;
 resume both units through the release coordinator after review.
+
+## Security audit remediation candidate (2026-09-07)
+
+The [container boundary runbook](security-boundary.md) provides management-network
+isolation, an idempotent IMDS forwarding guard, compatible Compose overlays, and
+bounded Supabase runtime/auth policies. These are reviewed local candidates;
+production activation and restored-database compatibility checks remain pending.

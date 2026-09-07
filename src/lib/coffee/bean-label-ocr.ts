@@ -1,5 +1,6 @@
 "use client";
 
+import { validateLabelImageBeforeDecode } from "./bean-label-image-header.ts";
 import { prepareLabelWordRetry } from "./bean-label-image.ts";
 import { findLabelWeightRegions, type LabelTextRegion } from "./bean-label-image-regions.ts";
 import { hasUnreadableLabelWeight, parseBeanLabelText } from "./bean-label-parser.ts";
@@ -201,6 +202,8 @@ export function createBrowserLabelReader() {
         });
         const partial = () => { options.onPartial?.(combined()); assertCurrent(); };
         async function readPixels(image: Blob, mode: string, boxes = false) {
+          await validateLabelImageBeforeDecode(image, signal);
+          assertCurrent();
           if (psm !== mode) {
             await job("setParameters", { params: { tessedit_pageseg_mode: mode, preserve_interword_spaces: "1", user_defined_dpi: "300" } });
             assertCurrent();
@@ -395,7 +398,7 @@ export function createBrowserLabelReader() {
       } catch (error) {
         if (generation === currentGeneration) stop();
         if (signal.aborted) throw abortError();
-        if (error instanceof Error && ["AbortError", "loading_failed", "recognition_failed"].includes(error.name === "AbortError" ? error.name : error.message)) throw error;
+        if (error instanceof Error && ["AbortError", "loading_failed", "recognition_failed", "invalid_image", "image_too_large"].includes(error.name === "AbortError" ? error.name : error.message)) throw error;
         throw new Error("recognition_failed");
       } finally {
         signal.removeEventListener("abort", abort);

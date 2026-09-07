@@ -19,6 +19,8 @@
 	}
 }
 
+import /etc/caddy/beanmap-public-auth-updates.Caddyfile
+
 (security_headers) {
 	header {
 		Strict-Transport-Security "max-age=31536000; includeSubDomains"
@@ -82,6 +84,7 @@ api.beanmap.site {
 	# operator tools join the container network. Admit only the application APIs.
 	@application_api path /auth/v1 /auth/v1/* /rest/v1 /rest/v1/* /graphql/v1 /graphql/v1/* /storage/v1 /storage/v1/* /functions/v1 /functions/v1/* /realtime/v1 /realtime/v1/*
 	handle @application_api {
+		import beanmap_public_auth_updates
 		reverse_proxy 127.0.0.1:8000
 	}
 	handle {

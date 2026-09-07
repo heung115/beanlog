@@ -1,5 +1,6 @@
 import { createClient, setSessionPersistencePreference } from "@/lib/supabase/server";
 import { getOAuthFailureKind, resolveAuthFailurePath, resolvePasswordRecoveryPath, resolveTrustedAppRedirect } from "@/lib/security/redirect";
+import { issuePasswordRecoveryProof } from "@/lib/security/password-recovery";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getRequestAppOrigin } from "@/lib/admin/private-access";
@@ -19,10 +20,14 @@ export async function GET(request: Request) {
   if ((code || tokenHash) && !searchParams.has("error")) {
     try {
       const supabase = await createClient(recovery ? { persistSession: false } : undefined);
-      const { error } = tokenHash
+      const { data, error } = tokenHash
         ? await supabase.auth.verifyOtp({ token_hash: tokenHash, type: "recovery" })
         : await supabase.auth.exchangeCodeForSession(code!);
-      if (!error) {
+      // mode/type and the SDK redirectType are caller-controlled hints. Only
+      // a verified recovery OTP or Auth-issued recovery AMR can authorize a reset.
+      const recoveryVerified = !error && recovery && data.session?.access_token
+        ? await issuePasswordRecoveryProof(supabase, data.session.access_token, tokenHash ? "recovery-otp" : "pkce") : false;
+      if (!error && (!recovery || recoveryVerified)) {
         if (recovery) await setSessionPersistencePreference(false);
         const response = NextResponse.redirect(recovery
           ? resolveTrustedAppRedirect(resolvePasswordRecoveryPath(searchParams.get("next"), preferredLocale), configuredAppUrl)

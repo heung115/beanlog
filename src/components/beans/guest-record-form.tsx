@@ -9,6 +9,7 @@ import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { ScoreSlider } from "@/components/beans/score-slider";
 import {
+  clearGuestBrowserDrafts,
   loadGuestBeanDraft,
   saveGuestBeanDraft,
 } from "@/lib/coffee/guest-draft";
@@ -45,6 +46,7 @@ export function GuestRecordForm() {
   const locale = useLocale();
   const t = useTranslations("guest");
   const tb = useTranslations("beans");
+  const td = useTranslations("draft");
   const tp = useTranslations("process");
   const tr = useTranslations("roast");
   const [form, setForm] = useState<BeanFormData>(emptyDraft);
@@ -174,6 +176,14 @@ export function GuestRecordForm() {
         <Button variant="ghost" className="mt-3 w-full" onClick={() => { nextFocus.current = "form"; setSaved(false); }}>
           {t("edit")}
         </Button>
+        <Button variant="ghost" className="w-full" onClick={() => {
+          clearGuestBrowserDrafts();
+          draftRecovery.discard(emptyDraft());
+          nextFocus.current = "form";
+          setSaved(false);
+        }}>
+          {td("discard")}
+        </Button>
       </article>
     );
   }
@@ -188,10 +198,10 @@ export function GuestRecordForm() {
       <RecordDraftNotice
         status={draftRecovery.status}
         onDiscard={() => {
-          const savedDraft = loadGuestBeanDraft();
-          draftRecovery.discard(savedDraft?.bean ?? emptyDraft());
-          if (savedDraft) setSaved(true);
-          else formRef.current?.querySelector<HTMLInputElement>('[name="name"]')?.focus();
+          clearGuestBrowserDrafts();
+          draftRecovery.discard(emptyDraft());
+          setSaved(false);
+          formRef.current?.querySelector<HTMLInputElement>('[name="name"]')?.focus();
         }}
         onRestore={draftRecovery.restoreConflict}
       />

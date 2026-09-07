@@ -6,9 +6,12 @@ services:
   # Do not use the names "meta" or "studio": Compose adds service names as DNS
   # aliases, and the existing public Kong has dormant routes to those aliases.
   private-meta:
-    image: supabase/postgres-meta:v0.96.6@sha256:a84cc713585eea7b401e4a2561ec4a1e48c87083d1c7ecb4502f204bb4391300
+    image: beanmap-postgres-meta@sha256:855f489860828f8cdb6f4110a467d2670ba5a2cec1ef7d2c5b7f7fcd93601b0b
     container_name: beanmap-private-meta
     user: "1000:1000"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=16m,mode=1777
     env_file:
       - path: /etc/beanmap-private-console/meta.env
         format: raw
@@ -37,12 +40,13 @@ services:
         max-size: "5m"
         max-file: "2"
     networks:
-      - supabase
+      - management
 
   private-studio:
-    image: supabase/studio:2026.08.03-sha-022b374@sha256:606aca9fdaa753b60968d5c304e2ada83869b76c9043684e63d5885aca9550e8
+    image: beanmap-studio@sha256:fbd09e43b4928bb4b3368808d2baa26ef7183dc4345b04c5ffe1e5a779927c42
     container_name: beanmap-private-studio
     user: "1000:1000"
+    read_only: true
     env_file:
       - path: /etc/beanmap-private-console/studio.env
         format: raw
@@ -60,12 +64,11 @@ services:
       ENABLED_FEATURES_LOGS_ALL: "false"
       SNIPPETS_MANAGEMENT_FOLDER: /app/snippets
       EDGE_FUNCTIONS_MANAGEMENT_FOLDER: /app/edge-functions
-    ports:
-      - "127.0.0.1:4321:3000"
     volumes:
       - /var/lib/beanmap-private-studio/snippets:/app/snippets
       - /var/lib/beanmap-private-studio/functions:/app/edge-functions:ro
     tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=16m,mode=1777
       - /app/apps/studio/.next/cache:rw,nosuid,nodev,size=128m,uid=1000,gid=1000,mode=0700
     depends_on:
       private-meta:
@@ -90,9 +93,13 @@ services:
         max-size: "5m"
         max-file: "2"
     networks:
-      - supabase
+      management:
+        # Host Caddy reaches this fixed address; an internal-only Docker network
+        # does not provide the former published loopback port.
+        ipv4_address: ${BEANMAP_STUDIO_IP:?Set the reserved Studio management IPv4 in the deployment .env}
 
 networks:
-  supabase:
+  management:
+    # Prepared by ops/production/provision-container-boundary.py; internal bridge.
     external: true
-    name: beanlogsupabase_default
+    name: beanmap-management

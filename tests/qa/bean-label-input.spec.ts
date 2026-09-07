@@ -514,6 +514,15 @@ for (const locale of ["ko", "en"] as const) {
       expect((await ocr.snapshot()).reads).toBe(0);
       await expectExistingDetails(page);
 
+      const giant = Buffer.from(photo.buffer);
+      giant.writeUInt32BE(6000, 16);
+      giant.writeUInt32BE(6000, 20);
+      await file.setInputFiles({ name: "giant-compressed.png", mimeType: "image/png", buffer: giant });
+      await expect(page.getByRole("status").filter({ hasText: label.errors.image_too_large })).toHaveText(label.errors.image_too_large);
+      await expect(page.getByAltText(label.preview, { exact: true })).toHaveCount(0);
+      expect((await ocr.snapshot()).reads).toBe(0);
+      await expectExistingDetails(page);
+
       await file.setInputFiles(photo);
       await expect(page.getByRole("status").filter({ hasText: label.errors.recognition_failed })).toHaveText(label.errors.recognition_failed);
       await expect(page.getByRole("group", { name: label.review, exact: true })).toHaveCount(0);

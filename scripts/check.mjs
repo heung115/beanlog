@@ -20,6 +20,8 @@ const checks = [
   { name: "TypeScript", command: "npm", args: ["run", "typecheck"] },
   { name: "ESLint", command: "npm", args: ["run", "lint"] },
   { name: "Node unit tests", command: "npm", args: ["run", "test:node"] },
+  { name: "Credential hygiene", command: "node", args: ["scripts/check-secret-files.mjs"] },
+  { name: "Container boundary", command: "python3", args: ["-m", "unittest", "discover", "-s", "ops/production", "-p", "test_*.py"] },
   { name: "Go race tests", command: "npm", args: ["run", "test:go"] },
   { name: "Go vet", command: "npm", args: ["run", "vet:go"] },
   {

@@ -5,7 +5,7 @@
 | 화면 | Tailscale HTTPS | 서버 내부 전달 |
 | --- | --- | --- |
 | 운영 현황 | `https://oracle-free.tail6e4bc0.ts.net` | Serve 443 → `127.0.0.1:9310` |
-| 데이터베이스 Studio | `https://oracle-free.tail6e4bc0.ts.net:8443` | Serve 8443 → `127.0.0.1:9311` → Studio `127.0.0.1:4321` |
+| 데이터베이스 Studio | `https://oracle-free.tail6e4bc0.ts.net:8443` | Serve 8443 → `127.0.0.1:9311` → Studio 관리망 고정 IPv4의 `3000` 포트 |
 | beanmap 관리자 | `https://oracle-free.tail6e4bc0.ts.net:9443/ko/admin` | Serve 9443 → `127.0.0.1:9312` → 기존 Next `127.0.0.1:3100` |
 
 웹 브라우저에서 쓰는 DB API 주소는 기존 `API_EXTERNAL_URL`이며, Studio 서버의 API 요청은 컨테이너 네트워크의 `supabase-kong:8000`을 사용한다. PostgreSQL과 postgres-meta 포트는 호스트에 공개하지 않는다. Studio에서 보여 주는 API 키·SQL·사용자 데이터도 소유자에게만 보여야 하므로 Studio 전체 경로가 같은 접근 제한을 받는다.
@@ -13,7 +13,7 @@
 ## 배포 전 확인
 
 - 다른 배포·브라우저 QA가 끝난 뒤 작업한다. 현재 앱·Supabase·Caddy 설정과 DB 백업을 root만 읽을 수 있는 위치에 보관한다.
-- Docker Compose 2.30 이상, 기존 네트워크 `beanlogsupabase_default`, 실행 중인 `supabase-db/auth/rest/kong`이 필요하다.
+- Docker Compose 2.30 이상, 실행 중인 `supabase-db/auth/rest/kong`과 [관리망 격리 준비](../../production/security-boundary.md)가 필요하다. Meta/Studio는 기존 앱 네트워크에 연결하지 않는다.
 - 기존 Kong에는 비활성 `studio:3000`·`meta:8080` 경로가 남아 있다. 이 구성은 서비스 이름을 `private-studio`·`private-meta`로 정해 그 DNS 별칭을 만들지 않는다. 서비스 키나 네트워크 별칭을 `studio`·`meta`로 바꾸면 공개 Kong 경로가 살아날 수 있다.
 - Tailscale의 현재 서버 소유자 계정과 `oracle-free.tail6e4bc0.ts.net` DNS가 맞아야 한다. HTTPS 인증서 기능을 활성화하고, 기존 Serve 설정을 확인한다. 기존 규칙을 `reset`하지 않는다.
 - 새 이미지 두 개는 버전과 multiarch digest를 고정했다. 2026-09-06 registry 검사에서 두 이미지 모두 `linux/arm64`와 `linux/amd64`를 지원했다.
@@ -22,6 +22,14 @@
 ## 파일 설치와 자격 증명 준비
 
 이 폴더를 `/opt/beanmap-private-console/deploy`에 복사하고, 상위의 collector·public 파일은 `/opt/beanmap-private-console`에 설치한다. 코드·공개 정적 파일은 root 소유로 두고 Caddy가 읽을 수 있게 한다. `INTEGRATION.md`에 있는 collector 설정·timer도 함께 설치한다.
+
+관리망의 실제 subnet과 주소 사용 현황을 확인하고 Studio용 IPv4를 하나 예약한다.
+배포 폴더의 `.env`에 `BEANMAP_STUDIO_IP=<예약한 IPv4>`를 한 번만 기록한다. 기존 Studio를
+이동하는 경우 현재 관리망 IPv4를 유지한다. 이 파일은 root 소유 `0600`으로 두며 다른
+설정을 보존한다. Compose는 이 주소를 고정하고 아래 준비 도구는 같은 값을 Caddy 환경에
+반영한다. Docker의 `internal` 전용 bridge에서는 loopback 포트 게시가 생성되지 않을 수
+있으므로 Studio의 `ports`는 사용하지 않는다. 호스트 Caddy만 내부 IPv4로 직접 연결하며
+앱에서 관리망으로 들어오는 트래픽 차단과 관리망의 외부 통신 제한은 유지한다.
 
 ```sh
 sudo python3 /opt/beanmap-private-console/deploy/provision.py
@@ -47,9 +55,11 @@ sudo python3 /opt/beanmap-private-console/deploy/provision.py
 ## Studio 시작
 
 ```sh
-sudo docker compose -f /opt/beanmap-private-console/deploy/compose.yml config --quiet
-sudo docker compose -f /opt/beanmap-private-console/deploy/compose.yml pull
-sudo docker compose -f /opt/beanmap-private-console/deploy/compose.yml up -d --wait
+# First prepare beanmap-management and attach DB/Kong using
+# ops/production/security-boundary.md; this Compose no longer joins the app network.
+sudo docker compose --env-file /opt/beanmap-private-console/deploy/.env -f /opt/beanmap-private-console/deploy/compose.yml config --quiet
+# Security-patched local images must already be loaded with their recorded digests.
+sudo docker compose --env-file /opt/beanmap-private-console/deploy/.env -f /opt/beanmap-private-console/deploy/compose.yml up -d --wait
 ```
 
 최초에는 두 healthcheck와 Studio의 DB 테이블 목록 조회를 확인한다. 두 컨테이너의 실제 Docker network aliases에 `studio`·`meta`가 없음을 확인하고, 공개 API 도메인의 `/`, `/pg/`, `/mcp`, `/api/mcp`에서 Studio·meta가 접근되지 않는지도 확인한다. Studio와 meta가 UID 1000으로 정상 동작하는지 확인하고, 쓰기 권한 오류를 해결하려고 root 실행이나 전체 디렉터리 `0777`로 바꾸지 않는다. 전용 snippets만 쓰기 가능하며 기존 함수 소스는 공유하지 않는다.

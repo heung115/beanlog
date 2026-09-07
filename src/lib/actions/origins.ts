@@ -9,6 +9,10 @@ import type {
 } from "@/types/database";
 
 const originIdSchema = z.number().int().positive();
+const subregionQuerySchema = z.object({
+  country: z.string().trim().min(1).max(100),
+  region: z.string().trim().max(200).optional(),
+});
 
 /** Returns only the values needed to render the country selector. */
 export async function getOriginCountries(): Promise<OriginCountryOption[]> {
@@ -61,12 +65,12 @@ export async function getUserOriginSubregions({
   country: string;
   region?: string;
 }): Promise<string[][]> {
-  const countryName = country.trim();
-  if (!countryName) return [];
+  const parsed = subregionQuerySchema.safeParse({ country, region });
+  if (!parsed.success) return [];
 
   try {
     return await apiFetch<string[][]>("/api/origins/subregions", {
-      query: { country: countryName, region: region?.trim() },
+      query: parsed.data,
     });
   } catch {
     return [];

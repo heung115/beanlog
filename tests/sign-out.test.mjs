@@ -18,6 +18,7 @@ function signOutWith(response) {
   vm.runInNewContext(outputText, {
     exports,
     require(name) {
+      if (name === "@/lib/security/password-recovery") return {};
       if (name === "@/lib/validation/auth") return authValidation;
       if (name === "@/lib/supabase/auth-recovery") return authRecovery;
       if (name === "zod") return { z };

@@ -19,7 +19,7 @@
     "journalPromise": "Remember the coffee you want to drink again.",
     "login": "Log in",
     "signup": "Sign up",
-    "logout": "Log out",
+    "logout": "Log out on this device",
     "sessionUnavailableTitle": "We couldn’t check your sign-in status",
     "sessionUnavailableDescription": "A temporary connection problem stopped this page from loading. Please wait a moment, then try again. Your saved records are unaffected.",
     "sessionRetry": "Try again",
@@ -85,7 +85,7 @@
   "guest": {
     "javascriptRequired": "Enable JavaScript to save a trial record in this browser. You can also sign in to save a basic record to your account.",
     "title": "Record without signing in",
-    "storageNotice": "This record is saved temporarily in this browser only. Clearing browser data will remove it.",
+    "storageNotice": "This record stays in this browser for up to 24 hours. Discarding it or signing in without importing it removes the draft.",
     "storageError": "This browser's storage is unavailable, so the record could not be saved temporarily. Check your browser settings and try again.",
     "temporarySave": "Save temporarily",
     "savedTitle": "Saved temporarily",
@@ -123,7 +123,7 @@
         "browser_unsupported": "This browser cannot read text from photos. Use another browser or enter the details yourself below.",
         "loading_failed": "The text recognition files could not load. Check your internet connection and try again, or enter the details yourself.",
         "invalid_image": "This photo could not be opened. Choose a JPG, PNG or WebP photo with clear text.",
-        "image_too_large": "This photo is too large. Choose a photo up to 10 MB, or crop it to the label and try again.",
+        "image_too_large": "This photo is too large. Choose a photo up to 10 MB and 25 megapixels, or crop it to the label and try again.",
         "no_fields": "The text could not be organized into bean details. Use the recognized text to fill them in yourself, or choose a closer photo of the information label.",
         "recognition_failed": "The photo text could not be read. Try again or enter the details yourself below. Your entered details are unchanged.",
         "timeout": "Reading took too long and was stopped. Crop the photo to the label and try again, or enter the details yourself. Your entered details are unchanged."

@@ -1,3 +1,4 @@
+import * as csp from "../src/lib/security/csp.ts";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
@@ -195,6 +196,7 @@ test("a trusted private ingress does not replace the user's login", async () => 
 
 test("the locale proxy rejects public admin pages before session lookup", async () => {
   const loaded = loadModule("../src/proxy.ts", {
+    "@/lib/security/csp": csp,
     "next/server": { NextRequest, NextResponse },
     "@/lib/admin/private-access": privateAccess(new Headers()),
     "@/lib/security/admin-boundary": boundary,
@@ -227,6 +229,7 @@ for (const [name, requestHeaders, expectedOrigin] of [
       "@/lib/supabase/auth-recovery": authRecovery,
       "@/lib/admin/private-access": access,
       "@/lib/security/redirect": redirects,
+      "@/lib/security/password-recovery": {},
       "next/navigation": { redirect: () => {} },
       "@/lib/supabase/server": {
         createPublicClient: async () => ({ auth: { signInWithOAuth: async (options) => {
@@ -244,6 +247,7 @@ for (const [name, requestHeaders, expectedOrigin] of [
     const callback = loadModule("../src/app/api/auth/callback/route.ts", {
       "@/lib/admin/private-access": access,
       "@/lib/security/redirect": redirects,
+      "@/lib/security/password-recovery": {},
       "next/server": { NextResponse },
       "next/headers": { cookies: async () => ({ get: () => undefined }) },
       "@/lib/supabase/server": { createClient: async () => ({ auth: {

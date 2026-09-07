@@ -72,7 +72,7 @@ export function PasswordRecoveryForm({ mode, locale, next, expired = false }: {
           <p className="mt-2 text-sm leading-6">{t("resetSameBrowser")}</p>
         </section>
       )}
-      <form action={formAction} onSubmit={submitForm} onReset={(event) => event.preventDefault()} onChange={() => setClientState({})} className="flex flex-col gap-4">
+      <form action={formAction} onSubmit={submitForm} onReset={(event) => event.preventDefault()} onChange={() => setClientState(state.requiresNewLink ? { requiresNewLink: true } : {})} className="flex flex-col gap-4">
         <input type="hidden" name="locale" value={locale} />
         <input type="hidden" name="next" value={next} />
         {mode === "request" ? (
@@ -88,7 +88,7 @@ export function PasswordRecoveryForm({ mode, locale, next, expired = false }: {
           </>
         )}
         {state.error && <p id="password-reset-error" role="alert" className="text-sm leading-6 text-red-700">{t(message)}</p>}
-        {state.error === "expired" ? (
+        {state.error === "expired" || state.requiresNewLink ? (
           <Link href={`/${locale}/forgot-password${query}`} className="text-sm font-semibold text-accent underline underline-offset-4">{t("requestNewResetLink")}</Link>
         ) : (
           <Button ref={submit} type="submit" loading={pending} className="mt-2 w-full">
