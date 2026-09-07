@@ -405,7 +405,7 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
                 <div data-testid="label-result-summary" className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
                     <p className="text-xs font-medium text-brown-medium">{extraction.fields.roastery || t("missingRoastery")}</p>
-                    <h3 className="mt-1 break-words text-xl font-semibold leading-7 tracking-tight text-brown">{extraction.fields.name || t("missingName")}</h3>
+                    <h3 className="mt-1 break-words text-xl font-semibold leading-7 tracking-tight text-brown">{extraction.fields.name || t(busy && !retainingResult ? "readingName" : "missingName")}</h3>
                   </div>
                   <p className="shrink-0 pt-1 text-lg font-medium tabular-nums text-brown" aria-label={`${tb("weight")}: ${extraction.fields.weight_g ? `${extraction.fields.weight_g} g` : t("missingValue")}`}>
                     {extraction.fields.weight_g ? <>{extraction.fields.weight_g}<span className="ml-1 text-xs font-normal text-brown-medium">g</span></> : <span className="text-sm text-brown-light">{t("missingWeight")}</span>}

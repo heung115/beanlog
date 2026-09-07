@@ -14,6 +14,47 @@ function line(text, y, height = 20, options = {}) {
 }
 const blocks = (...lines) => [{ paragraphs: [{ lines }] }];
 
+function damagedCountryCaption({ countryConfidence = 99, fragmentConfidence = 74, country = "Colombia", headerX = 50, gap = 5, intervening, symbolNoise = false } = {}) {
+  const damaged = line(`${country} ${symbolNoise ? "La" : "l"} Mesa${symbolNoise ? " ©" : ""}`, 138, 28, { width: 490, x: headerX, confidence: 96 });
+  damaged.words[0].confidence = countryConfidence;
+  damaged.words[1].confidence = fragmentConfidence;
+  return blocks(line("케냐 푸른 언덕", 50, 40, { width: 500, confidence: 99 }),
+    line("새벽 내추럴", 94, 38, { width: 300, confidence: 99 }), damaged,
+    ...(intervening ? [line(intervening, 167, 10, { width: 270 })] : []),
+    line("Caturra Natural", 166 + gap, 28, { width: 270, confidence: 99 }),
+    line("Country: Kenya", 210 + gap, 18, { width: 300, confidence: 99 }));
+}
+
+test("a damaged country-prefixed caption cannot leave its contradictory tail as a separate product", () => {
+  const base = { ...empty(), fields: { origin_country: "Kenya" }, evidence: { origin_country: "Country: Kenya" } };
+  for (const options of [{ fragmentConfidence: 74 }, { fragmentConfidence: 99 }, { fragmentConfidence: 99, symbolNoise: true }]) {
+    const source = damagedCountryCaption(options);
+    const original = structuredClone(source);
+    const result = extractLabelLayout(source, base);
+    assert.equal(result.fields.name, "케냐 푸른 언덕 새벽 내추럴");
+    assert.equal(result.fields.origin_country, "Kenya");
+    assert.deepEqual(source, original);
+  }
+});
+
+test("a damaged caption needs a confident printed country and matching independent country evidence", () => {
+  const base = { ...empty(), fields: { origin_country: "Kenya" }, evidence: { origin_country: "Country: Kenya" } };
+  for (const source of [damagedCountryCaption({ countryConfidence: 94.99 }), damagedCountryCaption({ country: "Colembea" }),
+    damagedCountryCaption({ country: "Kenya" })]) {
+    assert.equal(extractLabelLayout(source, base).fields.name, undefined);
+  }
+  assert.equal(extractLabelLayout(damagedCountryCaption(), empty()).fields.name, undefined);
+});
+
+test("a rejected country caption does not reach another column, distant title or cross a metadata row", () => {
+  const base = { ...empty(), fields: { origin_country: "Kenya" }, evidence: { origin_country: "Country: Kenya" } };
+  for (const source of [damagedCountryCaption({ headerX: 900 }), damagedCountryCaption({ gap: 22 }),
+    damagedCountryCaption({ gap: 15, intervening: "Variety: Caturra" }),
+    damagedCountryCaption({ gap: 5, intervening: "Variety: Caturra" })]) {
+    assert.equal(extractLabelLayout(source, base).fields.name, undefined);
+  }
+});
+
 test("a dominant title is anchored to adjacent printed coffee metadata", () => {
   const source = blocks(line("Copper Moon", 50, 40), line("Country: Colombia", 110, 15), line("Net weight: 250g", 140, 15));
   const result = extractLabelLayout(source, empty());

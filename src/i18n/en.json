@@ -138,6 +138,7 @@
       "partialResult": "Read so far",
       "missingRoastery": "Roastery not identified",
       "missingName": "Coffee name not identified",
+      "readingName": "Reading coffee name…",
       "missingWeight": "Weight unread",
       "missingValue": "Unread",
       "tastingNotes": "Label cup notes",
