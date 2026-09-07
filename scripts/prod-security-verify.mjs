@@ -246,7 +246,7 @@ try {
   expect(restricted.data?.code).toBe("42501");
   report(stage);
 
-  stage = "guest expired draft removal and image header validation";
+  stage = "guest expired draft removal and current draft discard";
   const guest = await (await browser.newContext()).newPage();
   await guest.goto(site + "/ko/try");
   const draftKey = "beanmap:guest-bean-draft";
@@ -261,16 +261,21 @@ try {
   await expect(guest.getByRole("article", { name: ko.guest.savedTitle })).toContainText(bean.name);
   await guest.getByRole("button", { name: ko.draft.discard, exact: true }).click();
   expect(await guest.evaluate(key => localStorage.getItem(key), draftKey)).toBeNull();
-  await guest.locator('[name="name"]').fill("Guest input survives rejected image");
-  const file = guest.locator('input[type="file"]');
+  report(stage);
+
+  // Photo import is available on authenticated record forms, not /try.
+  stage = "authenticated image header validation preserves form input";
+  await app.goto(site + "/ko/beans/new");
+  await app.locator('[name="name"]').fill("Input survives rejected image");
+  const file = app.locator('input[type="file"]');
   await file.setInputFiles({ name: "invalid.png", mimeType: "image/png", buffer: Buffer.from("not an image") });
-  await expect(guest.getByRole("status").filter({ hasText: ko.beans.labelImport.errors.invalid_image })).toBeVisible();
+  await expect(app.getByRole("status").filter({ hasText: ko.beans.labelImport.errors.invalid_image })).toBeVisible();
   const giant = Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=", "base64");
   giant.writeUInt32BE(6000, 16);
   giant.writeUInt32BE(6000, 20);
   await file.setInputFiles({ name: "giant.png", mimeType: "image/png", buffer: giant });
-  await expect(guest.getByRole("status").filter({ hasText: ko.beans.labelImport.errors.image_too_large })).toBeVisible();
-  await expect(guest.locator('[name="name"]')).toHaveValue("Guest input survives rejected image");
+  await expect(app.getByRole("status").filter({ hasText: ko.beans.labelImport.errors.image_too_large })).toBeVisible();
+  await expect(app.locator('[name="name"]')).toHaveValue("Input survives rejected image");
   report(stage);
 } catch {
   // Playwright errors can embed callback URLs, password fields or session material.
