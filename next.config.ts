@@ -48,9 +48,20 @@ const nextConfig: NextConfig = {
         headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
       },
       {
+        source: "/ocr/paddle-0.4.2-v1/:path*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+      {
         // Only the isolated OCR worker may compile WebAssembly. The page's
         // policy still prohibits eval, and every OCR asset comes from this site.
         source: "/ocr/tesseract-7.0.0/worker.min.js",
+        headers: [{
+          key: "Content-Security-Policy",
+          value: "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; worker-src 'none'; object-src 'none'",
+        }],
+      },
+      {
+        source: "/ocr/paddle-0.4.2-v1/worker.js",
         headers: [{
           key: "Content-Security-Policy",
           value: "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; worker-src 'none'; object-src 'none'",

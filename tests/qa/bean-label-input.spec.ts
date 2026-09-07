@@ -39,24 +39,31 @@ const requestedBlend = {
 };
 const requestedBlendText = [requestedBlend.name, ...requestedBlend.composition, requestedBlend.notesEn, requestedBlend.notesKo, "200g"].join("\n");
 const workerPath = "/ocr/tesseract-7.0.0/worker.min.js";
+const paddleWorkerPath = "/ocr/paddle-0.4.2-v1/worker.js";
 
-type OcrReply = { text?: string; error?: string; deferred?: boolean };
+type OcrReply = { text?: string; error?: string; deferred?: boolean; scores?: number[] };
 type OcrSnapshot = {
   reads: number;
   completions: number;
-  images: { size: number; signature: string; bytes: number[] }[];
+  images: { size: number; signature: string; sha256: string }[];
   workerUrls: string[];
   corePaths: string[];
   langPaths: string[];
   languages: string[];
+  modelPaths: string[];
   terminated: number[];
 };
-type OcrControl = OcrSnapshot & {
+type OcrControl = Omit<OcrSnapshot, "images"> & {
+  images: { size: number; signature: string; sha256: Promise<string> }[];
   release: (index: number) => void;
   dispose: () => void;
 };
 declare global {
-  interface Window { qaBrowserOcr?: OcrControl }
+  interface Window {
+    qaBrowserOcr?: OcrControl;
+    qaPhotoReadStarted?: boolean;
+    qaReleasePhotoRead?: () => void;
+  }
 }
 
 /** Mock only the OCR engine; image preparation, worker RPC, parser and UI remain real. */
@@ -69,7 +76,7 @@ async function mockBrowserOcr(page: Page, replies: OcrReply[] = [{ text: labelTe
       argumentFreeServerAction: Boolean(request.headers()["next-action"]) && request.postData()?.trim() === "[]",
     });
   });
-  await page.route(`**${workerPath}`, async (route) => {
+  await page.route(url => [workerPath, paddleWorkerPath].includes(url.pathname), async (route) => {
     expect(route.request().method()).toBe("GET");
     await route.fulfill({
       contentType: "application/javascript",
@@ -78,6 +85,19 @@ async function mockBrowserOcr(page: Page, replies: OcrReply[] = [{ text: labelTe
         const respond = (message) => {
           const { workerId, jobId, action, qa } = message;
           const reply = qa.reply;
+          if (message.kind === "worker-transport-request") {
+            // Synthetic OCR rows exercise the real polygon adapter and parser.
+            // No recognition result is derived from a production photo here.
+            const rows = (reply.text || "").split("\\n").filter(Boolean);
+            const items = rows.map((text, index) => ({ text, score: reply.scores?.[index] ?? 0.99,
+              poly: [[10, 10 + index * 40], [990, 10 + index * 40], [990, 30 + index * 40], [10, 30 + index * 40]] }));
+            self.postMessage({ kind: "worker-transport-response", requestId: message.requestId,
+              status: reply.error ? "error" : "success", qaCompletion: true,
+              payload: reply.error ? { message: reply.error } : [{ items, image: { width: 1000, height: Math.max(100, rows.length * 40 + 40) } }]
+            });
+            for (const source of message.payload.sources) source.imageBitmap?.close();
+            return;
+          }
           self.postMessage({ workerId, jobId, action,
             status: reply.error ? "reject" : "resolve",
             data: reply.error || { text: reply.text || "" }
@@ -90,11 +110,15 @@ async function mockBrowserOcr(page: Page, replies: OcrReply[] = [{ text: labelTe
             return;
           }
           const { workerId, jobId, action, qa } = message;
-          if (action === "recognize") {
-            self.postMessage({ workerId, jobId, action, status: "progress",
+          if (action === "recognize" || message.type === "predict") {
+            if (action === "recognize") self.postMessage({ workerId, jobId, action, status: "progress",
               data: { status: "recognizing text", progress: 0.5 } });
             if (qa.reply.deferred) pending.set(qa.index, message);
             else respond(message);
+          } else if (message.kind === "worker-transport-request") {
+            self.postMessage({ kind: "worker-transport-response", requestId: message.requestId, status: "success",
+              payload: message.type === "init" ? { summary: { backend: "wasm", detProvider: "wasm", recProvider: "wasm",
+                webgpuAvailable: false, assets: [], elapsedMs: 0, pipelineConfigWarnings: [] } } : {} });
           } else {
             self.postMessage({ workerId, jobId, action, status: "resolve", data: {} });
           }
@@ -108,7 +132,7 @@ async function mockBrowserOcr(page: Page, replies: OcrReply[] = [{ text: labelTe
     const recognizingWorkers: Worker[] = [];
     const state: OcrControl = {
       reads: 0, completions: 0, images: [], workerUrls: [], corePaths: [],
-      langPaths: [], languages: [], terminated: [],
+      langPaths: [], languages: [], modelPaths: [], terminated: [],
       release(index) {
         NativeWorker.prototype.postMessage.call(recognizingWorkers[index], { qaRelease: index });
       },
@@ -124,13 +148,19 @@ async function mockBrowserOcr(page: Page, replies: OcrReply[] = [{ text: labelTe
         workers.push(this);
         state.workerUrls.push(new URL(String(url), location.href).href);
         this.addEventListener("message", ({ data }) => {
-          if (data?.action === "recognize" && ["resolve", "reject"].includes(data.status)) state.completions += 1;
+          if (data?.action === "recognize" && ["resolve", "reject"].includes(data.status)
+            || data?.kind === "worker-transport-response" && data.qaCompletion) state.completions += 1;
         });
       }
       postMessage(message: unknown, transferOrOptions?: Transferable[] | StructuredSerializeOptions) {
         const request = message as {
           action?: string;
-          payload?: { image?: Uint8Array; langs?: string | string[]; options?: { corePath?: string; langPath?: string } };
+          type?: string;
+          payload?: {
+            image?: Uint8Array; langs?: string | string[]; sources?: { imageBitmap: ImageBitmap }[];
+            options?: { corePath?: string; langPath?: string; ortOptions?: { wasmPaths: string };
+              pipelineConfig?: { assets: { det: { url: string }; rec: { url: string } } } };
+          };
         };
         let outgoing = message;
         if (request.action === "load") state.corePaths.push(request.payload?.options?.corePath ?? "");
@@ -139,15 +169,30 @@ async function mockBrowserOcr(page: Page, replies: OcrReply[] = [{ text: labelTe
           const langs = request.payload?.langs;
           state.languages.push(Array.isArray(langs) ? langs.join("+") : langs ?? "");
         }
-        if (request.action === "recognize") {
+        if (request.type === "init") {
+          state.corePaths.push(request.payload?.options?.ortOptions?.wasmPaths ?? "");
+          const assets = request.payload?.options?.pipelineConfig?.assets;
+          state.modelPaths.push(assets?.det.url ?? "", assets?.rec.url ?? "");
+        }
+        if (request.action === "recognize" || request.type === "predict") {
           const index = state.reads++;
           recognizingWorkers[index] = this;
-          const image = request.payload?.image;
+          const bitmap = request.payload?.sources?.[0].imageBitmap;
+          let pixels: Uint8ClampedArray | undefined;
+          if (bitmap) {
+            const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+            const context = canvas.getContext("2d")!;
+            context.drawImage(bitmap, 0, 0);
+            pixels = context.getImageData(0, 0, bitmap.width, bitmap.height).data;
+          }
+          const image = pixels ?? request.payload?.image;
           state.images.push({
             size: image?.byteLength ?? 0,
-            signature: Array.from(image?.slice(0, 8) ?? []).map((byte) => byte.toString(16).padStart(2, "0")).join(""),
-            // These worker mocks use tiny PNG fixtures, so retain every byte to verify same-photo rescans.
-            bytes: Array.from(image ?? []),
+            signature: pixels ? "rgba" : Array.from(image?.slice(0, 8) ?? []).map((byte) => byte.toString(16).padStart(2, "0")).join(""),
+            // Hash the complete real input once. Returning megapixels on every
+            // progress poll can itself block the browser and hide UI races.
+            sha256: crypto.subtle.digest("SHA-256", new Uint8Array(image ?? [])).then(hash =>
+              Array.from(new Uint8Array(hash)).map(byte => byte.toString(16).padStart(2, "0")).join("")),
           });
           outgoing = { ...request, qa: { index, reply: replies[Math.min(index, replies.length - 1)] } };
         }
@@ -163,12 +208,13 @@ async function mockBrowserOcr(page: Page, replies: OcrReply[] = [{ text: labelTe
     };
   }, { replies, allowLateResponses });
 
-  const snapshot = () => page.evaluate(() => {
+  const snapshot = () => page.evaluate(async () => {
     const state = window.qaBrowserOcr!;
     return {
-      reads: state.reads, completions: state.completions, images: state.images,
+      reads: state.reads, completions: state.completions,
+      images: await Promise.all(state.images.map(async image => ({ ...image, sha256: await image.sha256 }))),
       workerUrls: state.workerUrls, corePaths: state.corePaths, langPaths: state.langPaths,
-      languages: state.languages, terminated: state.terminated,
+      languages: state.languages, modelPaths: state.modelPaths, terminated: state.terminated,
     };
   });
   return {
@@ -179,12 +225,22 @@ async function mockBrowserOcr(page: Page, replies: OcrReply[] = [{ text: labelTe
       const pageUrl = new URL(page.url());
       const origin = pageUrl.origin;
       expect(state.workerUrls.length).toBeGreaterThan(0);
-      expect(state.workerUrls.every((url) => url === `${origin}${workerPath}`)).toBe(true);
+      const paddle = state.workerUrls.includes(`${origin}${paddleWorkerPath}`);
+      const tesseract = state.workerUrls.includes(`${origin}${workerPath}`);
+      expect(state.workerUrls.every((url) => [workerPath, paddleWorkerPath].some(path => url === `${origin}${path}`))).toBe(true);
       expect(state.corePaths.length).toBeGreaterThan(0);
-      expect(state.corePaths.every((path) => new URL(path, origin).href === `${origin}/ocr/tesseract-7.0.0/core`)).toBe(true);
-      expect(state.langPaths.length).toBeGreaterThan(0);
-      expect(state.langPaths.every((path) => new URL(path, origin).href === `${origin}/ocr/tesseract-7.0.0/lang`)).toBe(true);
-      expect(state.languages.every((langs) => langs.split("+").sort().join("+") === "eng+kor")).toBe(true);
+      expect(state.corePaths.every(path => [`${origin}/ocr/tesseract-7.0.0/core`, `${origin}/ocr/paddle-0.4.2-v1/ort/`].includes(new URL(path, origin).href))).toBe(true);
+      if (paddle) {
+        expect(state.corePaths).toContain(`${origin}/ocr/paddle-0.4.2-v1/ort/`);
+        expect(state.modelPaths.length).toBeGreaterThanOrEqual(2);
+        expect(state.modelPaths.every((path) => path.startsWith(`${origin}/ocr/paddle-0.4.2-v1/models/`))).toBe(true);
+      }
+      if (tesseract) {
+        expect(state.corePaths.map(path => new URL(path, origin).href)).toContain(`${origin}/ocr/tesseract-7.0.0/core`);
+        expect(state.langPaths.length).toBeGreaterThan(0);
+        expect(state.langPaths.every((path) => new URL(path, origin).href === `${origin}/ocr/tesseract-7.0.0/lang`)).toBe(true);
+        expect(state.languages.every((langs) => langs.split("+").sort().join("+") === "eng+kor")).toBe(true);
+      } else expect(state.langPaths).toEqual([]);
       // Initial country/admin lookups use argument-free Next Server Action POSTs.
       // Permit only that empty argument list; photo or OCR-text payloads must still fail.
       const allowedOrigins = new Set([origin, new URL(browserSupabaseUrl).origin]);
@@ -205,6 +261,7 @@ async function withLabelForm(page: Page, locale: Locale, run: (user: QaUser) => 
     password: randomBytes(24).toString("hex"),
   };
   const userId = await ensureUser(user.email, user.password);
+  let testFailed = false;
   try {
     // Authenticate through the real app. Only the browser OCR worker is mocked.
     await page.goto(`/${locale}/login`);
@@ -212,10 +269,16 @@ async function withLabelForm(page: Page, locale: Locale, run: (user: QaUser) => 
     await page.locator('[name="password"]').fill(user.password);
     await page.locator('button[type="submit"]').click();
     await expect(page).toHaveURL(new RegExp(`/${locale}/explore$`));
-    await page.goto(`/${locale}/beans/new`);
+    // Follow the rendered empty-state action after the login redirect commits.
+    // Starting another document navigation at URL-change time races WebKit's redirect.
+    await page.locator(`main a[href="/${locale}/beans/new"]`).first().click();
+    await expect(page).toHaveURL(new RegExp(`/${locale}/beans/new$`));
     const t = locale === "ko" ? ko : en;
     await expect(page.locator("button").filter({ hasText: t.beans.labelImport.choose })).toBeVisible();
     await run(user);
+  } catch (error) {
+    testFailed = true;
+    throw error;
   } finally {
     try {
       if (!page.isClosed()) {
@@ -223,7 +286,9 @@ async function withLabelForm(page: Page, locale: Locale, run: (user: QaUser) => 
           await page.evaluate(() => window.qaBrowserOcr?.dispose());
           await page.unrouteAll({ behavior: "wait" });
         } catch (error) {
-          if (!page.isClosed()) throw error;
+          // A failed navigation can destroy the context during cleanup too.
+          // Keep that original failure visible while still deleting the QA user.
+          if (!page.isClosed() && !testFailed) throw error;
         }
       }
     } finally {
@@ -330,7 +395,7 @@ for (const mobile of [false, true]) {
       const state = await ocr.snapshot();
       expect(state.reads).toBe(2);
       expect(state.completions).toBe(2);
-      expect(state.images[0].bytes).not.toEqual(state.images[1].bytes);
+      expect(state.images[0].sha256).not.toBe(state.images[1].sha256);
       const raw = await openRecognizedText(panel, label.rawText);
       const lines = (await raw.innerText()).split("\n");
       expect(lines).toContain(requestedBlend.name);
@@ -395,7 +460,7 @@ for (const locale of ["ko", "en"] as const) {
         expect(recognized.reads).toBe(1);
         expect(recognized.images).toHaveLength(1);
         expect(recognized.images[0].size).toBeGreaterThan(0);
-        expect(recognized.images[0].signature).toBe("89504e470d0a1a0a");
+        expect(recognized.images[0].signature).toBe(recognized.workerUrls[0].endsWith(paddleWorkerPath) ? "rgba" : "89504e470d0a1a0a");
         await ocr.expectBrowserOnly();
         await expect(review.getByRole("checkbox")).toHaveCount(11);
         await expect(review).toContainText(label.evidence.replace("{text}", "Origin: Ethiopia"));
@@ -581,6 +646,172 @@ for (const locale of ["ko", "en"] as const) {
 
 const retainedLabelText = "Product: Original coffee\nRoaster: Original roastery\nNet weight: 200 g";
 
+for (const outcome of ["complete", "cancel"] as const) {
+  test(`ko detector refinement ${outcome} preserves manual input and rejects stale workers`, async ({ page }) => {
+    test.setTimeout(90_000);
+    const label = ko.beans.labelImport;
+    await withLabelForm(page, "ko", async () => {
+      const ocr = await mockBrowserOcr(page, [
+        { text: "Product: Recovered coffee\nOrigin: Ethiopia", scores: [0.1, 0.99] },
+        { text: "Product: Recovered coffee\nOrigin: Ethiopia\nNet weight: 200 g", deferred: true },
+      ], outcome === "cancel");
+      await page.getByLabel(label.choose, { exact: true }).setInputFiles(photo);
+      await expect.poll(async () => (await ocr.snapshot()).reads).toBeGreaterThanOrEqual(1);
+      test.skip(!(await ocr.snapshot()).workerUrls[0].endsWith(paddleWorkerPath), "Detector refinement applies to the Paddle reader.");
+      await expect.poll(async () => (await ocr.snapshot()).reads).toBe(2);
+      const panel = page.getByRole("region", { name: label.sectionTitle, exact: true });
+      await expect(panel).toHaveAttribute("aria-busy", "true");
+      const state = await ocr.snapshot();
+      expect(state.workerUrls[1]).toContain(workerPath);
+      expect(state.terminated).toContain(0);
+      await page.locator('[name="name"]').fill("My name during refinement");
+      await page.locator('[name="note"]').fill("My impression during refinement");
+      if (outcome === "cancel") {
+        await panel.getByRole("button", { name: label.cancel, exact: true }).click();
+        await expect(panel.getByRole("status")).toHaveText(label.cancelled);
+        await ocr.release(1);
+        await expect.poll(async () => (await ocr.snapshot()).completions).toBe(2);
+        await expect(panel.getByTestId("label-result")).toHaveCount(0);
+        await ocr.expectBrowserOnly();
+      } else {
+        await ocr.release(1);
+        await expect(panel).toHaveAttribute("aria-busy", "false");
+        await expect(panel.getByRole("heading")).toHaveText("Recovered coffee");
+        await expect(panel.getByRole("status")).toHaveText(/^원두 정보 \d+개를 읽었습니다\.$/);
+        await ocr.expectBrowserOnly();
+        await panel.getByRole("button", { name: label.apply, exact: true }).click();
+        await expect(page.locator('[name="weight_g"]')).toHaveValue("200");
+      }
+      await expect(page.locator('[name="name"]')).toHaveValue("My name during refinement");
+      await expect(page.locator('[name="note"]')).toHaveValue("My impression during refinement");
+    });
+  });
+}
+
+for (const mobile of [false, true]) {
+  test(`${mobile ? "@mobile " : ""}ko invalid replacement preserves the current photo, review, and choices`, async ({ page }) => {
+    test.setTimeout(90_000);
+    const label = ko.beans.labelImport;
+    await withLabelForm(page, "ko", async () => {
+      const ocr = await mockBrowserOcr(page, [{ text: retainedLabelText }]);
+      const file = page.getByLabel(label.choose, { exact: true });
+      await file.setInputFiles(photo);
+      const panel = page.getByRole("region", { name: label.sectionTitle, exact: true });
+      const review = panel.getByRole("group", { name: label.review, exact: true });
+      const apply = review.getByRole("button", { name: label.apply, exact: true });
+      await expect(apply).toBeEnabled();
+      await openFieldChoices(review);
+      const roastery = review.getByRole("checkbox", { name: ko.beans.roastery, exact: true });
+      await roastery.uncheck();
+      const raw = await openRecognizedText(panel, label.rawText);
+      const preview = page.getByAltText(label.preview, { exact: true });
+      const source = await preview.getAttribute("src");
+      await page.locator('[name="note"]').fill("My note survives an invalid replacement");
+      const giant = Buffer.from(photo.buffer);
+      giant.writeUInt32BE(6000, 16);
+      giant.writeUInt32BE(6000, 20);
+      const invalidPhotos = [
+        { file: { name: "wrong.svg", mimeType: "image/svg+xml", buffer: Buffer.from("<svg/>") }, code: "invalid_image" },
+        { file: { name: "corrupt.png", mimeType: "image/png", buffer: Buffer.from("not an image") }, code: "invalid_image" },
+        { file: { name: "oversized.png", mimeType: "image/png", buffer: giant }, code: "image_too_large" },
+      ] as const;
+      for (const invalid of invalidPhotos) {
+        await file.setInputFiles(invalid.file);
+        await expect(panel.getByRole("status")).toHaveText(label.errors[invalid.code]);
+        await expect(preview).toHaveAttribute("src", source!);
+        await expect(panel.getByText(photo.name, { exact: true })).toBeVisible();
+        await expect(review.getByRole("heading")).toHaveText("Original coffee");
+        await expect(raw).toHaveText(retainedLabelText);
+        await expect(roastery).not.toBeChecked();
+        await expect(apply).toBeEnabled();
+        expect((await ocr.snapshot()).reads).toBe(1);
+      }
+      await apply.click();
+      await expect(page.locator('[name="name"]')).toHaveValue("Original coffee");
+      await expect(page.locator('[name="roastery"]')).toHaveValue("");
+      await expect(page.locator('[name="note"]')).toHaveValue("My note survives an invalid replacement");
+      await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
+    });
+  });
+}
+
+test("ko invalid replacement leaves the active recognition running", async ({ page }) => {
+  test.setTimeout(90_000);
+  const label = ko.beans.labelImport;
+  await withLabelForm(page, "ko", async () => {
+    const ocr = await mockBrowserOcr(page, [{ text: retainedLabelText, deferred: true }]);
+    const file = page.getByLabel(label.choose, { exact: true });
+    await file.setInputFiles(photo);
+    await expect.poll(async () => (await ocr.snapshot()).reads).toBe(1);
+    const panel = page.getByRole("region", { name: label.sectionTitle, exact: true });
+    const preview = page.getByAltText(label.preview, { exact: true });
+    const source = await preview.getAttribute("src");
+    await file.setInputFiles({ name: "corrupt.png", mimeType: "image/png", buffer: Buffer.from("not an image") });
+    await expect(panel.getByRole("status")).toHaveText(label.errors.invalid_image);
+    await expect(panel).toHaveAttribute("aria-busy", "true");
+    await expect(preview).toHaveAttribute("src", source!);
+    expect((await ocr.snapshot()).terminated).toEqual([]);
+    await ocr.release(0);
+    await expect(panel).toHaveAttribute("aria-busy", "false");
+    await expect(panel.getByRole("heading")).toHaveText("Original coffee");
+    await expect(panel.getByRole("status")).toHaveText(label.found.replace("{count}", "3"));
+  });
+});
+
+for (const action of ["replace", "remove", "retry"] as const) {
+  test(`ko ${action} ignores an older photo whose validation finishes late`, async ({ page }) => {
+    test.setTimeout(90_000);
+    const label = ko.beans.labelImport;
+    await withLabelForm(page, "ko", async () => {
+      const ocr = await mockBrowserOcr(page, [
+        { text: retainedLabelText },
+        { text: "Product: Latest coffee\nNet weight: 250 g" },
+      ]);
+      const file = page.getByLabel(label.choose, { exact: true });
+      const panel = page.getByRole("region", { name: label.sectionTitle, exact: true });
+      await file.setInputFiles(photo);
+      await expect(panel.getByRole("button", { name: label.apply, exact: true })).toBeEnabled();
+      // Delay only disk-byte delivery; the real header validator still checks those bytes.
+      await page.evaluate(() => {
+        const read = File.prototype.arrayBuffer;
+        File.prototype.arrayBuffer = async function () {
+          const bytes = await read.call(this);
+          if (this.name === "slow-replacement.png") {
+            window.qaPhotoReadStarted = true;
+            await new Promise<void>(resolve => { window.qaReleasePhotoRead = resolve; });
+          }
+          return bytes;
+        };
+      });
+      await file.setInputFiles({ ...photo, name: "slow-replacement.png" });
+      await expect.poll(() => page.evaluate(() => window.qaPhotoReadStarted)).toBe(true);
+      if (action === "replace") {
+        await file.setInputFiles({ ...photo, name: "latest-replacement.png" });
+        await expect(panel.getByRole("heading")).toHaveText("Latest coffee");
+      } else if (action === "retry") {
+        await panel.getByRole("button", { name: label.retry, exact: true }).click();
+        await expect(panel.getByRole("heading")).toHaveText("Latest coffee");
+      } else {
+        await panel.getByRole("button", { name: label.remove, exact: true }).click();
+      }
+      await page.evaluate(async () => {
+        window.qaReleasePhotoRead?.();
+        await new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+      });
+      await expect(panel.getByText("slow-replacement.png", { exact: true })).toHaveCount(0);
+      if (action !== "remove") {
+        await expect(panel.getByText(action === "replace" ? "latest-replacement.png" : photo.name, { exact: true })).toBeVisible();
+        await expect(panel.getByRole("heading")).toHaveText("Latest coffee");
+        expect((await ocr.snapshot()).reads).toBe(2);
+      } else {
+        await expect(panel.getByTestId("label-result")).toHaveCount(0);
+        await expect(page.getByAltText(label.preview, { exact: true })).toHaveCount(0);
+        expect((await ocr.snapshot()).reads).toBe(1);
+      }
+    });
+  });
+}
+
 test("ko same-photo rescan keeps previous facts through partial reads and replaces them only on success", async ({ page }) => {
   test.setTimeout(90_000);
   const t = ko;
@@ -588,10 +819,12 @@ test("ko same-photo rescan keeps previous facts through partial reads and replac
   await withLabelForm(page, "ko", async () => {
     const ocr = await mockBrowserOcr(page, [
       { text: retainedLabelText },
+      { text: retainedLabelText },
       { text: "Product: Rescanned coffee\nRoaster: Rescanned roastery\nNet weight: 250", deferred: true },
       { text: "Net weight: 250 g", deferred: true },
+      { text: "Net weight: 250 g" },
     ]);
-    await page.getByLabel(label.choose, { exact: true }).setInputFiles(photo);
+    await page.getByLabel(label.choose, { exact: true }).setInputFiles(await compactLabelPhoto(page));
     const panel = page.getByRole("region", { name: label.sectionTitle, exact: true });
     const review = page.getByRole("group", { name: label.review, exact: true });
     const apply = review.getByRole("button", { name: label.apply, exact: true });
@@ -602,33 +835,34 @@ test("ko same-photo rescan keeps previous facts through partial reads and replac
     await openFieldChoices(review);
     await review.getByRole("checkbox", { name: t.beans.roastery, exact: true }).uncheck();
     const raw = await openRecognizedText(panel, label.rawText);
-    await expect(raw).toHaveText(retainedLabelText);
+    await expect(raw).toContainText(retainedLabelText);
+    const originalRaw = await raw.textContent();
     const source = await page.getByAltText(label.preview, { exact: true }).getAttribute("src");
 
     await rescan.click();
-    await expect.poll(async () => (await ocr.snapshot()).reads).toBe(2);
+    await expect.poll(async () => (await ocr.snapshot()).reads).toBe(3);
     await expect(panel).toHaveAttribute("aria-busy", "true");
     await expect(review.getByText(label.previousResult, { exact: true })).toBeVisible();
     await expect(review.getByTestId("label-result-summary")).toContainText("Original coffee");
     await expect(apply).toBeDisabled();
     for (const checkbox of await review.getByRole("checkbox").all()) await expect(checkbox).toBeDisabled();
     await expect(raw).toBeVisible();
-    await expect(raw).toHaveText(retainedLabelText);
-    expect((await ocr.snapshot()).images[1].bytes).toEqual((await ocr.snapshot()).images[0].bytes);
+    await expect(raw).toHaveText(originalRaw!);
+    expect((await ocr.snapshot()).images[2].sha256).toBe((await ocr.snapshot()).images[0].sha256);
     await expect(page.getByAltText(label.preview, { exact: true })).toHaveAttribute("src", source!);
 
     // The next pass emits a partial extraction; it must not displace a previous successful result.
-    await ocr.release(1);
-    await expect.poll(async () => (await ocr.snapshot()).reads).toBe(3);
+    await ocr.release(2);
+    await expect.poll(async () => (await ocr.snapshot()).reads).toBe(4);
     await expect(panel).toHaveAttribute("aria-busy", "true");
     await expect(review.getByTestId("label-result-summary")).toContainText("Original coffee");
     await expect(review.getByTestId("label-result-summary")).not.toContainText("Rescanned coffee");
-    await expect(raw).toHaveText(retainedLabelText);
+    await expect(raw).toHaveText(originalRaw!);
     await expect(review.getByRole("checkbox", { name: t.beans.roastery, exact: true })).not.toBeChecked();
     await expect(apply).toBeDisabled();
     await page.locator('[name="name"]').fill("My name entered during rescan");
 
-    await ocr.release(2);
+    await ocr.release(3);
     await expect(panel).toHaveAttribute("aria-busy", "false");
     await expect(review.getByTestId("label-result-summary")).toContainText("Rescanned coffee");
     await expect(review.getByTestId("label-result-summary")).toContainText("Rescanned roastery");
@@ -697,7 +931,7 @@ for (const scenario of [
         await ocr.release(1);
         const expectedError = scenario.outcome === "failure" ? label.errors.recognition_failed : label.errors.no_fields;
         await expect(panel.getByRole("status")).toHaveText(expectedError);
-        if (scenario.outcome === "no_fields") expect((await ocr.snapshot()).reads).toBeGreaterThanOrEqual(4);
+        if (scenario.outcome === "no_fields") expect((await ocr.snapshot()).reads).toBeGreaterThanOrEqual(2);
       }
       await expect(panel).toHaveAttribute("aria-busy", "false");
       await expect(review.getByText(label.previousResult, { exact: true })).toBeVisible();
@@ -878,8 +1112,9 @@ for (const locale of ["ko", "en"] as const) {
       const ocr = await mockBrowserOcr(page, [
         { text: "Product: Coffee seen first\nNet weight: 250" },
         { text: "Net weight: 250 g", deferred: true },
+        { text: "Net weight: 250 g" },
       ]);
-      await page.getByLabel(label.choose, { exact: true }).setInputFiles(photo);
+      await page.getByLabel(label.choose, { exact: true }).setInputFiles(await compactLabelPhoto(page));
       await expect.poll(async () => (await ocr.snapshot()).reads).toBe(2);
       const panel = page.getByRole("region", { name: label.sectionTitle, exact: true });
       const review = page.getByRole("group", { name: label.review, exact: true });

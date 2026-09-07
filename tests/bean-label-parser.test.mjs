@@ -1,6 +1,245 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { parseBeanLabelText } from "../src/lib/coffee/bean-label-parser.ts";
+import { isKnownLabelFlavor, isKnownLabelVariety, labelTitleClassifiers, parseBeanLabelText } from "../src/lib/coffee/bean-label-parser.ts";
+
+test("title conflict vocabulary uses exact countries and longest processing aliases", () => {
+  assert.deepEqual(labelTitleClassifiers("Peru Highland Anaerobic Washed"), { countries: ["Peru"], processes: ["anaerobic"] });
+  assert.deepEqual(labelTitleClassifiers("콜롬비아 비수세식"), { countries: ["Colombia"], processes: ["natural"] });
+  assert.deepEqual(labelTitleClassifiers("콜롬비아산100%"), { countries: ["Colombia"], processes: [] });
+  assert.deepEqual(labelTitleClassifiers("Colombia / Ethiopia Natural / Washed").countries.sort(), ["Colombia", "Ethiopia"]);
+  assert.deepEqual(labelTitleClassifiers("Naturalist Honeymoon"), { countries: [], processes: [] });
+  assert.deepEqual(labelTitleClassifiers("네추럴 Natural"), { countries: [], processes: ["natural"] });
+});
+
+test("a printed region-country pair uses the matching country's exact region vocabulary", () => {
+  for (const text of ["TOLIMA,COLOMBIA", "Colombia, Tolima", "톨리마, 콜롬비아"]) {
+    const result = parseBeanLabelText(text);
+    assert.equal(result.fields.origin_country, "Colombia");
+    assert.equal(result.fields.origin_region, "Tolima");
+    assert.equal(result.evidence.origin_region, text);
+  }
+  for (const text of ["Antigua, Colombia", "Unknown Ridge, Colombia", "Tolima, Huila, Colombia"]) {
+    assert.equal(parseBeanLabelText(text).fields.origin_region, undefined);
+  }
+});
+
+test("roast categories after cup notes supply roast and type without becoming names", () => {
+  for (const [level, text] of [["medium", "MEDIUM ROAST BLEND"], ["light", "LIGHT ROAST COFFEE"], ["dark", "DARK ROAST"]]) {
+    const result = parseBeanLabelText(`Notes:\nCocoa\n${text}`);
+    assert.equal(result.fields.roast_level, level);
+    assert.equal(result.bean_type, text.endsWith("BLEND") ? "blend" : "unknown");
+    assert.equal(result.fields.name, undefined);
+    assert.equal(result.evidence.roast_level, text);
+  }
+});
+
+test("the explicit net weight can follow a complete coffee package category", () => {
+  for (const category of ["WHOLE BEAN COFFEE", "GROUND COFFEE", "ROASTED COFFEE"]) {
+    const text = `${category} NET WT. 12 OZ (340G)`;
+    const result = parseBeanLabelText(text);
+    assert.equal(result.fields.weight_g, 340);
+    assert.equal(result.evidence.weight_g, text);
+  }
+  assert.equal(parseBeanLabelText("WHOLE BEAN COFFEE NET WT. 12 OZ").fields.weight_g, undefined);
+});
+
+test("a processing or roast value cannot be accepted as a coffee cultivar", () => {
+  for (const value of ["Washed", "Natural", "Medium Roast"]) {
+    assert.equal(parseBeanLabelText(`VARIETY ${value}`).fields.varietal, undefined, value);
+  }
+  assert.equal(parseBeanLabelText("VARIETY Various").fields.varietal, "Various");
+  assert.equal(parseBeanLabelText("Roasting: Medium").fields.roast_level, "medium");
+});
+
+test("printed flavor vocabulary anchors full lists without rewriting their descriptors", () => {
+  for (const notes of ["MAPLE SYRUP, RAISIN, TANGERINE PEEL, CACAO", "PEONY, WHITE NECTARINE, EARL GREY, VIBRANT"]) {
+    const result = parseBeanLabelText(notes);
+    assert.deepEqual(result.tasting_notes.en, notes.split(", "));
+    assert.deepEqual(result.tasting_notes_evidence, [notes]);
+  }
+  assert.equal(isKnownLabelFlavor("Vibrant"), false);
+  assert.equal(isKnownLabelFlavor("Maple Syrup"), true);
+  assert.equal(isKnownLabelFlavor("White Nectarine"), true);
+  assert.equal(isKnownLabelFlavor("P E O N Y"), true);
+  assert.equal(isKnownLabelFlavor("White Nectarlne"), false);
+  for (const line of ["PEONY, VIBRANT", "LOCAL, LANDRACES", "Discover maple syrup and raisin in our coffee"])
+    assert.deepEqual(parseBeanLabelText(line).tasting_notes?.en ?? [], [], line);
+});
+
+test("a complete local-landrace phrase is recognized without completing broken variety text", () => {
+  for (const value of ["LOCAL LANDRACES", "Local landraces", "L O C A L  L A N D R A C E S"]) {
+    assert.equal(isKnownLabelVariety(value), true, value);
+    assert.equal(parseBeanLabelText(`Varietal: ${value}`).fields.varietal, value.replace(/\s+/gu, " "));
+  }
+  for (const value of ["LOCAL", "LANDRACES COFFEE", "LOCAl LANDRACE5", "Local landraces, Caturra", "Local landraces of Ethiopia"])
+    assert.equal(isKnownLabelVariety(value), false, value);
+});
+
+test("observed dual-unit net weights retain the complete printed metric quantity", () => {
+  for (const line of ["NET WT. 120z (340g)", "NET WT 12 OZ (340g)", "Net Wt. 12 0z / 340 g", "12oz(340g)", "(340g)", "Net weight: 8.8 oz / 0.25 kg", "내용량: [1 kg]", "Net: 1kg (1,000g)"]) {
+    const result = parseBeanLabelText(line);
+    assert.equal(result.fields.weight_g, /1 ?kg/u.test(line) ? 1000 : /0.25/u.test(line) ? 250 : 340, line);
+    assert.equal(result.evidence.weight_g, line);
+  }
+  for (const line of ["NET: 12oz (250g)", "NET: 340g (500g)", "NET: 12oz", "NET: 120z", "NET: 200g or 250g", "NET: 2 x (200g)", "NET: 11,6 $/kg", "Return to Origin: 11,6 $/kg", "Brew recipe\n12oz (340g)", "Nutrition facts\n(340g)", "NET: -200g", "NET: (2009)", "NET: 2B3g", "NET: 200g free shipping"]) {
+    assert.equal(parseBeanLabelText(line).fields.weight_g, undefined, line);
+  }
+});
+
+test("compact Korean country facts require a complete country and origin qualifier", () => {
+  for (const [line, country] of [["케냐싱글오리진", "Kenya"], ["케냐 싱글오리진", "Kenya"], ["에티오피아100%", "Ethiopia"], ["원산지:에티오피아100%", "Ethiopia"], ["Ethiopia (에티오피아) 100%", "Ethiopia"], ["싱글 오리진 콜롬비아", "Colombia"]]) {
+    const result = parseBeanLabelText(line);
+    assert.equal(result.fields.origin_country, country, line);
+    assert.equal(result.evidence.origin_country, line);
+  }
+  for (const line of ["에티오피아구지라로G1워시드", "케냐블렌드", "에티오피아50%", "원산지:에티오피아60%/브라질40%", "Country: Ethiopia / Colombia", "Product: 케냐싱글오리진", "Cup notes: 에티오피아100%", "Made in Colombia", "에티오피아100%할인"]) {
+    assert.equal(parseBeanLabelText(line).fields.origin_country, undefined, line);
+  }
+});
+
+test("bracketed and bilingual headings delimit fields without manufacturing a value", () => {
+  const source = "[원두명] 봄빛\n[Country / 국가]: Ethiopia 에티오피아\n품종 (Variety): Pink Bourbon\n【가공 방식】워시드\n[내용량]200g\n[컵노트] Panela, Orange blossom";
+  const result = parseBeanLabelText(source);
+  assert.equal(result.fields.name, "봄빛");
+  assert.equal(result.fields.origin_country, "Ethiopia");
+  assert.equal(result.fields.varietal, "Pink Bourbon");
+  assert.equal(result.fields.process_method, "washed");
+  assert.equal(result.fields.weight_g, 200);
+  assert.deepEqual(result.tasting_notes.en, ["Panela", "Orange blossom"]);
+  assert.equal(parseBeanLabelText("[Product / Country]: Ethiopia").fields.name, undefined);
+  assert.equal(parseBeanLabelText("[Country] Atlantis").fields.origin_country, undefined);
+  assert.equal(parseBeanLabelText("[Notes] Apple, Honey\n[Country] Colombia").fields.origin_country, "Colombia");
+});
+
+test("a wrapped printed cultivar list is complete rather than only its final cultivar", () => {
+  for (const source of ["SL28,\nSL34,\nBATIAN", "Varieties: SL28,\nSL34,\nBATIAN", "[품종]\nSL28, SL34, BATIAN"]) {
+    const result = parseBeanLabelText(source);
+    assert.equal(result.fields.varietal, "SL28, SL34, BATIAN", source);
+    assert.match(result.evidence.varietal, /SL28.*SL34.*BATIAN/su);
+  }
+  assert.equal(parseBeanLabelText("Varietals: Caturra, Catuai / Bourbon").fields.varietal, "Caturra, Catuai / Bourbon");
+  for (const source of ["Lot: SL28,\nSL34,\nBATIAN", "SL28,\nUNKNOWN,\nBATIAN", "SL28, SL34, 774199", "G1", "74158", "Java", "Colombia"]) {
+    assert.equal(parseBeanLabelText(source).fields.varietal, undefined, source);
+  }
+});
+
+test("source-language explicit process and variety headings normalize without correcting source names", () => {
+  const result = parseBeanLabelText("Varietet: Pink Bourbon\nProces: Vasket\nReturn to Origin:11,6 $/kg");
+  assert.equal(result.fields.varietal, "Pink Bourbon");
+  assert.equal(result.fields.process_method, "washed");
+  assert.equal(result.fields.process_detail, "Vasket");
+  assert.equal(result.fields.weight_g, undefined);
+  const bilingual = parseBeanLabelText("가공방식 (Process): Natural / 내추럴\nVariety: Bourbon");
+  assert.equal(bilingual.fields.process_method, "natural");
+  assert.equal(bilingual.fields.process_detail, undefined);
+  assert.equal(parseBeanLabelText("Process: Washed / Natural").fields.process_method, undefined);
+  assert.equal(parseBeanLabelText("Process: 72h Anaerobic Natural").fields.process_method, "anaerobic");
+  assert.equal(parseBeanLabelText("Process: 72h Anaerobic Natural").fields.process_detail, "72h Anaerobic Natural");
+});
+
+test("interleaved sensory prose is not bound to a standalone processing heading", () => {
+  // Actual untouched heldout-04 Paddle text: the left process column and right
+  // sensory paragraph alternate in OCR reading order. Keep its spelling intact.
+  const raw = "TERAROSA\nRwanda Nyabirasi Arsene\nBourbon Washed\n르완다 냐비라시아르세니부르롱 워시드\nBourbon\n풍증\nTasting Noeo\n가공\n실구쟁의 달공한 장이와 플리드 오렌지와\nwashed\n산뜻한 산이가 일도감 있게 느피지는 커피\n수학\n2025.5- 2025.8\nNeRWR\n원산지 르완다\n250 9\n데라로사커피 커피원두100%";
+  const result = parseBeanLabelText(raw);
+  assert.equal(result.fields.process_detail, undefined);
+  assert.equal(result.evidence.process_detail, undefined);
+  assert.equal(result.fields.process_method, "washed");
+  assert.equal(result.evidence.process_method, "washed");
+  assert.equal(result.fields.origin_country, "Rwanda");
+  assert.equal(result.fields.varietal, "Bourbon");
+});
+
+test("processing details require technical evidence rather than adjacent flavor or promotional prose", () => {
+  for (const prose of ["Bright berry notes with a silky finish", "청사과와 달콤한 꿀의 여운", "Natural sweetness and honey aroma", "Honey, milk chocolate", "Enjoy this naturally sweet coffee"]) {
+    for (const heading of ["Process", "Processing detail", "가공", "가공 상세"]) {
+      const result = parseBeanLabelText(`${heading}\n${prose}\nWashed`);
+      assert.equal(result.fields.process_detail, undefined, `${heading}: ${prose}`);
+      assert.equal(result.fields.process_method, "washed", `${heading}: ${prose}`);
+      const inline = parseBeanLabelText(`${heading}: ${prose}`);
+      assert.equal(inline.fields.process_detail, undefined, `${heading}: ${prose}`);
+    }
+  }
+  for (const value of ["experimental 72h", "Sun dried on raised beds", "Double fermentation for 48 hours", "무산소 발효 후 저온 건조"]) {
+    const result = parseBeanLabelText(`Processing detail\n${value}`);
+    assert.equal(result.fields.process_detail, value);
+    assert.equal(result.evidence.process_detail, `Processing detail ${value}`);
+  }
+  assert.equal(parseBeanLabelText("Processing detail: arbitrary unreadable text").fields.process_detail, undefined);
+  assert.equal(parseBeanLabelText("Process: unreadable\nNatural").fields.process_method, undefined);
+  // The original user-card OCR also interleaves the final altitude fragment
+  // after the processing heading. Heights, dates and weights are not durations.
+  for (const metadata of ["2,480m", "1,850 m", "2026.09.07", "2026년 9월 7일", "250g"]) {
+    const result = parseBeanLabelText(`Natural\n가공방식:\n${metadata}`);
+    assert.equal(result.fields.process_detail, undefined, metadata);
+    assert.equal(result.fields.process_method, "natural", metadata);
+  }
+});
+
+test("printed notes end before a logo, promotional sentence or product metadata", () => {
+  const source = "컵노트: 청사과, 청포도,리치,복숭아\nCalamari";
+  assert.deepEqual(parseBeanLabelText(source).tasting_notes, { en: [], ko: ["청사과", "청포도", "리치", "복숭아"] });
+  const actual = parseBeanLabelText("Note : Lemongrass, Brown Sugar, Black Tea\n은은한 레몬그라스와 브라운 슈가의 향미가\n조화롭게 어우러지는 깔끔한 커피\n에티오피아100%\nLight\n200 g\n품목보고번호2022009039228\nRoasted at coffee lusso SUJI Roastery");
+  assert.deepEqual(actual.tasting_notes, { en: ["Lemongrass", "Brown Sugar", "Black Tea"], ko: [] });
+  assert.equal(actual.fields.origin_country, "Ethiopia");
+  assert.equal(actual.fields.weight_g, 200);
+  for (const boundary of ["WHOLE BEAN COFFEE", "SPECIALTY COFFEE", "Enjoy this coffee with friends", "품목보고번호 2022009039228", "OPEN", "SEASONAL", "https://example.test", "STORE IN A COOL DRY PLACE"]) {
+    const result = parseBeanLabelText(`Tasting notes:\nPanela, Orange blossom\n${boundary}\nUnrelated Brand`);
+    assert.deepEqual(result.tasting_notes.en, ["Panela", "Orange blossom"], boundary);
+  }
+  assert.deepEqual(parseBeanLabelText("TASTES LIKE: CHERRY, COLA,\nORANGE\nBRAZIL\nArbitrary Brand").tasting_notes.en, ["CHERRY", "COLA", "ORANGE"]);
+});
+
+test("known property values after a completed cup-note list remain package facts", () => {
+  const result = parseBeanLabelText("Cup notes: Apple, Honey\n케냐싱글오리진\nWASHED\nSL28, SL34\n200g");
+  assert.equal(result.fields.origin_country, "Kenya");
+  assert.equal(result.fields.process_method, "washed");
+  assert.equal(result.fields.varietal, "SL28, SL34");
+  assert.equal(result.fields.weight_g, 200);
+  assert.deepEqual(result.tasting_notes.en, ["Apple", "Honey"]);
+  assert.deepEqual(parseBeanLabelText("Tasting notes:\nHoney\nBourbon\nLight").fields, {});
+});
+
+test("regulatory numbers and package categories cannot become a named product", () => {
+  for (const value of ["품목보고번호2022009039228", "품목보고번호 2022009039228", "WHOLE BEAN COFFEE", "원두커피", "식품유형: 볶은커피"]) {
+    assert.equal(parseBeanLabelText(`Product: ${value}`).fields.name, undefined, value);
+  }
+  assert.equal(parseBeanLabelText("ROASTERS\nB\nHAND ROASTED\n200g").fields.roastery, undefined);
+  assert.equal(parseBeanLabelText("Product: Morning Coffee").fields.name, "Morning Coffee");
+  assert.equal(parseBeanLabelText("Product: Origin Story").fields.name, "Origin Story");
+  assert.equal(parseBeanLabelText("Product: Brew Day").fields.name, "Brew Day");
+  assert.equal(parseBeanLabelText("Product: Water Lily").fields.name, "Water Lily");
+});
+
+test("a roast value before its heading does not swallow the following descriptive list", () => {
+  const result = parseBeanLabelText("LIGHT ROAST LEVEL - FRUIT FORWARD, FLORAL, AND BOTANICAL");
+  assert.equal(result.fields.roast_level, "light");
+  assert.deepEqual(result.tasting_notes.en, ["FRUIT FORWARD", "FLORAL", "BOTANICAL"]);
+  for (const line of ["LIGHT-MEDIUM ROAST LEVEL - FRUIT", "LIGHT ROAST LEVEL - Enjoy our coffee", "Product: LIGHT ROAST LEVEL"])
+    assert.equal(parseBeanLabelText(line).tasting_notes, undefined, line);
+});
+
+test("explicit production provenance retains its name and location instead of copying the whole sentence", () => {
+  const result = parseBeanLabelText("Produceret af Rodrigo Hoyos i Huila, Colombia\nVarietet: Pink Bourbon\nProces: Vasket");
+  assert.equal(result.fields.farm_producer, "Rodrigo Hoyos");
+  assert.equal(result.fields.origin_region, "Huila");
+  assert.equal(result.fields.origin_country, "Colombia");
+  assert.equal(result.evidence.origin_country, "Produceret af Rodrigo Hoyos i Huila, Colombia");
+  const another = parseBeanLabelText("Produceret af Maria Silva i Cerrado, Brazil");
+  assert.equal(another.fields.farm_producer, "Maria Silva");
+  assert.equal(another.fields.origin_region, "Cerrado");
+  assert.equal(another.fields.origin_country, "Brazil");
+  assert.equal(parseBeanLabelText("Produceret af Rodrigo Hoyosi Huila, Colombia").fields.farm_producer, undefined);
+  assert.equal(parseBeanLabelText("Produceret af Sample i Huila, Colombia\nCountry: Ethiopia").fields.origin_country, undefined);
+  for (const source of ["Our coffee from Huila, Colombia", "Roasted in Huila, Colombia", "Produceret af Sample i Somewhere, Atlantis"])
+    assert.equal(parseBeanLabelText(source).fields.origin_country, undefined, source);
+});
+
+test("compact Korean origin shares identify a blend without treating one component as its origin", () => {
+  for (const source of ["원산지:에티오피아60%/브라질40%", "에티오피아60%\n브라질40%", "원산지: 에티오피아산60%, 브라질산40%"])
+    assert.equal(parseBeanLabelText(source).bean_type, "blend", source);
+  assert.equal(parseBeanLabelText("에티오피아100%").bean_type, "unknown");
+});
 
 test("source estates, street addresses and generic coffee headings are not roaster wordmarks", () => {
   for (const text of [
@@ -36,6 +275,9 @@ test("a visibly wrapped flavor list spans OCR blocks without swallowing followin
   assert.deepEqual(result.tasting_notes.en, ["CHERRY", "CHOCOLATE MOUSSE", "CARAMEL", "SMOOTH"]);
   assert.equal(result.fields.weight_g, 350);
   assert.deepEqual(parseBeanLabelText("Apple, Honey,\nOrigin: Ethiopia / Brazil").tasting_notes.en, ["Apple", "Honey"]);
+  assert.deepEqual(parseBeanLabelText("CHERRY, COLA,\n\nORANGE\n\nBRAZIL").tasting_notes.en, ["CHERRY", "COLA", "ORANGE"]);
+  assert.equal(parseBeanLabelText("TASTES LIKE      ROAST PROFILE   ROAST DATE:  z").tasting_notes, undefined);
+  assert.equal(parseBeanLabelText("BATCH #XXXX\n350G NET").fields.weight_g, 350);
 });
 
 test("a partially read column blend does not apply one lot's processing to the whole package", () => {
@@ -516,4 +758,44 @@ test("a Korean flavor list cannot lend evidence to unrelated Latin OCR fragments
   assert.deepEqual(reverse.tasting_notes, { en: ["Cocoa", "Hazelnut", "Plum"], ko: [] });
   const explicit = parseBeanLabelText("Cup notes: Panela, Orange blossom");
   assert.deepEqual(explicit.tasting_notes.en, ["Panela", "Orange blossom"]);
+});
+test("serial-number labels cannot become a roaster from an adjacent descriptor", () => {
+  for (const number of ["NO.04053", "N0.04053", "No. 04053", "No:04053", "Number 04053", "Serial No. 04053"]) {
+    for (const separator of [" ", "\n", "\n\n"]) {
+      assert.equal(parseBeanLabelText(`${number}${separator}Coffee Roasters`).fields.roastery, undefined, `${number}/${JSON.stringify(separator)}`);
+    }
+  }
+  for (const brand of ["47 North", "7 Grains", "NO.6 Coffee"]) {
+    assert.equal(parseBeanLabelText(`${brand}\nCoffee Roasters`).fields.roastery, brand);
+  }
+  assert.equal(parseBeanLabelText("NO.04053\nCopper Moon Coffee Roasters").fields.roastery, "Copper Moon");
+});
+
+test("a serial row does not hide a later independent cup-note list", () => {
+  const result = parseBeanLabelText("NO.12345\nCOFFEE ROASTERS\nEvening Blend\nApple, Lemon, Honey");
+  assert.deepEqual(result.tasting_notes.en, ["Apple", "Lemon", "Honey"]);
+  assert.equal(result.fields.roastery, undefined);
+});
+
+test("a serial row cannot end a recipe exclusion or join its flavor words", () => {
+  const result = parseBeanLabelText("Recipe:\nNO.12345\nApple, Lemon, Honey");
+  assert.equal(result.tasting_notes, undefined);
+});
+
+test("printed attribution and a spaced dash separate labels from their exact values", () => {
+  const result = parseBeanLabelText("Produced by Maria Cruz\nProcess - Washed\nCoffee beans");
+  assert.equal(result.fields.farm_producer, "Maria Cruz");
+  assert.equal(result.fields.process_method, "washed");
+  assert.equal(result.fields.process_detail, undefined);
+  assert.equal(result.evidence.farm_producer, "Produced by Maria Cruz");
+});
+
+test("a leading-zero decimal comma with an explicit kilogram unit is readable without guessing units", () => {
+  for (const value of ["Net weight: 0,250 Kg", "Coffee beans\n0,250 kg", "Coffee beans\n0,5 kg"]) {
+    assert.equal(parseBeanLabelText(value).fields.weight_g, value.includes("0,5") ? 500 : 250);
+  }
+  for (const value of ["0,250", "0,250 9", "0,250 g", "0,000 kg"]) {
+    assert.equal(parseBeanLabelText(`Coffee beans\n${value}`).fields.weight_g, undefined, value);
+  }
+  assert.equal(parseBeanLabelText("Coffee beans\n1,000 g").fields.weight_g, 1000);
 });

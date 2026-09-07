@@ -5,7 +5,8 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
 import { eligibleLabelFields, LABEL_FIELDS, type LabelExtraction, type LabelField } from "@/lib/coffee/bean-label";
-import { createBrowserLabelReader, type LabelReadProgress } from "@/lib/coffee/bean-label-ocr";
+import type { LabelReadProgress } from "@/lib/coffee/bean-label-ocr";
+import { createBrowserPaddleLabelReader } from "@/lib/coffee/bean-label-paddle";
 import { prepareLabelImages, prepareLabelWeightRetry } from "@/lib/coffee/bean-label-image";
 import { prepareLabelDetailRetries } from "@/lib/coffee/bean-label-detail-image";
 import { prepareLabelDeskew } from "@/lib/coffee/bean-label-deskew";
@@ -107,7 +108,8 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
   const currentForm = useRef(form);
   const currentDefaultProcessPermission = useRef(allowDefaultProcessFill);
   const request = useRef<{ sequence: number; controller: AbortController | null }>({ sequence: 0, controller: null });
-  const [reader] = useState(createBrowserLabelReader);
+  const photoSelection = useRef(0);
+  const [reader] = useState(createBrowserPaddleLabelReader);
   const [photo, setPhoto] = useState<LabelPhoto | null>(null);
   const [dragging, setDragging] = useState(false);
   const dragDepth = useRef(0);
@@ -134,6 +136,7 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
   }, [busy]);
   useEffect(() => () => { if (photo) URL.revokeObjectURL(photo.url); }, [photo]);
   useEffect(() => () => {
+    photoSelection.current += 1;
     request.current.sequence += 1;
     request.current.controller?.abort();
     reader.dispose();
@@ -147,6 +150,7 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
   }
 
   function cancelRequest(keepResult = false) {
+    photoSelection.current += 1;
     request.current.sequence += 1;
     request.current.controller?.abort();
     request.current.controller = null;
@@ -160,21 +164,22 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
 
   async function choosePhoto(file?: File) {
     if (!file || disabled) return;
-    cancelRequest();
-    setPhoto(null);
-    setNotice(null);
+    const selection = ++photoSelection.current;
     if (!IMAGE_TYPES.has(file.type)) { setError("invalid_image"); return; }
     if (file.size > MAX_LABEL_FILE_BYTES) { setError("image_too_large"); return; }
-    const sequence = request.current.sequence;
     try {
       // A preview can decode too, so validate before creating its object URL.
       await validateLabelImageBeforeDecode(file);
     } catch (failure) {
-      if (sequence !== request.current.sequence) return;
+      if (selection !== photoSelection.current) return;
       setError(failure instanceof Error && failure.message === "image_too_large" ? "image_too_large" : "invalid_image");
       return;
     }
-    if (sequence !== request.current.sequence) return;
+    if (selection !== photoSelection.current) return;
+    // A rejected replacement must not discard the current review or interrupt
+    // its worker. A separate selection sequence also rejects stale validation.
+    cancelRequest();
+    setNotice(null);
     setError(null);
     const nextPhoto = { url: URL.createObjectURL(file), name: file.name, file };
     setPhoto(nextPhoto);
@@ -183,6 +188,7 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
 
   async function readPhoto(selectedPhoto: LabelPhoto, retry = false) {
     if (disabled || request.current.controller) return;
+    photoSelection.current += 1;
     const keepResult = retry && selectedPhoto === photo && hasCompletedResult;
     const sequence = ++request.current.sequence;
     const controller = new AbortController();
@@ -201,11 +207,12 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
       clearResults();
     }
     try {
-      const image = await prepareLabelImages(selectedPhoto.file, controller.signal);
+      const image = await prepareLabelImages(selectedPhoto.file, controller.signal, "detector");
       if (sequence !== request.current.sequence) return;
       setPhase("loading");
       const { text, extraction: result } = await reader.recognize(image, {
         signal: controller.signal,
+        prepareFallbackImages: () => prepareLabelImages(selectedPhoto.file, controller.signal, "block"),
         prepareWeightRetry: () => prepareLabelWeightRetry(selectedPhoto.file, controller.signal),
         prepareDetailRetries: options => prepareLabelDetailRetries(selectedPhoto.file, controller.signal, options),
         prepareDeskewRetry: angle => prepareLabelDeskew(selectedPhoto.file, angle, controller.signal),
@@ -239,6 +246,7 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
       }
       setRawText(text.trim());
       setExtraction(result);
+      setError(null);
       setHasCompletedResult(true);
       setRetainingResult(false);
       setNotice(null);

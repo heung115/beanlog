@@ -35,8 +35,11 @@ test("origin structured data and the isolated OCR worker keep their intended pol
     const nonce = response!.headers()["content-security-policy"].match(/'nonce-([^']+)'/)?.[1];
     expect(await page.locator('script[type="application/ld+json"]').evaluate(element => (element as HTMLScriptElement).nonce)).toBe(nonce);
   }
-  const worker = await request.get("/ocr/tesseract-7.0.0/worker.min.js");
-  expect(worker.headers()["content-security-policy"]).toContain("'wasm-unsafe-eval'");
-  expect(worker.headers()["content-security-policy"]).not.toContain("'unsafe-inline'");
-  expect(worker.headers()["cache-control"]).toContain("immutable");
+  for (const path of ["/ocr/tesseract-7.0.0/worker.min.js", "/ocr/paddle-0.4.2-v1/worker.js"]) {
+    const worker = await request.get(path);
+    expect(worker.ok()).toBe(true);
+    expect(worker.headers()["content-security-policy"]).toContain("'wasm-unsafe-eval'");
+    expect(worker.headers()["content-security-policy"]).not.toContain("'unsafe-inline'");
+    expect(worker.headers()["cache-control"]).toContain("immutable");
+  }
 });

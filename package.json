@@ -52,6 +52,7 @@
   },
   "devDependencies": {
     "@google/design.md": "0.4.0",
+    "@paddleocr/paddleocr-js": "0.4.2",
     "@playwright/test": "1.62.0",
     "@tailwindcss/postcss": "4.3.3",
     "@tesseract.js-data/eng": "1.0.0",
@@ -64,8 +65,10 @@
     "@types/topojson-client": "3.1.5",
     "@types/topojson-specification": "1.0.5",
     "axe-core": "4.12.1",
+    "esbuild": "0.25.12",
     "eslint": "9.39.5",
     "eslint-config-next": "16.2.11",
+    "onnxruntime-web": "1.24.3",
     "tailwindcss": "4.3.3",
     "tesseract.js": "7.0.0",
     "typescript": "5.9.3"

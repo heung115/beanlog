@@ -5,6 +5,7 @@
 .env.*
 !.env.example
 node_modules
+**/__pycache__
 qa-report
 test-results
 playwright-report
@@ -12,6 +13,8 @@ coverage
 docs
 scripts/*
 !scripts/prepare-ocr-assets.mjs
+!scripts/ocr/
+!scripts/ocr/**
 public/ocr
 server
 staging

@@ -1,0 +1,1622 @@
+{
+  "version": 1,
+  "purpose": "26 previously observed public development coffee fixtures:12 original public fixtures plus8 first-opened and6 second-opened package photos. Both first blind evaluations failed and remain preserved; none of these are unread or independent blind data. No private images, binaries or OCR outputs. Download exact imageUrl bytes and require SHA; unavailable/changed URLs are missing data, never silently substituted.",
+  "pathBase": "repository",
+  "fixtures": [
+    {
+      "id": "ona-raspberry-candy",
+      "sourceUrl": "https://onacoffee.com.au/products/raspberry-candy",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0464/4824/6934/files/Raspberry-Candy_fe2a7355-15f3-474c-b3a2-43956e9a48dc.png?v=1730240374",
+      "expected": {
+        "fields": {
+          "name": "Raspberry Candy",
+          "roastery": "ONA",
+          "weight_g": 200
+        },
+        "tasting_notes": {
+          "en": [
+            "Sweet berries",
+            "creamy white chocolate"
+          ]
+        }
+      },
+      "visibleText": {
+        "name": "Raspberry / Candy",
+        "roastery": "O N A",
+        "weight": "200g",
+        "notes": "Sweet berries and creamy white chocolate",
+        "other": "MILK-BASED; GOLD LABEL"
+      },
+      "mustRemainUnknown": [
+        "origin_country",
+        "origin_region",
+        "varietal",
+        "roast_date",
+        "blend_components"
+      ],
+      "notes": "Official front package image. Name wraps over two lines in a decorative serif font. The page lists origins, but they are not printed on this visible side and must not be inferred. Milk-based is a brewing use, not a roast level.",
+      "sha256": "4f6e6f2ba48d7236778fa14f4932341536d47b1c64a997db8a20a4c856d181ac",
+      "evaluationExclusions": [],
+      "dimensions": {
+        "width": 1000,
+        "height": 1633
+      },
+      "format": "png",
+      "bytes": 1465495,
+      "split": "development",
+      "kind": "coffee",
+      "path": ".staging/ocr-release/public/ona-raspberry-candy.png"
+    },
+    {
+      "id": "squaremile-red-brick",
+      "sourceUrl": "https://shop.squaremilecoffee.com/products/red-brick",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0845/5287/6340/files/REDBRICK-89.jpg?v=1785138974",
+      "expected": {
+        "bean_type": "blend",
+        "fields": {
+          "name": "RED BRICK",
+          "weight_g": 350,
+          "blend_components": [
+            {
+              "origin_country": "Guatemala",
+              "percentage": 50,
+              "process_method": "washed"
+            },
+            {
+              "origin_country": "Costa Rica",
+              "percentage": 50,
+              "process_method": "honey"
+            }
+          ]
+        },
+        "tasting_notes": {
+          "en": [
+            "CHERRY",
+            "CHOCOLATE MOUSSE",
+            "CARAMEL",
+            "SMOOTH"
+          ]
+        }
+      },
+      "visibleText": {
+        "name": "RED BRICK",
+        "weight": "350G NET",
+        "component1": "50% Chacayá; Sololá, Guatemala; Process: Washed",
+        "component2": "50% Puente Tarrazú; Tarrazú, Costa Rica; Process: White Honey",
+        "notes": "CHERRY / CHOCOLATE MOUSSE / CARAMEL / SMOOTH",
+        "date": "XX/XX/XX"
+      },
+      "mustRemainUnknown": [
+        "roastery",
+        "roast_date"
+      ],
+      "notes": "Official distant front photograph. Label is a small part of 1136×1420 photo. The brand animal is visible but no textual Square Mile name is printed; brand knowledge from website must not fill roastery. Names and countries are visually readable but tiny; accents and process detail are difficult. Page text currently describes different seasonal blend components and is not ground truth.",
+      "sha256": "74f60387c99178249d4942f6b474ec5480eace54f4918b48f70f349122099cca",
+      "evaluationExclusions": [],
+      "dimensions": {
+        "width": 1136,
+        "height": 1420
+      },
+      "format": "jpeg",
+      "bytes": 108882,
+      "split": "development",
+      "kind": "coffee",
+      "path": ".staging/ocr-release/public/squaremile-red-brick.jpg"
+    },
+    {
+      "id": "momos-busan",
+      "sourceUrl": "https://momos.co.kr/shop_view/3067",
+      "imageUrl": "https://cdn.imweb.me/thumbnail/20260806/227a6b1549ae9.png",
+      "expected": {
+        "bean_type": "blend",
+        "fields": {
+          "name": "시그니처 블렌드 부산",
+          "roastery": "MOMOS COFFEE",
+          "weight_g": 200
+        }
+      },
+      "expectedAlternatives": {
+        "fields": {
+          "name": [
+            "Signature Blend Busan"
+          ]
+        }
+      },
+      "visibleText": {
+        "name": "시그니처 블렌드 / 부산; Signature Blend Busan",
+        "roastery": "MOMOS / COFFEE",
+        "weight": "200g",
+        "other": "커피 / 커피원두 100%"
+      },
+      "mustRemainUnknown": [
+        "origin_country",
+        "origin_region",
+        "varietal",
+        "roast_date",
+        "blend_components"
+      ],
+      "notes": "Official front package product photo. Very small white text over a dark textured green/blue background; some marketing text is outside the bag. Korean tasting-note sentence is visible but too small for an exact full transcription, so no tasting-note expectations are asserted. Origin percentages are absent; coffee beans 100% is not blend composition.",
+      "sha256": "1b623b0fc5a0713372e1d0b36e36410c25978cbb5903019ce8cae44e89a2d34c",
+      "evaluationExclusions": [
+        "tasting_notes"
+      ],
+      "dimensions": {
+        "width": 750,
+        "height": 750
+      },
+      "format": "png",
+      "bytes": 326376,
+      "split": "development",
+      "kind": "coffee",
+      "path": ".staging/ocr-release/public/momos-busan.png"
+    },
+    {
+      "id": "fritz-decaffeinated",
+      "sourceUrl": "https://fritz.co.kr/product/detail.html?product_no=982&cate_no=24&display_group=1",
+      "imageUrl": "https://fritz.co.kr/web/product/big/202607/c123c909348c10eac86b1352d6bda188.jpg",
+      "expected": {
+        "fields": {
+          "name": "프릳츠 디카페인",
+          "roastery": "프릳츠",
+          "weight_g": 200,
+          "process_method": "decaf"
+        }
+      },
+      "expectedAlternatives": {
+        "fields": {
+          "name": [
+            "디카페인",
+            "DECAFFEINATED COFFEE"
+          ]
+        }
+      },
+      "visibleText": {
+        "name": "프릳츠 디카페인; DECAFFEINATED COFFEE",
+        "roastery": "프릳츠",
+        "weight": "200g",
+        "other": "FULL TIME COFFEE LOVER"
+      },
+      "mustRemainUnknown": [
+        "origin_country",
+        "origin_region",
+        "varietal",
+        "roast_date",
+        "blend_components"
+      ],
+      "notes": "Official front package photo. Brand and product are on one yellow Korean line, with a second English name beneath. The curved slogan is unrelated to name/roastery. Process decaf is explicit; country and processing details from product web text must not be added.",
+      "sha256": "0a8f47cd1c2f60c2919ddb2199932e0b91a579224c592f4cae598929a944fcc5",
+      "evaluationExclusions": [],
+      "dimensions": {
+        "width": 1000,
+        "height": 1000
+      },
+      "format": "png",
+      "bytes": 1096923,
+      "split": "development",
+      "kind": "coffee",
+      "path": ".staging/ocr-release/public/fritz-decaffeinated.png"
+    },
+    {
+      "id": "terarosa-classic-espresso",
+      "sourceUrl": "https://renew.terarosa.com/market/product/detail/15-15",
+      "imageUrl": "https://renew.terarosa.com:9000/product/15/detail/detail_15_a089ad0e-2c88-45c2-b37b-90bc1b49cecc.png",
+      "expected": {
+        "fields": {
+          "name": "CLASSIC ESPRESSO",
+          "roastery": "TERAROSA",
+          "weight_g": 1000
+        }
+      },
+      "expectedAlternatives": {
+        "fields": {
+          "name": [
+            "클래식 에스프레소",
+            "테라로사 커피 클래식 에스프레소"
+          ]
+        }
+      },
+      "visibleText": {
+        "name": "CLASSIC ESPRESSO; 테라로사 커피 클래식 에스프레소",
+        "roastery": "TERAROSA",
+        "weight": "NET WT 1 kg",
+        "partialComposition": "과테말라산 35%, 브라질산 25%",
+        "other": "커피원두 100%"
+      },
+      "mustRemainUnknown": [
+        "roast_date",
+        "blend_components"
+      ],
+      "notes": "Official front package image. Tonal red-on-red label and very small Korean text. Two displayed origin percentages sum only to 60%; do not fabricate remaining shares or normalize to 100%. Kilograms must convert to 1000 g. Tasting note paragraph is difficult and not asserted.",
+      "sha256": "0b9c1c899831601933d4e34a5eb4126abae21687c7241b07eef4e8f9ba028e61",
+      "evaluationExclusions": [
+        "tasting_notes"
+      ],
+      "dimensions": {
+        "width": 800,
+        "height": 800
+      },
+      "format": "png",
+      "bytes": 146395,
+      "split": "development",
+      "kind": "coffee",
+      "path": ".staging/ocr-release/public/terarosa-classic-espresso.png"
+    },
+    {
+      "id": "counterculture-hologram-new",
+      "sourceUrl": "https://counterculturecoffee.com/products/12-oz-hologram",
+      "imageUrl": "https://counterculturecoffee.com/cdn/shop/files/Hologram_Main.jpg?v=1749046044",
+      "expected": {
+        "fields": {
+          "name": "hologram",
+          "roastery": "COUNTER CULTURE COFFEE",
+          "weight_g": 340
+        },
+        "tasting_notes": {
+          "en": [
+            "fruity",
+            "milk chocolate",
+            "syrupy"
+          ]
+        }
+      },
+      "expectedAlternatives": {
+        "fields": {
+          "roastery": [
+            "COUNTER CULTURE"
+          ]
+        }
+      },
+      "visibleText": {
+        "name": "hologram™",
+        "roastery": "COUNTER / CULTURE / COFFEE",
+        "weight": "Net Wt. 12 oz / 340 g",
+        "notes": "tasting notes: fruity | milk chocolate | syrupy",
+        "other": "WHOLE BEAN COFFEE"
+      },
+      "mustRemainUnknown": [
+        "origin_country",
+        "origin_region",
+        "farm_producer",
+        "varietal",
+        "process_method",
+        "process_detail",
+        "roast_level",
+        "roast_date",
+        "harvest_year",
+        "altitude_m",
+        "blend_components"
+      ],
+      "notes": "Original official front photo. Trademark symbol is omitted from normalized name. Page origin/blend/medium-roast facts are not visible in this image and are excluded.",
+      "sha256": "7490d93fe9111a00f44f98002ce5eafe6a8d93f6373350362195687b3d5f5c75",
+      "dimensions": {
+        "width": 2741,
+        "height": 2678
+      },
+      "format": "jpeg",
+      "bytes": 749271,
+      "split": "development",
+      "kind": "coffee",
+      "path": ".staging/ocr-release/public/counterculture-hologram-new.jpg"
+    },
+    {
+      "id": "stumptown-hair-bender-new",
+      "sourceUrl": "https://www.stumptowncoffee.com/products/hair-bender",
+      "imageUrl": "https://www.stumptowncoffee.com/cdn/shop/files/SCR_Hair_Bender_72DPI.png?v=1775167285",
+      "expected": {
+        "bean_type": "blend",
+        "fields": {
+          "name": "HAIR BENDER",
+          "roastery": "STUMPTOWN COFFEE ROASTERS",
+          "weight_g": 340
+        },
+        "tasting_notes": {
+          "en": [
+            "CITRUS",
+            "DARK CHOCOLATE"
+          ]
+        }
+      },
+      "expectedAlternatives": {
+        "fields": {
+          "roastery": [
+            "STUMPTOWN"
+          ]
+        }
+      },
+      "visibleText": {
+        "name": "HAIR BENDER",
+        "roastery": "STUMPTOWN / COFFEE / ROASTERS",
+        "weight": "NET WT 12 OZ (340g)",
+        "notes": "CITRUS & DARK CHOCOLATE",
+        "other": "GOOD LUCK; ESTD 1999; HAND ROASTED; BLEND (vertical, both sides); WHOLE BEAN"
+      },
+      "mustRemainUnknown": [
+        "origin_country",
+        "origin_region",
+        "farm_producer",
+        "varietal",
+        "process_method",
+        "process_detail",
+        "roast_level",
+        "roast_date",
+        "harvest_year",
+        "altitude_m",
+        "blend_components"
+      ],
+      "forbiddenValues": {
+        "tasting_notes.en": [
+          "Raisin"
+        ],
+        "fields.harvest_year": [
+          1999
+        ]
+      },
+      "notes": "Original official transparent PNG. Raisin appears on the product page but not this package image. ESTD 1999 is the company establishment year, not coffee harvest/roast date. Vertical BLEND is printed but no component countries/shares appear.",
+      "sha256": "0e6486cb81ed37ff7baccff7f4c9f97b2bf6618b103dc5d4f531e63ed1bdf6a9",
+      "dimensions": {
+        "width": 1534,
+        "height": 1534
+      },
+      "format": "png",
+      "bytes": 1860553,
+      "split": "development",
+      "kind": "coffee",
+      "path": ".staging/ocr-release/public/stumptown-hair-bender-new.png"
+    },
+    {
+      "id": "intelligentsia-black-cat-new",
+      "sourceUrl": "https://www.intelligentsia.com/products/black-cat-classic-espresso",
+      "imageUrl": "https://www.intelligentsia.com/cdn/shop/files/12oz_BC_Classic_1024x1024.png?v=1762379623",
+      "expected": {
+        "bean_type": "blend",
+        "fields": {
+          "name": "CLASSIC ESPRESSO",
+          "roastery": "Intelligentsia",
+          "weight_g": 340,
+          "origin_country": "Brazil"
+        },
+        "tasting_notes": {
+          "en": [
+            "CHERRY",
+            "COLA",
+            "ORANGE"
+          ]
+        }
+      },
+      "expectedAlternatives": {
+        "fields": {
+          "name": [
+            "BLACK CAT CLASSIC ESPRESSO",
+            "CLASSIC ESPRESSO BLACK CAT"
+          ]
+        }
+      },
+      "visibleText": {
+        "name": "BLACK / CAT (upper wordmark); CLASSIC / ESPRESSO (product label)",
+        "roastery": "Intelligentsia",
+        "weight": "NET WT. 12oz (340g)",
+        "origin": "BLEND OF COFFEES FROM: BRAZIL",
+        "notes": "TASTES LIKE: CHERRY, COLA, ORANGE",
+        "roast_profile": "ROAST PROFILE: COMFORTING",
+        "roast_date": "ROAST DATE: 11/01/25",
+        "other": "DIRECT TRADE; WB-13527; SPECIALTY COFFEE"
+      },
+      "mustRemainUnknown": [
+        "origin_region",
+        "farm_producer",
+        "varietal",
+        "process_method",
+        "process_detail",
+        "roast_level",
+        "harvest_year",
+        "altitude_m",
+        "blend_components"
+      ],
+      "evaluationExclusions": [
+        "roast_date"
+      ],
+      "notes": "Brazil is the only printed origin. The webpage currently lists multiple origins; Colombia must not be added from that page. COMFORTING is a proprietary roast profile, not an explicit standard light/medium/dark label. Batch WB-13527 is not a weight/date/varietal. Multiple names are permitted only because both BLACK CAT and CLASSIC ESPRESSO are printed.",
+      "sha256": "b08914f87eac78b21097307303a0e1b3ab842ddc19d8f86f0c09d368dea6883f",
+      "dimensions": {
+        "width": 1024,
+        "height": 1024
+      },
+      "format": "png",
+      "bytes": 617183,
+      "split": "development",
+      "kind": "coffee",
+      "path": ".staging/ocr-release/public/intelligentsia-black-cat-new.png"
+    },
+    {
+      "id": "onyx-tropical-weather-new",
+      "sourceUrl": "https://onyxcoffeelab.com/products/tropical-weather",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/1707/3261/files/tropical-weather-10oz-v2.webp?v=1785945822",
+      "sha256": "df34c1b646c548ec005b22e98f44f8adbbcce59f954dbc6e6efd47b62ec6b778",
+      "dimensions": {
+        "width": 1000,
+        "height": 1000
+      },
+      "format": "png",
+      "visibleText": {
+        "transcription": "tropical weather\nONYX\nCOFFEE\nLIGHT ROAST LEVEL - FRUIT FORWARD, FLORAL, AND BOTANICAL\n283g SPECIALTY WHOLE BEAN COFFEE"
+      },
+      "notes": "Title uses a decorative gothic typeface; the brand is much larger than the product name. Roastery text visible on this package is ONYX COFFEE, not the full corporate name Onyx Coffee Lab. Image weight is 283g. Do not substitute page variant size 10oz or an assumed rounded gram value. FRUIT FORWARD, FLORAL, AND BOTANICAL is the package's descriptive phrase, not the specific fruit notes printed on the webpage. No origin or process appears on this front image. Ethiopia, washed/natural, mixed variety, and webpage blend details must remain absent.",
+      "expected": {
+        "fields": {
+          "name": "tropical weather",
+          "roastery": "ONYX COFFEE",
+          "weight_g": 283,
+          "roast_level": "light"
+        },
+        "tasting_notes": {
+          "en": [
+            "FRUIT FORWARD",
+            "FLORAL",
+            "BOTANICAL"
+          ]
+        }
+      },
+      "mustRemainUnknown": [
+        "origin_country",
+        "origin_region",
+        "farm_producer",
+        "varietal",
+        "process_method",
+        "roast_date",
+        "altitude_m",
+        "blend_components"
+      ],
+      "evaluationExclusions": [],
+      "bytes": 817429,
+      "split": "development",
+      "kind": "coffee",
+      "path": ".staging/ocr-release/public/onyx-tropical-weather-new.webp"
+    },
+    {
+      "id": "coffee-collective-rodrigo-hoyos-new",
+      "sourceUrl": "https://coffeecollective.dk/products/rodrigo-hoyos-250g",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0744/9031/5020/files/RodrigoHoyos250gfront.png?v=1783676229",
+      "sha256": "d0a738b151cc17f72999aec39e13a602b0504f009ee83d57e8da265b3cc3a23b",
+      "dimensions": {
+        "width": 4450,
+        "height": 4450
+      },
+      "format": "png",
+      "visibleText": {
+        "transcription": "RODRIGO HOYOS\nProduceret af Rodrigo Hoyos i Huila, Colombia\nRen og balanceret. Noter af ribs, muscovadosukker\nog mørk chokolade\nVarietet: Pink Bourbon\nProces: Vasket\nReturn to Origin: 11,6 $/kg\nCOFFEE COLLECTIVE"
+      },
+      "notes": "The detailed text is Danish. Score exact visible transcription separately from optional semantic normalization; do not count lack of Danish translation as inaccurate OCR. Weight 250g appears in the filename and webpage but is not printed visibly on this front image. Expected weight is blank. Return to Origin: 11,6 $/kg is a monetary sourcing rate, not package weight, altitude, blend percentage, or date. The page's altitude is not visible in this image and must remain blank. Notes retain the exact Danish package words. English webpage paraphrases were not copied into ground truth. Vasket means washed; process_method=washed is explicit semantic normalization of printed Danish, not webpage inference. Danish notes remain in the transcription and are excluded from the app's Korean/English note-array scoring.",
+      "expected": {
+        "fields": {
+          "name": "RODRIGO HOYOS",
+          "roastery": "COFFEE COLLECTIVE",
+          "origin_country": "Colombia",
+          "origin_region": "Huila",
+          "farm_producer": "Rodrigo Hoyos",
+          "varietal": "Pink Bourbon",
+          "process_method": "washed",
+          "process_detail": "Vasket"
+        }
+      },
+      "mustRemainUnknown": [
+        "weight_g",
+        "roast_level",
+        "roast_date",
+        "altitude_m",
+        "blend_components"
+      ],
+      "evaluationExclusions": [
+        "tasting_notes"
+      ],
+      "expectedAlternatives": {
+        "fields": {
+          "process_detail": [
+            "Washed"
+          ]
+        }
+      },
+      "forbiddenValues": {
+        "fields.weight_g": [
+          250,
+          11.6,
+          116
+        ]
+      },
+      "bytes": 8587108,
+      "split": "development",
+      "kind": "coffee",
+      "path": ".staging/ocr-release/public/coffee-collective-rodrigo-hoyos-new.png"
+    },
+    {
+      "id": "beanbrothers-karimikui-ko-new",
+      "sourceUrl": "https://beanbrothers.co.kr/subscribe/subscribe_main",
+      "imageUrl": "https://cdn-pro-web-223-233.cdn-nhncommerce.com/ablestory_godomall_com/data/goods/21/07/30/1000000042/1000000042_list_089.png",
+      "sha256": "20ee8c53f7b6878ed8dd16d1dbac5cbbfc5f92a3dbcb2f6d210e891a7b41fd7e",
+      "dimensions": {
+        "width": 1080,
+        "height": 1081
+      },
+      "format": "png",
+      "bytes": 604416,
+      "expected": {
+        "bean_type": "single_origin",
+        "fields": {
+          "name": "카리미쿠이",
+          "origin_country": "Kenya",
+          "weight_g": 200,
+          "process_method": "washed",
+          "varietal": "SL28, SL34, BATIAN"
+        },
+        "tasting_notes": {
+          "en": [
+            "CAMPBELL GRAPE",
+            "PINEAPPLE",
+            "TAMARIND",
+            "KUMATO"
+          ]
+        }
+      },
+      "expectedAlternatives": {
+        "fields": {
+          "name": [
+            "KARIMIKUI",
+            "케냐 카리미쿠이"
+          ]
+        }
+      },
+      "visibleText": {
+        "name": "KARIMIKUI; 카리미쿠이",
+        "origin_and_type": "케냐 싱글오리진",
+        "weight": "200G",
+        "process": "WASHED",
+        "varietal": "SL28, SL34, BATIAN",
+        "notes": "CAMPBELL GRAPE, PINEAPPLE, TAMARIND, KUMATO",
+        "other": "Bb (logo); OPEN; SEASONAL"
+      },
+      "mustRemainUnknown": [
+        "origin_region",
+        "farm_producer",
+        "process_detail",
+        "roast_level",
+        "roast_date",
+        "harvest_year",
+        "altitude_m",
+        "blend_components"
+      ],
+      "evaluationExclusions": [
+        "roastery"
+      ],
+      "notes": "Mixed Korean-English actual package label. Product name is bilingual; country/type are printed only in Korean. All four English notes are printed on the photo, including KUMATO although the website summary lists fewer. The picture itself has no country region/producer/date or roast level. Selection was based on printed information, not engine output. Although metadata is rich, this is not a Korean-only label.",
+      "split": "development",
+      "kind": "coffee",
+      "path": ".staging/ocr-release/public/beanbrothers-karimikui-ko-new.png"
+    },
+    {
+      "id": "coffee-lusso-serenity-korean-new",
+      "sourceUrl": "https://www.coffeelusso.co.kr/goods/goods_view.php?goodsNo=1000000386",
+      "imageUrl": "https://godomall-storage.cdn-nhncommerce.com/98776a0700a4ee2b2ce6651d93c59310/goods/1000000386/image/main/1000000386_main_066.png",
+      "sha256": "3d1a2fc1b400a8c34721ca46c656925d1f983726c6b8475f99e406b2cd483bca",
+      "dimensions": {
+        "width": 1000,
+        "height": 1000
+      },
+      "format": "png",
+      "bytes": 299539,
+      "expected": {
+        "fields": {
+          "name": "세레니티",
+          "roastery": "coffee lusso",
+          "origin_country": "Ethiopia",
+          "origin_region": "구지 라로",
+          "process_method": "washed",
+          "roast_level": "light",
+          "weight_g": 200
+        },
+        "tasting_notes": {
+          "en": [
+            "Lemongrass",
+            "Brown Sugar",
+            "Black Tea"
+          ]
+        }
+      },
+      "visibleText": {
+        "name": "세레니티",
+        "subtitle": "에티오피아 구지 라로 G1 워시드",
+        "roastery": "coffee lusso",
+        "country": "에티오피아 100%",
+        "weight": "200 g",
+        "roastLevel": "Light",
+        "notes": "Note : Lemongrass, Brown Sugar, Black Tea",
+        "descriptionKo": "은은한 레몬그라스와 브라운 슈가의 향미가\n조화롭게 어우러지는 깔끔한 커피",
+        "other": "품목보고번호 2022009039228; Roasted at coffee lusso SUJI Roastery"
+      },
+      "mustRemainUnknown": [
+        "varietal",
+        "farm_producer",
+        "roast_date",
+        "altitude_m",
+        "blend_components",
+        "harvest_year"
+      ],
+      "notes": "Actual pouch front with its attached printed label; no surrounding webpage advertisement included. The main Korean product title is 세레니티; the smaller next line is origin/grade/process. G1 is a grade, not a cultivar. The 13-digit 품목보고번호 is a product reporting number, not a roast date or weight. 100% is origin content, not a known multi-component blend. The footer SUJI Roastery is the roaster location, not the coffee origin or producer. English equivalents Ethiopia/washed/light are semantic normalization of the printed Korean/English words. No harvest, altitude, cultivar, farm, or date was copied from the product page.",
+      "evaluationExclusions": [],
+      "forbiddenValues": {
+        "fields.varietal": [
+          "G1"
+        ],
+        "fields.origin_region": [
+          "SUJI",
+          "수지"
+        ],
+        "fields.farm_producer": [
+          "SUJI Roastery"
+        ]
+      },
+      "split": "development",
+      "kind": "coffee",
+      "path": ".staging/ocr-release/public/coffee-lusso-serenity-korean-new.png"
+    },
+    {
+      "id": "heldout-01",
+      "languages": [
+        "ko",
+        "en"
+      ],
+      "sourceUrl": "https://www.coffeelusso.co.kr/goods/goods_view.php?goodsNo=1000000378",
+      "imageUrl": "https://godomall-storage.cdn-nhncommerce.com/98776a0700a4ee2b2ce6651d93c59310/goods/1000000378/image/magnify/1000000378_magnify_085.jpg",
+      "sha256": "ba1b1872c1190f518f6a170b5be3768786aa6c907076b74d2770b496577e3b85",
+      "expected": {
+        "fields": {
+          "name": "루소 썸머",
+          "roastery": "coffee lusso",
+          "origin_country": "Colombia",
+          "process_method": "washed",
+          "roast_level": "medium_light",
+          "weight_g": 100
+        },
+        "tasting_notes": {
+          "en": [
+            "Jasmine",
+            "Floral",
+            "Orange Peel"
+          ]
+        }
+      },
+      "expectedAlternatives": {
+        "fields": {
+          "name": [
+            "루소 썸머 콜롬비아 엘 구아보 써멀쇼크 워시드"
+          ]
+        }
+      },
+      "visibleText": {
+        "title": "루소 썸머",
+        "subtitle": "콜롬비아 엘 구아보 써멀쇼크 워시드",
+        "notes": "Note : Jasmine, Floral, Orange Peel",
+        "description": "자스민과 오렌지필이 산뜻하게 어우러진\n여름 한정 스페셜티 커피",
+        "origin": "콜롬비아 100%",
+        "roast": "Moderately Light",
+        "weight": "100 g",
+        "other": "품목보고번호 2022009039224; Roasted at coffee lusso SUJI Roastery"
+      },
+      "mustRemainUnknown": [
+        "origin_region",
+        "farm_producer",
+        "varietal",
+        "roast_date",
+        "altitude",
+        "blend_components"
+      ],
+      "evaluationExclusions": [],
+      "notes": "All facts are printed on the attached pouch label. The origin subtitle may be included with the main name. El Guabo is not assigned a farm/region role without an explicit role label. Thermal shock is visible process detail; the supported process family is washed. Moderately Light is normalized as medium_light. The product reporting number is not a date, and SUJI Roastery is not the coffee origin.",
+      "dimensions": {
+        "width": 1000,
+        "height": 1000
+      },
+      "bytes": 223091,
+      "format": "jpeg",
+      "split": "development",
+      "kind": "coffee",
+      "path": ".staging/ocr-release/public/heldout-01.jpg",
+      "observedCohort": "opened-first-blind",
+      "originalManifestSha256": "c17d061b4fb8fd436d6e811a8c017d5ad0edc1d93c6f73d859acce03c73b0966"
+    },
+    {
+      "id": "heldout-02",
+      "languages": [
+        "ko",
+        "en"
+      ],
+      "sourceUrl": "https://www.beanbrothers.co.kr/goods/goods_view.php?goodsNo=1000001419",
+      "imageUrl": "https://godomall.speedycdn.net/2b2d2b9256ca4144b5bd52e460a0a675/goods/1000001419/image/magnify/1000001419_magnify_036.jpg",
+      "sha256": "137c093e534b532181baf824f28714e25722e00f919f54b637934fdf83161be9",
+      "expected": {
+        "fields": {
+          "name": "부에노스 아이레스",
+          "roastery": "Bb",
+          "origin_country": "Peru",
+          "process_method": "washed",
+          "varietal": "Caturra, Catuai, Typica",
+          "weight_g": 200
+        },
+        "tasting_notes": {
+          "en": [
+            "Maple Syrup",
+            "Raisin",
+            "Tangerine Peel",
+            "Cacao"
+          ]
+        }
+      },
+      "expectedAlternatives": {
+        "fields": {
+          "name": [
+            "BUENOS AIRES",
+            "페루 부에노스 아이레스",
+            "Peru Buenos Aires"
+          ],
+          "roastery": [
+            "Bean Brothers",
+            "BEAN BROTHERS",
+            "빈브라더스"
+          ]
+        }
+      },
+      "visibleText": {
+        "title": "BUENOS / AIRES; 부에노스 아이레스",
+        "brand": "Bb",
+        "country": "페루 싱글오리진",
+        "process": "WASHED",
+        "varietal": "CATURRA, CATUAI, TYPICA",
+        "notes": "MAPLE SYRUP, RAISIN, TANGERINE PEEL, CACAO",
+        "weight": "200G",
+        "other": "OPEN; SEASONAL"
+      },
+      "mustRemainUnknown": [
+        "origin_region",
+        "farm_producer",
+        "roast_level",
+        "roast_date",
+        "altitude",
+        "blend_components"
+      ],
+      "evaluationExclusions": [],
+      "notes": "Photograph of the pouch, with product title and country in Korean and the detailed fields in English. Bb is the printed brand mark; expanded brand forms are permitted as logo normalization, not required. Buenos Aires must not cause origin to be inferred as Argentina. No city/region or farm role is labelled.",
+      "dimensions": {
+        "width": 1620,
+        "height": 1081
+      },
+      "bytes": 330013,
+      "format": "jpeg",
+      "split": "development",
+      "kind": "coffee",
+      "path": ".staging/ocr-release/public/heldout-02.jpg",
+      "observedCohort": "opened-first-blind",
+      "originalManifestSha256": "c17d061b4fb8fd436d6e811a8c017d5ad0edc1d93c6f73d859acce03c73b0966"
+    },
+    {
+      "id": "heldout-03",
+      "languages": [
+        "ko",
+        "en"
+      ],
+      "sourceUrl": "https://www.beanbrothers.co.kr/goods/goods_view.php?goodsNo=1000001418",
+      "imageUrl": "https://godomall.speedycdn.net/2b2d2b9256ca4144b5bd52e460a0a675/goods/1000001418/image/magnify/1000001418_magnify_033.jpg",
+      "sha256": "a564701ec3ca9c048135816f3da9a54b48cc18193b0cb4b9b03c30d03171c317",
+      "expected": {
+        "fields": {
+          "name": "반코 타라투",
+          "roastery": "Bb",
+          "origin_country": "Ethiopia",
+          "process_method": "washed",
+          "varietal": "Local Landraces",
+          "weight_g": 200
+        },
+        "tasting_notes": {
+          "en": [
+            "Peony",
+            "White Nectarine",
+            "Earl Grey",
+            "Vibrant"
+          ]
+        }
+      },
+      "expectedAlternatives": {
+        "fields": {
+          "name": [
+            "BANQO TARATU",
+            "에티오피아 반코 타라투",
+            "Ethiopia Banqo Taratu"
+          ],
+          "roastery": [
+            "Bean Brothers",
+            "BEAN BROTHERS",
+            "빈브라더스"
+          ],
+          "varietal": [
+            "Landraces"
+          ]
+        }
+      },
+      "visibleText": {
+        "title": "BANQO TARATU; 반코 타라투",
+        "brand": "Bb",
+        "country": "에티오피아 싱글오리진",
+        "process": "WASHED",
+        "varietal": "LOCAL LANDRACES",
+        "notes": "PEONY, WHITE NECTARINE, EARL GREY, VIBRANT",
+        "weight": "200G",
+        "other": "OPEN; SEASONAL"
+      },
+      "mustRemainUnknown": [
+        "origin_region",
+        "farm_producer",
+        "roast_level",
+        "roast_date",
+        "altitude",
+        "blend_components"
+      ],
+      "evaluationExclusions": [],
+      "notes": "Official pouch photograph. English spelling on the actual package is BANQO TARATU. Korean title/country and English detailed facts are all physically printed. Vibrant is a listed sensory descriptor and is retained literally, not translated into a fruit. Bb logo normalization as in heldout-02.",
+      "dimensions": {
+        "width": 1620,
+        "height": 1081
+      },
+      "bytes": 323399,
+      "format": "jpeg",
+      "split": "development",
+      "kind": "coffee",
+      "path": ".staging/ocr-release/public/heldout-03.jpg",
+      "observedCohort": "opened-first-blind",
+      "originalManifestSha256": "c17d061b4fb8fd436d6e811a8c017d5ad0edc1d93c6f73d859acce03c73b0966"
+    },
+    {
+      "id": "heldout-04",
+      "languages": [
+        "ko",
+        "en"
+      ],
+      "sourceUrl": "https://terarosa.com/product/detail/?ItemCode=100520",
+      "imageUrl": "https://terarosa.com/UpImg/item/detail/20260821063103_1787293863785_3Lc5vZz_kt.png",
+      "sha256": "4461f79083d2783849668f1c5bb78c41d3caca743ff4fcc54a09066840a6def3",
+      "expected": {
+        "fields": {
+          "name": "Rwanda Nyabirasi Arsene Bourbon Washed",
+          "roastery": "TERAROSA",
+          "origin_country": "Rwanda",
+          "varietal": "Bourbon",
+          "process_method": "washed",
+          "weight_g": 250
+        }
+      },
+      "expectedAlternatives": {
+        "fields": {
+          "name": [
+            "르완다 냐비라시 아르세니 부르봉 워시드"
+          ],
+          "roastery": [
+            "테라로사"
+          ]
+        }
+      },
+      "visibleText": {
+        "title": "Rwanda Nyabirasi Arsene / Bourbon Washed",
+        "titleKo": "르완다 냐비라시 아르세니 부르봉 워시드",
+        "varietal": "품종 Bourbon",
+        "process": "가공 Washed",
+        "harvest": "수확 2025. 5 - 2025. 8",
+        "origin": "원산지 르완다",
+        "weight": "Net Wt 250 g",
+        "brand": "TERAROSA",
+        "other": "테라로사 커피 | 커피원두 100%"
+      },
+      "mustRemainUnknown": [
+        "origin_region",
+        "farm_producer",
+        "roast_level",
+        "roast_date",
+        "altitude",
+        "blend_components"
+      ],
+      "evaluationExclusions": [
+        "tasting_notes"
+      ],
+      "notes": "Actual red pouch photograph. Its long small Korean sensory paragraph is not transcribed confidently enough for exact scoring and tasting_notes is explicitly excluded before any engine run; it must not be treated as required blank. All listed fields are visually legible. The visible 2025 date interval is expressly labelled harvest, not roast date. Header names alone do not establish a farm/region field.",
+      "dimensions": {
+        "width": 800,
+        "height": 800
+      },
+      "bytes": 437008,
+      "format": "png",
+      "split": "development",
+      "kind": "coffee",
+      "path": ".staging/ocr-release/public/heldout-04.png",
+      "observedCohort": "opened-first-blind",
+      "originalManifestSha256": "c17d061b4fb8fd436d6e811a8c017d5ad0edc1d93c6f73d859acce03c73b0966"
+    },
+    {
+      "id": "heldout-05",
+      "languages": [
+        "ko",
+        "en"
+      ],
+      "sourceUrl": "https://www.coffeelusso.co.kr/goods/goods_view.php?goodsNo=1000000381",
+      "imageUrl": "https://godomall-storage.cdn-nhncommerce.com/98776a0700a4ee2b2ce6651d93c59310/goods/1000000381/image/magnify/1000000381_magnify_030.jpg",
+      "sha256": "c2642691e5f995f7a9a78851a6aa976bb7dd08f92a2890450cac9591af6f8d33",
+      "expected": {
+        "bean_type": "blend",
+        "fields": {
+          "name": "시그니처 브루잉",
+          "roastery": "coffee lusso",
+          "weight_g": 200,
+          "roast_level": "medium_light",
+          "blend_components": [
+            {
+              "origin_country": "Ethiopia",
+              "percentage": 70
+            },
+            {
+              "origin_country": "Colombia",
+              "percentage": 30
+            }
+          ]
+        },
+        "tasting_notes": {
+          "en": [
+            "Jasmine",
+            "Tropical",
+            "Oolong Tea"
+          ]
+        }
+      },
+      "expectedAlternatives": {
+        "fields": {
+          "name": [
+            "SIGNATURE BREWING"
+          ]
+        }
+      },
+      "visibleText": {
+        "title": "시그니처 / 브루잉; SIGNATURE BREWING",
+        "brand": "coffee lusso",
+        "weight": "200g",
+        "composition": "Origin 에티오피아 70% 콜롬비아 30%",
+        "roast": "Roasting Moderately Light",
+        "notes": "Note Jasmine Tropical Oolong Tea",
+        "other": "REMASTERED; 품목보고번호: 2022009039213"
+      },
+      "mustRemainUnknown": [
+        "origin_country",
+        "origin_region",
+        "farm_producer",
+        "varietal",
+        "process_method",
+        "roast_date",
+        "altitude"
+      ],
+      "evaluationExclusions": [],
+      "notes": "A pouch label with physically printed origin proportions. A single origin_country must stay unknown because two countries are explicitly present. No process, cultivar, or date is printed. Product reporting number must not become a roast date. Moderately Light is normalized as medium_light.",
+      "dimensions": {
+        "width": 1000,
+        "height": 1000
+      },
+      "bytes": 222147,
+      "format": "jpeg",
+      "split": "development",
+      "kind": "coffee",
+      "path": ".staging/ocr-release/public/heldout-05.jpg",
+      "observedCohort": "opened-first-blind",
+      "originalManifestSha256": "c17d061b4fb8fd436d6e811a8c017d5ad0edc1d93c6f73d859acce03c73b0966"
+    },
+    {
+      "id": "heldout-06",
+      "languages": [
+        "en"
+      ],
+      "sourceUrl": "https://timwendelboe.no/products/los-pirineos-pacamara",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/0738/6113/6597/files/LosPirineosPacamaraFilter-WEBSHOP_4585f953-a12d-4790-8286-ae71d423e898.webp?v=1785757614",
+      "sha256": "eff9c2ed38cc3becbafad4929884265806891e4a412fde98db7995622eaff8f8",
+      "expected": {
+        "fields": {
+          "name": "Los Pirineos",
+          "roastery": "Tim Wendelboe",
+          "origin_country": "El Salvador",
+          "origin_region": "Tecapa-Chinameca, Usulutan",
+          "farm_producer": "Diego Baraona",
+          "varietal": "Pacamara",
+          "process_method": "washed",
+          "weight_g": 250,
+          "roast_date": "2026-01-01"
+        },
+        "tasting_notes": {
+          "en": [
+            "Tart red berries",
+            "stone fruit",
+            "dark chocolate"
+          ]
+        }
+      },
+      "expectedAlternatives": {
+        "fields": {
+          "name": [
+            "Los Pirineos Pacamara"
+          ],
+          "roastery": [
+            "timwendelboe.no"
+          ]
+        }
+      },
+      "visibleText": {
+        "title": "Los / Pirineos",
+        "varietal": "Pacamara",
+        "producer": "Produced by Diego Baraona",
+        "origin": "Tecapa-Chinameca, / Usulutan, El Salvador",
+        "process": "Process - Washed",
+        "harvest": "February 2026 harvest",
+        "notes": "Flavour notes: Tart red berries, stone fruit & dark chocolate",
+        "footer": "Coffee roasted in Oslo, Norway / 01.01.2026 Batch 01 0,250 Kg",
+        "brand": "timwendelboe.no"
+      },
+      "mustRemainUnknown": [
+        "roast_level",
+        "altitude",
+        "blend_components"
+      ],
+      "evaluationExclusions": [],
+      "notes": "Official black pouch photograph. Brand appears as a dark domain wordmark at the bottom, with a graphic logo above. Norwegian/European comma in 0,250 Kg means 250 grams. The printed roast-area date is 01.01.2026 and the printed harvest is February 2026; their chronology conflicts on the source image. Preserve visible date, never silently substitute a harvest date or current date. Oslo/Norway are roasting location, not origin. The two printed place lines combine to the region value.",
+      "dimensions": {
+        "width": 1200,
+        "height": 1590
+      },
+      "bytes": 331003,
+      "format": "png",
+      "split": "development",
+      "kind": "coffee",
+      "path": ".staging/ocr-release/public/heldout-06.webp",
+      "observedCohort": "opened-first-blind",
+      "originalManifestSha256": "c17d061b4fb8fd436d6e811a8c017d5ad0edc1d93c6f73d859acce03c73b0966"
+    },
+    {
+      "id": "heldout-07",
+      "languages": [
+        "en"
+      ],
+      "sourceUrl": "https://lacabra.com/products/la-cinta",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/1094/5212/files/La_Cinta_La_Cabra_Highlight_coffee_box_200g.webp?v=1788179202",
+      "sha256": "b92301466fd296bb9453744ce0f94c628a0e5e1892583ffe174a8dcb017e6398",
+      "expected": {
+        "fields": {
+          "name": "La Cinta",
+          "roastery": "LA CABRA",
+          "varietal": "Wush Wush",
+          "weight_g": 200
+        },
+        "tasting_notes": {
+          "en": [
+            "Floral",
+            "Delicate"
+          ]
+        }
+      },
+      "expectedAlternatives": {
+        "fields": {}
+      },
+      "visibleText": {
+        "title": "La Cinta",
+        "brand": "LA CABRA",
+        "varietal": "WUSH WUSH",
+        "notes": "FLORAL AND DELICATE",
+        "weight": "200G / 7OZ"
+      },
+      "mustRemainUnknown": [
+        "origin_country",
+        "origin_region",
+        "farm_producer",
+        "process_method",
+        "roast_level",
+        "roast_date",
+        "altitude",
+        "blend_components"
+      ],
+      "evaluationExclusions": [],
+      "notes": "Official box photograph. Large top sensory words are not the product name. The front does not print country or processing, even though the product webpage does. Direct metric 200G takes priority over converting rounded 7OZ.",
+      "dimensions": {
+        "width": 1722,
+        "height": 1688
+      },
+      "bytes": 2908958,
+      "format": "png",
+      "split": "development",
+      "kind": "coffee",
+      "path": ".staging/ocr-release/public/heldout-07.webp",
+      "observedCohort": "opened-first-blind",
+      "originalManifestSha256": "c17d061b4fb8fd436d6e811a8c017d5ad0edc1d93c6f73d859acce03c73b0966"
+    },
+    {
+      "id": "heldout-08",
+      "languages": [
+        "en"
+      ],
+      "sourceUrl": "https://drinkarchetype.com/products/mexico-teojomulco",
+      "imageUrl": "https://cdn.shopify.com/s/files/1/1991/0809/files/MEXTEO2025.png?v=1756440923",
+      "sha256": "6ad68a5f179583aa94c2abde9da6826695e64dd8fc60f8562b93cccd358deb57",
+      "expected": {
+        "fields": {
+          "name": "Mexico Teojomulco",
+          "roastery": "ARCHETYPE COFFEE",
+          "origin_country": "Mexico",
+          "weight_g": 285
+        },
+        "tasting_notes": {
+          "en": [
+            "chocolate hazelnut spread",
+            "honey caramel",
+            "butterscotch"
+          ]
+        }
+      },
+      "expectedAlternatives": {
+        "fields": {
+          "name": [
+            "Teojomulco"
+          ]
+        }
+      },
+      "visibleText": {
+        "title": "mexico / teojomulco",
+        "brand": "ARCHETYPE COFFEE",
+        "notes": "chocolate hazelnut spread / honey caramel / butterscotch",
+        "weight": "10OZ / 285G"
+      },
+      "mustRemainUnknown": [
+        "origin_region",
+        "farm_producer",
+        "varietal",
+        "process_method",
+        "roast_level",
+        "roast_date",
+        "altitude",
+        "blend_components"
+      ],
+      "evaluationExclusions": [],
+      "notes": "Official product graphic containing a photographed pouch. All expected facts come from the label/pouch, not the large decorative background circle or webpage. Printed gram value is 285G; do not replace with 283/283.5 after converting 10oz. Teojomulco is title text; no explicit region role is assigned.",
+      "dimensions": {
+        "width": 1500,
+        "height": 1500
+      },
+      "bytes": 329699,
+      "format": "png",
+      "split": "development",
+      "kind": "coffee",
+      "path": ".staging/ocr-release/public/heldout-08.png",
+      "observedCohort": "opened-first-blind",
+      "originalManifestSha256": "c17d061b4fb8fd436d6e811a8c017d5ad0edc1d93c6f73d859acce03c73b0966"
+    },
+    {
+      "id": "heldout2-01",
+      "languages": [
+        "ko",
+        "en"
+      ],
+      "sourceUrl": "https://www.coffeelusso.co.kr/goods/goods_view.php?goodsNo=1000000374",
+      "imageUrl": "https://godomall-storage.cdn-nhncommerce.com/98776a0700a4ee2b2ce6651d93c59310/goods/1000000374/image/magnify/1000000374_magnify_055.jpg",
+      "sha256": "82df0b34364a5faf43079e543e3ae724e0823489b9df786c4c628c9fa4f35b83",
+      "expected": {
+        "fields": {
+          "name": "브라질 파젠다 살토 내추럴",
+          "roastery": "coffee lusso",
+          "origin_country": "Brazil",
+          "process_method": "natural",
+          "weight_g": 200
+        },
+        "tasting_notes": {
+          "ko": [
+            "아몬드",
+            "다크초콜릿"
+          ]
+        }
+      },
+      "expectedAlternatives": {
+        "fields": {
+          "name": [
+            "Brazil Fazenda Salto Natural"
+          ]
+        }
+      },
+      "visibleText": {
+        "brand": "coffee lusso",
+        "title": "Brazil Fazenda\nSalto Natural\n브라질 파젠다 살토 내추럴",
+        "description": "아몬드의 고소함과 다크초콜릿의 단맛이\n여운을 남기는 스페셜티 커피",
+        "origin": "브라질 100 %",
+        "roast": "Light Medium",
+        "weight": "200 g",
+        "other": "THE MORE : EXPERIENCE; 품목보고번호 2022009039231; Roasted at coffee lusso Suji Roastery"
+      },
+      "mustRemainUnknown": [
+        "roast_date",
+        "altitude_m",
+        "harvest_year",
+        "blend_components"
+      ],
+      "evaluationExclusions": [
+        "roast_level",
+        "farm_producer",
+        "origin_region",
+        "varietal"
+      ],
+      "notes": "One photographed pouch. Light Medium spans the current light/medium roast taxonomy, so roast_level is unscored. Fazenda Salto occurs in the product title without a separate role label; no farm/region role is required. No varietal visible. Numeric product-report code is not a date. Suji is the roastery address, not coffee origin.",
+      "dimensions": {
+        "width": 1000,
+        "height": 1000
+      },
+      "bytes": 175589,
+      "format": "jpeg",
+      "split": "development",
+      "kind": "coffee",
+      "path": ".staging/ocr-release/public/heldout2-01.jpg",
+      "observedCohort": "opened-second-blind",
+      "originalManifestSha256": "699fad876d8dd4a4b8bd5081433d236e3ba09e8ea3b7e64d013131f141bfb773"
+    },
+    {
+      "id": "heldout2-02",
+      "languages": [
+        "ko",
+        "en"
+      ],
+      "sourceUrl": "https://www.coffeelusso.co.kr/goods/goods_view.php?goodsNo=1000000299",
+      "imageUrl": "https://godomall-storage.cdn-nhncommerce.com/98776a0700a4ee2b2ce6651d93c59310/goods/1000000299/image/magnify/1000000299_magnify_013.jpg",
+      "sha256": "de01f21f66ae66d99a6d2ca6118fca6770b8008d67b93bffd269e30bec292f38",
+      "expected": {
+        "fields": {
+          "name": "케냐 AA TOP",
+          "roastery": "coffee lusso",
+          "origin_country": "Kenya",
+          "origin_region": "Kiambu, Kisii",
+          "farm_producer": "Mukunga Estate AA 0211",
+          "varietal": "SL28, SL34, K7, Ruiru11",
+          "process_method": "washed",
+          "weight_g": 200
+        },
+        "tasting_notes": {
+          "ko": [
+            "건과일",
+            "다크초콜릿",
+            "블랙티"
+          ]
+        }
+      },
+      "expectedAlternatives": {
+        "fields": {
+          "name": [
+            "Kenya AA TOP"
+          ],
+          "farm_producer": [
+            "Mukunga Estate"
+          ],
+          "varietal": [
+            "SL28, SL34, K7, Ruiru 11"
+          ]
+        }
+      },
+      "visibleText": {
+        "brand": "coffee lusso",
+        "title": "케냐 AA TOP",
+        "notes": "건과일 · 다크초콜릿 · 블랙티",
+        "originAndWeight": "200g | 케냐 100%",
+        "details": "Region : Kiambu, Kisii | Farm : Mukunga Estate AA 0211 | Process : Washed\nVariety : SL28, SL34, K7, Ruiru11 | Roasting : Light Medium | 품목보고번호 : 2022009039229"
+      },
+      "mustRemainUnknown": [
+        "roast_date",
+        "altitude_m",
+        "harvest_year",
+        "blend_components"
+      ],
+      "evaluationExclusions": [
+        "roast_level"
+      ],
+      "notes": "One photographed pouch. Product title and notes are vertical. Small but legible explicitly labeled bottom rows supply region/farm/process/variety. Light Medium is unscored because it spans the current light/medium taxonomy. AA 0211 is a lot identifier, not weight/date. Product-report number is not a date.",
+      "dimensions": {
+        "width": 1000,
+        "height": 1000
+      },
+      "bytes": 195225,
+      "format": "jpeg",
+      "split": "development",
+      "kind": "coffee",
+      "path": ".staging/ocr-release/public/heldout2-02.jpg",
+      "observedCohort": "opened-second-blind",
+      "originalManifestSha256": "699fad876d8dd4a4b8bd5081433d236e3ba09e8ea3b7e64d013131f141bfb773"
+    },
+    {
+      "id": "heldout2-03",
+      "languages": [
+        "ko",
+        "en"
+      ],
+      "sourceUrl": "https://momos.co.kr/shop_view/?idx=7407",
+      "imageUrl": "https://cdn.imweb.me/upload/S2026022396690869a4918/d94bb84af7f59.png",
+      "sha256": "9b84067908fefe649af9f855c03e9efe6ad2e209fe6ee86e94520f9154542fa0",
+      "expected": {
+        "fields": {
+          "name": "에티오피아 사포 클래식 워시드",
+          "roastery": "MOMOS COFFEE",
+          "origin_country": "Ethiopia",
+          "farm_producer": "사포 스테이션",
+          "varietal": "74158",
+          "process_method": "washed",
+          "process_detail": "클래식 워시드",
+          "weight_g": 100
+        },
+        "tasting_notes": {
+          "ko": [
+            "자스민",
+            "복숭아",
+            "바닐라",
+            "오렌지"
+          ]
+        }
+      },
+      "expectedAlternatives": {
+        "fields": {
+          "name": [
+            "Ethiopia Safo Classic Washed"
+          ],
+          "farm_producer": [
+            "Safo Station"
+          ],
+          "process_detail": [
+            "Classic Washed"
+          ]
+        }
+      },
+      "visibleText": {
+        "brand": "MOMOS COFFEE",
+        "decorativeText": "HAVANA",
+        "title": "에티오피아 사포 클래식 워시드\nEthiopia Safo Classic Washed",
+        "origin": "원산지: 에티오피아산 100%",
+        "station": "워싱 스테이션: 사포 스테이션",
+        "varietyProcess": "품종 / 가공 방식: 74158 / 클래식 워시드",
+        "notes": "컵 노트: 자스민의 향미와 복숭아의 산미, 바닐라의 단맛과\n오렌지의 깨끗한 여운이 조화로운 커피",
+        "weight": "내용량: 100g"
+      },
+      "mustRemainUnknown": [
+        "origin_region",
+        "roast_level",
+        "roast_date",
+        "altitude_m",
+        "harvest_year",
+        "blend_components"
+      ],
+      "forbiddenValues": {
+        "fields": {
+          "name": [
+            "HAVANA"
+          ],
+          "origin_country": [
+            "Cuba"
+          ]
+        }
+      },
+      "evaluationExclusions": [],
+      "notes": "One pouch with a white coffee-information label. HAVANA is printed in the package artwork, but the explicit label gives the specific coffee product and Ethiopian origin. Do not replace the label title with HAVANA or infer Cuba. Barcodes are not weight/date.",
+      "dimensions": {
+        "width": 1000,
+        "height": 1000
+      },
+      "bytes": 332256,
+      "format": "png",
+      "split": "development",
+      "kind": "coffee",
+      "path": ".staging/ocr-release/public/heldout2-03.png",
+      "observedCohort": "opened-second-blind",
+      "originalManifestSha256": "699fad876d8dd4a4b8bd5081433d236e3ba09e8ea3b7e64d013131f141bfb773"
+    },
+    {
+      "id": "heldout2-04",
+      "languages": [
+        "ko",
+        "en"
+      ],
+      "sourceUrl": "https://momos.co.kr/shop_view/?idx=7384",
+      "imageUrl": "https://cdn.imweb.me/upload/S2026022396690869a4918/440853da2b9f7.png",
+      "sha256": "6f47d1f1f25cde5968d2257b2e68b9419ccfc2b6abe18c5f6e0d8e574f2014c9",
+      "expected": {
+        "fields": {
+          "name": "콜롬비아 우일라 디카페인",
+          "roastery": "MOMOS COFFEE",
+          "origin_country": "Colombia",
+          "origin_region": "Huila",
+          "varietal": "Caturra, Castillo, Typica",
+          "process_method": "decaf",
+          "process_detail": "Sugarcane Process",
+          "weight_g": 200
+        },
+        "tasting_notes": {
+          "ko": [
+            "초콜릿",
+            "캐러멜",
+            "구운 아몬드"
+          ]
+        }
+      },
+      "expectedAlternatives": {
+        "fields": {
+          "name": [
+            "Colombia Huila Decaf"
+          ],
+          "origin_region": [
+            "우일라"
+          ],
+          "process_detail": [
+            "Sugarcane"
+          ]
+        }
+      },
+      "visibleText": {
+        "brand": "MOMOS COFFEE",
+        "title": "콜롬비아\n우일라 디카페인\nColombia Huila Decaf",
+        "varietyProcess": "Caturra, Castillo, Typica · Sugarcane Process",
+        "origin": "커피 / 커피원두 100% (콜롬비아산 100%)",
+        "description": "초콜릿의 풍미와 캐러멜 퍼지의 단맛, 구운 아몬드의\n고소함과 크리미한 질감이 조화로운 커피",
+        "weight": "200g",
+        "other": "Open 좌측 탭을 잡고 뜯어 쓰세요."
+      },
+      "mustRemainUnknown": [
+        "farm_producer",
+        "roast_level",
+        "roast_date",
+        "altitude_m",
+        "harvest_year",
+        "blend_components"
+      ],
+      "evaluationExclusions": [],
+      "notes": "One photographed pouch with a compact bilingual label. Huila is printed in the product title as the named Colombian region. Sugarcane Process is explicit decaffeination detail. A process subtype such as washed is not supplied by the image. Barcode is not a date.",
+      "dimensions": {
+        "width": 1000,
+        "height": 1000
+      },
+      "bytes": 351338,
+      "format": "png",
+      "split": "development",
+      "kind": "coffee",
+      "path": ".staging/ocr-release/public/heldout2-04.png",
+      "observedCohort": "opened-second-blind",
+      "originalManifestSha256": "699fad876d8dd4a4b8bd5081433d236e3ba09e8ea3b7e64d013131f141bfb773"
+    },
+    {
+      "id": "heldout2-05",
+      "languages": [
+        "en"
+      ],
+      "sourceUrl": "https://www.vervecoffee.com/products/sermon",
+      "imageUrl": "https://www.vervecoffee.com/cdn/shop/files/Sermon-12oz-Silo.png?v=1737402021",
+      "sha256": "695c9551460745f19fc3d1961e95813f875bc5cee8d3fa17777bda62b42be749",
+      "expected": {
+        "bean_type": "blend",
+        "fields": {
+          "name": "SERMON",
+          "roastery": "VERVE COFFEE ROASTERS",
+          "roast_level": "medium",
+          "weight_g": 340
+        },
+        "tasting_notes": {
+          "en": [
+            "Blueberry Pie",
+            "Cocoa",
+            "Candied Pecan"
+          ]
+        }
+      },
+      "expectedAlternatives": {
+        "fields": {
+          "roastery": [
+            "VERVE"
+          ]
+        }
+      },
+      "visibleText": {
+        "brand": "VERVE\nCOFFEE ROASTERS",
+        "title": "SERMON",
+        "slogan": "SO EASY TO WAKE UP TO; SWEET DEEP & SOULFUL",
+        "notes": "NOTES\nBLUEBERRY PIE\nCOCOA\nCANDIED PECAN",
+        "roast": "MEDIUM ROAST BLEND",
+        "weight": "WHOLE BEAN COFFEE NET WT. 12 OZ (340G)"
+      },
+      "mustRemainUnknown": [
+        "origin_country",
+        "origin_region",
+        "farm_producer",
+        "varietal",
+        "process_method",
+        "process_detail",
+        "roast_date",
+        "altitude_m",
+        "harvest_year",
+        "blend_components"
+      ],
+      "evaluationExclusions": [],
+      "notes": "Official transparent-background photograph of one pouch. Pixel alpha is preserved. No origin composition is printed on the visible front, even though the sales page may describe it. Slogans are not part of the product name.",
+      "dimensions": {
+        "width": 1400,
+        "height": 1547
+      },
+      "bytes": 1027001,
+      "format": "png",
+      "split": "development",
+      "kind": "coffee",
+      "path": ".staging/ocr-release/public/heldout2-05.png",
+      "observedCohort": "opened-second-blind",
+      "originalManifestSha256": "699fad876d8dd4a4b8bd5081433d236e3ba09e8ea3b7e64d013131f141bfb773"
+    },
+    {
+      "id": "heldout2-06",
+      "languages": [
+        "en"
+      ],
+      "sourceUrl": "https://www.vervecoffee.com/products/saldana-highlands",
+      "imageUrl": "https://www.vervecoffee.com/cdn/shop/files/Saldana-Highlands-12oz-Silo.png?v=1788200021",
+      "sha256": "f3855efe73386f70b498e52eae8ef1bb0053f462ca544462ae935d702a760988",
+      "expected": {
+        "bean_type": "single_origin",
+        "fields": {
+          "name": "SALDAÑA HIGHLANDS",
+          "roastery": "VERVE COFFEE ROASTERS",
+          "origin_country": "Colombia",
+          "origin_region": "Tolima",
+          "varietal": "Various",
+          "process_method": "washed",
+          "roast_level": "light",
+          "weight_g": 340
+        },
+        "tasting_notes": {
+          "en": [
+            "Red Apple",
+            "Milk Chocolate",
+            "Candied Orange"
+          ]
+        }
+      },
+      "expectedAlternatives": {
+        "fields": {
+          "name": [
+            "SALDANA HIGHLANDS"
+          ],
+          "roastery": [
+            "VERVE"
+          ]
+        }
+      },
+      "visibleText": {
+        "brand": "VERVE\nCOFFEE ROASTERS",
+        "title": "SALDAÑA\nHIGHLANDS",
+        "origin": "SINGLE ORIGIN\nTOLIMA, COLOMBIA",
+        "details": "PROCESS\nWASHED\nVARIETY\nVARIOUS",
+        "notes": "RED APPLE · MILK CHOCOLATE\nCANDIED ORANGE",
+        "other": "100% ORGANIC; USDA ORGANIC; LATIN AMERICA; SEASONAL DIRECT TRADE SINGLE ORIGIN",
+        "roast": "LIGHT ROAST",
+        "weight": "WHOLE BEAN COFFEE NET WT. 12 OZ (340G)"
+      },
+      "mustRemainUnknown": [
+        "farm_producer",
+        "roast_date",
+        "altitude_m",
+        "harvest_year",
+        "blend_components"
+      ],
+      "evaluationExclusions": [],
+      "notes": "Official transparent-background photograph of one pouch with a graphical organic badge overlay, preserved exactly as downloaded. Various is the only printed variety descriptor; no specific cultivar may be inferred. Latin America is a broad geographic label, not the country.",
+      "dimensions": {
+        "width": 1400,
+        "height": 1547
+      },
+      "bytes": 352988,
+      "format": "png",
+      "split": "development",
+      "kind": "coffee",
+      "path": ".staging/ocr-release/public/heldout2-06.png",
+      "observedCohort": "opened-second-blind",
+      "originalManifestSha256": "699fad876d8dd4a4b8bd5081433d236e3ba09e8ea3b7e64d013131f141bfb773"
+    }
+  ]
+}

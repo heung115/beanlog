@@ -1,0 +1,2 @@
+# Preserve checksum-pinned upstream license notices byte for byte.
+scripts/ocr/licenses/*.txt whitespace=-trailing-space,-blank-at-eof

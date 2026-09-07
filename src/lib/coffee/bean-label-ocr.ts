@@ -21,13 +21,14 @@ export interface LabelReadProgress {
   progress: number;
 }
 
-interface ReadOptions {
+export interface ReadOptions {
   signal: AbortSignal;
   onProgress: (progress: LabelReadProgress) => void;
   onPartial?: (result: { text: string; extraction: LabelExtraction }) => void;
   prepareWeightRetry?: () => Promise<Blob>;
   prepareDetailRetries?: (options: { includeColor: boolean }) => Promise<LabelImageVariant[]>;
   prepareDeskewRetry?: (angleDegrees: number) => Promise<Blob>;
+  prepareFallbackImages?: () => Promise<LabelImageVariant[]>;
 }
 
 interface PendingJob {
