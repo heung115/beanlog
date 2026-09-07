@@ -2,8 +2,10 @@ package middleware
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
@@ -116,9 +118,17 @@ func (writer *bufferedResponseWriter) flushTo(destination gin.ResponseWriter) er
 // subject. Every handler query is therefore enforced by PostgreSQL RLS even if
 // an application-level user_id predicate is accidentally omitted.
 func RequestDatabase(pool *pgxpool.Pool) gin.HandlerFunc {
+	return requestDatabase(pool.Begin)
+}
+
+func requestDatabase(begin func(context.Context) (pgx.Tx, error)) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		ctx := c.Request.Context()
-		tx, err := pool.Begin(ctx)
+		ctx, cancel := context.WithTimeout(c.Request.Context(), 12*time.Second)
+		defer cancel()
+		c.Request = c.Request.WithContext(ctx)
+		acquireCtx, cancelAcquire := context.WithTimeout(ctx, 2*time.Second)
+		tx, err := begin(acquireCtx)
+		cancelAcquire()
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusServiceUnavailable, gin.H{"error": "database unavailable"})
 			return
@@ -128,10 +138,18 @@ func RequestDatabase(pool *pgxpool.Pool) gin.HandlerFunc {
 		defer func() {
 			c.Writer = originalWriter
 			if !committed {
-				_ = tx.Rollback(ctx)
+				_ = rollbackRequest(tx)
 			}
 		}()
 
+		if _, err := tx.Exec(ctx, "SET LOCAL statement_timeout = '8s'"); err != nil {
+			c.AbortWithStatusJSON(http.StatusServiceUnavailable, gin.H{"error": "database unavailable"})
+			return
+		}
+		if _, err := tx.Exec(ctx, "SET LOCAL idle_in_transaction_session_timeout = '10s'"); err != nil {
+			c.AbortWithStatusJSON(http.StatusServiceUnavailable, gin.H{"error": "database unavailable"})
+			return
+		}
 		if _, err := tx.Exec(ctx, "SET LOCAL ROLE authenticated"); err != nil {
 			c.AbortWithStatusJSON(http.StatusServiceUnavailable, gin.H{"error": "database unavailable"})
 			return
@@ -151,13 +169,13 @@ func RequestDatabase(pool *pgxpool.Pool) gin.HandlerFunc {
 		c.Next()
 		c.Writer = originalWriter
 		if buffered.Overflowed() {
-			_ = tx.Rollback(ctx)
+			_ = rollbackRequest(tx)
 			c.AbortWithStatusJSON(http.StatusRequestEntityTooLarge, gin.H{"error": "response too large"})
 			return
 		}
 
 		if buffered.Status() >= http.StatusBadRequest {
-			_ = tx.Rollback(ctx)
+			_ = rollbackRequest(tx)
 			if err := buffered.flushTo(originalWriter); err != nil {
 				c.Abort()
 			}
@@ -184,4 +202,11 @@ func RequestDB(c *gin.Context) pgx.Tx {
 		panic("invalid request database transaction")
 	}
 	return tx
+}
+
+// Cleanup must retain its own bounded context after request cancellation.
+func rollbackRequest(tx pgx.Tx) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	return tx.Rollback(ctx)
 }

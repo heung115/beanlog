@@ -1,0 +1,67 @@
+# Apply LAST after the existing base, override and client-IP files. Compose >=2.30.
+# Preserve existing images, secret files, DB data and all trusted-IP settings.
+services:
+  kong:
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=32m,mode=1777
+      - /var/run/kong:rw,noexec,nosuid,nodev,size=128m,uid=1001,gid=1001,mode=0700
+    environment:
+      # /usr/local/kong also contains required shared libraries; do not mask it.
+      KONG_PREFIX: /var/run/kong
+      KONG_DECLARATIVE_CONFIG: /var/run/kong/kong.yml
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    pids_limit: 256
+    mem_limit: 768m
+    cpus: 1.0
+    networks:
+      default: {}
+      management: {}
+  auth:
+    image: beanlog-auth@sha256:03e69310e42ff84de122215f344eb1ccf862a7ac120a319cdd7d9b0a7540383c
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=32m,mode=1777
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    pids_limit: 128
+    mem_limit: 512m
+    cpus: 1.0
+    environment:
+      GOTRUE_EXTERNAL_PHONE_ENABLED: "false"
+      GOTRUE_SMS_AUTOCONFIRM: "false"
+      GOTRUE_SESSIONS_TIMEBOX: "720h"
+      GOTRUE_SESSIONS_INACTIVITY_TIMEOUT: "168h"
+      GOTRUE_SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: "true"
+  rest:
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=16m,mode=1777
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    pids_limit: 128
+    mem_limit: 512m
+    cpus: 1.0
+    environment:
+      PGRST_DB_SCHEMAS: public
+  db:
+    # Existing initialized data only: rehearse against an isolated restore before use.
+    # The reviewed image starts root, fixes ownership, then becomes postgres (100:101).
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=64m,mode=1777
+      - /var/run/postgresql:rw,noexec,nosuid,nodev,size=16m,uid=100,gid=101,mode=2775
+    security_opt: [no-new-privileges:true]
+    cap_drop: [ALL]
+    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER, SETGID, SETUID]
+    pids_limit: 512
+    mem_limit: 4g
+    cpus: 2.0
+    networks:
+      default: {}
+      management: {}
+networks:
+  management:
+    external: true
+    name: beanmap-management

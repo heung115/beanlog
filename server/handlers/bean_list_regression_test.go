@@ -139,3 +139,16 @@ type emptyBeanRows struct{ pgx.Rows }
 func (emptyBeanRows) Next() bool { return false }
 func (emptyBeanRows) Close()     {}
 func (emptyBeanRows) Err() error { return nil }
+
+func TestBeanListRejectsOverflowAndExcessiveOffsets(t *testing.T) {
+	for _, query := range []string{"page=9223372036854775807&limit=100", "page=1001&limit=100"} {
+		tx, rec := requestEmptyBeanList(t, query)
+		if rec.Code != 400 || tx.query != "" {
+			t.Fatalf("query %s: status %d database query %s", query, rec.Code, tx.query)
+		}
+	}
+	_, rec := requestEmptyBeanList(t, "page=1000&limit=100")
+	if rec.Code != 200 {
+		t.Fatalf("maximum supported offset rejected: %d", rec.Code)
+	}
+}

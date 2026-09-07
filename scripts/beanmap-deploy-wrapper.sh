@@ -19,6 +19,10 @@ compose_files=(-f /srv/beanlog/app/docker-compose.yml)
 if [[ -f /srv/beanlog/app/docker-compose.client-ip.yml ]]; then
   compose_files+=(-f /srv/beanlog/app/docker-compose.client-ip.yml)
 fi
+# Preserve the installed runtime network boundary on every app recreation.
+if [[ -f /srv/beanlog/app/docker-compose.security.yml ]]; then
+  compose_files+=(-f /srv/beanlog/app/docker-compose.security.yml)
+fi
 
 archive="$(mktemp /tmp/beanmap-deploy.XXXXXX.tar.gz)"
 release_dir="$(mktemp -d /tmp/beanmap-release.XXXXXX)"

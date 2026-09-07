@@ -261,13 +261,13 @@ section "3. Source and database controls"
 
 if rg -n 'dangerouslySetInnerHTML|\beval\s*\(|new Function\s*\(' src --glob '*.{ts,tsx}' > "$TMP_ROOT/xss-paths.txt" 2>/dev/null; then
   cut -d: -f1 "$TMP_ROOT/xss-paths.txt" | sort -u > "$TMP_ROOT/xss-files.txt"
-  finding "MEDIUM" "source/xss" "Dynamic HTML or code execution primitive found" "Files only: $(tr '\n' ' ' < "$TMP_ROOT/xss-files.txt")"
+  finding "INFO" "source/xss-review" "Dynamic HTML/code primitive requires source review; this pattern alone does not demonstrate XSS" "Files only: $(tr '\n' ' ' < "$TMP_ROOT/xss-files.txt")"
 else
   finding "OK" "source/xss" "No dynamic HTML or code execution primitive"
 fi
 if rg -n "fmt\.Sprintf\([^\n]*['\"]%s" server --glob '*.go' > "$TMP_ROOT/sql-paths.txt" 2>/dev/null; then
   cut -d: -f1 "$TMP_ROOT/sql-paths.txt" | sort -u > "$TMP_ROOT/sql-files.txt"
-  finding "HIGH" "source/sql" "Potential direct string interpolation in Go SQL" "Files only: $(tr '\n' ' ' < "$TMP_ROOT/sql-files.txt")"
+  finding "INFO" "source/formatting-review" "Go string formatting requires sink review; this pattern alone does not identify SQL execution" "Files only: $(tr '\n' ' ' < "$TMP_ROOT/sql-files.txt")"
 else
   finding "OK" "source/sql" "No direct Go SQL value interpolation pattern"
 fi

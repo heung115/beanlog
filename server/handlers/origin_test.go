@@ -1,6 +1,9 @@
 package handlers
 
 import (
+	"github.com/gin-gonic/gin"
+	"net/http/httptest"
+	"net/url"
 	"reflect"
 	"strings"
 	"testing"
@@ -46,5 +49,21 @@ func TestBuildUserSubregionsQueryWithoutRegion(t *testing.T) {
 				t.Fatalf("args = %#v, want %#v", args, wantArgs)
 			}
 		})
+	}
+}
+
+func TestAutocompleteRejectsOversizedQueriesBeforeDatabaseAccess(t *testing.T) {
+	for _, query := range []string{
+		"country=" + url.QueryEscape(strings.Repeat("한", 101)),
+		"country=Colombia&region=" + url.QueryEscape(strings.Repeat("😀", 101)),
+	} {
+		r := gin.New()
+		r.Use(func(c *gin.Context) { c.Set("request_database", &emptyBeanListTx{}) })
+		r.GET("/", NewOriginHandler().UserSubregions)
+		rec := httptest.NewRecorder()
+		r.ServeHTTP(rec, httptest.NewRequest("GET", "/?"+query, nil))
+		if rec.Code != 400 {
+			t.Fatalf("oversized query returned %d", rec.Code)
+		}
 	}
 }

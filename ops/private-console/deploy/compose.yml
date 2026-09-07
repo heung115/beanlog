@@ -6,9 +6,12 @@ services:
   # Do not use the names "meta" or "studio": Compose adds service names as DNS
   # aliases, and the existing public Kong has dormant routes to those aliases.
   private-meta:
-    image: supabase/postgres-meta:v0.96.6@sha256:a84cc713585eea7b401e4a2561ec4a1e48c87083d1c7ecb4502f204bb4391300
+    image: beanmap-postgres-meta@sha256:9173c0b89189d02fb1623a40614ac1f45b291e37943569b6a608caab5553642b
     container_name: beanmap-private-meta
     user: "1000:1000"
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=16m,mode=1777
     env_file:
       - path: /etc/beanmap-private-console/meta.env
         format: raw
@@ -37,12 +40,13 @@ services:
         max-size: "5m"
         max-file: "2"
     networks:
-      - supabase
+      - management
 
   private-studio:
-    image: supabase/studio:2026.08.03-sha-022b374@sha256:606aca9fdaa753b60968d5c304e2ada83869b76c9043684e63d5885aca9550e8
+    image: beanmap-studio@sha256:3ce929ecc269b059adadf58a024d7b9e369c58c7c113933fa842bf2c8849f117
     container_name: beanmap-private-studio
     user: "1000:1000"
+    read_only: true
     env_file:
       - path: /etc/beanmap-private-console/studio.env
         format: raw
@@ -66,6 +70,7 @@ services:
       - /var/lib/beanmap-private-studio/snippets:/app/snippets
       - /var/lib/beanmap-private-studio/functions:/app/edge-functions:ro
     tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=16m,mode=1777
       - /app/apps/studio/.next/cache:rw,nosuid,nodev,size=128m,uid=1000,gid=1000,mode=0700
     depends_on:
       private-meta:
@@ -90,9 +95,10 @@ services:
         max-size: "5m"
         max-file: "2"
     networks:
-      - supabase
+      - management
 
 networks:
-  supabase:
+  management:
+    # Prepared by ops/production/provision-container-boundary.py; internal bridge.
     external: true
-    name: beanlogsupabase_default
+    name: beanmap-management

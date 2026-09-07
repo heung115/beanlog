@@ -26,7 +26,7 @@ import { MIN_CALENDAR_DATE, MAX_CALENDAR_DATE } from "@/lib/coffee/calendar-date
 import { readRecentRoasteries, saveRecentRoastery } from "@/lib/coffee/recent-roasteries";
 import { createBean, createBeanFromForm, updateBean } from "@/lib/actions/beans";
 import {
-  clearGuestBeanDraft,
+  clearGuestBrowserDrafts,
   loadGuestBeanDraft,
 } from "@/lib/coffee/guest-draft";
 import {
@@ -37,7 +37,7 @@ import {
 } from "@/lib/actions/origins";
 import { cn } from "@/lib/utils";
 import { beanFormSchema } from "@/lib/validation/beans";
-import { parseRecordDraft, RECORD_DRAFT_PREFIX, recordDraftScope } from "@/lib/coffee/record-draft";
+import { parseRecordDraft, RECORD_DRAFT_PREFIX, recordDraftScope, serializeRecordDraft } from "@/lib/coffee/record-draft";
 import { isBeanDraftValue, type BeanDraftValue } from "@/lib/coffee/record-draft-value";
 import { beanDetailHref, resolveExploreReturnPath } from "@/lib/coffee/explore-navigation";
 import { useRecordDraft } from "@/components/beans/use-record-draft";
@@ -297,6 +297,7 @@ export function BeanForm({
   const [saveRecovery, setSaveRecovery] = useState<"conflict" | "session" | "retry" | null>(null);
   const [tagDraft, setTagDraft] = useState("");
   const [guestDraftLoaded, setGuestDraftLoaded] = useState(false);
+  const guestDraftTransferred = useRef(false);
   const [draftBaseline, setDraftBaseline] = useState<BeanDraftValue>(() => ({ form, tagDraft: "", showDetails }));
   const ownerId = draftOwnerId ?? initial?.user_id;
   const draftScope = recordDraftScope(ownerId ?? "unavailable", mode === "edit" ? initial?.id : undefined);
@@ -375,22 +376,37 @@ export function BeanForm({
   }
 
   useEffect(() => {
-    if (!importingGuestDraft) return;
+    if (!importingGuestDraft || !ownerId) return;
 
     try {
-      if (parseRecordDraft(sessionStorage.getItem(RECORD_DRAFT_PREFIX + draftScope), isBeanDraftValue)) return;
+      if (parseRecordDraft(sessionStorage.getItem(RECORD_DRAFT_PREFIX + draftScope), isBeanDraftValue)) {
+        clearGuestBrowserDrafts();
+        return;
+      }
     } catch { /* The recovery notice explains browser storage failures. */ }
 
     const draft = loadGuestBeanDraft();
     if (!draft) return;
+    const importedForm = { ...draft.bean, ...adoptedNativeEdits.current };
 
     startTransition(() => {
       setAllowDefaultProcessFill(false);
-      setForm({ ...draft.bean, ...adoptedNativeEdits.current });
+      setForm(importedForm);
       setShowDetails(hasDetails(draft.bean));
       setGuestDraftLoaded(true);
     });
-  }, [draftScope, importingGuestDraft]);
+  }, [draftScope, importingGuestDraft, ownerId]);
+
+  useEffect(() => {
+    if (!guestDraftLoaded || !ownerId || guestDraftTransferred.current) return;
+    try {
+      // Wait for the imported state to commit, so draft recovery cannot overwrite
+      // this transfer with its initial empty form during hydration.
+      sessionStorage.setItem(RECORD_DRAFT_PREFIX + draftScope, serializeRecordDraft(draftValue, null));
+      guestDraftTransferred.current = true;
+      clearGuestBrowserDrafts();
+    } catch { /* Retain the expiring guest copy if tab storage is unavailable. */ }
+  }, [draftScope, draftValue, guestDraftLoaded, ownerId]);
 
   useEffect(() => {
     let active = true;
@@ -794,7 +810,7 @@ export function BeanForm({
       let nextRecents: string[] | undefined;
       try { nextRecents = saveRecentRoastery(localStorage, ownerId, form.roastery); } catch { /* Storage is optional. */ }
       if (nextRecents) setRecentRoasteries(nextRecents);
-      if (importingGuestDraft) clearGuestBeanDraft();
+      if (importingGuestDraft) clearGuestBrowserDrafts();
       if (continueAdding) {
         toast.show(t("saved"));
         const nextForm = { ...defaultForm(), roastery: form.roastery };

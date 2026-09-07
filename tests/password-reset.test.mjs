@@ -23,7 +23,7 @@ function form(values = {}) {
   return data;
 }
 
-function authModule(overrides = {}) {
+function authModule(overrides = {}, recoveryProof = true) {
   const calls = [];
   const auth = {
     resetPasswordForEmail: async (...args) => { calls.push(["requestReset", ...args]); return { error: null }; },
@@ -36,6 +36,12 @@ function authModule(overrides = {}) {
   vm.runInNewContext(compiled, {
     exports, URL, URLSearchParams, FormData,
     require(name) {
+      if (name === "@/lib/security/password-recovery") return {
+        checkPasswordRecoveryProof: async (_client, userId, consume) => {
+          calls.push(["recoveryProof", userId, consume]);
+          return recoveryProof;
+        },
+      };
       if (name === "zod") return { z };
       if (name === "@/lib/validation/auth") return validation;
       if (name === "@/lib/supabase/auth-recovery") return authRecovery;
@@ -111,7 +117,7 @@ for (const locale of ["ko", "en"]) {
       assert.equal(destination.searchParams.get("next"), `/${locale}/beans/new?draft=1`);
       return true;
     });
-    assert.deepEqual(calls.map(([name]) => name), ["createClient", "getUser", "updateUser", "signOut", "clearSessionCookies"]);
+    assert.deepEqual(calls.map(([name]) => name), ["createClient", "getUser", "recoveryProof", "updateUser", "signOut", "clearSessionCookies"]);
     assert.deepEqual(plain(calls.find(([name]) => name === "updateUser")[1]), { password: "fixture-new-password" });
     assert.deepEqual(plain(calls.find(([name]) => name === "signOut")[1]), { scope: "local" });
   });
@@ -158,7 +164,7 @@ test("a sign-out transport failure after a completed update still clears cookies
 
 test("a rejected password update preserves the current session and identifies same-password errors", async () => {
   const { actions, calls } = authModule({ updateUser: async () => ({ error: { code: "same_password" } }) });
-  assert.deepEqual(plain(await actions.updatePasswordAction({}, form())), { error: "same_password", field: "password" });
+  assert.deepEqual(plain(await actions.updatePasswordAction({}, form())), { error: "same_password", field: "password", requiresNewLink: true });
   assert.equal(calls.some(([name]) => ["signOut", "clearSessionCookies"].includes(name)), false);
 });
 
@@ -172,4 +178,12 @@ test("signup's server action returns field errors for whitespace names and misma
     assert.deepEqual(plain(await actions.signUpAction({}, form(values))), expected);
     assert.deepEqual(calls, []);
   }
+});
+
+
+test("an ordinary valid session without recovery proof cannot change a password", async () => {
+  const { actions, calls } = authModule({}, false);
+  assert.deepEqual(plain(await actions.updatePasswordAction({}, form())), { error: "expired" });
+  assert.equal(calls.some(([name]) => name === "updateUser"), false);
+  assert.deepEqual(calls.find(([name]) => name === "recoveryProof"), ["recoveryProof", "fixture-user", true]);
 });

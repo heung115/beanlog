@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
@@ -36,6 +37,7 @@ export default async function OriginDetailPage({
 }: {
   params: Promise<{ locale: string; country: string }>;
 }) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   const { locale, country } = await params;
   const preset = findCountryPresetBySlug(country);
 
@@ -104,6 +106,7 @@ export default async function OriginDetailPage({
   return (
     <article className="mx-auto max-w-4xl pb-8">
       <script
+        nonce={nonce}
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />

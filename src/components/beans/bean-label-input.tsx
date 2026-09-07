@@ -11,7 +11,7 @@ import { prepareLabelDetailRetries } from "@/lib/coffee/bean-label-detail-image"
 import { prepareLabelDeskew } from "@/lib/coffee/bean-label-deskew";
 import type { BeanFormData } from "@/types/database";
 
-const MAX_FILE_BYTES = 10 * 1024 * 1024;
+import { MAX_LABEL_FILE_BYTES, validateLabelImageBeforeDecode } from "@/lib/coffee/bean-label-image-header";
 const READ_TIMEOUT_MS = 180_000;
 const IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 const FIELD_LABELS = {
@@ -158,13 +158,23 @@ export function BeanLabelInput({ form, onApply, disabled = false, allowDefaultPr
     if (!keepResult) clearResults();
   }
 
-  function choosePhoto(file?: File) {
+  async function choosePhoto(file?: File) {
     if (!file || disabled) return;
     cancelRequest();
     setPhoto(null);
     setNotice(null);
     if (!IMAGE_TYPES.has(file.type)) { setError("invalid_image"); return; }
-    if (file.size > MAX_FILE_BYTES) { setError("image_too_large"); return; }
+    if (file.size > MAX_LABEL_FILE_BYTES) { setError("image_too_large"); return; }
+    const sequence = request.current.sequence;
+    try {
+      // A preview can decode too, so validate before creating its object URL.
+      await validateLabelImageBeforeDecode(file);
+    } catch (failure) {
+      if (sequence !== request.current.sequence) return;
+      setError(failure instanceof Error && failure.message === "image_too_large" ? "image_too_large" : "invalid_image");
+      return;
+    }
+    if (sequence !== request.current.sequence) return;
     setError(null);
     const nextPhoto = { url: URL.createObjectURL(file), name: file.name, file };
     setPhoto(nextPhoto);

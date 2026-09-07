@@ -22,3 +22,20 @@ import /rules/beanmap-upstream-errors.Caddyfile
 :8081 {
 	respond "original app session recovery" 503
 }
+
+import /rules/beanmap-public-auth-updates.Caddyfile
+:8082 {
+	@application_api path /auth/v1 /auth/v1/* /rest/v1 /rest/v1/* /graphql/v1 /graphql/v1/* /storage/v1 /storage/v1/* /functions/v1 /functions/v1/* /realtime/v1 /realtime/v1/*
+	handle @application_api {
+		import beanmap_public_auth_updates
+		reverse_proxy 127.0.0.1:8083
+	}
+	handle {
+		respond 404
+	}
+}
+# Disposable gateway accepts every request, so a 405 can only come from the guard.
+:8083 {
+	header X-Fixture-Upstream reached
+	respond "gateway reached" 200
+}

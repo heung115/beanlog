@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
+import { clearGuestBrowserDrafts } from "@/lib/coffee/guest-draft";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { resolvePostAuthPath } from "@/lib/security/redirect";
@@ -28,6 +30,11 @@ export function TopBar({ user }: TopBarProps) {
   const appPathname = getAppPathname(pathname);
   const t = useTranslations("nav");
   const tAuth = useTranslations("auth");
+  const importingGuestDraft = appPathname === "/beans/new" && searchParams.get("draft") === "1";
+  useEffect(() => {
+    // Explicit import transfers its copy inside BeanForm before clearing it.
+    if (user && !importingGuestDraft) clearGuestBrowserDrafts();
+  }, [user, importingGuestDraft, pathname]);
 
   if (appPathname === "/signup/check-email") {
     return null;

@@ -1,16 +1,9 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
+import { contentSecurityPolicy } from "./src/lib/security/csp";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 const isDevelopment = process.env.NODE_ENV === "development";
-const publicSupabaseOrigin = (() => {
-  try {
-    return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL ?? "http://localhost:55321").origin;
-  } catch {
-    return "'self'";
-  }
-})();
-
 // 보안 헤더 — 모든 경로에 적용
 const securityHeaders = [
   { key: "X-Frame-Options", value: "DENY" },
@@ -26,25 +19,10 @@ const securityHeaders = [
     value: "max-age=63072000; includeSubDomains; preload",
   },
   {
-    // Static rendering requires inline bootstrap scripts. unsafe-eval is only
-    // needed by the React development runtime and is excluded in production.
+    // Non-HTML assets and API responses have no inline scripts. HTML receives
+    // a request-specific nonce policy from the proxy.
     key: "Content-Security-Policy",
-    value: [
-      "default-src 'self'",
-      `script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ""}`,
-      "script-src-attr 'none'",
-      "style-src 'self' 'unsafe-inline'",
-      "font-src 'self'",
-      "img-src 'self' data: blob:",
-      `connect-src 'self' ${publicSupabaseOrigin}${isDevelopment ? " http://localhost:* http://127.0.0.1:* ws://localhost:* ws://127.0.0.1:*" : ""}`,
-      "object-src 'none'",
-      "frame-src 'none'",
-      "worker-src 'self' blob:",
-      "manifest-src 'self'",
-      "frame-ancestors 'none'",
-      "base-uri 'self'",
-      "form-action 'self'",
-    ].join("; "),
+    value: contentSecurityPolicy(),
   },
 ];
 

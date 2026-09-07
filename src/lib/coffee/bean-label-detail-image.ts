@@ -1,5 +1,7 @@
 "use client";
 
+import { validateLabelImageBeforeDecode } from "./bean-label-image-header.ts";
+
 import type { PreparedLabelImage } from "./bean-label-image.ts";
 
 type PixelImage = { width: number; height: number; data: Uint8ClampedArray };
@@ -119,6 +121,7 @@ async function encode(element: HTMLCanvasElement, signal: AbortSignal) {
 
 /** Bounded optional views for facts missing after the normal OCR passes. */
 export async function prepareLabelDetailRetries(image: Blob, signal: AbortSignal, options: { includeColor?: boolean } = {}): Promise<PreparedLabelImage[]> {
+  await validateLabelImageBeforeDecode(image, signal);
   signal.throwIfAborted();
   const url = URL.createObjectURL(image);
   const picture = new Image();

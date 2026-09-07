@@ -158,6 +158,16 @@ if ! /usr/bin/git --git-dir="$repository_dir" merge-base --is-ancestor "$verifie
   exit 1
 fi
 
+# BEGIN latest-main deployment guard
+# A previously successful run is insufficient when main has advanced. The timer
+# will discover a fresh successful run after the latest main completes CI.
+main_sha="$(/usr/bin/git --git-dir="$repository_dir" rev-parse refs/heads/main)"
+if [[ "$verified_sha" != "$main_sha" ]]; then
+  echo "ignored a verified deployment that is no longer the latest main" >&2
+  exit 0
+fi
+# END latest-main deployment guard
+
 # BEGIN forward-only deployment guard
 # A delayed webhook or stale successful-run response may select an older main
 # commit. CI success and main membership do not authorize an automatic rollback.

@@ -1,7 +1,9 @@
 package routes
 
 import (
+	"context"
 	"net/http"
+	"time"
 
 	"beanmap-server/config"
 	"beanmap-server/handlers"
@@ -35,7 +37,9 @@ func Setup(cfg *config.Config, db *pgxpool.Pool) *gin.Engine {
 
 	// Health check (no auth)
 	r.GET("/health", func(c *gin.Context) {
-		if err := db.Ping(c.Request.Context()); err != nil {
+		ctx, cancel := context.WithTimeout(c.Request.Context(), 2*time.Second)
+		defer cancel()
+		if err := db.Ping(ctx); err != nil {
 			c.JSON(503, gin.H{"status": "unhealthy"})
 			return
 		}
@@ -49,8 +53,11 @@ func Setup(cfg *config.Config, db *pgxpool.Pool) *gin.Engine {
 	profileH := handlers.NewProfileHandler()
 	adminH := handlers.NewAdminHandler(cfg.AdminIngressSecret)
 
+	budget := middleware.NewRequestBudget()
 	auth := r.Group("/api")
+	auth.Use(budget.IP())
 	auth.Use(middleware.AuthRequired(cfg.JWKSURL, cfg.JWTIssuer))
+	auth.Use(budget.User())
 	auth.Use(middleware.RequestDatabase(db))
 	{
 		// Origin presets + catalog (reference data for signed-in users)
@@ -81,8 +88,9 @@ func Setup(cfg *config.Config, db *pgxpool.Pool) *gin.Engine {
 	// Reject public requests before JWT/database work and disable caching even on denial.
 	// Admin role lives in a private DB allowlist, independent of user metadata.
 	admin := r.Group("/api/admin")
-	admin.Use(adminH.NoStore, adminH.RequirePrivate)
+	admin.Use(adminH.NoStore, adminH.RequirePrivate, budget.IP())
 	admin.Use(middleware.AuthRequired(cfg.JWKSURL, cfg.JWTIssuer))
+	admin.Use(budget.User())
 	admin.Use(middleware.RequestDatabase(db))
 	admin.GET("/access", adminH.Access)
 	admin.Use(adminH.RequireAdmin)

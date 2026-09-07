@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import assert from "node:assert/strict";
 import test from "node:test";
 import {
@@ -97,7 +98,7 @@ function mockCanvas(t, { bitmapWidth = 400, bitmapHeight = 300, decode, encode, 
   });
   return { calls, bitmap, canvas, context };
 }
-const image = new Blob(["fixture"]);
+const image = new Blob([readFileSync(new URL("./fixtures/bean-label-ko.png", import.meta.url))], { type: "image/png" });
 const region = { x: 20, y: 30, width: 100, height: 20 };
 const signal = () => new AbortController().signal;
 const flush = () => new Promise(resolve => setImmediate(resolve));

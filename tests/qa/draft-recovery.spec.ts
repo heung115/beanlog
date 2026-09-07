@@ -64,9 +64,11 @@ for (const locale of ["ko", "en"] as const) {
     await expect(page.locator('[name="note"]')).toHaveValue("An unfinished revision.");
     await page.getByRole("button", { name: t.draft.discard, exact: true }).click();
     await page.getByRole("button", { name: t.draft.discardYes, exact: true }).click();
-    await expect(page.getByRole("article", { name: t.guest.savedTitle })).toContainText("A completed note.");
+    await expect(page.getByRole("article", { name: t.guest.savedTitle })).toHaveCount(0);
+    await expect(page.locator('[name="name"]')).toHaveValue("");
+    expect(await page.evaluate(() => localStorage.getItem("beanmap:guest-bean-draft"))).toBeNull();
     await page.reload();
-    await expect(page.getByRole("article", { name: t.guest.savedTitle })).toContainText("A completed note.");
+    await expect(page.locator('[name="name"]')).toHaveValue("");
   });
 
   test(`${locale} unavailable draft storage warns before an unfinished reload`, async ({ page }) => {

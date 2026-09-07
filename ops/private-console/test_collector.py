@@ -16,8 +16,11 @@ ENTRY = {"name": "beanlogapp-api-1", "label": "API"}
 
 class LogSafetyTests(unittest.TestCase):
     def test_request_uses_allowlisted_fields_and_replaces_dynamic_segments(self):
+        # Synthetic token is assembled so secret scanners do not mistake the
+        # redaction fixture for an accidentally committed credential.
+        fake_token = '.'.join(('eyJabc', 'secret', 'jwt'))
         raw = ('2026-09-06T03:02:01.123456789Z [GIN] 2026/09/06 - 03:02:01 | 500 | 1.25ms | 100.120.1.2 | GET '
-               '"/api/beans/123e4567-e89b-12d3-a456-426614174000?email=private@example.com&token=eyJabc.secret.jwt"')
+               f'"/api/beans/123e4567-e89b-12d3-a456-426614174000?email=private@example.com&token={fake_token}"')
         result = collector.parse_logs(raw, ENTRY)
         encoded = json.dumps(result)
         for secret in ("private@example.com", "eyJabc", "100.120.1.2", "123e4567"):

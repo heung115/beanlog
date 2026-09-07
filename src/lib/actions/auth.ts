@@ -11,6 +11,7 @@ import { z } from "zod";
 import { resolvePostAuthPath } from "@/lib/security/redirect";
 import { getRequestAppOrigin } from "@/lib/admin/private-access";
 import { validateRegistrationFields, validateNewPassword, type RegistrationField } from "@/lib/validation/auth";
+import { checkPasswordRecoveryProof } from "@/lib/security/password-recovery";
 import { isTemporaryAuthError } from "@/lib/supabase/auth-recovery";
 
 export type SignInState = {
@@ -26,6 +27,7 @@ export type PasswordResetState = {
   error?: "invalid_email" | "temporarily_unavailable" | "password_length" | "password_mismatch" | "expired" | "same_password";
   field?: "email" | "password" | "passwordConfirm";
   sent?: boolean;
+  requiresNewLink?: boolean;
 };
 
 function authFormDestination(formData: FormData) {
@@ -137,6 +139,7 @@ export async function updatePasswordAction(_previousState: PasswordResetState, f
   const issue = validateNewPassword(formData);
   if (issue) return issue;
   const { locale, query } = authFormDestination(formData);
+  let proofConsumed = false;
   try {
     const supabase = await createClient({ persistSession: false });
     // getUser verifies the cookie-backed session with Auth; getSession alone
@@ -145,13 +148,15 @@ export async function updatePasswordAction(_previousState: PasswordResetState, f
     if (identityError || !data.user) {
       return { error: isTemporaryAuthError(identityError) ? "temporarily_unavailable" : "expired" };
     }
+    if (!await checkPasswordRecoveryProof(supabase, data.user.id, true)) return { error: "expired" };
+    proofConsumed = true;
     const { error } = await supabase.auth.updateUser({ password: String(formData.get("password")) });
-    if (error) return { error: error.code === "same_password" ? "same_password" : "temporarily_unavailable", field: error.code === "same_password" ? "password" : undefined };
+    if (error) return { error: error.code === "same_password" ? "same_password" : "temporarily_unavailable", field: error.code === "same_password" ? "password" : undefined, requiresNewLink: true };
     // The password has already changed. A remote logout failure must not tell
     // the user that reset failed, or retain credentials in this browser.
     try { await supabase.auth.signOut({ scope: "local" }); } catch { /* Local cookies are still removed below. */ }
   } catch {
-    return { error: "temporarily_unavailable" };
+    return { error: "temporarily_unavailable", ...(proofConsumed ? { requiresNewLink: true } : {}) };
   }
   await clearSessionCookies();
   query.set("passwordReset", "1");

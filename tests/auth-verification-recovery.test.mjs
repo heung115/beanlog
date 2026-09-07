@@ -1,3 +1,4 @@
+import * as csp from "../src/lib/security/csp.ts";
 import * as authClientIp from "../src/lib/security/auth-client-ip.ts";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -33,6 +34,7 @@ function middlewareModuleWith(error, throws = false, clientFactory) {
     process: { env: {} },
     require(name) {
       if (name === "../security/auth-client-ip") return authClientIp;
+      if (name === "@/lib/security/csp") return csp;
       if (name === "next/server") return { NextResponse };
       if (name === "./auth-recovery") return authRecovery;
       if (name === "../security/redirect") return redirectHelpers;
@@ -117,6 +119,7 @@ function proxyWith(error) {
   vm.runInNewContext(compiled, {
     exports,
     require(name) {
+      if (name === "@/lib/security/csp") return csp;
       if (name === "next/server") return { NextRequest, NextResponse };
       if (name === "@/lib/supabase/middleware") return middlewareModuleWith(error);
       if (name === "./i18n/routing") return { routing };
@@ -136,6 +139,10 @@ test("locale proxy composition preserves the recovery rewrite, status, retry del
   const request = new NextRequest("http://localhost:3100/en/settings?from=journal");
   const response = await proxyWith({ status: 429 })(request);
   assert.equal(request.nextUrl.pathname, "/en/settings");
+  const policy = response.headers.get("content-security-policy");
+  assert.equal(response.headers.get("x-middleware-request-content-security-policy"), policy);
+  assert.ok(policy.includes(`'nonce-${request.headers.get("x-nonce")}'`));
+  assert.equal(response.headers.get("x-middleware-request-x-nonce"), request.headers.get("x-nonce"));
   assert.equal(response.status, 503);
   assert.equal(response.headers.get("location"), null);
   assert.equal(response.headers.get("cache-control"), "no-store");

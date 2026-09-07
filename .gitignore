@@ -28,6 +28,13 @@
 # misc
 .DS_Store
 *.pem
+*.secret
+*.key
+*.p12
+*.pfx
+*.har
+*.log
+*.log.*
 __pycache__/
 *.py[cod]
 

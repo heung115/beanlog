@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
@@ -38,6 +39,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
 }
 
 export default async function OriginsPage({ params }: { params: Promise<{ locale: string }> }) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "origins" });
   const seoLocale = toSeoLocale(locale);
@@ -70,7 +72,7 @@ export default async function OriginsPage({ params }: { params: Promise<{ locale
 
   return (
     <div className="mx-auto max-w-5xl pb-10 md:pb-16">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
+      <script nonce={nonce} type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }} />
 
       <PageIntro
         testId="origin-index-header"

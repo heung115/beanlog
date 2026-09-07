@@ -1,3 +1,4 @@
+import * as csp from "../src/lib/security/csp.ts";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { registerHooks } from "node:module";
@@ -23,6 +24,7 @@ vm.runInNewContext(compiled, {
   exports,
   URL,
   require(name) {
+    if (name === "@/lib/security/csp") return csp;
     if (name === "next/server") return { NextRequest, NextResponse };
     if (name === "next-intl/middleware") return { default: createIntlMiddleware };
     if (name === "./i18n/routing") return { routing };

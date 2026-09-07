@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import Link from "next/link";
 import { Suspense } from "react";
 import { LogoutNotice } from "@/components/auth/logout-notice";
@@ -13,7 +14,8 @@ import { localizedUrl, serializeJsonLd } from "@/lib/seo";
 
 const featuredOrigins = originPresets.slice(0, 3);
 
-export function LandingPage({ locale }: { locale: LandingLocale }) {
+export async function LandingPage({ locale }: { locale: LandingLocale }) {
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
   const copy = landingCopy[locale];
   const isKorean = locale === "ko";
   const structuredData = {
@@ -36,6 +38,7 @@ export function LandingPage({ locale }: { locale: LandingLocale }) {
     >
       <DocumentLocale locale={locale} />
       <script
+        nonce={nonce}
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(structuredData) }}
       />

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { PasswordRecoveryForm } from "@/components/auth/password-recovery-form";
 import { resolvePostAuthPath } from "@/lib/security/redirect";
+import { checkPasswordRecoveryProof } from "@/lib/security/password-recovery";
 import { isTemporaryAuthError } from "@/lib/supabase/auth-recovery";
 
 export default async function ResetPasswordPage({ params, searchParams }: {
@@ -19,7 +20,7 @@ export default async function ResetPasswordPage({ params, searchParams }: {
   try {
     const supabase = await createClient();
     const { data, error } = await supabase.auth.getUser();
-    valid = !error && Boolean(data.user);
+    valid = !error && Boolean(data.user) && await checkPasswordRecoveryProof(supabase, data.user!.id);
     unavailable = isTemporaryAuthError(error);
   } catch { unavailable = true; }
   const t = await getTranslations({ locale, namespace: "auth" });

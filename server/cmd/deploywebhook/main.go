@@ -15,28 +15,40 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 )
 
 const maxPayloadSize = 64 * 1024
+const maxDeliveryAge = 5 * time.Minute
+const maxFutureSkew = 30 * time.Second
+const deliveryRetention = 24 * time.Hour
+const maxLedgerEntries = 10000
 
 var commitPattern = regexp.MustCompile(`^[0-9a-f]{40}$`)
+var deliveryPattern = regexp.MustCompile(`^[0-9]{1,20}-[0-9]{1,10}$`)
 
 type triggerPayload struct {
 	Repository string `json:"repository"`
 	SHA        string `json:"sha"`
 	RunID      uint64 `json:"run_id"`
+	Timestamp  int64  `json:"timestamp"`
+	DeliveryID string `json:"delivery_id"`
 }
 
 type webhookHandler struct {
 	secret       []byte
 	triggerPath  string
 	triggerQueue chan<- struct{}
+	ledgerPath   string
+	now          func() time.Time
+	mu           sync.Mutex
 }
 
 func main() {
 	secretPath := envOrDefault("WEBHOOK_SECRET_FILE", "/etc/beanmap-deploy-webhook/secret")
 	triggerPath := envOrDefault("DEPLOY_TRIGGER_FILE", "/run/beanmap-deploy-trigger/request")
+	ledgerPath := envOrDefault("WEBHOOK_LEDGER_DIR", "/var/lib/beanmap-deploy-webhook/deliveries")
 	listenAddress := envOrDefault("LISTEN_ADDRESS", "127.0.0.1:9087")
 
 	secret, err := os.ReadFile(secretPath)
@@ -48,9 +60,16 @@ func main() {
 		log.Fatal("webhook secret must contain at least 32 bytes")
 	}
 
+	if err := os.MkdirAll(ledgerPath, 0o700); err != nil {
+		log.Fatalf("create durable delivery ledger: %v", err)
+	}
+	if err := syncDirectory(filepath.Dir(ledgerPath)); err != nil {
+		log.Fatalf("persist delivery ledger directory: %v", err)
+	}
+
 	triggerQueue := make(chan struct{}, 1)
 	go runDeployWorker(triggerQueue)
-	handler := webhookHandler{secret: secret, triggerPath: triggerPath, triggerQueue: triggerQueue}
+	handler := &webhookHandler{secret: secret, triggerPath: triggerPath, triggerQueue: triggerQueue, ledgerPath: ledgerPath, now: time.Now}
 	server := &http.Server{
 		Addr:              listenAddress,
 		Handler:           handler,
@@ -67,7 +86,7 @@ func main() {
 	}
 }
 
-func (h webhookHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
+func (h *webhookHandler) ServeHTTP(response http.ResponseWriter, request *http.Request) {
 	if request.URL.Path == "/healthz" {
 		if request.Method != http.MethodGet {
 			response.WriteHeader(http.StatusMethodNotAllowed)
@@ -106,6 +125,33 @@ func (h webhookHandler) ServeHTTP(response http.ResponseWriter, request *http.Re
 		return
 	}
 
+	if !deliveryPattern.MatchString(payload.DeliveryID) || !strings.HasPrefix(payload.DeliveryID, fmt.Sprintf("%d-", payload.RunID)) {
+		http.Error(response, "invalid delivery ID", http.StatusBadRequest)
+		return
+	}
+	now := time.Now()
+	if h.now != nil {
+		now = h.now()
+	}
+	if payload.Timestamp < now.Add(-maxDeliveryAge).Unix() || payload.Timestamp > now.Add(maxFutureSkew).Unix() {
+		http.Error(response, "expired delivery", http.StatusUnauthorized)
+		return
+	}
+
+	// Serialize ledger consumption and trigger replacement. Persist consumption
+	// BEFORE triggering work, so crashes and concurrent retries cannot replay it.
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	if err := consumeDelivery(h.ledgerPath, payload.DeliveryID, body, now); err != nil {
+		if errors.Is(err, os.ErrExist) {
+			http.Error(response, "delivery already consumed", http.StatusConflict)
+			return
+		}
+		log.Printf("persist deployment delivery: %v", err)
+		http.Error(response, "delivery ledger unavailable", http.StatusServiceUnavailable)
+		return
+	}
+
 	trigger := []byte(fmt.Sprintf("%s %d\n", payload.SHA, payload.RunID))
 	if err := replaceFile(h.triggerPath, trigger); err != nil {
 		log.Printf("write deployment trigger: %v", err)
@@ -119,6 +165,73 @@ func (h webhookHandler) ServeHTTP(response http.ResponseWriter, request *http.Re
 
 	log.Printf("accepted verified deployment trigger for %.12s", payload.SHA)
 	response.WriteHeader(http.StatusAccepted)
+}
+
+// The ledger must be on persistent local storage, never /run or /tmp. Each
+// signed delivery is consumed at most once even across process/host restarts.
+// Retain records beyond the signature window and cap disk use. Host time must
+// remain synchronized; large backward clock corrections require rotating secrets.
+func consumeDelivery(directory, deliveryID string, body []byte, now time.Time) error {
+	if directory == "" {
+		return errors.New("delivery ledger is not configured")
+	}
+	if err := pruneDeliveries(directory, now); err != nil {
+		return err
+	}
+	file, err := os.OpenFile(filepath.Join(directory, deliveryID), os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o600)
+	if err != nil {
+		return err
+	}
+	// Never remove a partially written record: fail closed after any I/O error.
+	defer file.Close()
+	if _, err := file.Write(body); err != nil {
+		return err
+	}
+	if err := file.Sync(); err != nil {
+		return err
+	}
+	return syncDirectory(directory)
+}
+
+func syncDirectory(directory string) error {
+	dir, err := os.Open(directory)
+	if err != nil {
+		return err
+	}
+	defer dir.Close()
+	return dir.Sync()
+}
+
+func pruneDeliveries(directory string, now time.Time) error {
+	dir, err := os.Open(directory)
+	if err != nil {
+		return err
+	}
+	defer dir.Close()
+	entries, err := dir.ReadDir(maxLedgerEntries + 1)
+	if err != nil && !errors.Is(err, io.EOF) {
+		return err
+	}
+	if len(entries) > maxLedgerEntries {
+		return errors.New("delivery ledger capacity exceeded")
+	}
+	remaining := len(entries)
+	for _, entry := range entries {
+		info, err := entry.Info()
+		if err != nil {
+			return err
+		}
+		if info.Mode().IsRegular() && deliveryPattern.MatchString(entry.Name()) && info.ModTime().Before(now.Add(-deliveryRetention)) {
+			if err := os.Remove(filepath.Join(directory, entry.Name())); err != nil {
+				return err
+			}
+			remaining--
+		}
+	}
+	if remaining >= maxLedgerEntries {
+		return errors.New("delivery ledger capacity exceeded")
+	}
+	return nil
 }
 
 func runDeployWorker(triggerQueue <-chan struct{}) {

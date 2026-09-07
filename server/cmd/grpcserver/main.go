@@ -19,10 +19,13 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 )
 
 func main() {
+	address, serverOptions, err := secureTransport(os.Getenv)
+	if err != nil {
+		log.Fatal(err)
+	}
 	cfg := config.Load()
 	if cfg.DatabaseURL == "" {
 		log.Fatal("database credential is unavailable")
@@ -63,21 +66,15 @@ func main() {
 
 	verifier := middleware.NewTokenVerifier(cfg.JWKSURL, cfg.JWTIssuer)
 
-	server := grpc.NewServer(
+	serverOptions = append(serverOptions,
 		grpc.UnaryInterceptor(grpcserver.AuthUnaryInterceptor(verifier)),
 	)
+	server := grpc.NewServer(serverOptions...)
 	beanmapv1.RegisterStatsServiceServer(server, grpcserver.NewStatsServer(pool))
-	// Reflection lets grpcurl / grpcui discover services during development.
-	// Disable it in production if you do not want the schema exposed.
-	reflection.Register(server)
-
-	port := os.Getenv("GRPC_PORT")
-	if port == "" {
-		port = "9090"
-	}
-	lis, err := net.Listen("tcp", ":"+port)
+	// Reflection is intentionally unavailable on this authenticated transport.
+	lis, err := net.Listen("tcp", address)
 	if err != nil {
-		log.Fatalf("failed to listen on %s: %v", port, err)
+		log.Fatalf("failed to listen on %s: %v", address, err)
 	}
 
 	// Graceful shutdown: stop accepting new RPCs and let in-flight ones finish.
@@ -89,7 +86,7 @@ func main() {
 		server.GracefulStop()
 	}()
 
-	log.Printf("beanmap gRPC server starting on :%s", port)
+	log.Printf("beanmap gRPC server starting on %s", address)
 	if err := server.Serve(lis); err != nil {
 		log.Fatalf("gRPC server failed: %v", err)
 	}

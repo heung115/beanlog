@@ -1,9 +1,10 @@
+import { readFileSync } from "node:fs";
 import assert from "node:assert/strict";
 import test from "node:test";
 import { setImmediate } from "node:timers/promises";
 import { createBrowserLabelReader } from "../src/lib/coffee/bean-label-ocr.ts";
 
-const imageBytes = Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+const imageBytes = new Uint8Array(readFileSync(new URL("./fixtures/bean-label-ko.png", import.meta.url)));
 const image = new Blob([imageBytes], { type: "image/png" });
 const recognizedText = "Product: Test Coffee\nRoaster: Local Roastery\nOrigin: Ethiopia";
 const initialActions = ["load", "loadLanguage", "initialize", "setParameters"];
@@ -712,4 +713,18 @@ test("cancelling a pending detail preparation prevents later pixel reads", async
   await rejected;
   assert.equal(workers[0].requests.filter(request => request.action === "recognize").length, 2);
   await retrySuccessfully(reader, workers);
+});
+
+
+test("direct OCR refuses giant compressed images before passing pixels to its worker", async t => {
+  const { reader, workers } = harness(t);
+  const bytes = new Uint8Array(imageBytes);
+  const header = new DataView(bytes.buffer);
+  header.setUint32(16, 6000); header.setUint32(20, 6000);
+  const result = reader.recognize(new Blob([bytes], { type: "image/png" }), emptyOptions());
+  const rejected = assert.rejects(result, { message: "image_too_large" });
+  await initialize(workers[0]);
+  await rejected;
+  assert.equal(workers[0].requests.filter(request => request.action === "recognize").length, 0);
+  assert.equal(workers[0].terminateCalls, 1);
 });

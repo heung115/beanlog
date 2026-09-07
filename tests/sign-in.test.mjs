@@ -20,6 +20,7 @@ function signInWith(response, { throws = false, clientThrows = false } = {}) {
   vm.runInNewContext(outputText, {
     exports,
     require(name) {
+      if (name === "@/lib/security/password-recovery") return {};
       if (name === "zod") return { z };
       if (name === "@/lib/validation/auth") return authValidation;
       if (name === "@/lib/supabase/auth-recovery") return authRecovery;

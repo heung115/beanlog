@@ -1,6 +1,11 @@
 import { z } from "zod";
-import { beanFormSchema } from "@/lib/validation/beans";
+import { beanFormSchema } from "../validation/beans.ts";
 import type { BeanFormData } from "@/types/database";
+
+import { RECORD_DRAFT_PREFIX } from "./record-draft.ts";
+
+export const GUEST_BEAN_DRAFT_TTL_MS = 24 * 60 * 60 * 1000;
+export const MAX_GUEST_DRAFT_LENGTH = 100_000;
 
 export const GUEST_BEAN_DRAFT_KEY = "beanmap:guest-bean-draft";
 
@@ -21,12 +26,15 @@ export type SaveGuestBeanDraftResult =
   | { status: "invalid" }
   | { status: "storage_unavailable" };
 
-export function parseGuestBeanDraft(value: string | null): GuestBeanDraft | null {
-  if (!value) return null;
+export function parseGuestBeanDraft(value: string | null, now = Date.now()): GuestBeanDraft | null {
+  if (!value || value.length > MAX_GUEST_DRAFT_LENGTH) return null;
 
   try {
     const parsed = guestBeanDraftSchema.safeParse(JSON.parse(value));
-    return parsed.success ? parsed.data : null;
+    if (!parsed.success) return null;
+    const savedAt = Date.parse(parsed.data.savedAt);
+    if (savedAt > now + 60_000 || now - savedAt > GUEST_BEAN_DRAFT_TTL_MS) return null;
+    return parsed.data;
   } catch {
     return null;
   }
@@ -36,7 +44,10 @@ export function loadGuestBeanDraft(): GuestBeanDraft | null {
   if (typeof window === "undefined") return null;
 
   try {
-    return parseGuestBeanDraft(window.localStorage.getItem(GUEST_BEAN_DRAFT_KEY));
+    const raw = window.localStorage.getItem(GUEST_BEAN_DRAFT_KEY);
+    const draft = parseGuestBeanDraft(raw);
+    if (raw && !draft) window.localStorage.removeItem(GUEST_BEAN_DRAFT_KEY);
+    return draft;
   } catch {
     return null;
   }
@@ -55,7 +66,9 @@ export function saveGuestBeanDraft(bean: BeanFormData): SaveGuestBeanDraftResult
   };
 
   try {
-    window.localStorage.setItem(GUEST_BEAN_DRAFT_KEY, JSON.stringify(draft));
+    const raw = JSON.stringify(draft);
+    if (raw.length > MAX_GUEST_DRAFT_LENGTH) return { status: "invalid" };
+    window.localStorage.setItem(GUEST_BEAN_DRAFT_KEY, raw);
     return { status: "saved", draft };
   } catch {
     return { status: "storage_unavailable" };
@@ -68,6 +81,14 @@ export function clearGuestBeanDraft() {
   try {
     window.localStorage.removeItem(GUEST_BEAN_DRAFT_KEY);
   } catch {
-    // The account copy is already saved even if browser storage is unavailable.
+    // Storage may be blocked by browser privacy settings.
   }
+}
+
+/** Clear both guest copies without touching an account-scoped draft. */
+export function clearGuestBrowserDrafts() {
+  clearGuestBeanDraft();
+  if (typeof window === "undefined") return;
+  try { window.sessionStorage.removeItem(RECORD_DRAFT_PREFIX + "guest"); }
+  catch { /* Storage may be blocked by browser privacy settings. */ }
 }

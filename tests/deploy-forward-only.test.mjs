@@ -86,3 +86,16 @@ test("superseded webhooks allow fallback without deleting a potentially newer re
     assert.equal(result.stdout, expected);
   }
 });
+
+test("only the latest fetched main head may be deployed", () => {
+  const latestGuard = source.match(/# BEGIN latest-main deployment guard\n([\s\S]*?)# END latest-main deployment guard/)?.[1];
+  assert.ok(latestGuard);
+  for (const candidate of [older, current, newer, diverging]) {
+    const result = spawnSync("bash", ["-c", `set -euo pipefail\n${latestGuard}\nprintf 'DEPLOY_NEXT\\n'`], {
+      encoding: "utf8",
+      env: { ...process.env, repository_dir: path.join(directory, ".git"), verified_sha: candidate },
+    });
+    assert.equal(result.status, 0);
+    assert.equal(result.stdout, candidate === newer ? "DEPLOY_NEXT\n" : "");
+  }
+});

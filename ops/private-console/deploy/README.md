@@ -13,7 +13,7 @@
 ## 배포 전 확인
 
 - 다른 배포·브라우저 QA가 끝난 뒤 작업한다. 현재 앱·Supabase·Caddy 설정과 DB 백업을 root만 읽을 수 있는 위치에 보관한다.
-- Docker Compose 2.30 이상, 기존 네트워크 `beanlogsupabase_default`, 실행 중인 `supabase-db/auth/rest/kong`이 필요하다.
+- Docker Compose 2.30 이상, 실행 중인 `supabase-db/auth/rest/kong`과 [관리망 격리 준비](../../production/security-boundary.md)가 필요하다. Meta/Studio는 기존 앱 네트워크에 연결하지 않는다.
 - 기존 Kong에는 비활성 `studio:3000`·`meta:8080` 경로가 남아 있다. 이 구성은 서비스 이름을 `private-studio`·`private-meta`로 정해 그 DNS 별칭을 만들지 않는다. 서비스 키나 네트워크 별칭을 `studio`·`meta`로 바꾸면 공개 Kong 경로가 살아날 수 있다.
 - Tailscale의 현재 서버 소유자 계정과 `oracle-free.tail6e4bc0.ts.net` DNS가 맞아야 한다. HTTPS 인증서 기능을 활성화하고, 기존 Serve 설정을 확인한다. 기존 규칙을 `reset`하지 않는다.
 - 새 이미지 두 개는 버전과 multiarch digest를 고정했다. 2026-09-06 registry 검사에서 두 이미지 모두 `linux/arm64`와 `linux/amd64`를 지원했다.
@@ -47,6 +47,8 @@ sudo python3 /opt/beanmap-private-console/deploy/provision.py
 ## Studio 시작
 
 ```sh
+# First prepare beanmap-management and attach DB/Kong using
+# ops/production/security-boundary.md; this Compose no longer joins the app network.
 sudo docker compose -f /opt/beanmap-private-console/deploy/compose.yml config --quiet
 sudo docker compose -f /opt/beanmap-private-console/deploy/compose.yml pull
 sudo docker compose -f /opt/beanmap-private-console/deploy/compose.yml up -d --wait
