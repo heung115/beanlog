@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { createHash } from "node:crypto";
 import { fileURLToPath } from "node:url";
+import { spawnSync } from "node:child_process";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const assetVersion = "tesseract-7.0.0";
@@ -31,6 +32,13 @@ export function prepareOcrAssets() {
   const notice = "Tesseract.js 7.0.0 and Tesseract.js-core 7.0.0: Apache-2.0.\nEnglish and Korean language packages @tesseract.js-data/* 1.0.0: MIT.\nSources: https://github.com/naptha/tesseract.js https://github.com/naptha/tesseract.js-core https://github.com/naptha/tessdata\nLanguage data originates from Tesseract tessdata (Apache-2.0): https://github.com/tesseract-ocr/tessdata\n";
   fs.writeFileSync(path.join(output, "NOTICE.txt"), notice);
   fs.writeFileSync(path.join(output, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
+  // Keep the synchronous API used by staging/QA: assets must be complete before
+  // the application starts. The child builds only when its pinned inputs change.
+  const paddle = spawnSync(process.execPath, [path.join(root, "scripts/ocr/prepare-paddle.mjs")], {
+    cwd: root, encoding: "utf8", maxBuffer: 1024 * 1024,
+  });
+  if (paddle.error) throw paddle.error;
+  if (paddle.status !== 0) throw new Error(`Paddle OCR assets could not be prepared.\n${paddle.stderr || paddle.stdout}`);
   return manifest;
 }
 

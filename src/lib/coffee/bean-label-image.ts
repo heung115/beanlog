@@ -79,7 +79,7 @@ async function encodeCanvas(element: HTMLCanvasElement, signal: AbortSignal): Pr
  * supports it. Decorative packaging benefits from a sparse full-image pass;
  * ordinary text labels retain one block pass. No OCR text or brand is consulted.
  */
-export async function prepareLabelImages(image: Blob, signal: AbortSignal): Promise<PreparedLabelImage[]> {
+export async function prepareLabelImages(image: Blob, signal: AbortSignal, profile: "block" | "detector" = "block"): Promise<PreparedLabelImage[]> {
   await validateLabelImageBeforeDecode(image, signal);
   signal.throwIfAborted();
   const url = URL.createObjectURL(image);
@@ -109,12 +109,12 @@ export async function prepareLabelImages(image: Blob, signal: AbortSignal): Prom
     // Clean text labels already read well at their original resolution. Enlarging
     // them can alter small units, so reserve the extra work for mixed packaging.
     if (!region) {
-      const ordinaryScale = Math.min(1, ORDINARY_DIMENSION / Math.max(width, height));
+      const ordinaryScale = Math.min(1, (profile === "detector" ? MAX_OUTPUT_DIMENSION : ORDINARY_DIMENSION) / Math.max(width, height));
       // Normalize decoded orientation once, including EXIF-rotated JPEG/WebP.
-      // Keep the browser's default rendering path used by the original label UI.
-      // Readback-oriented canvas settings can change even a 1:1 PNG conversion.
+      // Preserve the original block reader's rendering. The detector keeps
+      // smaller lettering and uses a consistent software-backed canvas.
       const ordinary = document.createElement("canvas");
-      const context = ordinary.getContext("2d");
+      const context = ordinary.getContext("2d", profile === "detector" ? { willReadFrequently: true } : undefined);
       if (!context) throw new Error("invalid_image");
       ordinary.width = Math.max(1, Math.round(width * ordinaryScale));
       ordinary.height = Math.max(1, Math.round(height * ordinaryScale));

@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "developmentManifests": [
+    ".staging/ocr-compare-20260907/dataset/manifest.json",
+    ".staging/ocr-compare-20260907/dataset/korean-supplement.json",
+    ".staging/ocr-heldout-20260907/manifest.json",
+    ".staging/ocr-heldout2-20260907/manifest.json"
+  ],
+  "blindManifests": [],
+  "sealedBlindManifest": null,
+  "sealedBlindManifestSha256": null,
+  "openedFirstBlind": {
+    "manifest": ".staging/ocr-heldout-20260907/manifest.json",
+    "manifestSha256": "c17d061b4fb8fd436d6e811a8c017d5ad0edc1d93c6f73d859acce03c73b0966",
+    "preservedResults": ".staging/ocr-release/paddle-final-20260907/blind-results/results.json",
+    "report": "tests/qa/ocr-release-results.md#first-independent-eight",
+    "status": "First blind evaluation failed. All eight coffee photos and two negatives are now observed regression fixtures; later reruns cannot be called independent blind evidence."
+  },
+  "openedSecondBlind": {
+    "manifest": ".staging/ocr-heldout2-20260907/manifest.json",
+    "manifestSha256": "699fad876d8dd4a4b8bd5081433d236e3ba09e8ea3b7e64d013131f141bfb773",
+    "preservedResults": ".staging/ocr-release/paddle-release3-20260907/blind-complete/results.json",
+    "report": "tests/qa/ocr-release-results.md#second-independent-six",
+    "status": "First evaluation failed. Six initial reads survived a scoring-schema interruption and were retained with eighteen continuation reads; no completed read was rerun. All six photos are now observed regression data."
+  },
+  "note": "The development manifests now contain 28 observed coffee photos, including 2 local private photos, plus 2 observed negatives. Use --no-generated-negatives for this 30-fixture regression corpus. No unread blind manifest is currently registered. A future independent set must be selected/transcribed without OCR and kept sealed until engine/parser/runtime/harness freeze; add it explicitly with --blind only for first evaluation. Preserve every first-blind result and do not revise truth from OCR output."
+}

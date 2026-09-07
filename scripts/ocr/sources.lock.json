@@ -1,0 +1,202 @@
+{
+  "schemaVersion": 1,
+  "assetVersion": "paddle-0.4.2-v1",
+  "packages": {
+    "@paddleocr/paddleocr-js": "0.4.2",
+    "onnxruntime-web": "1.24.3",
+    "esbuild": "0.25.12"
+  },
+  "sourceMaps": {
+    "index.mjs.map": "c3bff6784b1e1e54b133e8d48df609f5dd53e3bd2943450061224fc4a6eb3ce5",
+    "assets/worker-entry-C9UNuyOJ.js.map": "9a04c3cb01c1558983a9ff03cd5ebc3bd3a81e271b2b394c388e097610a62d33"
+  },
+  "sourceInventory": {
+    "src/resources/tar.ts": "8bc88c5834cd2cc3475b4ac4cfe88aee6098a362e5f71955303b396cc7f67b3f",
+    "src/resources/model-asset.ts": "4e79fb183ee8cdf5332b18c3db2a7f751c24415e86a11f5e732af54e1eac94b7",
+    "src/pipelines/ocr/config.ts": "01956c487715ea5dd9a938b691b0816f4277de4deb797f403d7060e7441dfead",
+    "src/platform/browser.ts": "a0c76ba05de4f5e6a73d759de7b9ac00b366213bd284333bd2272c3a181d6a11",
+    "src/runtime/ort.ts": "cfad473a5b42bbb04d6d501cb7257ecf6a2827fec4555e31a9e09098f4f3a866",
+    "src/utils/common.ts": "a1530a3aaa5c16553ace4d28b3a9fa093fa03778bfc863ab53f6e8c27e6b98d8",
+    "src/models/infer.ts": "e9b2cdad10457ddf5c75a803940db7e861e94a0e9cc60b4826c40e1da468bf2b",
+    "src/models/common.ts": "d50f7b740c1f8966c7b8c99b84c3ae0e688a0fe73966486efd4116d845cc4496",
+    "src/models/det.ts": "8ea4378c7cda0df51b605eacdd91aca9a4ea77025ff34dcb4d8d20a00ec6e5e7",
+    "src/models/rec.ts": "cbf13aa70e340fb9db2eaa6db368999415f9f46dcbc6d29d2ecf6f8acf7cdbdc",
+    "src/pipelines/ocr/crop.ts": "9a2ca52e86d32dc55ef493afff70ba900bc63b815f1ebee9a79c393f5f431b1d",
+    "src/runtime/opencv.ts": "7ff0d53096a1c423315feca8ea59c7349b85f15254ab855de7d5d54f7afdb8bf",
+    "src/pipelines/ocr/runtime-params.ts": "8272f83ff945df9184018674a4276bb92e492565fd61bdda02cd844246a7974b",
+    "src/pipelines/ocr/default-config.ts": "6ce361b5762b02258c03622821526497765b0afa5a42879a7fffa907e12db015",
+    "src/pipelines/ocr/shared.ts": "ca15dfdbbbb537338bfc7f47f23c0f0dcb652689a1d8596ae7e4232537078cfa",
+    "src/pipelines/ocr/core.ts": "4fdb157717f433fef9b28d2fcc0565f685134d2b770cacf879315111a637706a",
+    "src/worker/protocol.ts": "6a6088623b6b68a5357b0788ca2134ffb175e39335a5e8ff3bdb107ca63e90dd",
+    "src/worker/client.ts": "4795e7c4698b01c8565cb45e8546cf7e851ea7643827e51ad3dcb7b93686dc47",
+    "src/pipelines/ocr/worker-backed.ts": "81ce1f74fbace5909a3ac39f660037778c7684f26a2653f61a479b2650ff6839",
+    "src/pipelines/ocr/index.ts": "11c6fdb0682b34abbd915969bb839831b97a36945b327617e21d260ceadca4c7",
+    "src/worker/entry.ts": "05eb78af8c90deb19f936ed9ea6b17f01d4dc9cdb34ca7b764afe7faffb3f256",
+    "src/platform/worker.ts": "e6d926338feafbda3d6c228dd28edc04fa4ae8814c3fff8a6628c2ddc905a396",
+    "vendor/js-yaml.mjs": "efbc45850bf15f0c8ee3434983f512be656002d7507dc292c7ade4449b5d57fa",
+    "src/pipelines/ocr/worker-entry.ts": "44ee654f54c9ec80b556b182e09dc94f6fc8257a298482430c6b8497fa2a9388"
+  },
+  "models": [
+    {
+      "url": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/PP-OCRv5_mobile_det_onnx_infer.tar",
+      "path": "models/PP-OCRv5_mobile_det_onnx_infer.tar",
+      "bytes": 4843520,
+      "sha256": "781056046c9ed77a15c94681605db6a0f62317c2e9cce6931c71da2478d4bc30"
+    },
+    {
+      "url": "https://paddle-model-ecology.bj.bcebos.com/paddlex/official_inference_model/paddle3.0.0/korean_PP-OCRv5_mobile_rec_onnx_infer.tar",
+      "path": "models/korean_PP-OCRv5_mobile_rec_onnx_infer.tar",
+      "bytes": 13537280,
+      "sha256": "568ed8b43a260adc9f484d92105e425ea8cddf8ce16940c177bc12864cfb0eb0"
+    }
+  ],
+  "opencvSource": {
+    "bytes": 94993429,
+    "sha256": "b2171af5be6b26f7a06b1229948bbb2bdaa74fcf5cd097e0af6378fce50a6eb9",
+    "url": "https://codeload.github.com/opencv/opencv/tar.gz/refs/tags/4.10.0"
+  },
+  "toolchains": {
+    "darwin-arm64": {
+      "bytes": 246131148,
+      "sha256": "47449057c345a09aa8750be1a357c364ffea9f8a066066cb341a7a2a14bac96a",
+      "url": "https://storage.googleapis.com/webassembly/emscripten-releases-builds/mac/fd61bacaf40131f74987e649a135f1dd559aff60/wasm-binaries-arm64.tar.xz"
+    },
+    "linux-x64": {
+      "url": "https://storage.googleapis.com/webassembly/emscripten-releases-builds/linux/fd61bacaf40131f74987e649a135f1dd559aff60/wasm-binaries.tar.xz",
+      "bytes": 301536980,
+      "sha256": "c39de24beca60fd580f6dff0eca0e275016042a30234588b19eda82397e299f3"
+    },
+    "linux-arm64": {
+      "url": "https://storage.googleapis.com/webassembly/emscripten-releases-builds/linux/fd61bacaf40131f74987e649a135f1dd559aff60/wasm-binaries-arm64.tar.xz",
+      "bytes": 287714708,
+      "sha256": "61b412135630a60c5517278dc83930e06f80fa286fcc2bb6366c4f620c86e4e0"
+    }
+  },
+  "opencvBuild": {
+    "version": "4.10.0",
+    "whitelistSha256": "b3915aa4fb171b2eb3e3ece45531c0cf6fce72e44951482f149f27f18a2bed81",
+    "flags": "-s DYNAMIC_EXECUTION=0 -s EXPORT_ES6=1 -s ENVIRONMENT=web,worker -s EXPORTED_RUNTIME_METHODS=HEAPU8,HEAP8,HEAP16,HEAPU16,HEAP32,HEAPU32,HEAPF32,HEAPF64",
+    "cmakeOptions": [
+      "BUILD_LIST=core,imgproc,js",
+      "BUILD_TESTS=OFF",
+      "BUILD_PERF_TESTS=OFF",
+      "BUILD_EXAMPLES=OFF",
+      "BUILD_opencv_dnn=OFF",
+      "BUILD_ZLIB=OFF",
+      "WITH_OPENJPEG=OFF",
+      "BUILD_INFO_SKIP_TIMESTAMP=ON",
+      "OPENCV_TIMESTAMP=",
+      "CMAKE_POLICY_VERSION_MINIMUM=3.5"
+    ],
+    "artifactVariants": [
+      {
+        "host": "darwin-arm64",
+        "files": {
+          "opencv_js.js": {
+            "bytes": 133067,
+            "sha256": "3b01bddaff886474f7c0b2f894c4e5fb7e8a40f2ff0d4c920c6c42474c47a118"
+          },
+          "opencv_js.wasm": {
+            "bytes": 1292510,
+            "sha256": "ecb3927a9de29b8c5db033892d9680f2b92b7cb8d92c901082a4db61c0719aa4"
+          }
+        }
+      }
+    ]
+  },
+  "ortFiles": [
+    {
+      "path": "ort/ort-wasm-simd-threaded.mjs",
+      "bytes": 24274,
+      "sha256": "5687566b1bc1c8cf628d76c2ddb16b2a3b81a7997273d4666564880495088e57"
+    },
+    {
+      "path": "ort/ort-wasm-simd-threaded.wasm",
+      "bytes": 12361745,
+      "sha256": "be0e129949062ad50290ef94683fac8be5bb6156f709e030b7a5f1661a2f6c17"
+    }
+  ],
+  "licenses": [
+    {
+      "path": "Boost-1.0-LICENSE.txt",
+      "bytes": 1338,
+      "sha256": "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566"
+    },
+    {
+      "path": "Clipper-copyright.txt",
+      "bytes": 5328,
+      "sha256": "d1326a49e9b54eb36cacde5c57c018a6f06bd785496bc4ddb8bf2d7965142d8a"
+    },
+    {
+      "path": "Emscripten-3.1.64-LICENSE.txt",
+      "bytes": 5093,
+      "sha256": "620a78084fc7ca97c0b5dea9abf891f3ffcadfdbf305276f099c9c4e12fc1d86"
+    },
+    {
+      "path": "JSBN-LICENSE.txt",
+      "bytes": 1544,
+      "sha256": "e0e396530fd1624126e9a7e0df94811e4062e03baeccb07bc33c934b0fd93a85"
+    },
+    {
+      "path": "ONNXRuntime-1.24.3-LICENSE.txt",
+      "bytes": 1073,
+      "sha256": "2f07c72751aed99790b8a4869cf2311df85a860b22ded05fa22803587a48922c"
+    },
+    {
+      "path": "ONNXRuntime-1.24.3-ThirdPartyNotices.txt",
+      "bytes": 325054,
+      "sha256": "0e07b95f3a8d6230037707c5c4a2b554d12c4cb67369669ac255635528ffcee2"
+    },
+    {
+      "path": "OpenCV-4.10.0-LICENSE.txt",
+      "bytes": 11358,
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "path": "PaddleOCR-LICENSE.txt",
+      "bytes": 11376,
+      "sha256": "3840c5c0c61c294264d2dd77b8777be6ddd90121ef4e0e64abcd22edea581d6e"
+    },
+    {
+      "path": "js-yaml-4.1.1-LICENSE.txt",
+      "bytes": 1084,
+      "sha256": "a07bc24468b9654ce76a547d47a2db282d07733b715db4c73a98bd63961f9550"
+    },
+    {
+      "path": "OpenCV-Demosaicing-MD-NOTICE.txt",
+      "bytes": 2182,
+      "sha256": "51f8d731362368db23a993cec6e1df08e6b63334c400328cc3b5badeaef6de0b"
+    },
+    {
+      "path": "OpenCV-FDLIBM-Sun-NOTICES.txt",
+      "bytes": 724,
+      "sha256": "fe278fd8d6fcf624e781c4f440bd193643446bf27cc77dcf0626931a3217b5a6"
+    },
+    {
+      "path": "OpenCV-RGB2Lab-ATTRIBUTION.txt",
+      "bytes": 398,
+      "sha256": "cb4066044a4f1d30cbe24fcbc6e9bb09dc5d2860481507d134a50ea00c9c827a"
+    },
+    {
+      "path": "OpenCV-SoftFloat-3c-COPYING.txt",
+      "bytes": 1732,
+      "sha256": "0c5b08365136da52639d777f1ebfc03988b0169d80655c90c59f1b3fa3e526a2"
+    },
+    {
+      "path": "OpenCV-zlib-1.3.1-HEADER-NOTICE.txt",
+      "bytes": 1328,
+      "sha256": "02421fcfbfb1d656ef0b6ff4cd3c39f2946f08c3219fa42db482add7ce1f53ea"
+    },
+    {
+      "path": "OpenCV-zlib-LICENSE.txt",
+      "bytes": 1002,
+      "sha256": "845efc77857d485d91fb3e0b884aaa929368c717ae8186b66fe1ed2495753243"
+    },
+    {
+      "path": "musl-COPYRIGHT.txt",
+      "bytes": 6204,
+      "sha256": "f9bc4423732350eb0b3f7ed7e91d530298476f8fec0c6c427a1c04ade22655af",
+      "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/3.1.64/system/lib/libc/musl/COPYRIGHT"
+    }
+  ]
+}

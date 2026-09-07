@@ -259,3 +259,321 @@ test("varietal and producer values named after a country are not explicit origin
     assert.equal(extractLabelLayout(source, countryBase("Colombia", label)).fields.name, undefined, label);
   }
 });
+
+test("a single printed product word can use adjacent origin, process and package weight", () => {
+  const source = blocks(line("Crescendo", 50, 45), line("Country: Colombia", 112, 15),
+    line("Process: Washed", 136, 15), line("250g", 160, 15));
+  assert.equal(extractLabelLayout(source, empty()).fields.name, "Crescendo");
+});
+
+test("receipt, advertisement, generic package categories and regulatory identifiers are never product names", () => {
+  for (const title of ["COFFEE RECEIPT", "SUMMER COLLECTION", "SPECIALTY WHOLE BEAN COFFEE", "품목보고번호 2022009039228", "SEASONAL", "DIRECT TRADE"]) {
+    assert.equal(extractLabelLayout(blocks(line(title, 50, 50), line("Roasted coffee", 120, 15),
+      line("Country: Colombia", 145, 15), line("250g", 168, 15)), empty()).fields.name, undefined, title);
+  }
+});
+
+test("cup-note exclusions stay in their own physical column and ignore OCR container order", () => {
+  const title = line("Copper Moon", 50, 40, { x: 50, width: 240 });
+  const origin = line("Country: Colombia", 115, 15, { x: 50, width: 240 });
+  const heading = line("Cup notes:", 20, 15, { x: 600, width: 120 });
+  for (const rows of [[heading, title, origin], [title, origin, heading], [origin, heading, title]]) {
+    assert.equal(extractLabelLayout(blocks(...rows), empty()).fields.name, "Copper Moon");
+  }
+  assert.equal(extractLabelLayout(blocks(line("Cup notes:", 20, 15, { x: 50 }),
+    line("Country: Colombia", 40, 15, { x: 600 }), line("Orange Blossom", 60, 45), line("Coffee", 130, 15)), empty()).fields.name, undefined);
+});
+
+test("the complete stacked wordmark is excluded while a single-word product is recovered", () => {
+  const source = blocks(line("NORTH", 20, 30, { width: 200 }), line("RIDGE", 52, 29, { width: 200 }),
+    line("COFFEE", 85, 25, { width: 160, x: 70 }), line("Crescendo", 210, 43, { width: 210 }),
+    line("Tasting notes:", 275, 14), line("Black tea, honey", 300, 14), line("WHOLE BEAN COFFEE", 350, 15), line("250g", 375, 15));
+  const result = extractLabelLayout(source, { ...empty(), fields: { weight_g: 250 }, evidence: { weight_g: "250g" } });
+  assert.equal(result.fields.name, "Crescendo");
+  assert.equal(result.fields.roastery, "NORTH RIDGE");
+  assert.equal(result.evidence.roastery, "NORTH\nRIDGE\nCOFFEE");
+});
+
+test("a corroborated coffee wordmark does not supplant a smaller single-word product", () => {
+  const source = blocks(line("coffee summit", 20, 60, { width: 350 }), line("여울숲", 130, 30, { x: 170, width: 100 }),
+    line("Country: Ethiopia", 170, 15, { x: 120, width: 240 }), line("Net weight: 200g", 205, 15, { x: 120, width: 240 }),
+    line("Roasted at coffee summit Roastery", 260, 12, { x: 120, width: 240 }));
+  for (const base of [empty(), { ...empty(), fields: { name: "coffee summit" }, evidence: { name: "coffee summit" } }]) {
+    const result = extractLabelLayout(source, base);
+    assert.equal(result.fields.name, "여울숲");
+    assert.equal(result.fields.roastery, "coffee summit");
+  }
+});
+
+test("ordinary single-word headings require package evidence and cannot win a tie", () => {
+  for (const source of [blocks(line("Crescendo", 50, 45)), blocks(line("Crescendo", 50, 45), line("250g", 115, 15)),
+    blocks(line("Crescendo", 50, 45), line("Nightfall", 190, 44), line("Country: Colombia", 130, 15), line("250g", 160, 15))]) {
+    assert.equal(extractLabelLayout(source, empty()).fields.name, undefined);
+  }
+});
+
+test("a single-word local title can belong to a metadata column without being larger than its origin line", () => {
+  const base = { ...empty(), fields: { origin_country: "Kenya", weight_g: 200 }, evidence: { origin_country: "케냐 싱글오리진", weight_g: "200G" } };
+  const source = blocks(line("RIVERBEND", 110, 21, { x: 50, width: 150 }), line("WASHED", 80, 21, { x: 350, width: 100 }),
+    line("Tasting notes:", 200, 16, { x: 50, width: 160 }), line("Tamarind", 236, 21, { x: 50, width: 150 }),
+    line("여울숲", 238, 21, { x: 350, width: 90 }), line("케냐 싱글오리진", 260, 24, { x: 325, width: 140 }),
+    line("200G", 288, 20, { x: 365, width: 60 }));
+  assert.equal(extractLabelLayout(source, base).fields.name, "여울숲");
+});
+
+test("expanded OCR polygons may overlap while still representing distinct stacked title lines", () => {
+  const source = blocks(line("Orchard", 50, 80), line("Promise", 105, 72), line("MILK-BASED", 200, 15),
+    line("Sweet fruit and creamy chocolate", 232, 18));
+  const base = { ...empty(), fields: { weight_g: 200 }, evidence: { weight_g: "200g" } };
+  assert.equal(extractLabelLayout(source, base).fields.name, "Orchard Promise");
+});
+
+test("weight-unit letters support a one-word title but damaged alphanumeric weights cannot support a large wordmark", () => {
+  const source = blocks(line("Crescendo", 50, 45), line("Tasting notes:", 110, 15),
+    line("fruity | milk chocolate", 135, 15), line("WHOLE BEAN COFFEE", 165, 15), line("Net Wt. 12 oz / 340 g", 190, 15));
+  assert.equal(extractLabelLayout(source, empty()).fields.name, "Crescendo");
+  const damaged = blocks(line("tropical breeze", 20, 40), line("RIDGE", 100, 90),
+    line("LIGHT ROAST LEVEL", 280, 12), line("2B3g SPECIALTY COFFEE", 300, 12));
+  assert.equal(extractLabelLayout(damaged, empty()).fields.name, "tropical breeze");
+});
+
+test("a large wordmark can use a smaller specialty-coffee descriptor without becoming the product", () => {
+  const source = blocks(line("CLASSIC", 50, 30), line("ESPRESSO", 84, 30), line("Highland", 210, 55, { width: 310 }),
+    line("SPECIALTY COFFEE", 300, 17, { width: 143 }), line("NET WT. 12 oz (340g)", 335, 17));
+  const result = extractLabelLayout(source, empty());
+  assert.equal(result.fields.name, "CLASSIC ESPRESSO");
+  assert.equal(result.fields.roastery, "Highland");
+});
+
+test("roaster descriptors anchor a title while narrow vertical logo fragments do not become names", () => {
+  const source = blocks(line("JCK", 30, 80, { width: 44 }), line("ROASTERS", 130, 30, { width: 250 }),
+    line("Evening Harbor", 220, 55, { width: 280 }), line("CITRUS & DARK CHOCOLATE", 300, 15), line("NET WT 12 OZ (340g)", 350, 15));
+  assert.equal(extractLabelLayout(source, empty()).fields.name, "Evening Harbor");
+  assert.equal(extractLabelLayout(blocks(source[0].paragraphs[0].lines[0], source[0].paragraphs[0].lines[1],
+    line("Country: Colombia", 170, 15), line("200g", 200, 15)), empty()).fields.name, undefined);
+});
+
+test("a distant one-word masthead cannot borrow metadata from a complete product title below it", () => {
+  const source = blocks(line("HIGHLAND", 30, 50), line("CLASSIC ESPRESSO", 260, 25),
+    line("Roasted coffee", 310, 15), line("NET WT 1 kg", 420, 15));
+  assert.equal(extractLabelLayout(source, empty()).fields.name, "CLASSIC ESPRESSO");
+});
+
+test("out-of-range word confidence cannot establish a title", () => {
+  for (const confidence of [-1, 101, Infinity, NaN]) {
+    assert.equal(extractLabelLayout(blocks(line("Crescendo", 50, 40, { wordConfidence: confidence }),
+      line("Country: Colombia", 110, 15), line("250g", 135, 15)), empty()).fields.name, undefined);
+  }
+});
+
+test("an exact printed country statement resumes metadata below tasting notes", () => {
+  const source = blocks(line("coffee summit", 20, 60, { width: 350 }), line("여울숲", 170, 29, { x: 170, width: 100 }),
+    line("Note: Lemongrass, Brown Sugar", 235, 13, { x: 120, width: 240 }),
+    line("에티오피아100%", 294, 20, { x: 160, width: 140 }), line("200 g", 321, 21, { x: 170, width: 100 }),
+    line("Light", 324, 16, { x: 120, width: 40 }),
+    line("Roasted at coffee summit Roastery", 380, 12, { x: 120, width: 240 }));
+  const base = { ...empty(), fields: { origin_country: "Ethiopia", weight_g: 200 }, evidence: { origin_country: "에티오피아100%", weight_g: "200 g" } };
+  assert.equal(extractLabelLayout(source, base).fields.name, "여울숲");
+});
+
+test("a detached badge does not interrupt or conflict with a wrapped local title", () => {
+  const result = extractLabelLayout(blocks(
+    line("고요한", 100, 50, { width: 260, confidence: 99 }),
+    line("RESERVE", 128, 32, { x: 420, width: 170, confidence: 99 }),
+    line("아침숲", 162, 48, { width: 230, confidence: 99 }),
+    line("Country: Kenya", 230, 18), line("200 g", 263, 18)), countryBase("Kenya", "Country: Kenya"));
+  assert.equal(result.fields.name, "고요한 아침숲");
+  assert.equal(result.evidence.name, "고요한\n아침숲");
+});
+
+test("an origin caption joins its smaller product line without absorbing the flavor prose", () => {
+  const result = extractLabelLayout(blocks(
+    line("MEXICO", 100, 27, { width: 150, confidence: 99 }),
+    line("Santa Lucia", 135, 17, { width: 175, confidence: 99 }),
+    line("Chocolate hazelnut spread", 162, 16, { width: 260, confidence: 99 }),
+    line("Honey caramel", 184, 16), line("285 g", 222, 15), line("Coffee", 250, 16)),
+  { ...empty(), fields: { weight_g: 285 }, evidence: { weight_g: "285 g" } });
+  assert.equal(result.fields.name, "MEXICO Santa Lucia");
+});
+
+test("overlapping brand polygons cannot turn the wordmark into a product", () => {
+  const result = extractLabelLayout(blocks(line("MOUNTAIN", 10, 30), line("COFFEE", 38, 25),
+    line("Quiet Valley", 110, 35), line("Country: Kenya", 163, 16), line("200 g", 190, 16)), countryBase("Kenya", "Country: Kenya"));
+  assert.equal(result.fields.name, "Quiet Valley");
+  assert.equal(result.fields.roastery, "MOUNTAIN");
+});
+
+test("a product between its cultivar and weight does not borrow a footer logo", () => {
+  const result = extractLabelLayout(blocks(line("Geisha", 20, 25), line("Los Pinos", 66, 30),
+    line("200 g", 111, 16), line("Distant Ridge", 153, 40)),
+  { ...empty(), fields: { varietal: "Geisha", weight_g: 200 }, evidence: { varietal: "Geisha", weight_g: "200 g" } });
+  assert.equal(result.fields.name, "Los Pinos");
+});
+
+test("a clear adjacent bilingual reading can win over a degraded transcription of the same origin", () => {
+  const result = extractLabelLayout(blocks(line("르완다 푸른언덕 부르롱 워시드", 20, 36, { confidence: 89, width: 470 }),
+    line("Rwanda Blue Hill Bourbon Washed", 68, 25, { confidence: 99, width: 470 }),
+    line("Country: Rwanda", 113, 16), line("250 g", 140, 16)), countryBase("Rwanda", "Country: Rwanda"));
+  assert.equal(result.fields.name, "Rwanda Blue Hill Bourbon Washed");
+});
+
+test("transcription confidence cannot decide between contradictory country headings", () => {
+  for (const metadata of [[], [line("Ethiopia 에티오피아", 270, 16)]]) {
+    const source = countryCard(undefined, undefined, metadata);
+    for (const row of source[0].paragraphs[0].lines.slice(0, 2)) {
+      row.confidence = 88;
+      for (const word of row.words) word.confidence = 88;
+    }
+    assert.equal(extractLabelLayout(source, countryBase("Ethiopia", "Ethiopia 에티오피아")).fields.name, undefined);
+  }
+});
+
+test("a proven non-product base name is cleared even if no replacement title is readable", () => {
+  const base = { ...empty(), fields: { name: "MOUNTAIN" }, evidence: { name: "MOUNTAIN" } };
+  const original = structuredClone(base);
+  const result = extractLabelLayout(blocks(line("MOUNTAIN", 10, 30), line("COFFEE", 50, 25)), base);
+  assert.equal(result.fields.name, undefined);
+  assert.equal(result.evidence.name, undefined);
+  assert.deepEqual(base, original);
+});
+
+test("a compact country heading is supported by its explicit local origin and independent coffee detail", () => {
+  const base = { ...countryBase("Rwanda", "Origin: Rwanda"), fields: { origin_country: "Rwanda", varietal: "Bourbon", process_method: "washed" },
+    evidence: { origin_country: "Origin: Rwanda", varietal: "Bourbon", process_method: "Process: Washed" } };
+  const title = [line("Rwanda Green Valley", 50, 13, { confidence: 99, width: 180 }),
+    line("Bourbon Washed", 67, 13, { confidence: 97, width: 140 })];
+  const body = [line("Bourbon", 104, 11), line("Process: Washed", 124, 11), line("Origin: Rwanda", 148, 11, { confidence: 84 })];
+  assert.equal(extractLabelLayout(blocks(...title, ...body), base).fields.name, "Rwanda Green Valley Bourbon Washed");
+  assert.equal(extractLabelLayout(blocks(...title, ...body.slice(0, 2)), base).fields.name, undefined);
+  assert.equal(extractLabelLayout(blocks(...title, line("Origin: Rwanda", 148, 11)), countryBase("Rwanda", "Origin: Rwanda")).fields.name, undefined);
+  const blurredOrigin = body.map(row => structuredClone(row));
+  blurredOrigin[2].confidence = 70;
+  for (const word of blurredOrigin[2].words) word.confidence = 70;
+  assert.equal(extractLabelLayout(blocks(...title, ...blurredOrigin), base).fields.name, undefined);
+});
+
+test("compatible compact bilingual headings select one printed language without joining translations", () => {
+  const base = { ...empty(), fields: { origin_country: "Rwanda", varietal: "Bourbon" },
+    evidence: { origin_country: "Origin: Rwanda", varietal: "Bourbon" } };
+  const source = blocks(line("Rwanda Green Valley", 50, 13, { confidence: 99, width: 180 }),
+    line("Bourbon Washed", 67, 13, { confidence: 99, width: 140 }),
+    line("르완다 푸른 계곡 부르봉 워시드", 84, 13, { confidence: 99, width: 180 }),
+    line("Bourbon", 120, 11), line("Origin: Rwanda", 148, 11));
+  // Country, process and the same adjacent heading area permit one source reading.
+  // Differing countries, methods and separated products remain negative tests above.
+  assert.equal(extractLabelLayout(source, base).fields.name, "Rwanda Green Valley Bourbon Washed");
+});
+
+test("a compact second language starts its own title and preserves the more readable source", () => {
+  const rows = [line("Brazil Mountain", 50, 25, { confidence: 99, width: 230 }),
+    line("Summit Natural", 79, 25, { confidence: 99, width: 210 }),
+    line("브라질푸른산내추럴", 110, 27, { confidence: 96, width: 240 }),
+    line("Country: Brazil", 160, 15), line("200 g", 190, 15)];
+  // The two English continuation rows form one name; the Korean repetition
+  // starts a separate heading even when OCR omitted every word space.
+  for (const ordered of [rows, [...rows].reverse(), [rows[2], rows[4], rows[1], rows[0], rows[3]]]) {
+    const result = extractLabelLayout(blocks(...ordered), countryBase("Brazil", "Country: Brazil"));
+    assert.equal(result.fields.name, "Brazil Mountain Summit Natural");
+    assert.equal(result.evidence.name, "Brazil Mountain\nSummit Natural");
+  }
+});
+
+test("a small confidence difference between compatible adjacent language versions is enough", () => {
+  const source = blocks(line("콜롬비아", 50, 40, { confidence: 94.5, width: 140 }),
+    line("초록언덕 디카페인", 88, 34, { confidence: 99, width: 250 }),
+    line("Colombia Green Hill Decaf", 128, 25, { confidence: 98, width: 290 }),
+    line("Country: Colombia", 175, 15), line("200 g", 200, 15));
+  assert.equal(extractLabelLayout(source, countryBase("Colombia", "Country: Colombia")).fields.name, "Colombia Green Hill Decaf");
+});
+
+test("conflicting processes cannot be overruled by confidence or a missing space", () => {
+  for (const koreanTitle of ["르완다푸른언덕워시드", "르완다 푸른언덕 워시드"]) {
+    const source = blocks(line(koreanTitle, 50, 30, { confidence: 88, width: 300 }),
+      line("Rwanda Green Hill Natural", 90, 28, { confidence: 99, width: 300 }),
+      line("Country: Rwanda", 145, 15), line("200 g", 175, 15));
+    assert.equal(extractLabelLayout(source, countryBase("Rwanda", "Country: Rwanda")).fields.name, undefined);
+  }
+});
+
+test("equal-country bilingual headings on separate products cannot disambiguate each other", () => {
+  for (const second of [line("르완다 푸른언덕 워시드", 250, 30, { confidence: 99, width: 300 }),
+    line("르완다 푸른언덕 워시드", 50, 30, { confidence: 99, width: 300, x: 550 })]) {
+    const source = blocks(line("Rwanda Green Hill Washed", 50, 30, { confidence: 99, width: 300 }), second,
+      line("Country: Rwanda", 105, 15, { width: 300 }), line("Country: Rwanda", second.bbox.y1 + 25, 15, { x: second.bbox.x0, width: 300 }));
+    assert.equal(extractLabelLayout(source, countryBase("Rwanda", "Country: Rwanda")).fields.name, undefined);
+  }
+});
+
+test("a broad geographic badge in another column does not compete with the coffee title", () => {
+  for (const geography of ["CENTRAL AMERICA", "EAST AFRICA", "남아메리카"]) {
+    const result = extractLabelLayout(blocks(line("Mountain", 70, 30, { width: 250 }),
+      line("Passage", 105, 28, { width: 250 }), line("Country: Colombia", 155, 15, { width: 250 }),
+      line("Process: Washed", 180, 15, { width: 250 }), line(geography, 170, 35, { x: 450, width: 250 }),
+      line("Single origin", 230, 17, { x: 450, width: 250 })), countryBase("Colombia", "Country: Colombia"));
+    assert.equal(result.fields.name, "Mountain Passage", geography);
+  }
+});
+
+test("a source-backed roast classification anchors a single-word title without lending context to a distant slogan", () => {
+  const source = blocks(line("Awaken", 80, 40, { width: 200, confidence: 98 }),
+    line("Solstice", 180, 50, { width: 280, confidence: 99 }),
+    line("MEDIUM ROAST BLEND", 395, 18, { width: 280 }), line("WHOLE BEAN COFFEE NET WT. 250g", 423, 18, { width: 280 }));
+  const base = { ...empty(), bean_type: "blend", fields: { roast_level: "medium" }, evidence: { roast_level: "MEDIUM ROAST BLEND" } };
+  assert.equal(extractLabelLayout(source, base).fields.name, "Solstice");
+  const distantEvidence = { ...base, evidence: { roast_level: "Other source" } };
+  assert.notEqual(extractLabelLayout(source, distantEvidence).fields.name, "Solstice");
+});
+
+function vertical(text, y, x = 500) {
+  return { ...line(text, y, 150, { x, width: 32, confidence: 99 }), orientation: "vertical", fontSize: 32 };
+}
+
+test("vertical text uses its printed character thickness while adjacent columns remain separate", () => {
+  const title = vertical("Solstice", 70);
+  const source = blocks(title, vertical("Cocoa, Plum", 70, 450),
+    line("Country: Rwanda", 265, 15, { x: 450, width: 250 }), line("Process: Washed", 290, 15, { x: 450, width: 250 }));
+  assert.equal(extractLabelLayout(source, empty()).fields.name, "Solstice");
+  assert.equal(extractLabelLayout(blocks(title, vertical("Nightfall", 70, 580), ...source[0].paragraphs[0].lines.slice(2)), empty()).fields.name, undefined);
+});
+
+test("invalid vertical font-size metadata cannot enlarge or recover a title", () => {
+  for (const fontSize of [undefined, null, 0, -1, NaN, Infinity, 1000]) {
+    const source = blocks({ ...vertical("Solstice", 70), fontSize }, line("Country: Rwanda", 265, 15, { x: 450, width: 250 }));
+    assert.equal(extractLabelLayout(source, empty()).fields.name, undefined, String(fontSize));
+  }
+});
+
+test("an inferred generic base name is reconsidered only when its exact source row proves the category", () => {
+  const base = { ...empty(), bean_type: "blend", fields: { name: "MEDIUM ROAST BLEND", roastery: "Existing", roast_level: "medium" },
+    evidence: { name: "MEDIUM ROAST BLEND", roastery: "Roaster: Existing", roast_level: "MEDIUM ROAST BLEND" } };
+  const rows = [line("Solstice", 100, 40), line("MEDIUM ROAST BLEND", 225, 18), line("250g", 255, 18)];
+  const original = structuredClone(base);
+  assert.equal(extractLabelLayout(blocks(...rows), base).fields.name, "Solstice");
+  assert.deepEqual(base, original);
+  const explicit = { ...base, evidence: { ...base.evidence, name: "Product: MEDIUM ROAST BLEND" } };
+  assert.strictEqual(extractLabelLayout(blocks(...rows), explicit), explicit);
+  const unsupported = blocks(rows[0], line("LIGHT ROAST", 225, 18), rows[2]);
+  assert.strictEqual(extractLabelLayout(unsupported, base), base);
+});
+
+test("two independently typed footer rows support a vertical title beyond the single-row distance", () => {
+  const title = vertical("Solstice", 70);
+  const region = line("Region: Tolima", 365, 15, { x: 450, width: 250 });
+  const process = line("Process: Washed", 384, 15, { x: 450, width: 250 });
+  const source = blocks(title, region, process);
+  assert.equal(extractLabelLayout(source, empty()).fields.name, "Solstice");
+  const originals = structuredClone(source);
+  assert.equal(extractLabelLayout(blocks(process, title, region), empty()).fields.name, "Solstice");
+  assert.deepEqual(source, originals);
+  for (const details of [[region], [region, { ...region, bbox: { ...region.bbox, y0: 384, y1: 399 } }],
+    [region, line("Region: Huila", 384, 15, { x: 450, width: 250 })],
+    [line("Process: Washed", 365, 15, { x: 450, width: 250 }), line("Process: White Honey", 384, 15, { x: 450, width: 250 })],
+    [region, line("Process: Washed", 384, 15, { x: 850, width: 250 })],
+    [region, line("Process: Washed", 800, 15, { x: 450, width: 250 })],
+    [region, line("Process: Washed", 384, 15, { x: 450, width: 250, confidence: 70 })]]) {
+    assert.equal(extractLabelLayout(blocks(title, ...details), empty()).fields.name, undefined);
+  }
+  // Merely tall, narrow logo boxes do not acquire vertical-reading semantics.
+  const unclassified = { ...title }; delete unclassified.orientation; delete unclassified.fontSize;
+  assert.equal(extractLabelLayout(blocks(unclassified, region, process), empty()).fields.name, undefined);
+});

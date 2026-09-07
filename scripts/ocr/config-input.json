@@ -1,0 +1,16 @@
+{
+  "textDetectionModelName": "PP-OCRv5_mobile_det",
+  "textDetectionModelAsset": { "url": "models/PP-OCRv5_mobile_det_onnx_infer.tar" },
+  "textRecognitionModelName": "korean_PP-OCRv5_mobile_rec",
+  "textRecognitionModelAsset": { "url": "models/korean_PP-OCRv5_mobile_rec_onnx_infer.tar" },
+  "ortOptions": { "backend": "wasm", "wasmPaths": "ort/", "numThreads": 1, "simd": true, "proxy": false },
+  "textDetectionBatchSize": 1,
+  "textRecognitionBatchSize": 1,
+  "textDetLimitSideLen": 1600,
+  "textDetLimitType": "max",
+  "textDetMaxSideLimit": 2600,
+  "textDetThresh": 0.3,
+  "textDetBoxThresh": 0.6,
+  "textDetUnclipRatio": 1.5,
+  "textRecScoreThresh": 0
+}

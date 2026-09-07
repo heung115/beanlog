@@ -1,0 +1,5 @@
+/********************************* COPYRIGHT NOTICE *******************************\
+  The function for RGB to Lab conversion is based on the MATLAB script
+  RGB2Lab.m translated by Mark Ruzon from C code by Yossi Rubner, 23 September 1997.
+  See the page [http://vision.stanford.edu/~ruzon/software/rgblab.html]
+\**********************************************************************************/
