@@ -23,7 +23,7 @@ APP = Path('/srv/beanlog/app')
 SOURCE = Path('/srv/beanlog/app-src')
 REPO = STATE / 'repository.git'
 SECRET = Path('/etc/beanmap-private-console/auth-rate-id.secret')
-MIGRATIONS = ('00029_', '00030_', '00031_', '00032_')
+MIGRATIONS = ('00029_', '00030_', '00031_', '00032_', '00033_')
 
 
 def migration_sources(source: Path) -> list[tuple[str, str, str]]:

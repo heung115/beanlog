@@ -31,11 +31,29 @@ insert into public.origin_entities(source_key,country_id,name)
 select 'privacy-contact-only-fixture',id,'fixture@example.test' from public.origin_countries limit 1;
 SQL
   fi
+  if [[ "$(basename "$migration")" == "00033_required_bean_fields.sql" ]]; then
+    "${psql_test[@]}" <<'SQL'
+insert into auth.users(id,email,raw_user_meta_data) values
+ ('a3300000-0000-0000-0000-000000000099','legacy-required-fixture@example.test','{}');
+insert into public.beans(id,user_id,name,roastery,bean_type,origin_country,process_method,roast_level,place_type,overall_score,note)
+values ('c3300000-0000-0000-0000-000000000099','a3300000-0000-0000-0000-000000000099','   ',E'\t','single_origin',null,'washed','light','home',4,'');
+SQL
+  fi
   "${psql_test[@]}" -f "$migration" > /dev/null
 done
+"${psql_test[@]}" <<'SQL'
+do $$ begin
+ if not exists(select 1 from public.beans where id='c3300000-0000-0000-0000-000000000099'
+   and name='   ' and roastery=E'\t' and note='' and origin_country is null) then
+  raise exception 'Required-field upgrade rewrote or removed a legacy record';
+ end if;
+end $$;
+delete from auth.users where id='a3300000-0000-0000-0000-000000000099';
+SQL
 "${psql_test[@]}" -f "$root/scripts/verify-function-acls.sql"
 "${psql_test[@]}" -f "$root/scripts/test-current-session.sql"
 "${psql_test[@]}" -f "$root/scripts/test-mandatory-edit-version.sql"
+"${psql_test[@]}" -f "$root/scripts/test-required-bean-fields.sql"
 "${psql_test[@]}" -f "$root/scripts/test-account-deletion.sql"
 "${psql_test[@]}" -f "$root/scripts/test-origin-contact.sql"
 "${psql_test[@]}" -c 'grant select (name) on public.origin_entities to authenticated' > /dev/null

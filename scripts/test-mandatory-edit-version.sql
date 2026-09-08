@@ -10,7 +10,7 @@ select set_config('request.jwt.claim.sub','a1000000-0000-0000-0000-000000000001'
 set local role beanmap_api_runtime;
 do $$
 declare fixture_id uuid; version_one timestamptz; version_two timestamptz; candidate jsonb;
- base jsonb := '{"name":"Version fixture","roastery":"Fixture","bean_type":"single_origin","process_method":"washed","roast_level":"medium","place_type":"home","overall_score":4,"consumed_at":"2026-01-01T00:00:00Z","note":""}';
+ base jsonb := '{"name":"Version fixture","roastery":"Fixture","bean_type":"single_origin","process_method":"washed","roast_level":"medium","place_type":"home","overall_score":4,"consumed_at":"2026-01-01T00:00:00Z","note":"Fixture note","origin_country":"Ethiopia"}';
 begin
  fixture_id := public.create_bean_record(base,'[{"tag":"initial","category":"sweet"}]','[]');
  select updated_at into strict version_one from public.beans where id=fixture_id;

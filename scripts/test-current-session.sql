@@ -30,8 +30,8 @@ set local role beanmap_api_runtime;
 do $$ declare bean_id uuid; begin
  update public.profiles set display_name='valid' where id=auth.uid();
  if not found then raise exception 'Valid API preference update denied'; end if;
- bean_id := public.create_bean_record('{"name":"Session fixture","roastery":"Fixture","bean_type":"single_origin","process_method":"washed","roast_level":"medium","place_type":"home","overall_score":4,"consumed_at":"2026-01-01T00:00:00Z","note":""}', '[]','[]');
- perform public.update_bean_record(bean_id,jsonb_build_object('expected_updated_at',(select updated_at from public.beans where id=bean_id)) || '{"name":"Updated fixture","roastery":"Fixture","bean_type":"single_origin","process_method":"washed","roast_level":"medium","place_type":"home","overall_score":4,"consumed_at":"2026-01-01T00:00:00Z","note":""}', '[]','[]');
+ bean_id := public.create_bean_record('{"name":"Session fixture","roastery":"Fixture","bean_type":"single_origin","process_method":"washed","roast_level":"medium","place_type":"home","overall_score":4,"consumed_at":"2026-01-01T00:00:00Z","note":"Fixture note","origin_country":"Ethiopia"}', '[]','[]');
+ perform public.update_bean_record(bean_id,jsonb_build_object('expected_updated_at',(select updated_at from public.beans where id=bean_id)) || '{"name":"Updated fixture","roastery":"Fixture","bean_type":"single_origin","process_method":"washed","roast_level":"medium","place_type":"home","overall_score":4,"consumed_at":"2026-01-01T00:00:00Z","note":"Fixture note","origin_country":"Ethiopia"}', '[]','[]');
  if not public.delete_bean_record(bean_id) then raise exception 'API delete failed'; end if;
  begin
   perform public.delete_current_account();

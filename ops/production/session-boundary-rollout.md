@@ -1,6 +1,6 @@
 # Coordinated session-boundary release
 
-This one-time operator procedure keeps SQL migrations 00029–00032 and the API
+This one-time operator procedure keeps SQL migrations 00029–00033 and the API
 that supplies their current-session claims in the same release window. The normal
 app deployer does not apply migrations; it must not deploy this release first.
 The existing app serves throughout the image build. SQL commit and app replacement
@@ -8,7 +8,7 @@ can produce a brief retry window. Do not roll back to the old API after SQL comm
 
 ## Preparation
 
-Review the exact release and all four migrations before proceeding. Run:
+Review the exact release and all five migrations before proceeding. Run:
 
 ```sh
 python3 ops/production/test_session_boundary_rollout.py
@@ -32,7 +32,7 @@ The script only executes with root and `--execute`. It performs these steps:
 6. Save a private full database dump and roles backup, and check the dump inventory.
    This inventory check is not a full restore rehearsal. Keep these backups private;
    they contain application/authentication data and must not be committed.
-7. Apply four migrations, the private checksum ledger and the function-ACL checks
+7. Apply five migrations, the private checksum ledger and the function-ACL checks
    in one transaction, connecting as `supabase_admin`; migrations assign ownership
    of security functions/tables to `postgres`. No historical migration is replayed.
 8. Replace the app without rebuilding, require healthy containers and exact built
@@ -85,7 +85,7 @@ eligible for ordinary deployment without an equivalent operator-owned gate.
 
 Fix the cause, then create a private empty `resume` file in the state directory.
 The same process re-verifies CI/main identity and starts another preserved attempt.
-If all four ledger checksums match it verifies ACLs without replaying SQL. A
+If all five ledger checksums match it verifies ACLs without replaying SQL. A
 partial or changed ledger is rejected and requires explicit investigation. No
 automatic SQL rollback, privilege widening, data restoration or old-API deployment
 is implemented. Keep the first backup attempt as the pre-migration recovery source.

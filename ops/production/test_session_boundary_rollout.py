@@ -29,7 +29,7 @@ class RolloutTests(unittest.TestCase):
             sql = rollout.transaction_sql(source, {})
             self.assertEqual(sql.splitlines().count('begin;'), 1)
             self.assertEqual(sql.splitlines().count('commit;'), 1)
-            self.assertEqual(sql.count('insert into beanmap_security.release_migrations'), 4)
+            self.assertEqual(sql.count('insert into beanmap_security.release_migrations'), len(rollout.MIGRATIONS))
             self.assertLess(sql.index('select 2;'), sql.index('commit;'))
 
     def test_resume_requires_complete_matching_checksums(self):

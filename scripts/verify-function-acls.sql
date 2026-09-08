@@ -17,6 +17,22 @@ begin
       raise exception 'Missing allowlisted function: %', signature;
     end if;
   end loop;
+  if to_regprocedure('beanmap_security.normalize_required_bean_fields(jsonb)') is null then
+    raise exception 'Required bean-field validator is missing';
+  end if;
+  foreach role_name in array array['anon', 'authenticated', 'service_role', 'beanmap_api_runtime'] loop
+    if has_function_privilege(role_name, 'beanmap_security.normalize_required_bean_fields(jsonb)', 'EXECUTE') then
+      raise exception 'Internal field validator is exposed to %', role_name;
+    end if;
+  end loop;
+  foreach signature in array allowed[1:2] loop
+    if not exists(select 1 from pg_proc where oid = signature::regprocedure
+      and proowner = 'postgres'::regrole and prosecdef
+      and position('perform beanmap_security.require_current_session();' in prosrc) > 0
+      and position('p_bean := beanmap_security.normalize_required_bean_fields(p_bean);' in prosrc) > 0) then
+      raise exception 'Bean mutation boundary is incomplete: %', signature;
+    end if;
+  end loop;
   for fn in
     select p.oid, format('%I.%I(%s)', n.nspname, p.proname,
       replace(oidvectortypes(p.proargtypes), ', ', ',')) as signature, p.proacl, p.proowner

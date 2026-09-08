@@ -6,6 +6,7 @@ const privileged = new Set([
   "00030_account_deletion_proof.sql",
   "00031_mandatory_edit_version.sql",
   "00032_origin_contact_minimization.sql",
+  "00033_required_bean_fields.sql",
 ]);
 export function splitStagingMigrations(names) {
   const ordered = [...names].filter(name => /^\d+_.+\.sql$/.test(name)).sort();
