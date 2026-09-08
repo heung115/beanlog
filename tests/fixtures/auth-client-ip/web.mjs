@@ -18,7 +18,7 @@ http.createServer((request, response) => {
     response.writeHead(401); response.end("invalid signature"); return;
   }
   response.writeHead(200, { "content-type": "application/json" });
-  response.end(JSON.stringify({ verified: request.url === "/auth/v1/user" }));
+  response.end(JSON.stringify({ verified: request.url === "/auth/v1/user", rateIdentity: request.headers["x-beanmap-auth-rate-identity"] }));
 }).listen(9999, "0.0.0.0");
 
 http.createServer(async (request, response) => {

@@ -31,6 +31,36 @@ if (mode === "exhaust-user") {
   result=count;
 } else if (mode === "token-other-client") {
   result={token:await status("http://fixture-caddy:8080/auth-token",{method:"POST"})};
+} else if (mode === "operation-budgets") {
+  const send = (path, headers={}) => status(`http://fixture-caddy:8081/auth/v1/${path}`, {method:"POST", headers:{apikey:"fixture-only-api-key",...headers}});
+  result={forgedPassword:await send("token?grant_type=password", {"X-Beanmap-Auth-Client-IP":otherIp,"X-Forwarded-For":otherIp})};
+  for (const path of ["signup","recover","otp"]) {
+    const count={}; for(let i=0;i<11;i++) {const code=await send(path);count[code]=(count[code]??0)+1;} result[path]=count;
+  }
+  for (const [key,path] of [["verify","verify"],["refresh","token?grant_type=refresh_token"],["logout","logout"]]) result[key]=await send(path);
+  result.adminDenied=await send("admin/users");
+  result.internalAdminDenied=await status("http://beanmap-auth-gateway:8000/auth/v1/admin/users",{headers:{apikey:"fixture-only-api-key"}});
+  result.admin=await status("http://beanmap-auth-gateway:8000/auth/v1/admin/users",{headers:{apikey:"fixture-only-admin-key"}});
+  const identity = await fetch("http://fixture-caddy:8081/auth/v1/verify",{method:"POST",headers:{apikey:"fixture-only-api-key","X-Beanmap-Auth-Rate-Identity":"deletion:forged","X-Beanmap-Auth-Client-IP":otherIp}}).then(r=>r.json());
+  result.nativeIdentityReplaced=identity.rateIdentity !== "deletion:forged" && identity.rateIdentity.startsWith("public:");
+  result.adminSpellingsBlocked=true;
+  for(const path of ["admin/users","%61dmin/users","admin%2Fusers","admin//users","./admin/users","other/../admin/users"]){
+    if(await send(path,{apikey:"fixture-only-admin-key"})!==404) result.adminSpellingsBlocked=false;
+  }
+  // Exhaust the IP aggregate across different operations. Requests rejected by
+  // operation/IP limits must not consume the shared public or admin capacity.
+  let aggregateRejected = false;
+  for(const path of ["token?grant_type=refresh_token","authorize","callback","other"]){
+    for(let i=0;i<125;i++){if(await send(path)===429) aggregateRejected=true;}
+  }
+  result.aggregateBounded=aggregateRejected;
+  let rejected = 0;
+  for(let batch=0;batch<400;batch++) {
+    const codes=await Promise.all(Array.from({length:25},()=>send("other")));
+    rejected += codes.filter(code=>code===429).length;
+  }
+  result.deniedTrafficCannotSpendGlobal=rejected===10000;
+  result.adminAfterPublicExhaustion=await status("http://beanmap-auth-gateway:8000/auth/v1/admin/users",{headers:{apikey:"fixture-only-admin-key"}});
 } else if (mode === "after-recreate") {
   result={user:await status("http://fixture-caddy:8080/auth-check")};
 }

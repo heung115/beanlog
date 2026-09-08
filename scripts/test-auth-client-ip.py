@@ -74,9 +74,11 @@ try:
             '-v', f'{FIXTURE}/kong.yml:/fixture/kong.yml:ro',
             '-e', 'KONG_DATABASE=off', '-e', 'KONG_DECLARATIVE_CONFIG=/fixture/kong.yml',
             '-e', 'KONG_PROXY_LISTEN=0.0.0.0:8000', '-e', 'KONG_ADMIN_LISTEN=off',
-            '-e', f'KONG_TRUSTED_IPS={web_ip}/32',
+            '-v', f'{ROOT}/ops/production/kong-plugins/beanmap-auth-budgets:/usr/local/share/lua/5.1/kong/plugins/beanmap-auth-budgets:ro',
+            '-e', f'KONG_TRUSTED_IPS={web_ip}/32,{subnet.network_address+4}/32',
+            '-e', 'KONG_NGINX_HTTP_LUA_SHARED_DICT=beanmap_auth_budgets 10m',
             '-e', 'KONG_REAL_IP_HEADER=X-Beanmap-Auth-Client-IP', '-e', 'KONG_REAL_IP_RECURSIVE=off',
-            '-e', 'KONG_PLUGINS=bundled', '-e', 'KONG_DNS_ORDER=LAST,A,CNAME',
+            '-e', 'KONG_PLUGINS=bundled,beanmap-auth-budgets', '-e', 'KONG_DNS_ORDER=LAST,A,CNAME',
         ], aliases=['beanmap-auth-gateway'])
         launch('caddy', str(subnet.network_address+4), CADDY, [
             '-v', f'{FIXTURE}/Caddyfile:/etc/caddy/Caddyfile:ro',
@@ -87,7 +89,7 @@ try:
         for attempt in range(30):
             state = json.loads(run(['docker', 'inspect', names['kong']]))[0]['State']
             if not state['Running']:
-                raise RuntimeError('Kong fixture stopped; inspect local fixture configuration')
+                raise RuntimeError('Kong fixture stopped: ' + subprocess.check_output(['docker', 'logs', names['kong']], stderr=subprocess.STDOUT, text=True)[-3000:])
             try:
                 ready = run(['docker','exec',names['a'],'node','-e',"fetch('http://beanmap-auth-gateway:8000/').then(r=>{if(r.status!==404)process.exit(1)}).catch(()=>process.exit(1))"])
                 break
@@ -106,13 +108,20 @@ try:
         summary['forged_headers'] = client('a', 'spoof', b_ip)
         assert summary['forged_headers']['throughWeb'] == 429, summary
         assert summary['forged_headers']['directKong'] == 429, summary
-        assert summary['forged_headers']['publicApi'] == 200, summary
+        assert summary['forged_headers']['publicApi'] == 429, summary
         summary['auth_and_private_boundaries'] = client('b', 'auth-boundaries', a_ip)
         assert summary['auth_and_private_boundaries'] == {'missingKey':401,'invalidJwt':401,'privateDenied':404,'privateAllowed':200}, summary
         summary['token_limit_unchanged'] = client('a', 'exhaust-token')
         assert summary['token_limit_unchanged'] == {'200':60,'429':1}, summary
-        summary['token_other_client_still_shared_write_limit'] = client('b', 'token-other-client')
-        assert summary['token_other_client_still_shared_write_limit'] == {'token':429}, summary
+        summary['token_other_client_separate_write_limit'] = client('b', 'token-other-client')
+        assert summary['token_other_client_separate_write_limit'] == {'token':200}, summary
+        summary['independent_operation_budgets'] = client('a', 'operation-budgets', b_ip)
+        assert summary['independent_operation_budgets'] == {'forgedPassword':429,'signup':{'200':10,'429':1},'recover':{'200':10,'429':1},'otp':{'200':10,'429':1},'verify':200,'refresh':200,'logout':200,'adminDenied':404,'internalAdminDenied':403,'admin':200,'nativeIdentityReplaced':True,'adminSpellingsBlocked':True,'aggregateBounded':True,'deniedTrafficCannotSpendGlobal':True,'adminAfterPublicExhaustion':200}, summary
+        fixture_logs = subprocess.check_output(['docker', 'logs', names['kong']], stderr=subprocess.STDOUT, text=True)
+        assert 'scope=client-total' in fixture_logs, 'Aggregate IP limiter was not exercised'
+        assert 'scope=public-total' not in fixture_logs, 'Rejected traffic consumed the global budget'
+        summary['client_b_after_client_a_total_exhaustion'] = client('b', 'second-client', a_ip)
+        assert summary['client_b_after_client_a_total_exhaustion'] == {'user':200}, summary
         # Free the dynamic slot while the fixed web address is absent. An auto-IP
         # container must take .6, never the reserved .2; recreating web must work.
         run(['docker','rm','-f',names['web'],names['b']])

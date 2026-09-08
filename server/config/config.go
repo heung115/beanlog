@@ -11,6 +11,8 @@ type Config struct {
 	DatabaseURL        string
 	JWKSURL            string
 	JWTIssuer          string
+	AuthURL            string
+	AuthRateIDSecret   string
 	CORSOrigin         string
 	AdminIngressSecret string
 }
@@ -21,6 +23,8 @@ func Load() *Config {
 		DatabaseURL:        getEnvOrFile("DATABASE_URL", "DATABASE_URL_FILE", "postgres://authenticator:postgres@localhost:55322/postgres?sslmode=disable"),
 		JWKSURL:            getEnv("JWKS_URL", "http://localhost:55321/auth/v1/.well-known/jwks.json"),
 		JWTIssuer:          getEnv("JWT_ISSUER", "http://127.0.0.1:55321/auth/v1"),
+		AuthURL:            getEnv("AUTH_URL", "http://127.0.0.1:55321/auth/v1"),
+		AuthRateIDSecret:   getSecretFile("AUTH_RATE_ID_SECRET_FILE"),
 		CORSOrigin:         getEnv("CORS_ORIGIN", "http://localhost:3100"),
 		AdminIngressSecret: getSecretFile("ADMIN_INGRESS_SECRET_FILE"),
 	}

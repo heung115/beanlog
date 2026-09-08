@@ -76,6 +76,10 @@ double_confirm_changes = true
 enable_confirmations = true
 max_frequency = "60s"
 
+[auth.email.template.magic_link]
+subject = "Beanmap verification code"
+content_path = "./supabase/templates/magic-link.html"
+
 [auth.sms]
 enable_signup = false
 enable_confirmations = false

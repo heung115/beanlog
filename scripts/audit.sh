@@ -497,10 +497,10 @@ NODE
       values
         ('public', 'handle_new_user()', false),
         ('public', 'check_rate_limit(text,integer,integer)', false),
-        ('public', 'delete_current_account()', true),
-        ('public', 'create_bean_record(jsonb,jsonb,jsonb)', true),
-        ('public', 'update_bean_record(uuid,jsonb,jsonb,jsonb)', true),
-        ('public', 'delete_bean_record(uuid)', true),
+        ('public', 'delete_current_account()', false),
+        ('public', 'create_bean_record(jsonb,jsonb,jsonb)', false),
+        ('public', 'update_bean_record(uuid,jsonb,jsonb,jsonb)', false),
+        ('public', 'delete_bean_record(uuid)', false),
         ('public', 'assert_bean_mutation_payload(jsonb,jsonb,jsonb)', false),
         ('beanmap_private', 'beanmap_is_admin()', true),
         ('beanmap_private', 'beanmap_admin_overview()', true),
@@ -554,7 +554,7 @@ NODE
           or not has_schema_privilege('authenticated', oid, 'USAGE')
       );
   " 2>/dev/null || printf 'query-failed')"
-  if [[ "$FUNCTION_PRIVILEGE_COUNT" == "0" ]]; then
+  if [[ "$FUNCTION_PRIVILEGE_COUNT" == "0" ]] && docker exec -i "$STAGING_DB_CONTAINER" psql -X -U postgres -d postgres -v ON_ERROR_STOP=1 < "$ROOT/scripts/verify-function-acls.sql" >/dev/null 2>&1; then
     finding "OK" "runtime/database-privileges" "Sensitive function execution grants match the least-privilege policy"
   else
     finding "HIGH" "runtime/database-privileges" "Sensitive function grants are unsafe or could not be verified"
@@ -569,8 +569,7 @@ NODE
         ('authenticated', 'blend_components', 'SELECT'),
         ('authenticated', 'origin_presets', 'SELECT'),
         ('authenticated', 'origin_countries', 'SELECT'),
-        ('authenticated', 'origin_regions', 'SELECT'),
-        ('authenticated', 'origin_entities', 'SELECT')
+        ('authenticated', 'origin_regions', 'SELECT')
     ), actual as (
       select grantee::text, table_name::text, privilege_type::text
       from information_schema.table_privileges
@@ -582,14 +581,14 @@ NODE
       (select * from expected except select * from actual)
     ), expected_columns(grantee, table_name, column_name, privilege_type) as (
       values
-        ('authenticated', 'profiles', 'display_name', 'UPDATE'),
-        ('authenticated', 'profiles', 'locale', 'UPDATE')
+        ('beanmap_api_runtime', 'profiles', 'display_name', 'UPDATE'),
+        ('beanmap_api_runtime', 'profiles', 'locale', 'UPDATE')
     ), actual_columns as (
       select grantee::text, table_name::text, column_name::text, privilege_type::text
       from information_schema.column_privileges
       where table_schema = 'public'
         and privilege_type = 'UPDATE'
-        and grantee in ('PUBLIC', 'anon', 'authenticated', 'service_role')
+        and grantee in ('PUBLIC', 'anon', 'authenticated', 'service_role', 'beanmap_api_runtime')
     ), column_mismatches as (
       (select * from actual_columns except select * from expected_columns)
       union all
@@ -626,13 +625,13 @@ NODE
   API_ROLE_PROPERTIES="$(docker exec "$STAGING_DB_CONTAINER" psql -U supabase_admin -d postgres -Atqc "
     select not rolsuper
        and not rolbypassrls
-       and rolcanlogin
-       and pg_has_role(rolname, 'authenticated', 'MEMBER')
+       and rolcanlogin and not rolinherit and not rolcreatedb and not rolcreaterole
+       and pg_has_role(rolname, 'beanmap_api_runtime', 'MEMBER')
        and rolpassword like 'SCRAM-SHA-256\$%'
        and (
-         select count(*) = 1
-            and bool_and(granted_role.rolname = 'authenticated')
-            and bool_and(not membership.admin_option)
+         select bool_or(granted_role.rolname = 'beanmap_api_runtime')
+            and bool_and(granted_role.rolname in ('beanmap_api_runtime', 'authenticated'))
+            and bool_and(not membership.admin_option and not membership.inherit_option and membership.set_option)
          from pg_auth_members membership
          join pg_roles granted_role on granted_role.oid = membership.roleid
          where membership.member = pg_authid.oid
@@ -641,7 +640,7 @@ NODE
     where rolname = 'beanmap_api';
   " 2>/dev/null || printf 'query-failed')"
   if [[ "$API_ACTIVITY_ROLE" == "safe" && "$API_ROLE_PROPERTIES" == "t" ]]; then
-    finding "OK" "runtime/database-role" "API uses the dedicated non-superuser, non-BYPASSRLS authenticated member"
+    finding "OK" "runtime/database-role" "API uses the dedicated login with explicit private runtime role switching"
   else
     finding "CRITICAL" "runtime/database-role" "API database login can bypass policy or could not be verified"
   fi

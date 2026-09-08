@@ -43,11 +43,14 @@ services:
       DATABASE_URL_FILE: /run/secrets/api_database_url
       JWKS_URL: ${JWKS_URL:?set JWKS_URL}
       JWT_ISSUER: ${JWT_ISSUER:?set JWT_ISSUER}
+      AUTH_URL: ${AUTH_URL:?set the internal Auth endpoint}
+      AUTH_RATE_ID_SECRET_FILE: /run/secrets/auth_rate_id
       CORS_ORIGIN: ${CORS_ORIGIN:?set CORS_ORIGIN}
     ports:
       - "127.0.0.1:${API_PORT:-8080}:8080"
     secrets:
       - api_database_url
+      - auth_rate_id
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/health"]
       interval: 10s
@@ -71,3 +74,5 @@ networks:
 secrets:
   api_database_url:
     file: ./secrets/api_database_url
+  auth_rate_id:
+    file: ./secrets/auth_rate_id

@@ -96,45 +96,44 @@ type OriginPreset struct {
 // --- Request/Response DTOs ---
 
 type CreateBeanRequest struct {
-	ExpectedUpdatedAt *string               `json:"expected_updated_at,omitempty"`
-	Name              string                `json:"name" binding:"required,max=200"`
-	Roastery          string                `json:"roastery" binding:"required,max=200"`
-	BeanType          string                `json:"bean_type" binding:"required,oneof=single_origin blend"`
-	OriginCountry     string                `json:"origin_country" binding:"omitempty,max=100"`
-	OriginCountryID   *int64                `json:"origin_country_id"`
-	OriginRegion      *string               `json:"origin_region" binding:"omitempty,max=200"`
-	OriginRegionID    *int64                `json:"origin_region_id"`
-	OriginSubregions  []string              `json:"origin_subregions"`
-	OriginLat         *float64              `json:"origin_lat"`
-	OriginLng         *float64              `json:"origin_lng"`
-	FarmProducer      *string               `json:"farm_producer" binding:"omitempty,max=300"`
-	OriginEntityID    *int64                `json:"origin_entity_id"`
-	Varietal          *string               `json:"varietal" binding:"omitempty,max=100"`
-	ProcessMethod     string                `json:"process_method" binding:"required,oneof=washed natural honey anaerobic carbonic decaf other"`
-	ProcessDetail     *string               `json:"process_detail" binding:"omitempty,max=200"`
-	AltitudeM         *int                  `json:"altitude_m"`
-	HarvestYear       *int                  `json:"harvest_year"`
-	RoastLevel        string                `json:"roast_level" binding:"required,oneof=light medium dark"`
-	RoastDate         *string               `json:"roast_date"`
-	ConsumedAt        *string               `json:"consumed_at"`
-	PlaceType         string                `json:"place_type" binding:"required,oneof=cafe home"`
-	CafeName          *string               `json:"cafe_name" binding:"omitempty,max=200"`
-	CafeLocation      *string               `json:"cafe_location" binding:"omitempty,max=200"`
-	MenuName          *string               `json:"menu_name" binding:"omitempty,max=200"`
-	OverallScore      float64               `json:"overall_score" binding:"required,min=1,max=10"`
-	Note              string                `json:"note" binding:"max=2000"`
-	ScoreAroma        *int                  `json:"score_aroma"`
-	ScoreAcidity      *int                  `json:"score_acidity"`
-	ScoreBody         *int                  `json:"score_body"`
-	ScoreSweetness    *int                  `json:"score_sweetness"`
-	ScoreAftertaste   *int                  `json:"score_aftertaste"`
-	ScoreBalance      *int                  `json:"score_balance"`
-	PurchaseSource    *string               `json:"purchase_source" binding:"omitempty,oneof=online roastery cafe other"`
-	Price             *int                  `json:"price"`
-	WeightG           *int                  `json:"weight_g"`
-	PurchasedAt       *string               `json:"purchased_at"`
-	Tags              []TagInput            `json:"tags" binding:"max=100,dive"`
-	BlendComponents   []BlendComponentInput `json:"blend_components" binding:"max=50,dive"`
+	Name             string                `json:"name" binding:"required,max=200"`
+	Roastery         string                `json:"roastery" binding:"required,max=200"`
+	BeanType         string                `json:"bean_type" binding:"required,oneof=single_origin blend"`
+	OriginCountry    string                `json:"origin_country" binding:"omitempty,max=100"`
+	OriginCountryID  *int64                `json:"origin_country_id"`
+	OriginRegion     *string               `json:"origin_region" binding:"omitempty,max=200"`
+	OriginRegionID   *int64                `json:"origin_region_id"`
+	OriginSubregions []string              `json:"origin_subregions"`
+	OriginLat        *float64              `json:"origin_lat"`
+	OriginLng        *float64              `json:"origin_lng"`
+	FarmProducer     *string               `json:"farm_producer" binding:"omitempty,max=300"`
+	OriginEntityID   *int64                `json:"origin_entity_id"`
+	Varietal         *string               `json:"varietal" binding:"omitempty,max=100"`
+	ProcessMethod    string                `json:"process_method" binding:"required,oneof=washed natural honey anaerobic carbonic decaf other"`
+	ProcessDetail    *string               `json:"process_detail" binding:"omitempty,max=200"`
+	AltitudeM        *int                  `json:"altitude_m"`
+	HarvestYear      *int                  `json:"harvest_year"`
+	RoastLevel       string                `json:"roast_level" binding:"required,oneof=light medium dark"`
+	RoastDate        *string               `json:"roast_date"`
+	ConsumedAt       *string               `json:"consumed_at"`
+	PlaceType        string                `json:"place_type" binding:"required,oneof=cafe home"`
+	CafeName         *string               `json:"cafe_name" binding:"omitempty,max=200"`
+	CafeLocation     *string               `json:"cafe_location" binding:"omitempty,max=200"`
+	MenuName         *string               `json:"menu_name" binding:"omitempty,max=200"`
+	OverallScore     float64               `json:"overall_score" binding:"required,min=1,max=10"`
+	Note             string                `json:"note" binding:"max=2000"`
+	ScoreAroma       *int                  `json:"score_aroma"`
+	ScoreAcidity     *int                  `json:"score_acidity"`
+	ScoreBody        *int                  `json:"score_body"`
+	ScoreSweetness   *int                  `json:"score_sweetness"`
+	ScoreAftertaste  *int                  `json:"score_aftertaste"`
+	ScoreBalance     *int                  `json:"score_balance"`
+	PurchaseSource   *string               `json:"purchase_source" binding:"omitempty,oneof=online roastery cafe other"`
+	Price            *int                  `json:"price"`
+	WeightG          *int                  `json:"weight_g"`
+	PurchasedAt      *string               `json:"purchased_at"`
+	Tags             []TagInput            `json:"tags" binding:"max=100,dive"`
+	BlendComponents  []BlendComponentInput `json:"blend_components" binding:"max=50,dive"`
 }
 
 type TagInput struct {
@@ -156,7 +155,10 @@ type BlendComponentInput struct {
 	SortOrder        int      `json:"sort_order"`
 }
 
-type UpdateBeanRequest = CreateBeanRequest
+type UpdateBeanRequest struct {
+	CreateBeanRequest
+	ExpectedUpdatedAt string `json:"expected_updated_at" binding:"required"`
+}
 
 // --- Origin catalog options (mirror the frontend selector actions) ---
 

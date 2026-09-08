@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { ensureUser, qaEmptyUser, qaOtherUser, qaUser, signIn } from "./helpers";
+import { ensureUser, qaEmptyUser, qaOtherUser, qaUser, signIn, qaBeanApi, qaAuthenticatedApi } from "./helpers";
 
 type Fixture = {
   name: string;
@@ -23,10 +23,7 @@ async function deleteAllBeans(client: SupabaseClient, userId: string) {
   if (listError) throw listError;
 
   for (const bean of beans ?? []) {
-    const { data: deleted, error } = await client.rpc("delete_bean_record", {
-      p_id: bean.id,
-    });
-    if (error || !deleted) throw error ?? new Error(`Failed to delete QA bean ${bean.id}`);
+    await qaBeanApi(client, `/${bean.id}`, "DELETE");
   }
 }
 
@@ -35,13 +32,8 @@ async function createBean(
   bean: Record<string, unknown>,
   tags: Array<{ tag: string; category: string }> = []
 ) {
-  const { data, error } = await client.rpc("create_bean_record", {
-    p_bean: bean,
-    p_tags: tags,
-    p_components: [],
-  });
-  if (error || !data) throw error ?? new Error("Failed to create QA bean");
-  return data as string;
+  const result = await qaBeanApi(client, "", "POST", { ...bean, tags, blend_components: [] });
+  return result.id as string;
 }
 
 export default async function globalSetup() {
@@ -52,23 +44,10 @@ export default async function globalSetup() {
   const { client: isolation } = await signIn(qaOtherUser.email, qaOtherUser.password);
   const { client: empty } = await signIn(qaEmptyUser.email, qaEmptyUser.password);
 
-  // handle_new_user creates profiles. Update only the caller-owned display fields;
-  // never use service-role table access in this harness.
-  const { error: primaryProfileError } = await primary
-    .from("profiles")
-    .update({ display_name: "beanmap QA", locale: "ko" })
-    .eq("id", primaryId);
-  if (primaryProfileError) throw primaryProfileError;
-  const { error: isolationProfileError } = await isolation
-    .from("profiles")
-    .update({ display_name: "beanmap QA Isolation", locale: "ko" })
-    .eq("id", isolationId);
-  if (isolationProfileError) throw isolationProfileError;
-  const { error: emptyProfileError } = await empty
-    .from("profiles")
-    .update({ display_name: "beanmap QA Empty", locale: "ko" })
-    .eq("id", emptyId);
-  if (emptyProfileError) throw emptyProfileError;
+  // Every application mutation uses the current-session API boundary.
+  await qaAuthenticatedApi(primary, "/api/profile", "PUT", { display_name: "beanmap QA", locale: "ko" });
+  await qaAuthenticatedApi(isolation, "/api/profile", "PUT", { display_name: "beanmap QA Isolation", locale: "ko" });
+  await qaAuthenticatedApi(empty, "/api/profile", "PUT", { display_name: "beanmap QA Empty", locale: "ko" });
 
   const fixturePath = path.join(process.cwd(), "tests/fixtures/unspecialty-july-2026.json");
   const fixtures = JSON.parse(await fs.readFile(fixturePath, "utf8")) as Fixture[];

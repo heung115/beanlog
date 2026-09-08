@@ -402,7 +402,19 @@
     "legal": "법적 안내",
     "terms": "서비스 이용약관",
     "privacy": "개인정보 처리방침",
-    "deleteError": "계정을 삭제하지 못했어요. 다시 시도하거나 취소할 수 있어요."
+    "deleteError": "계정을 삭제하지 못했어요. 다시 시도하거나 취소할 수 있어요.",
+    "deletionCode": "인증 코드",
+    "deletionCodeSent": "계정 이메일로 인증 코드를 보냈습니다.",
+    "sendDeletionCode": "인증 코드 받기",
+    "resendDeletionCode": "인증 코드 다시 받기",
+    "deletionErrors": {
+      "invalid_code": "인증 코드를 확인해 주세요.",
+      "challenge_expired": "인증 코드가 만료됐습니다. 새 코드를 받아 주세요.",
+      "rate_limited": "잠시 후 다시 시도해 주세요.",
+      "session_expired": "다시 로그인해 주세요.",
+      "temporarily_unavailable": "지금은 처리할 수 없습니다. 잠시 후 다시 시도해 주세요.",
+      "email_unavailable": "계정의 이메일 확인이 필요합니다."
+    }
   },
   "common": {
     "cancel": "취소",

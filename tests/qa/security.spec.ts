@@ -10,6 +10,7 @@ import {
   qaOtherUser,
   qaUser,
   signIn,
+  localFixtureRpc,
 } from "./helpers";
 
 test("ensuring an existing QA user preserves its active refresh tokens", async () => {
@@ -167,7 +168,7 @@ test("authenticated PostgREST writes cannot bypass bean or profile invariants", 
     });
     expect.soft(invalidBlendError, "direct invalid blend insert").toMatchObject({ code: "42501" });
 
-    const { data: blendId, error: blendCreateError } = await client.rpc(
+    const { data: blendId, error: blendCreateError } = await localFixtureRpc(client,
       "create_bean_record",
       {
         p_bean: {
@@ -202,7 +203,7 @@ test("authenticated PostgREST writes cannot bypass bean or profile invariants", 
       .eq("id", blendComponentsBeforeDelete?.[0]?.id);
     expect.soft(componentDeleteError, "direct component delete").toMatchObject({ code: "42501" });
 
-    const { data: singleId, error: singleCreateError } = await client.rpc(
+    const { data: singleId, error: singleCreateError } = await localFixtureRpc(client,
       "create_bean_record",
       {
         p_bean: { ...beanPayload, name: `[QA] valid RPC single ${suffix}` },
@@ -239,7 +240,7 @@ test("authenticated PostgREST writes cannot bypass bean or profile invariants", 
 
     const { data: originalProfile, error: profileReadError } = await client
       .from("profiles")
-      .select("email,created_at")
+      .select("email,created_at,display_name,locale")
       .eq("id", userId)
       .single();
     expect(profileReadError).toBeNull();
@@ -253,10 +254,10 @@ test("authenticated PostgREST writes cannot bypass bean or profile invariants", 
       .from("profiles")
       .update({ display_name: "Allowed QA Name", locale: "en" })
       .eq("id", userId);
-    expect(allowedProfileError).toBeNull();
+    expect(allowedProfileError).toMatchObject({ code: "42501" });
 
     const oversizedTagsName = `[QA] oversized tags ${suffix}`;
-    const { error: oversizedTagsError } = await client.rpc("create_bean_record", {
+    const { error: oversizedTagsError } = await localFixtureRpc(client, "create_bean_record", {
       p_bean: { ...beanPayload, name: oversizedTagsName },
       p_tags: Array.from({ length: 101 }, (_, index) => ({
         tag: `limit-${index}`,
@@ -267,7 +268,7 @@ test("authenticated PostgREST writes cannot bypass bean or profile invariants", 
     expect.soft(oversizedTagsError, "RPC tag limit").toMatchObject({ code: "22023" });
 
     const oversizedComponentsName = `[QA] oversized components ${suffix}`;
-    const { error: oversizedComponentsError } = await client.rpc("create_bean_record", {
+    const { error: oversizedComponentsError } = await localFixtureRpc(client, "create_bean_record", {
       p_bean: {
         ...beanPayload,
         name: oversizedComponentsName,
@@ -283,7 +284,7 @@ test("authenticated PostgREST writes cannot bypass bean or profile invariants", 
     });
     expect.soft(oversizedComponentsError, "RPC component limit").toMatchObject({ code: "22023" });
 
-    const { error: oversizedUpdateError } = await client.rpc("update_bean_record", {
+    const { error: oversizedUpdateError } = await localFixtureRpc(client, "update_bean_record", {
       p_id: singleId,
       p_bean: { ...beanPayload, name: `[QA] oversized update ${suffix}` },
       p_tags: Array.from({ length: 101 }, (_, index) => ({
@@ -329,8 +330,8 @@ test("authenticated PostgREST writes cannot bypass bean or profile invariants", 
       .single();
     expect.soft(protectedProfile?.email).toBe(originalProfile?.email);
     expect.soft(protectedProfile?.created_at).toBe(originalProfile?.created_at);
-    expect.soft(protectedProfile?.display_name).toBe("Allowed QA Name");
-    expect.soft(protectedProfile?.locale).toBe("en");
+    expect.soft(protectedProfile?.display_name).toBe(originalProfile?.display_name);
+    expect.soft(protectedProfile?.locale).toBe(originalProfile?.locale);
   } finally {
     const { error } = await admin.auth.admin.deleteUser(userId);
     if (error) throw error;
@@ -340,7 +341,7 @@ test("authenticated PostgREST writes cannot bypass bean or profile invariants", 
 test("atomic RPC rolls back the parent when a child row is invalid", async () => {
   const { client } = await signIn(qaUser.email, qaUser.password);
   const name = "[QA:atomic] invalid child must roll back";
-  const { error } = await client.rpc("create_bean_record", {
+  const { error } = await localFixtureRpc(client, "create_bean_record", {
     p_bean: {
       name,
       roastery: "QA Atomic",
@@ -552,67 +553,117 @@ test("Go API rejects forged JWTs and rolls back database child failures", async 
   expect(oversizedBody.status()).toBe(400);
 });
 
-test("account deletion removes only the authenticated disposable user", async () => {
-  const suffix = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+test("ordinary sessions cannot delete accounts without a verified deletion challenge", async ({ request }) => {
+  test.skip(!qaApiURL, "Deletion boundary checks require the Go API");
   const disposable = {
-    email: `beanmap-qa-delete-${suffix}@local.test`,
+    email: `beanmap-qa-delete-${Date.now()}-${randomBytes(6).toString("hex")}@local.test`,
     password: randomBytes(32).toString("base64url"),
   };
-  const disposableId = await ensureUser(disposable.email, disposable.password);
-  let deleted = false;
-
+  const id = await ensureUser(disposable.email, disposable.password);
   try {
-    const { client } = await signIn(disposable.email, disposable.password);
-    const { error: insertError } = await client.rpc("create_bean_record", {
-      p_bean: {
-        name: "[QA] disposable account bean",
-        roastery: "QA Delete",
-        bean_type: "single_origin",
-        origin_country: "Kenya",
-        process_method: "washed",
-        roast_level: "light",
-        consumed_at: "2026-07-30T12:00:00.000Z",
-        place_type: "home",
-        overall_score: 8,
-        note: "must cascade with account deletion",
-      },
-      p_tags: [],
-      p_components: [],
-    });
-    expect(insertError).toBeNull();
-
-    const { error: deleteError } = await client.rpc("delete_current_account");
-    expect(deleteError).toBeNull();
-    deleted = true;
-
-    const { data: removedUser, error: removedUserError } =
-      await admin.auth.admin.getUserById(disposableId);
-    expect(removedUserError).toBeTruthy();
-    expect(removedUser.user).toBeNull();
-
-    // The project intentionally does not grant service_role direct table
-    // access. Reuse the deleted user's still-signed JWT: PostgREST can verify
-    // it until expiry, while the cascaded RLS-visible rows must already be gone.
-    const { data: removedProfiles, error: profileReadError } = await client
-      .from("profiles")
-      .select("id")
-      .eq("id", disposableId);
-    const { data: removedBeans, error: beanReadError } = await client
-      .from("beans")
-      .select("id")
-      .eq("user_id", disposableId);
-    expect(profileReadError).toBeNull();
-    expect(beanReadError).toBeNull();
-    expect(removedProfiles).toEqual([]);
-    expect(removedBeans).toEqual([]);
-
-    const { data: isolationUser, error: isolationError } =
-      await admin.auth.admin.listUsers({ perPage: 1000 });
-    expect(isolationError).toBeNull();
-    expect(isolationUser.users.some((user) => user.email === qaOtherUser.email)).toBe(true);
-  } finally {
-    if (!deleted) {
-      await admin.auth.admin.deleteUser(disposableId);
+    const { client, session } = await signIn(disposable.email, disposable.password);
+    const { error } = await client.rpc("delete_current_account");
+    expect(error).toMatchObject({ code: "42501" });
+    for (const body of [{}, { challenge: "a".repeat(64) }, { challenge: "a".repeat(64), code: "000000" }]) {
+      const response = await request.post(`${qaApiURL}/api/account/delete`, {
+        headers: { Authorization: `Bearer ${session.access_token}` }, data: body,
+      });
+      expect([400, 401, 403]).toContain(response.status());
     }
+    const { data: alive, error: aliveError } = await admin.auth.admin.getUserById(id);
+    expect(aliveError).toBeNull();
+    expect(alive.user?.id).toBe(id);
+  } finally {
+    const { error } = await admin.auth.admin.deleteUser(id);
+    if (error) throw error;
+  }
+});
+
+test("authenticated browser roles cannot execute internal mutation RPCs", async () => {
+  const { client } = await signIn(qaUser.email, qaUser.password);
+  for (const [name, payload] of [
+    ["create_bean_record", { p_bean: {}, p_tags: [], p_components: [] }],
+    ["update_bean_record", { p_id: "00000000-0000-0000-0000-000000000000", p_bean: {}, p_tags: [], p_components: [] }],
+    ["delete_bean_record", { p_id: "00000000-0000-0000-0000-000000000000" }],
+  ] as const) {
+    const { error } = await client.rpc(name, payload);
+    expect(error).toMatchObject({ code: "42501" });
+  }
+});
+
+test("revoked sessions lose Auth, PostgREST and Go API access immediately", async ({ request }) => {
+  test.skip(!qaApiURL || !["localhost", "127.0.0.1", "[::1]"].includes(new URL(qaApiURL).hostname), "Session mutation regression requires isolated loopback staging");
+  const user = {
+    email: `beanmap-qa-revocation-${Date.now()}-${randomBytes(6).toString("hex")}@local.test`,
+    password: randomBytes(32).toString("hex"),
+  };
+  const id = await ensureUser(user.email, user.password);
+  try {
+    const { session } = await signIn(user.email, user.password);
+    const headers = { apikey: stagingAnonKey, Authorization: `Bearer ${session.access_token}` };
+    const payload = { name: "[QA] session canary", roastery: "QA", bean_type: "single_origin", origin_country: "Kenya", process_method: "washed", roast_level: "light", consumed_at: "2026-09-08", place_type: "home", overall_score: 8, tags: [], blend_components: [] };
+    const created = await request.post(`${qaApiURL}/api/beans`, { headers, data: payload });
+    expect(created.status()).toBe(201);
+    const beanId = (await created.json()).id;
+    const ownBefore = await request.get(`${stagingSupabaseUrl}/rest/v1/beans?id=eq.${beanId}&select=id`, { headers });
+    expect(await ownBefore.json()).toEqual([{ id: beanId }]);
+
+    const logout = await request.post(`${stagingSupabaseUrl}/auth/v1/logout?scope=global`, { headers });
+    expect(logout.status()).toBe(204);
+    expect([401, 403]).toContain((await request.get(`${stagingSupabaseUrl}/auth/v1/user`, { headers })).status());
+    for (const table of ["profiles", "beans", "tasting_tags", "blend_components"]) {
+      const stale = await request.get(`${stagingSupabaseUrl}/rest/v1/${table}?select=id`, { headers });
+      expect(stale.status()).toBe(200);
+      expect(await stale.json()).toEqual([]);
+    }
+    const staleProfile = await request.patch(`${stagingSupabaseUrl}/rest/v1/profiles?id=eq.${id}`, {
+      headers, data: { display_name: "Revoked profile write" },
+    });
+    expect([200, 204, 403]).toContain(staleProfile.status());
+    expect((await request.get(`${qaApiURL}/api/beans`, { headers })).status()).toBe(401);
+    expect((await request.post(`${qaApiURL}/api/beans`, { headers, data: payload })).status()).toBe(401);
+    expect((await request.delete(`${qaApiURL}/api/beans/${beanId}`, { headers })).status()).toBe(401);
+
+    const { client: fresh } = await signIn(user.email, user.password);
+    const { data: retained, error: retainedError } = await fresh.from("beans").select("id");
+    expect(retainedError).toBeNull();
+    expect(retained).toEqual([{ id: beanId }]);
+    const { data: profile } = await fresh.from("profiles").select("display_name").eq("id", id).single();
+    expect(profile?.display_name).not.toBe("Revoked profile write");
+  } finally {
+    const { error } = await admin.auth.admin.deleteUser(id);
+    if (error) throw error;
+  }
+});
+
+test("origin contacts cannot be fetched directly while curated entity names remain usable", async ({ request }) => {
+  test.skip(!qaApiURL, "Origin API boundary checks require local staging");
+  const { session } = await signIn(qaUser.email, qaUser.password);
+  const headers = { apikey: stagingAnonKey, Authorization: `Bearer ${session.access_token}` };
+  for (const bearer of [stagingAnonKey, session.access_token]) {
+    const raw = await request.get(`${stagingSupabaseUrl}/rest/v1/origin_entities?select=*&limit=1`, {
+      headers: { apikey: stagingAnonKey, Authorization: `Bearer ${bearer}` },
+    });
+    expect([401, 403]).toContain(raw.status());
+    expect((await raw.json()).code).toBe("42501");
+  }
+  const countries = await request.get(`${qaApiURL}/api/origins/countries`, { headers });
+  expect(countries.status()).toBe(200);
+  const country = ((await countries.json()) as Array<{ id: number; name_en: string }>).find(value => value.name_en === "Ethiopia");
+  expect(country).toBeTruthy();
+  const regions = await request.get(`${qaApiURL}/api/origins/countries/${country!.id}/regions`, { headers });
+  expect(regions.status()).toBe(200);
+  const candidates = await regions.json() as Array<{ id: number }>;
+  let entities: Array<Record<string, unknown>> = [];
+  for (const region of candidates.slice(0, 10)) {
+    const response = await request.get(`${qaApiURL}/api/origins/countries/${country!.id}/regions/${region.id}/entities`, { headers });
+    expect(response.status()).toBe(200);
+    entities = await response.json();
+    if (entities.length) break;
+  }
+  expect(entities.length).toBeGreaterThan(0);
+  for (const entity of entities) {
+    expect(Object.keys(entity).sort()).toEqual(["entity_type", "id", "name", "name_ko"]);
+    expect(entity.name).not.toMatch(/@|\b(?:phone|telephone|mobile|email|fax)\b|[0-9](?:[0-9\s().+\-]*[0-9]){6}/i);
   }
 });

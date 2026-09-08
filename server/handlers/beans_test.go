@@ -49,11 +49,16 @@ func TestBeanMutationsValidateBlendPercentagePrecision(t *testing.T) {
 				for i, percentage := range test.percentages {
 					components[i] = models.BlendComponentInput{OriginCountry: "Ethiopia", Percentage: percentage}
 				}
-				body, err := json.Marshal(models.CreateBeanRequest{
+				request := models.CreateBeanRequest{
 					Name: "House Blend", Roastery: "Test Roastery", BeanType: "blend",
 					ProcessMethod: "washed", RoastLevel: "medium", PlaceType: "home",
 					OverallScore: 8, BlendComponents: components,
-				})
+				}
+				var payload any = request
+				if mutation.method == http.MethodPut {
+					payload = models.UpdateBeanRequest{CreateBeanRequest: request, ExpectedUpdatedAt: "2026-09-08T12:00:00.123456Z"}
+				}
+				body, err := json.Marshal(payload)
 				if err != nil {
 					t.Fatal(err)
 				}

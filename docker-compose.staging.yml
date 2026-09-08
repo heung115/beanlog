@@ -58,9 +58,12 @@ services:
       DATABASE_URL_FILE: /run/secrets/api_database_url
       JWKS_URL: ${STAGING_JWKS_URL:-http://kong:8000/auth/v1/.well-known/jwks.json}
       JWT_ISSUER: ${STAGING_JWT_ISSUER:-http://127.0.0.1:55321/auth/v1}
+      AUTH_URL: http://auth:9999
+      AUTH_RATE_ID_SECRET_FILE: /run/secrets/auth_rate_id
       CORS_ORIGIN: ${STAGING_APP_URL:-http://localhost:3100}
     secrets:
       - api_database_url
+      - auth_rate_id
     ports:
       - "127.0.0.1:${STAGING_API_PORT:-8180}:8080"
     healthcheck:
@@ -97,3 +100,5 @@ networks:
 secrets:
   api_database_url:
     file: ${STAGING_DATABASE_URL_FILE:?run npm run staging:up}
+  auth_rate_id:
+    file: ${STAGING_AUTH_RATE_ID_SECRET_FILE:?run npm run staging:up}

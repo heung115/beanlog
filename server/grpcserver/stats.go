@@ -2,6 +2,7 @@ package grpcserver
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"math"
 	"sort"
@@ -32,21 +33,33 @@ func (s *StatsServer) GetStats(ctx context.Context, _ *beanmapv1.GetStatsRequest
 		return nil, status.Error(codes.Unauthenticated, "missing authenticated user")
 	}
 
+	sessionID, sessionOK := SessionIDFromContext(ctx)
+	if !sessionOK {
+		return nil, status.Error(codes.Unauthenticated, "missing authenticated session")
+	}
+	ctx, cancel := context.WithTimeout(ctx, 12*time.Second)
+	defer cancel()
 	tx, err := s.pool.Begin(ctx)
 	if err != nil {
 		return nil, status.Error(codes.Unavailable, "database unavailable")
 	}
 	defer func() { _ = tx.Rollback(ctx) }()
 
-	if _, err := tx.Exec(ctx, "SET LOCAL ROLE authenticated"); err != nil {
+	if _, err := tx.Exec(ctx, "SET LOCAL statement_timeout = '8s'"); err != nil {
 		return nil, status.Error(codes.Unavailable, "database unavailable")
 	}
-	if _, err := tx.Exec(ctx,
-		`SELECT set_config('request.jwt.claim.sub', $1, true),
-		        set_config('request.jwt.claim.role', 'authenticated', true)`,
-		userID,
-	); err != nil {
+	if _, err := tx.Exec(ctx, "SET LOCAL ROLE beanmap_api_runtime"); err != nil {
+		return nil, status.Error(codes.Unavailable, "database unavailable")
+	}
+	claims, err := json.Marshal(map[string]string{"sub": userID, "session_id": sessionID, "role": "authenticated"})
+	if err != nil {
 		return nil, status.Error(codes.Unauthenticated, "invalid identity")
+	}
+	if _, err := tx.Exec(ctx, `SELECT set_config('request.jwt.claims', $1, true), set_config('request.jwt.claim.sub', $2, true), set_config('request.jwt.claim.role', 'authenticated', true)`, string(claims), userID); err != nil {
+		return nil, status.Error(codes.Unauthenticated, "invalid identity")
+	}
+	if _, err := tx.Exec(ctx, "SELECT beanmap_security.require_current_session()"); err != nil {
+		return nil, status.Error(codes.Unauthenticated, "invalid session")
 	}
 
 	rows, err := tx.Query(ctx,

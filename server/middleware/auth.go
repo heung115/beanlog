@@ -18,6 +18,30 @@ import (
 )
 
 const UserIDKey = "user_id"
+const SessionIDKey = "session_id"
+
+type Identity struct {
+	UserID    string
+	SessionID string
+}
+
+func validUUID(value string) bool {
+	if len(value) != 36 {
+		return false
+	}
+	for i, c := range value {
+		if i == 8 || i == 13 || i == 18 || i == 23 {
+			if c != '-' {
+				return false
+			}
+			continue
+		}
+		if !((c >= '0' && c <= '9') || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F')) {
+			return false
+		}
+	}
+	return true
+}
 
 type jwksKey struct {
 	Kty string `json:"kty"`
@@ -153,8 +177,14 @@ func NewTokenVerifier(jwksURL, issuer string) *TokenVerifier {
 // Verify validates tokenStr (a raw JWT without the "Bearer " prefix) and
 // returns the authenticated user id (the JWT subject). It enforces ES256,
 // a known kid, required expiration, the configured issuer, the
-// "authenticated" audience, and the "authenticated" role claim.
+// "authenticated" audience/role, and UUID subject/session claims.
 func (v *TokenVerifier) Verify(tokenStr string) (string, error) {
+	identity, err := v.VerifyIdentity(tokenStr)
+	return identity.UserID, err
+}
+
+// VerifyIdentity retains the signed session id for current-session checks.
+func (v *TokenVerifier) VerifyIdentity(tokenStr string) (Identity, error) {
 	token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
 		// Verify signing method is ES256
 		if t.Method.Alg() != jwt.SigningMethodES256.Alg() {
@@ -172,23 +202,27 @@ func (v *TokenVerifier) Verify(tokenStr string) (string, error) {
 		jwt.WithAudience("authenticated"),
 	)
 	if err != nil || !token.Valid {
-		return "", fmt.Errorf("invalid token")
+		return Identity{}, fmt.Errorf("invalid token")
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
-		return "", fmt.Errorf("invalid claims")
+		return Identity{}, fmt.Errorf("invalid claims")
 	}
 
 	sub, _ := claims["sub"].(string)
-	if sub == "" {
-		return "", fmt.Errorf("missing subject")
+	if !validUUID(sub) {
+		return Identity{}, fmt.Errorf("missing subject")
 	}
 	role, _ := claims["role"].(string)
 	if role != "authenticated" {
-		return "", fmt.Errorf("invalid role")
+		return Identity{}, fmt.Errorf("invalid role")
 	}
-	return sub, nil
+	sessionID, _ := claims["session_id"].(string)
+	if !validUUID(sessionID) {
+		return Identity{}, fmt.Errorf("invalid session id")
+	}
+	return Identity{UserID: sub, SessionID: sessionID}, nil
 }
 
 func AuthRequired(jwksURL, issuer string) gin.HandlerFunc {
@@ -207,13 +241,14 @@ func AuthRequired(jwksURL, issuer string) gin.HandlerFunc {
 			return
 		}
 
-		userID, err := verifier.Verify(tokenStr)
+		identity, err := verifier.VerifyIdentity(tokenStr)
 		if err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
 			return
 		}
 
-		c.Set(UserIDKey, userID)
+		c.Set(UserIDKey, identity.UserID)
+		c.Set(SessionIDKey, identity.SessionID)
 		c.Next()
 	}
 }

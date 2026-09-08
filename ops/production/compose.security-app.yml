@@ -12,6 +12,11 @@ services:
       auth-client-ip:
         ipv4_address: ${BEANMAP_WEB_AUTH_IP:?set the existing trusted web IPv4 address}
   api:
+    environment:
+      AUTH_URL: http://supabase-auth:9999
+      AUTH_RATE_ID_SECRET_FILE: /run/secrets/auth_rate_id
+    secrets:
+      - auth_rate_id
     logging: *bounded-logs
     networks:
       app-runtime: {}
@@ -19,3 +24,7 @@ services:
 networks:
   app-runtime:
     internal: true
+
+secrets:
+  auth_rate_id:
+    file: ${BEANMAP_AUTH_RATE_ID_SECRET_FILE:-/etc/beanmap-private-console/auth-rate-id.secret}

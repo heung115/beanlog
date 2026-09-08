@@ -22,11 +22,20 @@ func TestBeanUpdateForwardsVersionAndReportsAtomicConflict(t *testing.T) {
 	}{
 		{"current version", "2026-09-06T12:00:00.123456Z", nil, 200},
 		{"stale version", "2026-09-06T12:00:00.123456Z", &pgconn.PgError{Code: "PT409"}, 409},
-		{"old client", nil, nil, 200},
+		{"null version", nil, nil, 400},
+		{"omitted version", nil, nil, 400},
+		{"empty version", "", nil, 400},
+		{"date only", "2026-09-06", nil, 400},
+		{"impossible calendar date", "2026-02-30T12:00:00Z", nil, 400},
+		{"numeric version", 123, nil, 400},
+		{"object version", map[string]string{}, nil, 400},
 		{"invalid version", "not-a-timestamp", nil, 400},
 	} {
 		t.Run(item.name, func(t *testing.T) {
 			data := map[string]any{"name": "House Blend", "roastery": "QA", "bean_type": "blend", "process_method": "washed", "roast_level": "medium", "place_type": "home", "overall_score": 8, "expected_updated_at": item.version, "blend_components": []map[string]any{{"origin_country": "Ethiopia", "percentage": 100}}}
+			if item.name == "omitted version" {
+				delete(data, "expected_updated_at")
+			}
 			body, _ := json.Marshal(data)
 			recorder := httptest.NewRecorder()
 			c, _ := gin.CreateTestContext(recorder)

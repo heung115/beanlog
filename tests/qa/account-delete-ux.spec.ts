@@ -5,6 +5,7 @@ import en from "../../src/i18n/en.json" with { type: "json" };
 import { landingCopy } from "../../src/content/landing";
 import { getSupabaseCookieName } from "../../src/lib/supabase/cookie-name";
 import { SESSION_ONLY_COOKIE_NAME } from "../../src/lib/supabase/session-persistence";
+import { accountDeletionCode } from "./deletion-email";
 import { admin, browserSupabaseUrl, ensureUser } from "./helpers";
 
 for (const locale of ["ko", "en"] as const) {
@@ -22,14 +23,23 @@ for (const locale of ["ko", "en"] as const) {
       await page.goto(`/${locale}/settings`);
       await expect(page.locator('[name="displayName"]')).toBeEnabled();
       await page.getByRole("button", { name: t.settings.deleteAccount, exact: true }).click();
-      await page.getByRole("dialog").getByRole("button", { name: t.common.confirm, exact: true }).click();
+      const dialog = page.getByRole("dialog");
+      const confirm = dialog.getByRole("button", { name: t.common.confirm, exact: true });
+      await expect(confirm).toBeDisabled();
+      await dialog.getByRole("button", { name: t.settings.sendDeletionCode, exact: true }).click();
+      await expect(dialog.getByRole("status")).toHaveText(t.settings.deletionCodeSent);
+      const code = await accountDeletionCode(page, account.email);
+      await dialog.locator('[name="deletionCode"]').fill(code === "000000" ? "111111" : "000000");
+      await confirm.click();
+      await expect(dialog.getByRole("alert")).toHaveText(t.settings.deletionErrors.invalid_code);
+      await dialog.locator('[name="deletionCode"]').fill(code);
+      await confirm.click();
       await expect(page.getByRole("status").filter({ hasText: landingCopy[locale].accountDeleted })).toBeVisible();
       await expect(page).toHaveURL(new RegExp(`/${locale}$`));
       await expect(page.locator('[name="email"], [name="displayName"]')).toHaveCount(0);
       expect((await admin.auth.admin.getUserById(id)).data.user).toBeNull();
       const authCookie = getSupabaseCookieName(browserSupabaseUrl);
       expect((await page.context().cookies()).filter(({ name }) => name === authCookie || name.startsWith(`${authCookie}.`) || name === SESSION_ONLY_COOKIE_NAME)).toEqual([]);
-      await page.screenshot({ path: test.info().outputPath("account-deleted.png") });
       await page.reload();
       await expect(page).toHaveURL(new RegExp(`/${locale}$`));
       await expect(page.getByRole("status").filter({ hasText: landingCopy[locale].accountDeleted })).toHaveCount(0);

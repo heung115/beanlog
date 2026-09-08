@@ -13,6 +13,12 @@ import (
 )
 
 type userIDKey struct{}
+type sessionIDKey struct{}
+
+func SessionIDFromContext(ctx context.Context) (string, bool) {
+	id, ok := ctx.Value(sessionIDKey{}).(string)
+	return id, ok && id != ""
+}
 
 // UserIDFromContext returns the authenticated user id placed on the context by
 // the auth interceptor. Handlers use this instead of reading metadata directly.
@@ -51,11 +57,13 @@ func AuthUnaryInterceptor(verifier *middleware.TokenVerifier) grpc.UnaryServerIn
 			return nil, status.Error(codes.Unauthenticated, "missing or malformed authorization metadata")
 		}
 
-		userID, err := verifier.Verify(token)
+		identity, err := verifier.VerifyIdentity(token)
 		if err != nil {
 			return nil, status.Error(codes.Unauthenticated, "invalid token")
 		}
 
-		return handler(context.WithValue(ctx, userIDKey{}, userID), req)
+		ctx = context.WithValue(ctx, userIDKey{}, identity.UserID)
+		ctx = context.WithValue(ctx, sessionIDKey{}, identity.SessionID)
+		return handler(ctx, req)
 	}
 }

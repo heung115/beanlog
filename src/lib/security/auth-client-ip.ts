@@ -27,7 +27,7 @@ export function verifiedClientIp(requestHeaders: Headers, secret: string): strin
   return canonicalClientIp(requestHeaders.get(CLIENT_IP_HEADER));
 }
 
-/** Only Caddy-proven client IPs may affect the internal GET /user rate bucket. */
+/** Only Caddy-proven addresses may affect explicitly allowed internal Auth requests. */
 export function createTrustedAuthFetch(
   requestHeaders: Headers,
   options: TrustedClientOptions = {},
@@ -36,7 +36,7 @@ export function createTrustedAuthFetch(
   const secretFile = options.secretFile ?? process.env.AUTH_CLIENT_IP_SECRET_FILE;
   const internalUrl = options.internalUrl ?? process.env.SUPABASE_SERVER_URL;
   let clientIp: string | null = null;
-  let userEndpoint: string | null = null;
+  let authEndpoint: URL | null = null;
   try {
     if (secretFile && internalUrl) {
       const secret = (options.readSecret ?? ((file) => readFileSync(file, "utf8")))(secretFile).trim();
@@ -45,7 +45,7 @@ export function createTrustedAuthFetch(
       // Deployment supplies the private gateway address; credentials and URL
       // suffixes would make the endpoint ambiguous and must disable forwarding.
       if (base.protocol === "http:" && !base.username && !base.password && !base.search && !base.hash) {
-        userEndpoint = `${base.origin}${base.pathname.replace(/\/$/, "")}/auth/v1/user`;
+        authEndpoint = new URL(`${base.origin}${base.pathname.replace(/\/$/, "")}/auth/v1/`);
       }
     }
   } catch {
@@ -58,11 +58,18 @@ export function createTrustedAuthFetch(
     const method = (init?.method ?? request?.method ?? "GET").toUpperCase();
     const headers = new Headers(init?.headers ?? request?.headers);
     // The proof never leaves Next. Supplied bucket headers are always removed,
-    // including from non-user endpoints or public/external destinations.
+    // including from administrator endpoints and public/external destinations.
     headers.delete(CLIENT_PROOF_HEADER);
     headers.delete(CLIENT_IP_HEADER);
     headers.delete(AUTH_CLIENT_IP_HEADER);
-    if (clientIp && method === "GET" && !target.search && target.href === userEndpoint) {
+    headers.delete("x-beanmap-auth-rate-identity");
+    const endpoint = authEndpoint && target.origin === authEndpoint.origin
+      && target.pathname.startsWith(authEndpoint.pathname)
+      ? target.pathname.slice(authEndpoint.pathname.length) : null;
+    const allowed = endpoint === "user" ? ["GET", "PUT", "PATCH"]
+      : ["token", "signup", "recover", "otp", "verify", "logout", "resend", "reauthenticate"].includes(endpoint ?? "")
+        ? ["POST"] : [];
+    if (clientIp && allowed.includes(method) && !target.hash && !target.username && !target.password) {
       headers.set(AUTH_CLIENT_IP_HEADER, clientIp);
     }
     return fetchImpl(input, { ...init, headers });

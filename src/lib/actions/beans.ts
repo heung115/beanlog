@@ -1,14 +1,15 @@
 "use server";
 
-import { createClient, clearSessionCookies } from "@/lib/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
-import { redirect, RedirectType } from "next/navigation";
+import { redirect } from "next/navigation";
 import { localeCookie } from "@/i18n/routing";
 import { z } from "zod";
 import type { BeanFormData, BeanWithTags } from "@/types/database";
 import type { OriginMapEntry } from "@/types/stats";
 import {
+  beanEditVersionSchema,
   beanFiltersSchema,
   beanFormSchema,
   beanIdSchema,
@@ -172,7 +173,7 @@ export async function createBeanFromForm(formData: FormData) {
   );
 }
 
-export async function updateBean(id: string, formData: BeanFormData, expectedUpdatedAt?: string) {
+export async function updateBean(id: string, formData: BeanFormData, expectedUpdatedAt: string) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -181,7 +182,7 @@ export async function updateBean(id: string, formData: BeanFormData, expectedUpd
   const parsedId = beanIdSchema.safeParse(id);
   const parsed = beanFormSchema.safeParse(formData);
   if (!parsedId.success || !parsed.success) return { error: "Invalid bean data" };
-  if (expectedUpdatedAt !== undefined && !z.iso.datetime({ offset: true }).safeParse(expectedUpdatedAt).success) {
+  if (!beanEditVersionSchema.safeParse(expectedUpdatedAt).success) {
     return { error: "Invalid record version" };
   }
 
@@ -389,22 +390,4 @@ export async function updateProfile(displayName: string, locale: string) {
   } catch {
     return { error: "Unable to update profile" };
   }
-}
-
-export async function deleteAccount(locale = "ko") {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
-  if (!user) return { error: "Unauthorized" };
-
-  const { error } = await supabase.rpc("delete_current_account");
-  if (error) return { error: "Unable to delete account" };
-  try {
-    await supabase.auth.signOut({ scope: "local" });
-  } catch {
-    // The account is already deleted. Always clear this browser's credentials.
-  }
-  await clearSessionCookies();
-
-  redirect(`/${locale === "en" ? "en" : "ko"}?accountDeleted=1`, RedirectType.replace);
 }

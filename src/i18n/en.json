@@ -402,7 +402,19 @@
     "legal": "Legal",
     "terms": "Terms of Service",
     "privacy": "Privacy Policy",
-    "deleteError": "Could not delete your account. You can retry or cancel."
+    "deleteError": "Could not delete your account. You can retry or cancel.",
+    "deletionCode": "Verification code",
+    "deletionCodeSent": "A verification code was sent to your account email.",
+    "sendDeletionCode": "Send verification code",
+    "resendDeletionCode": "Resend verification code",
+    "deletionErrors": {
+      "invalid_code": "Check your verification code.",
+      "challenge_expired": "This code has expired. Request a new code.",
+      "rate_limited": "Please wait before trying again.",
+      "session_expired": "Please sign in again.",
+      "temporarily_unavailable": "Unable to complete this request. Please try again shortly.",
+      "email_unavailable": "Your account email must be verified."
+    }
   },
   "common": {
     "cancel": "Cancel",

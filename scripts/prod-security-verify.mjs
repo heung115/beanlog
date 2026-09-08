@@ -120,6 +120,21 @@ try {
   expect((await recoveryContext.cookies()).filter(c => c.name.includes("auth-token"))).toHaveLength(0);
   report(stage);
 
+  stage = "recovery revokes the old bearer across Auth and PostgREST";
+  expect([401, 403]).toContain((await call("/auth/v1/user", originalToken)).status);
+  for (const table of ["profiles", "beans", "tasting_tags", "blend_components"]) {
+    const stale = await call(`/rest/v1/${table}?select=id`, originalToken);
+    expect(stale.status).toBe(200);
+    expect(stale.data).toEqual([]);
+  }
+  const staleWrite = await call(`/rest/v1/profiles?id=eq.${users[0].id}`, originalToken, "PATCH", { display_name: "Must not persist" });
+  expect([200, 204, 403]).toContain(staleWrite.status);
+  const staleApi = await bridge("api-probe", { ...users[0], bearer: originalToken, probe: "read-canary" });
+  expect(staleApi.status).toBe(401);
+  await ordinary.goto(site + "/ko/explore");
+  await expect(ordinary).toHaveURL(/\/ko\/login/);
+  report(stage);
+
   stage = "old password rejected and new password accepted";
   await recovered.page.locator('[name="email"]').fill(users[0].email);
   await recovered.page.locator('[name="password"]').fill(users[0].password);
@@ -161,8 +176,13 @@ try {
   expect((await failedReplay.text()).includes('"error":"expired"')).toBe(true);
   report(stage);
 
-  stage = "RPC CRUD and cross-user isolation";
+  await recoveryContext.clearCookies();
+  await login(recovered.page, users[0]);
+  stage = "browser mutation RPCs denied";
   const tokenA = await token(recoveryContext);
+  const currentProfile = await call(`/rest/v1/profiles?id=eq.${users[0].id}&select=display_name`, tokenA);
+  expect(currentProfile.status).toBe(200);
+  expect(currentProfile.data[0].display_name).not.toBe("Must not persist");
   const otherContext = await browser.newContext();
   const other = await otherContext.newPage();
   await login(other, users[1]);
@@ -170,29 +190,16 @@ try {
   const bean = { name: "Disposable security verification", roastery: "Verification",
     bean_type: "single_origin", origin_country: "Kenya", process_method: "washed",
     roast_level: "light", consumed_at: "2026-09-07", place_type: "home", overall_score: 8, note: "Disposable" };
-  const create = await call("/rest/v1/rpc/create_bean_record", tokenA, "POST", { p_bean: bean, p_tags: [], p_components: [] });
-  expect(create.status).toBe(200);
-  expect(typeof create.data).toBe("string");
-  const beanId = create.data;
-  const own = await call(`/rest/v1/beans?id=eq.${beanId}&select=id,name,updated_at`, tokenA);
-  expect(own.data).toHaveLength(1);
-  const cross = await call(`/rest/v1/beans?id=eq.${beanId}&select=id`, tokenB);
-  expect(cross.status).toBe(200);
-  expect(cross.data).toEqual([]);
-  const badUpdate = await call("/rest/v1/rpc/update_bean_record", tokenB, "POST", { p_id: beanId, p_bean: bean, p_tags: [], p_components: [] });
-  expect(badUpdate.status).toBeGreaterThanOrEqual(400);
-  const update = await call("/rest/v1/rpc/update_bean_record", tokenA, "POST", {
-    p_id: beanId, p_bean: { ...bean, note: "Updated disposable", expected_updated_at: own.data[0].updated_at }, p_tags: [], p_components: [],
-  });
-  expect(update.status).toBe(200);
-  const updated = await call(`/rest/v1/beans?id=eq.${beanId}&select=note`, tokenA);
-  expect(updated.data[0].note).toBe("Updated disposable");
-  const direct = await call(`/rest/v1/beans?id=eq.${beanId}`, tokenA, "PATCH", { note: "Direct write must fail" });
-  expect(direct.data?.code).toBe("42501");
-  const deleted = await call("/rest/v1/rpc/delete_bean_record", tokenA, "POST", { p_id: beanId });
-  expect(deleted.status).toBe(200);
-  expect(deleted.data).toBe(true);
-  expect((await call(`/rest/v1/beans?id=eq.${beanId}&select=id`, tokenA)).data).toEqual([]);
+  for (const [name, payload] of [
+    ["create_bean_record", { p_bean: bean, p_tags: [], p_components: [] }],
+    ["update_bean_record", { p_id: randomUUID(), p_bean: bean, p_tags: [], p_components: [] }],
+    ["delete_bean_record", { p_id: randomUUID() }],
+    ["delete_current_account", {}],
+  ]) {
+    const denied = await call(`/rest/v1/rpc/${name}`, tokenA, "POST", payload);
+    expect(denied.status).toBe(403);
+    expect(denied.data?.code).toBe("42501");
+  }
   report(stage);
 
   // These pages and Server Actions call the internal Go API, exercising its
@@ -213,6 +220,14 @@ try {
   await expect(app.getByTestId("bean-overall-score")).toBeVisible();
   const uiId = new URL(app.url()).pathname.split("/").at(-1);
   expect(uiId).toMatch(/^[a-f0-9-]{36}$/);
+  const ownRecord = await call(`/rest/v1/beans?id=eq.${uiId}&select=id`, tokenA);
+  expect(ownRecord.status).toBe(200);
+  expect(ownRecord.data).toEqual([{ id: uiId }]);
+  const crossRecord = await call(`/rest/v1/beans?id=eq.${uiId}&select=id`, tokenB);
+  expect(crossRecord.status).toBe(200);
+  expect(crossRecord.data).toEqual([]);
+  const directWrite = await call(`/rest/v1/beans?id=eq.${uiId}`, tokenA, "PATCH", { note: "Direct write must fail" });
+  expect(directWrite.data?.code).toBe("42501");
   report(stage);
 
   stage = "application UI edit and statistics through Go API";
@@ -237,9 +252,12 @@ try {
   await expect(app.getByTestId("stats-empty-state")).toBeVisible();
   report(stage);
 
-  stage = "allowed profile PATCH and internal function ACL";
+  stage = "profile mutations require Go API and internal function ACLs hold";
   const profile = await call(`/rest/v1/profiles?id=eq.${users[0].id}`, tokenA, "PATCH", { display_name: "Disposable verified profile", locale: "ko" });
-  expect(profile.status).toBe(204);
+  expect(profile.status).toBe(403);
+  expect(profile.data?.code).toBe("42501");
+  const profileApi = await bridge("api-probe", { ...users[0], bearer: tokenA, probe: "update-profile" });
+  expect(profileApi.status).toBe(200);
   const profileRead = await call(`/rest/v1/profiles?id=eq.${users[0].id}&select=display_name`, tokenA);
   expect(profileRead.data[0].display_name).toBe("Disposable verified profile");
   const restricted = await call("/rest/v1/rpc/check_rate_limit", tokenA, "POST", { p_action: "verify", p_max_count: 1, p_window_minutes: 60 });

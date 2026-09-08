@@ -1,3 +1,4 @@
+import { accountDeletionCode } from "./deletion-email";
 import { randomBytes, randomUUID } from "node:crypto";
 import axe from "axe-core";
 import { readFile } from "node:fs/promises";
@@ -231,9 +232,10 @@ for (const locale of ["ko", "en"] as const) {
       else await route.continue();
     });
     const dialog = page.getByRole("dialog");
-    await dialog.getByRole("button", { name: t.common.confirm, exact: true }).click();
-    await expect(dialog.getByRole("alert")).toHaveText(t.settings.deleteError);
-    await expect(dialog.getByRole("button", { name: t.common.confirm, exact: true })).toBeEnabled();
+    await dialog.getByRole("button", { name: t.settings.sendDeletionCode, exact: true }).click();
+    await expect(dialog.getByRole("alert")).toHaveText(t.settings.deletionErrors.temporarily_unavailable);
+    await expect(dialog.getByRole("button", { name: t.settings.sendDeletionCode, exact: true })).toBeEnabled();
+    await expect(dialog.getByRole("button", { name: t.common.confirm, exact: true })).toBeDisabled();
     await dialog.getByRole("button", { name: t.common.cancel, exact: true }).click();
     await expect(dialog).toHaveCount(0);
   });
@@ -283,7 +285,11 @@ for (const locale of ["ko", "en"] as const) {
       await page.goto(`/${other}/settings`);
       await expect(name).toHaveValue("새 이름 New name");
       await page.getByRole("button", { name: next.settings.deleteAccount, exact: true }).click();
-      await page.getByRole("dialog").getByRole("button", { name: next.common.confirm, exact: true }).click();
+      const deletionDialog = page.getByRole("dialog");
+      await deletionDialog.getByRole("button", { name: next.settings.sendDeletionCode, exact: true }).click();
+      await expect(deletionDialog.getByRole("status")).toHaveText(next.settings.deletionCodeSent);
+      await deletionDialog.locator('[name="deletionCode"]').fill(await accountDeletionCode(page, user.email));
+      await deletionDialog.getByRole("button", { name: next.common.confirm, exact: true }).click();
       await expect(page).toHaveURL(new RegExp(`/${other}$`));
       const result = await admin.auth.admin.getUserById(id);
       expect(result.data.user).toBeNull();

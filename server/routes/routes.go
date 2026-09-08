@@ -54,6 +54,13 @@ func Setup(cfg *config.Config, db *pgxpool.Pool) *gin.Engine {
 	adminH := handlers.NewAdminHandler(cfg.AdminIngressSecret)
 
 	budget := middleware.NewRequestBudget()
+	// Deletion owns short committed transactions so failed OTP attempts cannot
+	// roll back their persistent rate budget with the common request transaction.
+	deletionH := handlers.NewAccountDeletionHandler(db, cfg.AuthURL, cfg.AuthRateIDSecret)
+	account := r.Group("/api/account")
+	account.Use(budget.IP(), middleware.AuthRequired(cfg.JWKSURL, cfg.JWTIssuer), budget.User())
+	account.POST("/deletion-challenge", deletionH.Challenge)
+	account.POST("/delete", deletionH.Delete)
 	auth := r.Group("/api")
 	auth.Use(budget.IP())
 	auth.Use(middleware.AuthRequired(cfg.JWKSURL, cfg.JWTIssuer))

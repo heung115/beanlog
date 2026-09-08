@@ -1,0 +1,15 @@
+[Unit]
+Description=Inspect sustained authentication rate-limit denials
+After=docker.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/beanmap-auth-budget-monitor
+StateDirectory=beanmap-auth-budgets
+StateDirectoryMode=0700
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+RestrictAddressFamilies=AF_UNIX
+CapabilityBoundingSet=

@@ -440,12 +440,7 @@ func normalizeConsumedAt(raw *string) string {
 // buildBeanRecordPayload marshals the request plus the resolved origin selection
 // into the three JSONB arguments the atomic bean RPCs expect. Blend component
 // sort_order is normalized to the array index, matching the frontend.
-func buildBeanRecordPayload(req *models.CreateBeanRequest, sel *originSelection) (string, string, string, error) {
-	if req.ExpectedUpdatedAt != nil {
-		if _, err := time.Parse(time.RFC3339Nano, *req.ExpectedUpdatedAt); err != nil {
-			return "", "", "", errors.New("invalid expected_updated_at")
-		}
-	}
+func buildBeanRecordPayload(req *models.CreateBeanRequest, sel *originSelection, expectedUpdatedAt *string) (string, string, string, error) {
 	canonicalText := func(value *string) *string {
 		if value == nil {
 			return nil
@@ -454,7 +449,7 @@ func buildBeanRecordPayload(req *models.CreateBeanRequest, sel *originSelection)
 		return &text
 	}
 	bean := beanRecordPayload{
-		ExpectedUpdatedAt: req.ExpectedUpdatedAt,
+		ExpectedUpdatedAt: expectedUpdatedAt,
 		Name:              req.Name, Roastery: req.Roastery, BeanType: req.BeanType,
 		OriginCountry: sel.OriginCountry, OriginCountryID: sel.OriginCountryID,
 		OriginRegion: sel.OriginRegion, OriginRegionID: sel.OriginRegionID,
@@ -542,7 +537,7 @@ func (h *BeanHandler) Create(c *gin.Context) {
 		return
 	}
 
-	beanJSON, tagsJSON, componentsJSON, err := buildBeanRecordPayload(&req, sel)
+	beanJSON, tagsJSON, componentsJSON, err := buildBeanRecordPayload(&req, sel, nil)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid bean data"})
 		return
@@ -572,13 +567,18 @@ func (h *BeanHandler) Update(c *gin.Context) {
 		return
 	}
 
-	sel, err := resolveOriginSelection(c.Request.Context(), db, &req)
+	if _, err := time.Parse(time.RFC3339Nano, req.ExpectedUpdatedAt); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid record version"})
+		return
+	}
+
+	sel, err := resolveOriginSelection(c.Request.Context(), db, &req.CreateBeanRequest)
 	if err != nil {
 		writeOriginResolutionError(c, err)
 		return
 	}
 
-	beanJSON, tagsJSON, componentsJSON, err := buildBeanRecordPayload(&req, sel)
+	beanJSON, tagsJSON, componentsJSON, err := buildBeanRecordPayload(&req.CreateBeanRequest, sel, &req.ExpectedUpdatedAt)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid bean data"})
 		return

@@ -5,6 +5,11 @@ consumers:
       - key: fixture-only-api-key
     acls:
       - group: anon
+  - username: service_role
+    keyauth_credentials:
+      - key: fixture-only-admin-key
+    acls:
+      - group: anon
 services:
   - name: auth-v1-user-read
     url: http://fixture-web:9999
@@ -19,11 +24,7 @@ services:
       - name: acl
         config:
           allow: [anon]
-      - name: rate-limiting
-        config:
-          minute: 600
-          limit_by: ip
-          policy: local
+      - name: beanmap-auth-budgets
   - name: auth-v1
     url: http://fixture-web:9999
     routes:
@@ -35,8 +36,4 @@ services:
       - name: acl
         config:
           allow: [anon]
-      - name: rate-limiting
-        config:
-          minute: 60
-          limit_by: ip
-          policy: local
+      - name: beanmap-auth-budgets

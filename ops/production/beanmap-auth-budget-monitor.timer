@@ -1,0 +1,11 @@
+[Unit]
+Description=Inspect authentication gateway limits every minute
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=1min
+AccuracySec=5s
+Unit=beanmap-auth-budget-monitor.service
+
+[Install]
+WantedBy=timers.target

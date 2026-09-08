@@ -4,7 +4,7 @@ import test from "node:test";
 import vm from "node:vm";
 import ts from "typescript";
 import { z } from "zod";
-import { beanFormSchema } from "../src/lib/validation/beans.ts";
+import { beanEditVersionSchema, beanFormSchema } from "../src/lib/validation/beans.ts";
 
 const { outputText } = ts.transpileModule(readFileSync(new URL("../src/lib/actions/beans.ts", import.meta.url), "utf8"), {
   compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
@@ -18,7 +18,7 @@ function fixture({ user = true, status } = {}) {
   vm.runInNewContext(outputText, { exports, require(name) {
     if (name === "zod") return { z };
     if (name === "@/lib/supabase/server") return { createClient: async () => ({ auth: { getUser: async () => ({ data: { user: user ? { id: "qa" } : null }, error: null }) } }) };
-    if (name === "@/lib/validation/beans") return { beanFormSchema, beanIdSchema: z.uuid() };
+    if (name === "@/lib/validation/beans") return { beanEditVersionSchema, beanFormSchema, beanIdSchema: z.uuid() };
     if (name === "@/lib/api/client") return { ApiError, apiFetch: async (_path, options) => { writes.push(options.body); if (status) throw new ApiError(status); return { success: true, id }; } };
     if (name === "next/cache") return { revalidatePath: (path) => revalidated.push(path) };
     if (["next/navigation", "next/headers", "@/i18n/routing"].includes(name)) return {};
@@ -41,9 +41,18 @@ test("the exact microsecond record version reaches the atomic API update", async
 test("conflicts and expired sessions remain distinguishable from connection failures", async () => {
   for (const [status, expected] of [[409, "record_conflict"], [401, "Unauthorized"], [503, "Unable to update bean"]]) {
     const actions = fixture({ status });
-    assert.equal((await actions.updateBean(id, bean)).error, expected);
+    assert.equal((await actions.updateBean(id, bean, "2026-09-06T12:34:56.123456Z")).error, expected);
     assert.equal(actions.revalidated.length, 0);
   }
   assert.equal((await fixture({ user: false }).updateBean(id, bean)).error, "Unauthorized");
   assert.equal((await fixture({ status: 401 }).createBean(bean)).error, "Unauthorized");
+});
+
+test("every edit requires a valid version before any API write", async () => {
+  for (const version of [undefined, null, "", "not-a-timestamp", "2026-02-30T12:00:00Z", "2026-09-06", 123, {}, []]) {
+    const actions = fixture();
+    assert.equal((await actions.updateBean(id, bean, version)).error, "Invalid record version");
+    assert.equal(actions.writes.length, 0);
+    assert.equal(actions.revalidated.length, 0);
+  }
 });
