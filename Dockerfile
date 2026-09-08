@@ -60,12 +60,14 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder /app/scripts/verify-image-runtime.mjs ./scripts/verify-image-runtime.mjs
 # The standalone server only needs the Node runtime. Remove package managers
 # and server source maps from the production image to reduce attack surface.
 RUN rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx \
     /opt/yarn* /usr/local/bin/yarn /usr/local/bin/yarnpkg && \
     find /app -type f -name '*.map' -delete
 USER nextjs
+RUN node scripts/verify-image-runtime.mjs
 EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"

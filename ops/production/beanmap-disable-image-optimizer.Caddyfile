@@ -1,0 +1,9 @@
+# This application uses unoptimized blob previews and has no server optimizer
+# callers. Keep this reduction in exposed image-decoder surface after upgrades.
+(beanmap_disable_image_optimizer) {
+	@beanmap_image_optimizer path /_next/image /_next/image/*
+	handle @beanmap_image_optimizer {
+		header Cache-Control "no-store"
+		respond 404
+	}
+}
