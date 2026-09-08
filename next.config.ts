@@ -30,6 +30,9 @@ const nextConfig: NextConfig = {
   output: "standalone",
   deploymentId: process.env.NEXT_DEPLOYMENT_ID,
   poweredByHeader: false,
+  // Photos stay in browser-local Blob previews; no server optimizer is needed.
+  // Keep its decoder endpoint disabled, including direct requests to it.
+  images: { unoptimized: true },
   experimental: {
     proxyClientMaxBodySize: "1mb",
     // Production containers have a read-only root filesystem. Metadata route

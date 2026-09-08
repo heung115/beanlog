@@ -13,6 +13,7 @@ coverage
 docs
 scripts/*
 !scripts/prepare-ocr-assets.mjs
+!scripts/verify-image-runtime.mjs
 !scripts/ocr/
 !scripts/ocr/**
 public/ocr
