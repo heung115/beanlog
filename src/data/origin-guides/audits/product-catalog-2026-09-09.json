@@ -1,0 +1,2561 @@
+{
+  "reviewedAt": "2026-09-09",
+  "catalogCoverage": {
+    "accessedAt": "2026-09-09",
+    "entry": "https://unspecialty.com",
+    "pages": [
+      {
+        "url": "https://unspecialty.com/product/all_beans.html?cate_no=85",
+        "count": 194,
+        "pagination": [],
+        "scope": "전체 원두; server-rendered hidden list consumed by all-beans-page script"
+      },
+      {
+        "url": "https://unspecialty.com/product/monthly_pick.html?cate_no=79",
+        "count": 62,
+        "pagination": [],
+        "scope": "coffee monthly-pick list only; machine section excluded"
+      },
+      {
+        "url": "https://unspecialty.com/product/green-coffee-beans.html?cate_no=73",
+        "count": 12,
+        "pagination": [
+          "https://unspecialty.com/product/green-coffee-beans.html?cate_no=73&page=1",
+          "https://unspecialty.com/product/green-coffee-beans.html?cate_no=73&page=2"
+        ],
+        "scope": "green coffee"
+      },
+      {
+        "url": "https://unspecialty.com/product/green-coffee-beans.html?cate_no=73&page=2",
+        "count": 10,
+        "pagination": [
+          "https://unspecialty.com/product/green-coffee-beans.html?cate_no=73&page=1",
+          "https://unspecialty.com/product/green-coffee-beans.html?cate_no=73&page=2"
+        ],
+        "scope": "green coffee"
+      }
+    ],
+    "uniqueProducts": 278,
+    "contains811": {
+      "productNo": 811,
+      "title": "[판매 종료] 말릭커피 (8/1~8/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=811"
+    },
+    "limits": [
+      "Only linked public catalogs; no numeric product scanning.",
+      "194 all-beans source rows are complete rendered catalog snapshot; no page links or lazy fetch in all-beans-page mounting code.",
+      "Monthly coffee list has no pagination; archival entries retained.",
+      "Product-level origins still need independent verification; catalog names may be farms or station names, not geographic regions."
+    ]
+  },
+  "counts": {
+    "products": 278,
+    "fetched": 278,
+    "rawOptions": 2634,
+    "uniqueRawOptions": 2289
+  },
+  "products": [
+    {
+      "productNo": 774,
+      "title": "[아이덴티티 커피랩] 에티오피아 워르카 첼베사 & 쿠비 모디파이드 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=774",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 1668
+    },
+    {
+      "productNo": 776,
+      "title": "[아이덴티티 커피랩] 콜롬비아 엑셀소 마운틴 워터 디카페인",
+      "url": "https://unspecialty.com/product/detail.html?product_no=776",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 2,
+      "detailTextCharacters": 704
+    },
+    {
+      "productNo": 660,
+      "title": "[아이덴티티 커피랩] 에티오피아 시다마 벤사 알로 74158 워시드 (스카이 프로젝트 : EE)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=660",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 635,
+      "title": "[아이덴티티 커피랩] 콜롬비아 라 빅토리아 아리스토불로 라요 게이샤 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=635",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 634,
+      "title": "[아이덴티티 커피랩] 에티오피아 손콜레 칼라토 74110, 74112 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=634",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 633,
+      "title": "[아이덴티티 커피랩] 페루 드레이드 페레즈 델가도 게이샤 무산소 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=633",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 798,
+      "title": "[고로커피 로스터스] 콜롬비아 수프리모 마운틴 워터 디카페인",
+      "url": "https://unspecialty.com/product/detail.html?product_no=798",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 715
+    },
+    {
+      "productNo": 737,
+      "title": "[고로커피 로스터스] 콜롬비아 로스 노갈레스 자바 애너로빅 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=737",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 532
+    },
+    {
+      "productNo": 736,
+      "title": "[고로커피 로스터스] 콜롬비아 비야 카롤리나 핑크버번 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=736",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 404
+    },
+    {
+      "productNo": 735,
+      "title": "[고로커피 로스터스] 에티오피아 부르사 문타샤 74158 피베리 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=735",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 575
+    },
+    {
+      "productNo": 705,
+      "title": "[고로커피 로스터스] 에티오피아 예가체프 첼베사 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=705",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 463,
+      "title": "[가치커피] 보통 블렌드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=463",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 721
+    },
+    {
+      "productNo": 464,
+      "title": "[가치커피] 구수 블렌드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=464",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 735
+    },
+    {
+      "productNo": 465,
+      "title": "[가치커피] 코스모스 블렌드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=465",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 710
+    },
+    {
+      "productNo": 880,
+      "title": "[말릭커피] 민트 초코 (언스페셜티 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=880",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 755
+    },
+    {
+      "productNo": 825,
+      "title": "[무우수 커피 로스터스] 살구오름 (언스페셜티 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=825",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 492
+    },
+    {
+      "productNo": 817,
+      "title": "[커피화 로스터스] 마이야르 토마토 (언스페셜티 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=817",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 966
+    },
+    {
+      "productNo": 790,
+      "title": "[루베르 로스터리] 에티오피아 구지 우라가 수케 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=790",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 650
+    },
+    {
+      "productNo": 760,
+      "title": "[트레커스빈] 풍요의 여신 '안나푸르나' (언스페셜티 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=760",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 957
+    },
+    {
+      "productNo": 632,
+      "title": "[해월커피] '비로소 봄' (언스페셜티 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=632",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 520,
+      "title": "[코스피어] 드링커블 (하우스 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=520",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 484
+    },
+    {
+      "productNo": 500,
+      "title": "[토치커피] 레드 호라이즌 ver. 2 (언스페셜티 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=500",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 491,
+      "title": "[에어리] 에어리 미디엄 블렌드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=491",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 483,
+      "title": "[고로커피 로스터스] 슈톨렌 블렌드 (언스페셜티 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=483",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 477,
+      "title": "[존스몰 로스터리] 베이스먼트 블렌드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=477",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 658
+    },
+    {
+      "productNo": 462,
+      "title": "[가치커피] 피치 가든 (언스페셜티 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=462",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 762
+    },
+    {
+      "productNo": 408,
+      "title": "[클라리멘토] 누베그리스 블렌드 (하우스 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=408",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 2,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 403,
+      "title": "[아이덴티티 커피랩] 키치 블렌드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=403",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 881,
+      "title": "[말릭커피] 그린 애플 쥬스 (언스페셜티 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=881",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 748
+    },
+    {
+      "productNo": 872,
+      "title": "[루베르 로스터리] 에티오피아 게뎁 단체 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=872",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 617
+    },
+    {
+      "productNo": 762,
+      "title": "[트레커스빈] 블랙잭 블렌드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=762",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 727
+    },
+    {
+      "productNo": 642,
+      "title": "[무우수 커피 로스터스] 스타라이트 : 시트러스 트윙클",
+      "url": "https://unspecialty.com/product/detail.html?product_no=642",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 657
+    },
+    {
+      "productNo": 521,
+      "title": "[코스피어] 에스에스 (시즈널 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=521",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 2,
+      "detailTextCharacters": 531
+    },
+    {
+      "productNo": 502,
+      "title": "[토치커피] 스윗 앤 모어 (하우스 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=502",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 2,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 492,
+      "title": "[에어리] 에어리 다크 블렌드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=492",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 484,
+      "title": "[고로커피 로스터스] 그레코로만 블렌드 (하우스 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=484",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 767
+    },
+    {
+      "productNo": 478,
+      "title": "[존스몰 로스터리] 에스프레소 블렌드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=478",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 627
+    },
+    {
+      "productNo": 453,
+      "title": "[커피화 로스터스] 짙은 블렌드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=453",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 569
+    },
+    {
+      "productNo": 443,
+      "title": "[해월커피] 해월 다크 로스트 블렌드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=443",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 409,
+      "title": "[클라리멘토] 카라멜로 블렌드 (하우스 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=409",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 2,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 400,
+      "title": "[아이덴티티 커피랩] 칠린 블렌드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=400",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 409
+    },
+    {
+      "productNo": 869,
+      "title": "[코스피어] 에티오피아 할로 베리티 내추럴 디카페인",
+      "url": "https://unspecialty.com/product/detail.html?product_no=869",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 539
+    },
+    {
+      "productNo": 812,
+      "title": "[클라리멘토] 콜롬비아 후일라 피탈리토 슈가케인 디카페인",
+      "url": "https://unspecialty.com/product/detail.html?product_no=812",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 538
+    },
+    {
+      "productNo": 778,
+      "title": "[존스몰 로스터리] 케냐 키린야가 키아무구모 SL28, SL34 AA 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=778",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 956
+    },
+    {
+      "productNo": 761,
+      "title": "[트레커스빈] 디디 블렌드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=761",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 735
+    },
+    {
+      "productNo": 758,
+      "title": "[무우수 커피 로스터스] 유타 블렌드 (하우스 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=758",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 750
+    },
+    {
+      "productNo": 748,
+      "title": "[에어리] 에티오피아 첼베사 74110,74112,74158 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=748",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 706
+    },
+    {
+      "productNo": 734,
+      "title": "[말릭커피] 자스민 워터 (언스페셜티 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=734",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 777
+    },
+    {
+      "productNo": 582,
+      "title": "[루베르 로스터리] 토파즈 블렌드 (하우스 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=582",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 501,
+      "title": "[토치커피] 글램 앤 모어 (하우스 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=501",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 2,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 485,
+      "title": "[고로커피 로스터스] 대공원 블렌드 (하우스 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=485",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 530
+    },
+    {
+      "productNo": 454,
+      "title": "[커피화 로스터스] 산들 블렌드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=454",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 601
+    },
+    {
+      "productNo": 442,
+      "title": "[해월커피] 해월 미디엄 로스트 블렌드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=442",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 402,
+      "title": "[아이덴티티 커피랩] 미드센추리 블렌드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=402",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 371
+    },
+    {
+      "productNo": 882,
+      "title": "[말릭커피] 로지 체리 (언스페셜티 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=882",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 834
+    },
+    {
+      "productNo": 873,
+      "title": "[루베르 로스터리] 파나마 엘리다 로마 아리바 게이샤 DRD 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=873",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 829
+    },
+    {
+      "productNo": 867,
+      "title": "[코스피어] 온두라스 엘 라우렐 파라이네마 워시드 Lot.2",
+      "url": "https://unspecialty.com/product/detail.html?product_no=867",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 629
+    },
+    {
+      "productNo": 818,
+      "title": "[커피화 로스터스] 고요 블렌드 (Decaf)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=818",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 719
+    },
+    {
+      "productNo": 808,
+      "title": "[에어리] 파나마 알티에리 로라 카투아이 ASD 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=808",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 971
+    },
+    {
+      "productNo": 792,
+      "title": "[존스몰 로스터리] 콜롬비아 우일라 라 테라사 치로소 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=792",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 935
+    },
+    {
+      "productNo": 763,
+      "title": "[트레커스빈] 밀키웨이 블렌드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=763",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 699
+    },
+    {
+      "productNo": 757,
+      "title": "[해월커피] 탄자니아 아카시아 힐스 파카마라 AA 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=757",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 524
+    },
+    {
+      "productNo": 738,
+      "title": "[클라리멘토] 볼리비아 콰트로 라마스 카투아이 락틱 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=738",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 558
+    },
+    {
+      "productNo": 470,
+      "title": "[무우수 커피 로스터스] 패터슨 블렌드 (하우스 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=470",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 958
+    },
+    {
+      "productNo": 868,
+      "title": "[코스피어] 코스타리카 수마바 데 루르데스 몬테 야노 보니또 밀레니오 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=868",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 716
+    },
+    {
+      "productNo": 858,
+      "title": "[트레커스빈] 콜롬비아 산 어거스틴 슈가케인 디카페인",
+      "url": "https://unspecialty.com/product/detail.html?product_no=858",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 887
+    },
+    {
+      "productNo": 823,
+      "title": "[커피화 로스터스] 콜롬비아 후일라 엑셀소 슈가케인 EA 디카페인",
+      "url": "https://unspecialty.com/product/detail.html?product_no=823",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 1170
+    },
+    {
+      "productNo": 796,
+      "title": "[클라리멘토] 콜롬비아 파라이소92 레드버번 더블 애너로빅 퍼먼테이션 슈가케인 디카페인",
+      "url": "https://unspecialty.com/product/detail.html?product_no=796",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 545
+    },
+    {
+      "productNo": 791,
+      "title": "[존스몰 로스터리] 케냐 니에리 카구뉴 SL 셀렉션 내추럴 헤비",
+      "url": "https://unspecialty.com/product/detail.html?product_no=791",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 859
+    },
+    {
+      "productNo": 752,
+      "title": "[루베르 로스터리] 에티오피아 시다마 부르사 루무다모 피베리 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=752",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 743
+    },
+    {
+      "productNo": 695,
+      "title": "[에어리] 파나마 라마스투스 엘리다 이스테이트 카투아이 ASD 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=695",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 471,
+      "title": "[무우수 커피 로스터스] 오하이오 블렌드 (하우스 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=471",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 998
+    },
+    {
+      "productNo": 466,
+      "title": "[가치커피] 에티오피아 구지 함벨라 타겔 알레마예후 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=466",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 444,
+      "title": "[해월커피] 케냐 가라투아 159 SL28 AA 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=444",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 417,
+      "title": "[말릭커피] 마일드 블렌드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=417",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 315
+    },
+    {
+      "productNo": 879,
+      "title": "[트레커스빈] 에티오피아 예가체프 첼첼레 슈퍼 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=879",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 858
+    },
+    {
+      "productNo": 863,
+      "title": "[커피화 로스터스] 에티오피아 구지 우라비스트 에얼룸 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=863",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 1703
+    },
+    {
+      "productNo": 856,
+      "title": "[무우수 커피 로스터스] 에티오피아 워카 사카로 월리쇼, 데가 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=856",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 490
+    },
+    {
+      "productNo": 802,
+      "title": "[코스피어] 프루츠프루츠 (언스페셜티 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=802",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 607
+    },
+    {
+      "productNo": 801,
+      "title": "[에어리] 파나마 잔슨 하시엔다 라스 라구나스 게이샤 내추럴 (26-227)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=801",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 786
+    },
+    {
+      "productNo": 794,
+      "title": "[클라리멘토] 콜롬비아 라 에스메랄다 시드라 세미 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=794",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 604
+    },
+    {
+      "productNo": 751,
+      "title": "[루베르 로스터리] 파나마 에일라 365 게이샤 내추럴 산투아리오 46",
+      "url": "https://unspecialty.com/product/detail.html?product_no=751",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 703
+    },
+    {
+      "productNo": 750,
+      "title": "[가치커피] 페루 엘 세로 옐로 카투라 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=750",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 1064
+    },
+    {
+      "productNo": 706,
+      "title": "[해월커피] 페루 아마조나스 루야 산타 테레사 게이샤 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=706",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 479,
+      "title": "[존스몰 로스터리] 시즈널 블렌드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=479",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 2,
+      "detailTextCharacters": 682
+    },
+    {
+      "productNo": 416,
+      "title": "[말릭커피] 프루티 블렌드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=416",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 420
+    },
+    {
+      "productNo": 862,
+      "title": "[커피화 로스터스] 에티오피아 시다마 아르베고나 휴레 74158 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=862",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 2035
+    },
+    {
+      "productNo": 854,
+      "title": "[무우수 커피 로스터스] 에티오피아 구지 샤키소 타데 GG 쿠루메 내추럴 마운틴 워터 디카페인",
+      "url": "https://unspecialty.com/product/detail.html?product_no=854",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 510
+    },
+    {
+      "productNo": 809,
+      "title": "[트레커스빈] 에티오피아 구지 우라가 시코 데가 쿠루메 내추럴 SWP 디카페인",
+      "url": "https://unspecialty.com/product/detail.html?product_no=809",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 639
+    },
+    {
+      "productNo": 807,
+      "title": "[에어리] 파나마 알티에리 알레 게이샤 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=807",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 920
+    },
+    {
+      "productNo": 785,
+      "title": "[코스피어] 니카라과 아구아 사르카 엘 토리토 무산소 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=785",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 605
+    },
+    {
+      "productNo": 772,
+      "title": "[존스몰 로스터리] 에티오피아 물루게타 문타샤 휴레 74158 모스토 무산소 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=772",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 834
+    },
+    {
+      "productNo": 756,
+      "title": "[해월커피] 온두라스 핀카 미에리시 세로아줄 '오아시스' 게이샤 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=756",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 583
+    },
+    {
+      "productNo": 731,
+      "title": "[말릭커피] 에티오피아 반코 타라투 더블 퍼먼테이션 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=731",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 997
+    },
+    {
+      "productNo": 719,
+      "title": "[클라리멘토] 에티오피아 첼첼레 윌리쇼, 데가 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=719",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 678,
+      "title": "[루베르 로스터리] 콜롬비아 산타 바바라 아구아 린다 치로소 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=678",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 673,
+      "title": "[가치커피] 엘살바도르 산타로사 파카마라 허니",
+      "url": "https://unspecialty.com/product/detail.html?product_no=673",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 884,
+      "title": "[말릭커피] 에티오피아 구지 샤키소 타데 GG 쿠루메 내추럴 마운틴 워터 디카페인",
+      "url": "https://unspecialty.com/product/detail.html?product_no=884",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 715
+    },
+    {
+      "productNo": 878,
+      "title": "[트레커스빈] 콜롬비아 엘 트리운포 수단 루메 모스토 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=878",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 890
+    },
+    {
+      "productNo": 855,
+      "title": "[무우수 커피 로스터스] 콜롬비아 라스 과야카네스 치로소 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=855",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 594
+    },
+    {
+      "productNo": 853,
+      "title": "[커피화 로스터스] 에티오피아 구지 샤키소 타데 GG 쿠루메 내추럴 마운틴 워터 디카페인",
+      "url": "https://unspecialty.com/product/detail.html?product_no=853",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 1949
+    },
+    {
+      "productNo": 793,
+      "title": "[클라리멘토] 브라질 파젠다 로도무뉴 게이샤 다크룸 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=793",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 553
+    },
+    {
+      "productNo": 786,
+      "title": "[코스피어] 케냐 키아무구모 AA SL28, SL34 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=786",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 503
+    },
+    {
+      "productNo": 771,
+      "title": "[존스몰 로스터리] 콜롬비아 라 보헤미아 게이샤 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=771",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 778
+    },
+    {
+      "productNo": 723,
+      "title": "[토치커피] 아쿠아: 클리어 티 Ver.2 (언스페셜티 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=723",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 868
+    },
+    {
+      "productNo": 677,
+      "title": "[루베르 로스터리] 페루 엘 라우렐 라쿠마 마르셀리노 칭구엘 마르셀 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=677",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 490,
+      "title": "[에어리] 트로피컬 쥬시 (언스페셜티 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=490",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 885,
+      "title": "[말릭커피] 콜롬비아 엘 미라도르 핑크 버번 허니",
+      "url": "https://unspecialty.com/product/detail.html?product_no=885",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 1016
+    },
+    {
+      "productNo": 864,
+      "title": "[커피화 로스터스] 브라질 파젠다 호도무뇨 게이샤 다크룸 퍼먼테이션 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=864",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 1991
+    },
+    {
+      "productNo": 828,
+      "title": "[무우수 커피 로스터스] 과테말라 안티구아 파소 가나도 버번 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=828",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 513
+    },
+    {
+      "productNo": 787,
+      "title": "[코스피어] 에티오피아 부르사 차리초 애너로빅 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=787",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 519
+    },
+    {
+      "productNo": 769,
+      "title": "[트레커스빈] 에티오피아 구지 우라가 가디오 시코 74110, 74112, 에얼룸 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=769",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 772
+    },
+    {
+      "productNo": 740,
+      "title": "[클라리멘토] 콜롬비아 아구아 린다 치로소 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=740",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 661
+    },
+    {
+      "productNo": 700,
+      "title": "[존스몰 로스터리] 에티오피아 아르베고나 두완초 74158 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=700",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 674,
+      "title": "[가치커피] 콜롬비아 라 에스메랄다 게이샤 무산소 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=674",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 585,
+      "title": "[루베르 로스터리] 아메시스트 : 퍼플 무드 (언스페셜티 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=585",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 886,
+      "title": "[말릭커피] 콜롬비아 엘 오브라헤 게이샤 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=886",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 628
+    },
+    {
+      "productNo": 875,
+      "title": "[무우수 커피 로스터스] 콜롬비아 핀카 베타니아 핑크 버번 허니",
+      "url": "https://unspecialty.com/product/detail.html?product_no=875",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 593
+    },
+    {
+      "productNo": 819,
+      "title": "[커피화 로스터스] 에티오피아 게데오 게뎁 할로 하르투메 에얼룸 모디파이드 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=819",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 1301
+    },
+    {
+      "productNo": 810,
+      "title": "[코스피어] 콜롬비아 캄포 에르모소 시드라 워시드 바이오",
+      "url": "https://unspecialty.com/product/detail.html?product_no=810",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 1008
+    },
+    {
+      "productNo": 799,
+      "title": "[트레커스빈] 에티오피아 바샤 베켈레 곤조베 74112, 74158 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=799",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 810
+    },
+    {
+      "productNo": 795,
+      "title": "[클라리멘토] 에티오피아 단체 에얼룸 모디파이드 허니",
+      "url": "https://unspecialty.com/product/detail.html?product_no=795",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 577
+    },
+    {
+      "productNo": 701,
+      "title": "[존스몰 로스터리] 페루 버그우 셀렉션 게이샤 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=701",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 467,
+      "title": "[가치커피] 에티오피아 시다마 벤사 무라고 바샤 베켈레 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=467",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 876,
+      "title": "[무우수 커피 로스터스] 콜롬비아 라스 플로레스 오팔 게이샤 애너로빅 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=876",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 692
+    },
+    {
+      "productNo": 865,
+      "title": "[커피화 로스터스] 파나마 엘 바하레케 게이샤 내추럴 Lot.11",
+      "url": "https://unspecialty.com/product/detail.html?product_no=865",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 1539
+    },
+    {
+      "productNo": 803,
+      "title": "[코스피어] 파나마 엘리다 부엘타 게이샤 ASD RF1D 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=803",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 747
+    },
+    {
+      "productNo": 773,
+      "title": "[말릭커피] 콜롬비아 톨리마 카페 그란데 엘 비노 마운틴워터 디카페인",
+      "url": "https://unspecialty.com/product/detail.html?product_no=773",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 478
+    },
+    {
+      "productNo": 767,
+      "title": "[트레커스빈] 케냐 이아가즈 피베리 TOP 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=767",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 1394
+    },
+    {
+      "productNo": 749,
+      "title": "[가치커피] 콜롬비아 로스 파티오스 '펑키 체리' 무산소 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=749",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 1365
+    },
+    {
+      "productNo": 741,
+      "title": "[클라리멘토] 에티오피아 니구세 게메다 카라모 74158 무산소 허니",
+      "url": "https://unspecialty.com/product/detail.html?product_no=741",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 529
+    },
+    {
+      "productNo": 680,
+      "title": "[존스몰 로스터리] 에티오피아 예가체프 첼베사 74110, 74112, 74158 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=680",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 631,
+      "title": "[해월커피] 과테말라 엘 인헤르또 게이샤 내추럴 (드라이드 온 체리)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=631",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 589,
+      "title": "[루베르 로스터리] 페루 라 코이파 라 플로르 버번 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=589",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 840,
+      "title": "[커피화 로스터스] 콜롬비아 팔레스티나 게이샤 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=840",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 1911
+    },
+    {
+      "productNo": 826,
+      "title": "[무우수 커피 로스터스] 에티오피아 부르사 시다마 루무다모 74158 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=826",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 538
+    },
+    {
+      "productNo": 764,
+      "title": "[트레커스빈] 파나마 엘리다 아구아까떼 게이샤 DRD 워시드 (Lot. 1004-240425)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=764",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 860
+    },
+    {
+      "productNo": 739,
+      "title": "[클라리멘토] 볼리비아 콰트로 라마스 게이샤 펄스 진공 허니",
+      "url": "https://unspecialty.com/product/detail.html?product_no=739",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 542
+    },
+    {
+      "productNo": 724,
+      "title": "[토치커피] 파나마 로스 세니소스 게이샤 콜드 퍼먼테이션 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=724",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 721,
+      "title": "[말릭커피] 코스타리카 엘사르 데 사르세로 화이트 허니 & 마운틴 워터 디카페인",
+      "url": "https://unspecialty.com/product/detail.html?product_no=721",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 708,
+      "title": "[해월커피] 온두라스 산타 루시아 카소나 게이샤 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=708",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 692,
+      "title": "[코스피어] 에티오피아 구지 비샬라 에얼룸 레드 허니",
+      "url": "https://unspecialty.com/product/detail.html?product_no=692",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 581,
+      "title": "[루베르 로스터리] 예멘 다마르 안스 바니 오페어 사드 알 오파이리 켄트 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=581",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 476,
+      "title": "[존스몰 로스터리] 스트로베리 스플래쉬 (언스페셜티 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=476",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 841,
+      "title": "[커피화 로스터스] 파나마 아시엔다 라 에스메랄다 엘 벨로 아길라 게이샤 워시드(3FC CRD)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=841",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 1709
+    },
+    {
+      "productNo": 827,
+      "title": "[무우수 커피 로스터스] 에티오피아 알로 시다마 벤사 하마쇼 상고타 74158 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=827",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 586
+    },
+    {
+      "productNo": 766,
+      "title": "[트레커스빈] 에티오피아 바샤 베켈레 곤조베 싱글팜 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=766",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 1135
+    },
+    {
+      "productNo": 725,
+      "title": "[토치커피] 에티오피아 구지 바데이 74110, 74112 허니",
+      "url": "https://unspecialty.com/product/detail.html?product_no=725",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 720,
+      "title": "[클라리멘토] 페루 라 팔마 카투라, 버번, 파체 백 퍼먼티드 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=720",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 691,
+      "title": "[코스피어] 페루 라스 티링게스 티피카 무산소 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=691",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 682,
+      "title": "[말릭커피] 에티오피아 예가체프 엡타 첼베사 에얼룸 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=682",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 676,
+      "title": "[가치커피] 튜브앤랙",
+      "url": "https://unspecialty.com/product/detail.html?product_no=676",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 580,
+      "title": "[루베르 로스터리] 파나마 하시엔다 라 에스메랄다 부에노스 아이레스 게이샤 1NC (스페셜랏)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=580",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 451,
+      "title": "[해월커피] 과테말라 라스 마카다미아스 게이샤 2871 내추럴 (2025 CoE #1)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=451",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 829,
+      "title": "[무우수 커피 로스터스] 콜롬비아 CGLE 라 에스페란자 게이샤 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=829",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 493
+    },
+    {
+      "productNo": 820,
+      "title": "[커피화 로스터스] 에티오피아 시다마 아르베고나 차리초 74158 무산소 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=820",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 1558
+    },
+    {
+      "productNo": 768,
+      "title": "[트레커스빈] 파나마 체바스 게이샤 내추럴 다크룸 Lot 007",
+      "url": "https://unspecialty.com/product/detail.html?product_no=768",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 1178
+    },
+    {
+      "productNo": 726,
+      "title": "[토치커피] 에티오피아 하데나 머츄어 에얼룸 모디파이드 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=726",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 690,
+      "title": "[코스피어] 에콰도르 루그마파타 시드라 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=690",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 577,
+      "title": "[루베르 로스터리] 파나마 심비오시스 게이샤 무산소 내추럴 (랏 13)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=577",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 513,
+      "title": "[말릭커피] 라스트 크리스마스 (언스페셜티 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=513",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 468,
+      "title": "[가치커피] 페루 라스 에티오페스 게이샤 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=468",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 407,
+      "title": "[클라리멘토] 베르데 (언스페셜티 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=407",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 831,
+      "title": "[무우수 커피 로스터스] 에콰도르 엘리자 시드라 더블 퍼먼테이션 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=831",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 487
+    },
+    {
+      "productNo": 821,
+      "title": "[커피화 로스터스] 콜롬비아 엘 플라세르 게이샤 CM 화이트 허니",
+      "url": "https://unspecialty.com/product/detail.html?product_no=821",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 1547
+    },
+    {
+      "productNo": 765,
+      "title": "[트레커스빈] 콜롬비아 엘 쁠라셀 게이샤 CM 화이트 허니",
+      "url": "https://unspecialty.com/product/detail.html?product_no=765",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 1094
+    },
+    {
+      "productNo": 727,
+      "title": "[토치커피] 에티오피아 두완초 74158 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=727",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 576,
+      "title": "[루베르 로스터리] 베스트 오브 파나마 2025 게이샤 워시드 부문 14위 핀카 엘 데스티노 두엔데 게이샤 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=576",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 515,
+      "title": "[코스피어] 언-에어 (언스페셜티 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=515",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 591
+    },
+    {
+      "productNo": 469,
+      "title": "[가치커피] 콜롬비아 엘 디비소 옴블리곤 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=469",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 415,
+      "title": "[말릭커피] 골든 애플 쥬스 (언스페셜티 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=415",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 839,
+      "title": "[커피화 로스터스] 파나마 탈라만카 디그나 누네즈 게이샤 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=839",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 1933
+    },
+    {
+      "productNo": 830,
+      "title": "[무우수 커피 로스터스] 온두라스 핀카 미에리시 산타 루시아 게이샤 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=830",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 514
+    },
+    {
+      "productNo": 728,
+      "title": "[토치커피] 탄자니아 아카시아 힐스 파카마라 AA 풀리 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=728",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 822,
+      "title": "[커피화 로스터스] 코스타리카 코라손 데 헤수스 비스타 파라이소 타카 게이샤 워시드 익스페리멘탈",
+      "url": "https://unspecialty.com/product/detail.html?product_no=822",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 1314
+    },
+    {
+      "productNo": 755,
+      "title": "[무우수 커피 로스터스] 에티오피아 예가체프 할로 베리티 에얼룸 내추럴 디카페인",
+      "url": "https://unspecialty.com/product/detail.html?product_no=755",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 537
+    },
+    {
+      "productNo": 806,
+      "title": "[무우수 커피 로스터스] 케냐 나미라 림웨 AA 풀리 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=806",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 500
+    },
+    {
+      "productNo": 716,
+      "title": "[커피화 로스터스] 에콰도르 라 노리아 그린 팁 게이샤 LA 워시드 Lot.1",
+      "url": "https://unspecialty.com/product/detail.html?product_no=716",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 665,
+      "title": "[말릭커피] 케냐 니에리힐 AA Top SL28, 루이루 11, 바티안 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=665",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 805,
+      "title": "[무우수 커피 로스터스] 에티오피아 카라모 할라타 산타웨네 74158 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=805",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 472
+    },
+    {
+      "productNo": 715,
+      "title": "[커피화 로스터스] 에티오피아 게뎁 단체 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=715",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 754,
+      "title": "[무우수 커피 로스터스] 에티오피아 예가체프 할로 베리티 에얼룸 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=754",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 480
+    },
+    {
+      "productNo": 714,
+      "title": "[커피화 로스터스] 콜롬비아 엘 오브라헤 게이샤 워시드 Lot. 156",
+      "url": "https://unspecialty.com/product/detail.html?product_no=714",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 687,
+      "title": "[무우수 커피 로스터스] 케냐 키리냐가 구아마 AA 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=687",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 753,
+      "title": "[무우수 커피 로스터스] 페루 엘 미라도르 데 산타 로사 게이샤 무산소 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=753",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 611
+    },
+    {
+      "productNo": 670,
+      "title": "[커피화 로스터스] 페루 엘 세드로 게이샤 풀리 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=670",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 668,
+      "title": "[커피화 로스터스] 에티오피아 예가체프 할로 베리티 에얼룸 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=668",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 643,
+      "title": "[무우수 커피 로스터스] 콜롬비아 아구아 린다 치로소 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=643",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 527,
+      "title": "[무우수 커피 로스터스] 멜팅 스노우맨",
+      "url": "https://unspecialty.com/product/detail.html?product_no=527",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 452,
+      "title": "[커피화 로스터스] 올때 메로나 (언스페셜티 블렌드)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=452",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 648,
+      "title": "[무우수 커피 로스터스] 과테말라 로스마 포자 게이샤 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=648",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 649,
+      "title": "[무우수 커피 로스터스] 파나마 산타 마리아 게이샤 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=649",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 722,
+      "title": "[에어리] 파나마 라마스투스 엘리다 부엘타 게이샤 DRD 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=722",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 784,
+      "title": "[에어리] 파나마 잔슨 하시엔다 라스 라구나스 게이샤 워시드 (26-74)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=784",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 766
+    },
+    {
+      "productNo": 852,
+      "title": "[판매 종료] 모듈 커피 로스터스 (8/18~8/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=852",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 36,
+      "detailTextCharacters": 95
+    },
+    {
+      "productNo": 859,
+      "title": "[판매 종료] Puman Coffee (8/25~8/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=859",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 9,
+      "detailTextCharacters": 72
+    },
+    {
+      "productNo": 851,
+      "title": "[9월 커피 월픽] 해월커피 (9/1~9/30)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=851",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 76,
+      "detailTextCharacters": 72
+    },
+    {
+      "productNo": 804,
+      "title": "[판매 종료] 커네스 브루잉 스팟 (7/18~7/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=804",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 38,
+      "detailTextCharacters": 95
+    },
+    {
+      "productNo": 811,
+      "title": "[판매 종료] 말릭커피 (8/1~8/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=811",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 71,
+      "detailTextCharacters": 72
+    },
+    {
+      "productNo": 800,
+      "title": "[판매 종료] TANAT (7/16~7/22)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=800",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 8,
+      "detailTextCharacters": 72
+    },
+    {
+      "productNo": 775,
+      "title": "[판매 종료] 커피화 로스터스 (7/1~7/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=775",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 72,
+      "detailTextCharacters": 72
+    },
+    {
+      "productNo": 745,
+      "title": "[판매 종료] 컴투레스트 (6/18~6/30)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=745",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 36,
+      "detailTextCharacters": 72
+    },
+    {
+      "productNo": 729,
+      "title": "[판매 종료] One Half (6/11~6/16)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=729",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 8,
+      "detailTextCharacters": 72
+    },
+    {
+      "productNo": 703,
+      "title": "[판매 종료] 도안 (5/18~5/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=703",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 29,
+      "detailTextCharacters": 72
+    },
+    {
+      "productNo": 702,
+      "title": "[판매 종료] 노띵커피 (6/1~6/30)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=702",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 59,
+      "detailTextCharacters": 72
+    },
+    {
+      "productNo": 689,
+      "title": "[판매 종료] BIG SUR COFFEE (5/8~5/14)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=689",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 8,
+      "detailTextCharacters": 72
+    },
+    {
+      "productNo": 662,
+      "title": "[판매 종료] 트레커스빈 (4/18~4/30)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=662",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 57,
+      "detailTextCharacters": 72
+    },
+    {
+      "productNo": 654,
+      "title": "[판매 종료] 토치커피 (5/1~5/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=654",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 58,
+      "detailTextCharacters": 135
+    },
+    {
+      "productNo": 566,
+      "title": "[판매 종료] 무우수 커피 로스터스 (3/18~3/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=566",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 41,
+      "detailTextCharacters": 72
+    },
+    {
+      "productNo": 548,
+      "title": "[판매 종료] 아이덴티티커피랩 (3/1~3/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=548",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 48,
+      "detailTextCharacters": 72
+    },
+    {
+      "productNo": 285,
+      "title": "[판매 종료] 커넥츠커피 (2/22 ~ 2/28)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=285",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 25,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 573,
+      "title": "[판매 종료] 커넥츠커피 (4/1~4/30)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=573",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 65,
+      "detailTextCharacters": 107
+    },
+    {
+      "productNo": 536,
+      "title": "[판매 종료] 레이지모먼트 커피스탠드 (2/22 ~ 2/28)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=536",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 25,
+      "detailTextCharacters": 72
+    },
+    {
+      "productNo": 200,
+      "title": "<판매 종료> 예셰숄 (4/24 ~ 4/30)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=200",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 14,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 202,
+      "title": "<판매 종료> 시그니쳐 로스터스 (5/1 ~ 5/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=202",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 40,
+      "detailTextCharacters": 54
+    },
+    {
+      "productNo": 209,
+      "title": "<판매 종료> 뉴웨이브 커피 로스터스 (6/1 ~ 6/30)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=209",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 35,
+      "detailTextCharacters": 113
+    },
+    {
+      "productNo": 210,
+      "title": "<판매 종료> 칼라스커피 (5/25 ~ 5/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=210",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 17,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 215,
+      "title": "<판매 종료> 코스피어 (6/24 ~ 6/30)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=215",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 13,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 216,
+      "title": "[판매 종료] YM 커피 프로젝트 (7/1 ~ 7/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=216",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 30,
+      "detailTextCharacters": 138
+    },
+    {
+      "productNo": 223,
+      "title": "[판매 종료] 안밀 (7/25 ~ 7/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=223",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 16,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 224,
+      "title": "[판매 종료] 빈브라더스 (8/1 ~ 8/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=224",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 44,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 232,
+      "title": "[판매 종료] 말릭 커피 (8/25 ~ 8/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=232",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 23,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 234,
+      "title": "[판매 종료] 피어커피 (9/1 ~ 9/30)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=234",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 40,
+      "detailTextCharacters": 140
+    },
+    {
+      "productNo": 243,
+      "title": "[판매 종료] 아얀투 (9/24 ~ 9/30)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=243",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 15,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 244,
+      "title": "[판매 종료] 코페아 (10/1 ~ 10/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=244",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 36,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 251,
+      "title": "[판매 종료] 노띵커피 (10/22 ~ 10/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=251",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 23,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 252,
+      "title": "[판매 종료] 블랙업커피 (11/1 ~ 11/30)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=252",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 36,
+      "detailTextCharacters": 115
+    },
+    {
+      "productNo": 258,
+      "title": "[판매 종료] 리얼빈 (11/22 ~ 11/30)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=258",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 17,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 262,
+      "title": "[판매 종료] 아이덴티티커피랩 (12/1 ~ 12/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=262",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 48,
+      "detailTextCharacters": 115
+    },
+    {
+      "productNo": 266,
+      "title": "[판매 종료] 향미사 (12/22 ~ 12/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=266",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 17,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 268,
+      "title": "[판매 종료] 모모스커피 (1/1 ~ 1/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=268",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 73,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 274,
+      "title": "[판매 종료] 토치커피 (1/22 ~ 1/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=274",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 24,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 275,
+      "title": "[판매 종료] 커피화 로스터스 (2/1 ~ 2/28)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=275",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 54,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 286,
+      "title": "[판매 종료] 로우키 (3/1 ~ 3/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=286",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 52,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 288,
+      "title": "[판매 종료] NSWF (3/22 ~ 3/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=288",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 25,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 289,
+      "title": "[판매 종료] 클라리멘토 (4/1 ~ 4/30)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=289",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 54,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 294,
+      "title": "[판매 종료] 해월커피 (4/22 ~ 4/30)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=294",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 36,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 296,
+      "title": "[판매 종료] 비로소커피 (5/1 ~ 5/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=296",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 53,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 298,
+      "title": "[판매 종료] 파브스커피 (5/22 ~ 5/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=298",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 29,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 303,
+      "title": "[판매 종료] 헤베커피 (6/1 ~ 6/30)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=303",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 56,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 307,
+      "title": "[판매 종료] 고로커피 로스터스 (6/22 ~ 6/30)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=307",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 24,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 308,
+      "title": "[판매 종료] 말릭 커피 (7/1 ~ 7/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=308",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 51,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 313,
+      "title": "[판매 종료] 딥블루레이크 (8/1 ~ 8/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=313",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 65,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 314,
+      "title": "[판매 종료] 키헤이 (7/22 ~ 7/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=314",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 28,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 323,
+      "title": "[판매 종료] 에어리 (8/22 ~ 8/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=323",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 30,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 324,
+      "title": "[판매 종료] 시그니쳐 로스터스 (9/1 ~ 9/30)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=324",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 46,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 330,
+      "title": "[판매 종료] 뉴웨이브 커피 로스터스 (10/1 ~ 10/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=330",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 45,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 331,
+      "title": "[판매 종료] 존스몰 로스터리 (9/22 ~ 9/30)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=331",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 28,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 341,
+      "title": "[판매 종료] 가치커피 (10/22 ~ 10/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=341",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 38,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 346,
+      "title": "[판매 종료] 센터커피 (11/1 ~ 11/30)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=346",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 48,
+      "detailTextCharacters": 72
+    },
+    {
+      "productNo": 357,
+      "title": "[판매 종료] 크레이트커피 (11/22 ~ 11/30)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=357",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 27,
+      "detailTextCharacters": 72
+    },
+    {
+      "productNo": 373,
+      "title": "[판매 종료] 올웨이즈 어거스트 (12/22 ~ 12/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=373",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 30,
+      "detailTextCharacters": 74
+    },
+    {
+      "productNo": 389,
+      "title": "[판매 종료] 루베르 로스터리 (1/18 ~ 1/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=389",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 37,
+      "detailTextCharacters": 72
+    },
+    {
+      "productNo": 371,
+      "title": "[판매 종료] 코페아 (1/1 ~ 1/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=371",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 56,
+      "detailTextCharacters": 72
+    },
+    {
+      "productNo": 390,
+      "title": "[판매 종료] 먼스커피 (2/1 ~ 2/28)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=390",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 52,
+      "detailTextCharacters": 72
+    },
+    {
+      "productNo": 358,
+      "title": "[판매 종료] 블랙업커피 (12/1 ~ 12/31)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=358",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 58,
+      "detailTextCharacters": 72
+    },
+    {
+      "productNo": 845,
+      "title": "[커피 생두] 코스타리카 아시엔다 산 이시드로 라브라도르 게이샤 허니",
+      "url": "https://unspecialty.com/product/detail.html?product_no=845",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 781,
+      "title": "[커피 생두] 브라질 파젠다 엄 슈프림 펄프드 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=781",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 606,
+      "title": "[커피 생두] 파나마 트롬포 카페 크리스피 게이샤 내추럴(28-3-25)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=606",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 591,
+      "title": "[커피 생두] 파나마 토투마스 ARA #2521 게이샤 프리드라이드 콜드 퍼먼테이션",
+      "url": "https://unspecialty.com/product/detail.html?product_no=591",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 506,
+      "title": "[커피 생두] 에티오피아 하이시아 샤페타 74158 무산소 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=506",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 377,
+      "title": "[커피 생두] 파나마 라마스투스 엘리다 아구아카테 게이샤 내추럴(DRD)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=377",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 372,
+      "title": "[커피 생두] 에티오피아 알로 알라체 74158 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=372",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 368,
+      "title": "[커피 생두] 파나마 나인티 플러스 바루 에스테이트 케찰 #24332 게샤 허니",
+      "url": "https://unspecialty.com/product/detail.html?product_no=368",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 359,
+      "title": "[커피 생두] 파나마 아시엔다 라 에스메랄다 게이샤(구아보 워시드, 투마코 내추럴)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=359",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 2,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 348,
+      "title": "[커피 생두] 파나마 블랙 문 치로소 무산소 내추럴(Lot 15, 21, 41)",
+      "url": "https://unspecialty.com/product/detail.html?product_no=348",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 315,
+      "title": "[커피 생두] 코스타리카 아시엔다 산 이시드로 라브라도르 티피카 허니",
+      "url": "https://unspecialty.com/product/detail.html?product_no=315",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 304,
+      "title": "[커피 생두] 에티오피아 알로 타미루 미리가 74158 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=304",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 292,
+      "title": "[커피 생두] 파나마 블랙 문 2024 BoP 옥션 랏 - 치로소 내추럴 V-01, 게이샤 워시드 GW-10",
+      "url": "https://unspecialty.com/product/detail.html?product_no=292",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 2,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 287,
+      "title": "[커피 생두] 파나마 라마스투스 엘리다 토레 게이샤 워시드 DRD",
+      "url": "https://unspecialty.com/product/detail.html?product_no=287",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 278,
+      "title": "[커피 생두] 브라질 파젠다 엄 옐로우 버번 다크룸 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=278",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 272,
+      "title": "[커피 생두] 파나마 라마스투스 엘리다 로마 센트로 게이샤 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=272",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 1,
+      "detailTextCharacters": 40
+    },
+    {
+      "productNo": 265,
+      "title": "[커피 생두] 파나마 누구오 게이샤 내추럴 427-N-NF",
+      "url": "https://unspecialty.com/product/detail.html?product_no=265",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 4,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 264,
+      "title": "[커피 생두] 파나마 라 에스메랄다 하라미요 보스케 게이샤 워시드",
+      "url": "https://unspecialty.com/product/detail.html?product_no=264",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 2,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 263,
+      "title": "[커피 생두] 파나마 블랙 문 치로소 무산소 내추럴",
+      "url": "https://unspecialty.com/product/detail.html?product_no=263",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 2,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 236,
+      "title": "[커피 생두] 파나마 나인티플러스 바루 에스테이트 게이샤 내추럴 100g",
+      "url": "https://unspecialty.com/product/detail.html?product_no=236",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 0,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 235,
+      "title": "[커피 생두] 파나마 롱보드 미스티마운틴 게이샤 워시드 100g",
+      "url": "https://unspecialty.com/product/detail.html?product_no=235",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 0,
+      "detailTextCharacters": 38
+    },
+    {
+      "productNo": 231,
+      "title": "[커피 생두] 파나마 핀카 누구오 게이샤 3종",
+      "url": "https://unspecialty.com/product/detail.html?product_no=231",
+      "status": "read",
+      "retrievedAt": "2026-09-09",
+      "optionCount": 3,
+      "detailTextCharacters": 38
+    }
+  ]
+}

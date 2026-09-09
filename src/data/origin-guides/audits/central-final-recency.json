@@ -1,0 +1,329 @@
+[
+  {
+    "regionId": "guatemala-antigua",
+    "replaceLotName": "Santa Clara Estate — Bourbon Washed",
+    "lot": {
+      "name": "Covadonga — Bourbon, Caturra & Catuai Washed",
+      "producer": "Guillermo Sánchez",
+      "location": "San Juan del Obispo, Antigua, Sacatepéquez, Guatemala",
+      "varieties": [
+        "Bourbon",
+        "Caturra",
+        "Catuai"
+      ],
+      "process": {
+        "ko": "워시드",
+        "en": "Washed"
+      },
+      "flavorNotes": {
+        "ko": [
+          "오렌지",
+          "아몬드",
+          "쌉싸름한 초콜릿",
+          "말린 무화과",
+          "청포도"
+        ],
+        "en": [
+          "Orange",
+          "Almond",
+          "Bittersweet chocolate",
+          "Dried fig",
+          "White grape"
+        ]
+      },
+      "harvest": "2026",
+      "sources": [
+        {
+          "title": "Los Volcanes – Covadonga – Bourbon, Caturra and Catuai – Washed",
+          "url": "https://www.allycoffee.com/coffees/los-volcanes-covadonga-bourbon-caturra-catuai-washed/",
+          "publisher": "Ally Coffee",
+          "accessedAt": "2026-09-09"
+        }
+      ]
+    },
+    "reason": "Ally Coffee 원문에서 Antigua, Guillermo Sánchez, Covadonga, 세 품종, Washed, Harvest 2026 및 해당 로트 향미를 모두 직접 확인했다. 수확연도가 없는 Santa Clara Bourbon Washed 대신 최근 작황이 명시된 워시드 사례로 교체할 수 있다.",
+    "limitations": "농장 위치는 San Juan del Obispo이며 La Esperanza는 가공장이다. 가공장 위치를 재배 위치로 옮기지 않았다. 월별 수확 시점은 미기재라 연도만 사용한다.",
+    "sourceAccess": "direct-page",
+    "recommendationStatus": "confirmed"
+  },
+  {
+    "regionId": "honduras-copan",
+    "replaceLotName": "El Meson — Parainema",
+    "lot": {
+      "name": "Finca La Unica — Parainema Washed",
+      "producer": "Leticia Lopez",
+      "location": "Corquín, Copán, Honduras",
+      "varieties": [
+        "Parainema"
+      ],
+      "process": {
+        "ko": "풀리 워시드",
+        "en": "Fully washed"
+      },
+      "flavorNotes": {
+        "ko": [
+          "루트비어",
+          "체리",
+          "아몬드",
+          "버터스카치"
+        ],
+        "en": [
+          "Root beer",
+          "Cherry",
+          "Almond",
+          "Butterscotch"
+        ]
+      },
+      "harvest": "2025/26",
+      "sources": [
+        {
+          "title": "Honduras Finca La Unica",
+          "url": "https://www.cloudcitycoffee.com/products/new-honduras-finca-la-unica",
+          "publisher": "Cloud City Coffee Roasting",
+          "accessedAt": "2026-09-09"
+        }
+      ]
+    },
+    "reason": "Cloud City Coffee 판매 로트 원문에 Leticia Lopez, Corquín/Copán, Parainema, Fully Washed, Harvest 2025–26 및 네 향미가 모두 명시되어 있다. 수확 미상의 기존 El Meson Parainema Fully Washed를 교체하면 품종·가공 범위는 유지하면서 최근 작황 근거를 채울 수 있다.",
+    "limitations": "Finca Terrerito는 이 상품에서 수입자로 기재되므로 생산자로 사용하지 않았다. Harvest는 시즌 범위이며 월별 시점은 미기재다.",
+    "sourceAccess": "direct-page",
+    "recommendationStatus": "confirmed"
+  },
+  {
+    "lot": {
+      "name": "La Esmeralda — 72 Hour Anaerobic Natural",
+      "producer": "De La Finca Coffee",
+      "location": "La Sampedrana, Comayagua, Honduras",
+      "varieties": [
+        "Caturra",
+        "Typica"
+      ],
+      "process": {
+        "ko": "72시간 이중 발효 무산소 내추럴",
+        "en": "72-hour double-fermentation anaerobic natural"
+      },
+      "flavorNotes": {
+        "ko": [
+          "라즈베리",
+          "블랙베리",
+          "멜론",
+          "레드커런트",
+          "라임",
+          "코코아 파우더"
+        ],
+        "en": [
+          "Raspberry",
+          "Blackberry",
+          "Melon",
+          "Red currant",
+          "Lime",
+          "Cocoa powder"
+        ]
+      },
+      "harvest": "2026",
+      "sources": [
+        {
+          "title": "Honduras Finca La Esmeralda 72 Hour Anaerobic Natural Organic",
+          "url": "https://thecaptainscoffee.com/collections/green-coffee/products/honduras-comayagua-finca-la-esmeralda-72hour-anaerobic-natural",
+          "publisher": "The Captain’s Coffee",
+          "accessedAt": "2026-09-09"
+        }
+      ]
+    },
+    "limitations": [
+      "농장과 생산 법인은 명시되어 있지만 개인 농부 이름은 없다.",
+      "기존 워시드에서 무산소 내추럴로 가공이 바뀐다. 프로필 rationale의 워시드 설명도 교체에 맞춰 갱신해야 한다.",
+      "Harvest year: 2026을 직접 확인했다. 별도 Arrival Date는 수확일에 사용하지 않았다.",
+      "상품 본문에서 해당 로트 향미만 옮겼다. 인접한 19시간 내추럴이나 레드 허니 상품의 향미를 섞지 않았다."
+    ],
+    "replaceLotName": "La Esmeralda — Washed",
+    "regionId": "honduras-comayagua",
+    "reason": "같은 La Esmeralda 농장과 Caturra·Typica 구성의 명시 2026 수확 로트이다. 원문 제목과 상세 가공이 일치하는 72시간 무산소 내추럴로 수확연도 미표기 워시드를 대체할 수 있다.",
+    "sourceAccess": "direct-page",
+    "recommendationStatus": "confirmed"
+  },
+  {
+    "regionId": "el-salvador-santa-ana",
+    "replaceLotName": "Finca El Salvador — Pacamara Natural",
+    "lot": {
+      "name": "Malacara C — Pacamara Natural, SA.26.04.MC.PACA",
+      "producer": "Don Arturo Alvaréz",
+      "location": "Volcán de Santa Ana / Apaneca-Ilamatepec, Santa Ana",
+      "varieties": [
+        "Pacamara"
+      ],
+      "process": {
+        "ko": "내추럴",
+        "en": "Natural"
+      },
+      "flavorNotes": {
+        "ko": [
+          "꽃향",
+          "파넬라"
+        ],
+        "en": [
+          "Floral",
+          "Panela"
+        ]
+      },
+      "harvest": "2026",
+      "sources": [
+        {
+          "title": "El Salvador — Malacara C — Pacamara — Natural, SA.26.04.MC.PACA",
+          "url": "https://curador.green/en/products/el-salvador-malacara-pacamara-natural",
+          "publisher": "Curador Coffee S.L.",
+          "accessedAt": "2026-09-09"
+        }
+      ]
+    },
+    "reason": "수입사의 단일 상품 본문에 생산자, Santa Ana 지역 및 화산 산지, Pacamara, Natural, 로트 코드, 향미와 Harvest 2026이 함께 명시된다. 기존 수확연도 미표기 Pacamara Natural과 품종·가공이 같아 교체 적합하다.",
+    "limitations": [
+      "web.open은 Cache miss였으나 해당 URL의 검색 전체 본문을 읽어 필수 정보를 모두 확인했다.",
+      "상품은 Incoming 상태이다. Warehouse Date와 본문 도착 예정일이 서로 달라 입고일은 기록하지 않았으며 수확연도에는 사용하지 않았다.",
+      "향미 중 명명된 향미인 Floral·Panela만 옮겼다. very sweet·complex acidity는 별도 감각 속성이어서 향미 목록에서 생략했다."
+    ],
+    "sourceAccess": "indexed-full-text-only",
+    "recommendationStatus": "conditional-source-access"
+  },
+  {
+    "regionId": "el-salvador-chalatenango",
+    "replaceLotName": "El Amoton — lot 26496",
+    "lot": {
+      "name": "Finca La Peña — Gilberto Landaverde, Washed",
+      "producer": "Gilberto Landaverde",
+      "location": "La Palma, Chalatenango",
+      "varieties": [
+        "Pacamara",
+        "Bourbon",
+        "Pacas"
+      ],
+      "process": {
+        "ko": "워시드",
+        "en": "Washed"
+      },
+      "flavorNotes": {
+        "ko": [
+          "살구",
+          "라임",
+          "체리"
+        ],
+        "en": [
+          "Apricot",
+          "Lime",
+          "Cherry"
+        ]
+      },
+      "harvest": "2026-02",
+      "sources": [
+        {
+          "title": "El Salvador Gilberto Landaverde — Finca La Peña",
+          "url": "https://samplecoffee.com.au/coffee/gilberto-landaverde",
+          "publisher": "Sample Coffee Roasters",
+          "accessedAt": "2026-09-09"
+        }
+      ]
+    },
+    "reason": "로스터의 실제 상품 페이지 본문에 명명 생산자와 농장, La Palma·Chalatenango, 실제 판매 로트의 세 품종 및 Washed, 해당 향미, Harvested: February 2026이 함께 명시된다. 수확일 없는 기존 워시드 후보를 최신 수확 로트로 교체할 수 있다.",
+    "limitations": [
+      "Pacamara 단일품종이 아닌 Pacamara·Bourbon·Pacas 혼합 로트이다. 기존 El Amoton과 가공은 같지만 품종 구성은 다르다.",
+      "페이지 표의 고도 1545m와 농장 본문의 1613m가 달라 고도를 기록하지 않았다. 요청한 생산자·지역·품종·가공·향미·수확일은 상호 일치한다.",
+      "본문의 농장 일반 설명에는 honey와 washed를 모두 운영한다고 나오지만 판매 로트 상단에는 washed로 명확히 한정되어 있다. 농장 설명을 로트 가공으로 혼합하지 않았다."
+    ],
+    "sourceAccess": "direct-page",
+    "recommendationStatus": "confirmed"
+  },
+  {
+    "regionId": "nicaragua-matagalpa",
+    "replaceLotName": "Limoncillo — Ethiosar Washed, IMM 927",
+    "lot": {
+      "name": "Limoncillo — Caturra Washed",
+      "producer": "Erwin \"Wingo\" Jr Mierisch",
+      "location": "Yasica Norte, Matagalpa",
+      "varieties": [
+        "Caturra"
+      ],
+      "process": {
+        "ko": "워시드",
+        "en": "Washed"
+      },
+      "flavorNotes": {
+        "ko": [
+          "토피",
+          "구운 헤이즐넛",
+          "빨간 사과",
+          "카카오 닙스"
+        ],
+        "en": [
+          "Toffee",
+          "Roasted hazelnuts",
+          "Red apple",
+          "Cacao nibs"
+        ]
+      },
+      "harvest": "2026-01",
+      "sources": [
+        {
+          "title": "Limoncillo, Washed Caturra, Nicaragua",
+          "url": "https://www.dropcoffee.com/products/limoncillo-washed-carturra-nicaragua",
+          "publisher": "Drop Coffee Roasters",
+          "accessedAt": "2026-09-09"
+        }
+      ]
+    },
+    "reason": "동일 Limoncillo 농장의 워시드를 유지하면서 Harvest January 2026을 직접 명시한 Caturra 상품으로 교체할 수 있다. 생산자·농장·지역·품종·가공·해당 로트 향미가 한 원문에 일치한다.",
+    "limitations": [
+      "기존 Ethiosar에서 Caturra로 품종이 바뀐다. 프로필 rationale의 Ethiosar 두 가공 비교 문구도 교체에 맞게 갱신해야 한다.",
+      "기존 Ozone IMM 927에는 2026년 8월 게시 맥락에서 올해 니카라과 수확이라는 상대 표현이 있다. 기존 로트가 오래된 작황이라고 단정하지 않았고, 이번 후보는 절대 연월이 명시된 수확을 우선했다."
+    ],
+    "sourceAccess": "direct-page",
+    "recommendationStatus": "confirmed"
+  },
+  {
+    "regionId": "mexico-veracruz",
+    "replaceLotName": "Finca El Izote — Washed",
+    "lot": {
+      "name": "Tecoxco — Don Adolfo y Damian",
+      "producer": "Don Adolfo Xotlanihua Temoxtle and son",
+      "location": "Tlecuaxco, Zongolica, Veracruz",
+      "varieties": [
+        "Anacafé 14",
+        "Gesha"
+      ],
+      "process": {
+        "ko": "발효 제어 워시드",
+        "en": "Washed with controlled fermentation"
+      },
+      "flavorNotes": {
+        "ko": [
+          "핵과류",
+          "라임",
+          "당밀",
+          "꽃향"
+        ],
+        "en": [
+          "Stone fruit",
+          "Lime",
+          "Molasses",
+          "Floral"
+        ]
+      },
+      "harvest": "2026",
+      "sources": [
+        {
+          "title": "Don Adolfo y Damian — Tecoxco, Cosecha 2026",
+          "url": "https://densocafe.com/producto/adolfo/",
+          "publisher": "Denso Café",
+          "accessedAt": "2026-09-09"
+        }
+      ]
+    },
+    "reason": "Cosecha 2026을 명시한 명명 생산자와 Tecoxco 농장 로트이며 Veracruz의 Zongolica·Tlecuaxco까지 추적된다. 수확연도 미표기 워시드 한 자리를 교체해 최신 수확 예시를 보강할 수 있다.",
+    "limitations": [
+      "기존 El Izote와 농장·생산자·품종이 다른 로트이며, 워시드 계열만 공통이다. El Izote 자체의 수확연도를 갱신하는 제안이 아니다.",
+      "발효 시간이나 무산소 조건은 명시하지 않아 추가하지 않았다. 수확 월도 명시하지 않아 연도만 기록했다.",
+      "현재 Veracruz에는 두 로트가 있어 세 번째로 추가하는 선택도 가능하다. 교체를 택하면 El Izote를 실제 예시로 다루는 rationale 문구를 함께 정리해야 한다."
+    ],
+    "sourceAccess": "direct-page",
+    "recommendationStatus": "confirmed"
+  }
+]

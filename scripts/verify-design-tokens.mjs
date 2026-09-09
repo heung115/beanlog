@@ -62,6 +62,8 @@ function walk(directory) {
 
 for (const file of walk(sourceRoot).filter((file) => /\.(?:css|ts|tsx)$/.test(file))) {
   const relative = path.relative(sourceRoot, file);
+  // Origin records contain lot identifiers such as #156, not visual styles.
+  if (relative.startsWith("data/origin-guides/")) continue;
   if (allowedRawColorFiles.has(relative)) continue;
   const contents = fs.readFileSync(file, "utf8");
   const matches = [...contents.matchAll(/#[0-9a-f]{3,8}\b|rgba?\s*\(/gi)];

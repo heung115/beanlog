@@ -1,0 +1,253 @@
+[
+  {
+    "regionId": "colombia-huila",
+    "query": "\"Papayo\" \"Huila\" coffee roaster notes",
+    "urls": [
+      "https://ineffablecoffee.com/products/betania-farm-papayo"
+    ],
+    "decision": "채택: Betania / Linarco Rodríguez / Papayo / anaerobic washed / cherimoya·apricot·vanilla / harvest 2026.",
+    "accessedAt": "2026-09-09",
+    "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering."
+  },
+  {
+    "regionId": "colombia-narino",
+    "query": "coffee roaster Narino Obraje Caturra tasting notes",
+    "urls": [
+      "https://caffegoriziana.it/en/product/colombia-finca-el-obraje-2/"
+    ],
+    "decision": "채택: El Obraje / Caturra / natural / mango·jasmine·honey. 기존 Ally Caturra 로트와 동일 로트라고 간주하지 않음.",
+    "accessedAt": "2026-09-09",
+    "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering."
+  },
+  {
+    "regionId": "colombia-antioquia",
+    "query": "coffee roaster Antioquia Chiroso tasting notes",
+    "urls": [
+      "https://flowerchildcoffee.com/products/edgar-gonzalez-chiroso"
+    ],
+    "decision": "채택: Edgar Gonzalez / Urrao / Chiroso / washed double fermentation / dried berries·cascara·geranium / harvest March 2026.",
+    "accessedAt": "2026-09-09",
+    "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering."
+  },
+  {
+    "regionId": "colombia-cauca",
+    "query": "\"Cauca\" coffee roaster \"notes\" \"washed\"; \"Inza\" \"coffee\" \"roaster\" \"variety\"",
+    "urls": [
+      "https://theangryroaster.com/products/colombia-gesha-inza"
+    ],
+    "decision": "채택: La Colina / Rafael Velasquéz & Andrés Martinez / Inzá, Cauca / Gesha / washed / bergamot·clementine·lavender·blueberries.",
+    "accessedAt": "2026-09-09",
+    "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering."
+  },
+  {
+    "regionId": "colombia-inza",
+    "query": "\"Inza\" \"coffee\" \"roaster\" \"variety\"",
+    "urls": [
+      "https://theangryroaster.com/products/colombia-gesha-inza"
+    ],
+    "decision": "채택: La Colina의 동일 제품. Cauca 상위 지역에도 연결하되 고유 로트는 한 개.",
+    "accessedAt": "2026-09-09",
+    "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering."
+  },
+  {
+    "regionId": "colombia-pitalito",
+    "query": "\"Pitalito\" \"roasters\" \"Aji\"",
+    "urls": [
+      "https://onyxcoffeelab.com/en-int/products/colombia-yadimir-quiguanas-perez-bourbon-aji"
+    ],
+    "decision": "채택: Los Yarumos / Yadimir Quiguanas Pérez / Bourbon Aji / washed / hibiscus·vanilla·ruby red grapefruit·apple / Early 2024. 본문 인터뷰 Ombligón 노트는 혼입하지 않음.",
+    "accessedAt": "2026-09-09",
+    "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering."
+  },
+  {
+    "regionId": "colombia-san-agustin",
+    "query": "\"San Agustin\" site:seycoffee.com \"Aruzi\"",
+    "urls": [
+      "https://www.seycoffee.com/products/2025-victor-alfonso-bonilla-la-chorrera-end-of-season-colombia"
+    ],
+    "decision": "채택: La Chorrera / Victor Alfonso Bonilla / Aruzi / washed / chamomile·honeydew·peach / Jan 2025. 유전적 계통 불확정.",
+    "accessedAt": "2026-09-09",
+    "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering."
+  },
+  {
+    "regionId": "colombia-tolima",
+    "query": "coffee roaster Tolima Jorge Rojas tasting notes; \"Tolima\" \"roasters\" \"Bourbon\"; \"Planadas\" coffee roaster variety tasting",
+    "urls": [
+      "https://patiocoffee.com.au/shop/colombia-planadas/"
+    ],
+    "decision": "채택: Patio의 Planadas / Typica·Castillo·Caturra / natural fermented / red apple·honey·nougat. 생산자 실명·수확연도 미공개.",
+    "accessedAt": "2026-09-09",
+    "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering."
+  },
+  {
+    "regionId": "colombia-planadas",
+    "query": "\"Planadas\" coffee roaster variety tasting",
+    "urls": [
+      "https://patiocoffee.com.au/shop/colombia-planadas/"
+    ],
+    "decision": "채택: Patio Planadas 제품. Tolima 상위 연결은 같은 로트를 재사용. 농장 이름 추정하지 않음.",
+    "accessedAt": "2026-09-09",
+    "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering."
+  },
+  {
+    "regionId": "brazil-cerrado",
+    "query": "\"Cerrado\" coffee roaster tasting notes variety; \"Cerrado\" \"roasters\" \"Arara\"",
+    "urls": [
+      "https://www.blackwhiteroasters.com/products/r-daterra-our-plot-project-jan-25"
+    ],
+    "decision": "채택: Daterra Our Plot / Luis N. Pascoal / Yellow Arara / 서로 다른 효모로 발효한 3개 anaerobic natural 혼합 / praline pecan·crème brûléed citrus·aged rum·milk chocolate. URL Jan25를 수확연도로 사용하지 않음.",
+    "accessedAt": "2026-09-09",
+    "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering."
+  },
+  {
+    "regionId": "brazil-sul-de-minas",
+    "query": "\"Sul de Minas\" coffee roaster tasting notes variety",
+    "urls": [
+      "https://www.parlor.coffee/products/santa-luzia-brazil"
+    ],
+    "decision": "채택: Santa Luzia / 여성 생산자 공동 로트 / Catuai·Catucai·Mundo Novo·Acaia·Arara / natural / almond·brown sugar·caramel·yellow fruit.",
+    "accessedAt": "2026-09-09",
+    "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering."
+  },
+  {
+    "regionId": "brazil-bahia",
+    "query": "\"Bahia\" coffee roaster tasting notes variety; \"Chapada Diamantina\" coffee roaster tasting variety",
+    "urls": [
+      "https://roastcafes.com/produto/arara-do-paulo-menezes-2024/"
+    ],
+    "decision": "채택: Fazenda Moeté / Paulo Lemos Menezes / Piatã, Chapada Diamantina / Arara / cereja descascado / rapadura·passion fruit·apricot·white flowers / Aug 2024.",
+    "accessedAt": "2026-09-09",
+    "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering."
+  },
+  {
+    "regionId": "brazil-chapada-diamantina",
+    "query": "\"Chapada Diamantina\" coffee roaster tasting variety",
+    "urls": [
+      "https://roastcafes.com/produto/arara-do-paulo-menezes-2024/"
+    ],
+    "decision": "채택: Moeté Arara. Bahia에도 같은 underlying lot 연결. 2024 표기를 최근 연도로 바꾸지 않음.",
+    "accessedAt": "2026-09-09",
+    "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering."
+  },
+  {
+    "regionId": "brazil-carmo-de-minas",
+    "query": "\"Carmo de Minas\" coffee roaster tasting notes variety",
+    "urls": [
+      "https://www.partnerscoffee.com/blogs/education/brazil-irmas-pereira-2025"
+    ],
+    "decision": "채택: Irmãs Pereira / Maria Valéria & Maria Rogéria Pereira / Yellow Bourbon / natural / milk chocolate·apricot·pecan. 글 제목 2025는 수확연도 아님.",
+    "accessedAt": "2026-09-09",
+    "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering."
+  },
+  {
+    "regionId": "brazil-mantiqueira-de-minas",
+    "query": "\"Mantiqueira\" coffee roaster tasting notes variety; \"Carmo de Minas\" coffee roaster tasting notes variety",
+    "urls": [
+      "https://www.partnerscoffee.com/blogs/education/brazil-irmas-pereira-2025"
+    ],
+    "decision": "채택: Partners가 Carmo de Minas를 Mantiqueira range에 명시. Irmãs Pereira 같은 로트를 상위 연결. SUMO 기존 Arara 2025/26도 재대조 일치.",
+    "accessedAt": "2026-09-09",
+    "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering."
+  },
+  {
+    "regionId": "brazil-alta-mogiana",
+    "query": "\"Alta Mogiana\" coffee roaster \"variety\"",
+    "urls": [
+      "https://www.cafemoscardini.com/en"
+    ],
+    "decision": "채택: Cacau & Castanhas / Sítio Santa Maria da Boa Vista / Elder Moscardini Filho / Mundo Novo / natural / cacao nibs·nuts. 기존 Tupi와 Yellow Obata 제품과 구분.",
+    "accessedAt": "2026-09-09",
+    "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering."
+  },
+  {
+    "regionId": "peru-jaen",
+    "query": "\"Jaen\" coffee roaster notes varietal",
+    "urls": [
+      "https://beansmiths.com/en/product/el-diamante/"
+    ],
+    "decision": "채택: El Diamante / 여러 생산 가족 / Caturra·Pache / washed 24h / red grape·honey·currant brownie. 지역 일반 품종을 이 로트에 추가하지 않음.",
+    "accessedAt": "2026-09-09",
+    "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering."
+  },
+  {
+    "regionId": "peru-cajamarca",
+    "query": "\"Cajamarca\" coffee roaster tasting variety; \"Cajamarca\" \"roaster\" \"Marshell\"; \"San Ignacio\" coffee roaster notes variety",
+    "urls": [
+      "https://caffelab.com/peru-san-ignacio/"
+    ],
+    "decision": "채택: Caffèlab San Ignacio 제품을 Cajamarca 상위에 연결. 품종·가공·노트 정확히 같은 사례.",
+    "accessedAt": "2026-09-09",
+    "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering."
+  },
+  {
+    "regionId": "peru-san-ignacio",
+    "query": "\"San Ignacio\" coffee roaster notes variety",
+    "urls": [
+      "https://caffelab.com/peru-san-ignacio/"
+    ],
+    "decision": "채택: San Francisco·Los Llanos·San Andres·El Sauce 소농 / Caturra·Catuai·Bourbon·Mundo Novo / washed 20–30h / chocolate·tangerine·almond·caramel.",
+    "accessedAt": "2026-09-09",
+    "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering."
+  },
+  {
+    "regionId": "peru-cusco",
+    "query": "\"Cusco\" coffee roaster tasting variety; \"Cusco\" \"roaster\" \"SL9\"; site:moonwakecoffeeroasters.com \"San Sebastian\"",
+    "urls": [
+      "https://moonwakecoffeeroasters.com/products/san-sebastian-julio-chavez-washed-sl9-peru"
+    ],
+    "decision": "채택: San Sebastian / Julio Chavez / Inkawasi / SL-9 / washed / jasmine·peach·pomelo·sencha. 수확연도 없음. India Selection9와 통합하지 않음.",
+    "accessedAt": "2026-09-09",
+    "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering."
+  },
+  {
+    "regionId": "peru-junin",
+    "query": "\"Junin\" coffee roaster notes varietal",
+    "urls": [
+      "https://www.redroostercoffee.com/products/peru-highland-select-natural"
+    ],
+    "decision": "채택: Highland Select / COOPAGRY / Caturra·Catimor·Catuai·Obata·Tupi / extended fermentation natural / bing cherry syrup·dried mango·devil’s food cake·strawberry preserves. 48h 산소제한 patio를 밀폐탱크라고 바꾸지 않음.",
+    "accessedAt": "2026-09-09",
+    "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering."
+  },
+  {
+    "regionId": "colombia-quindio",
+    "query": "\"Quindio\" coffee roaster notes variety",
+    "urls": [
+      "https://passportcoffee.com.au/blogs/roastery-ramblings/colombia-campo-hermoso-wush-wush-natural"
+    ],
+    "decision": "채택: Campo Hermoso / Edwin Noreña / Wush Wush / natural 16h anaerobic / floral·lemon·lychee·milk chocolate.",
+    "accessedAt": "2026-09-09",
+    "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering."
+  },
+  {
+    "regionId": "colombia-valle-del-cauca",
+    "query": "\"Valle del Cauca\" coffee roaster notes variety",
+    "urls": [
+      "https://www.reframecoffee.com/shop/colombia-lusitania/"
+    ],
+    "decision": "채택: Lusitania / Consuelo Marín & Javier Macias / Caicedonia / Castillo / natural / mango·rum·lime juice. 같은 페이지 관련상품 Los Nogales 정보는 배제.",
+    "accessedAt": "2026-09-09",
+    "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering."
+  },
+  {
+    "regionId": "brazil-espirito-santo",
+    "query": "\"Espirito Santo\" coffee roaster notes variety; \"Espirito Santo\" \"roasters\" \"Catucai\"",
+    "urls": [
+      "https://www.blacktucanocoffee.com/products/assinatura-cafe-black-tucano-single-origin-torrado-e-em-graos-250g"
+    ],
+    "decision": "채택: Bom Destino / Josiane Lima Bissoli / Afonso Cláudio / Catucaí 2SL Amarelo / washed / floral·honey·rapadura·peach.",
+    "accessedAt": "2026-09-09",
+    "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering."
+  },
+  {
+    "regionId": "brazil-mogiana",
+    "query": "\"Mogiana\" coffee roaster tasting notes variety; \"Mogiana\" \"roasters\" \"Bourbon\" \"farm\"",
+    "urls": [
+      "https://boxxcoffee.la/products/brazil-sitio-siriema",
+      "https://reykjavikroasters.is/en/portfolio-posts/mogiana-en/"
+    ],
+    "decision": "채택: Boxx Sítio Siriema / Ivan & Rose dos Santos / Arara / natural / red plum·rosehip·red apple. Reykjavík regional Yellow Bourbon은 생산자 불명이라 별도 로트 보류.",
+    "accessedAt": "2026-09-09",
+    "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering."
+  }
+]

@@ -1,0 +1,208 @@
+{
+  "guide": {
+    "id": "vietnam-lac-duong",
+    "country": "Vietnam",
+    "name": "Lạc Dương",
+    "nameKo": "락즈엉",
+    "kind": "region",
+    "aliases": [
+      "Lac Duong",
+      "라끄즈엉",
+      "락드엉"
+    ],
+    "summary": {
+      "ko": "럼동 고원에서 코호 공동체가 커피를 재배하는 산지입니다. 레드 버번과 카티모르 워시드 커피가 생산됩니다.",
+      "en": "A Lâm Đồng highland origin where K’ho communities grow coffee, including washed Red Bourbon and Catimor."
+    },
+    "environment": {
+      "ko": "소농이 수확과 가공을 맡으며, 코호 커피는 천천히 건조해 고르게 수분을 낮춥니다.",
+      "en": "Smallholders harvest and process their coffee; K’ho lots use slow drying to reduce moisture evenly."
+    },
+    "flavorNotes": {
+      "ko": [
+        "캐러멜",
+        "아몬드",
+        "시트러스",
+        "꽃"
+      ],
+      "en": [
+        "Caramel",
+        "Almond",
+        "Citrus",
+        "Floral"
+      ]
+    },
+    "varieties": [
+      "Red Bourbon",
+      "Catimor"
+    ],
+    "processes": {
+      "ko": [
+        "워시드"
+      ],
+      "en": [
+        "Washed"
+      ]
+    },
+    "specialty": {
+      "ko": "코호 농가의 레드 버번과 카티모르가 별도 원두로 유통됩니다.",
+      "en": "K’ho farmers’ Red Bourbon and Catimor are traded as separate offerings."
+    },
+    "sources": [
+      {
+        "title": "Red Bourbon Coffee",
+        "url": "https://www.themarriedbeans.com/en/products/ca-phe-red-bourbon",
+        "publisher": "The Married Beans",
+        "accessedAt": "2026-09-09"
+      },
+      {
+        "title": "K’ho Arabica G1 — Lac Duong",
+        "url": "https://www.themarriedbeans.com/en/products/ca-phe-nhan-xanh-ca-phe-s%E1%BB%91ng-ch%C6%B0a-rang-nhan-xanh-arabica-yellow-cherry-lam-d%E1%BB%93ng-goi-500g-copy",
+        "publisher": "The Married Beans",
+        "accessedAt": "2026-09-09"
+      },
+      {
+        "title": "K’ho Roasted Coffee",
+        "url": "https://www.themarriedbeans.com/en/products/ca-phe-kho",
+        "publisher": "The Married Beans",
+        "accessedAt": "2026-09-09"
+      },
+      {
+        "title": "Green Coffee Export — Lạc Dương Red Bourbon",
+        "url": "https://www.themarriedbeans.com/en/pages/green-coffee-export",
+        "publisher": "The Married Beans",
+        "accessedAt": "2026-09-09"
+      }
+    ],
+    "verification": {
+      "reviewedAt": "2026-09-09",
+      "flavorBasis": "lot",
+      "flavorContext": {
+        "ko": "The Married Beans의 락즈엉 레드 버번 및 코호 카티모르 원두 노트.",
+        "en": "Notes from The Married Beans’ Lạc Dương Red Bourbon and K’ho Catimor offerings."
+      },
+      "flavorSourceUrls": [
+        "https://www.themarriedbeans.com/en/products/ca-phe-red-bourbon",
+        "https://www.themarriedbeans.com/en/products/ca-phe-nhan-xanh-ca-phe-s%E1%BB%91ng-ch%C6%B0a-rang-nhan-xanh-arabica-yellow-cherry-lam-d%E1%BB%93ng-goi-500g-copy",
+        "https://www.themarriedbeans.com/en/products/ca-phe-kho"
+      ]
+    }
+  },
+  "profile": {
+    "regionId": "vietnam-lac-duong",
+    "priority": "standard",
+    "rationale": "로스터의 별도 Red Bourbon 및 Catimor 제품에서 Lạc Dương 생산지와 가공 및 향미를 확인했다. Catimor 생두는 1500m로 표기되지만 지역 전체 고도 범위는 추정하지 않았다.",
+    "sources": [
+      {
+        "title": "Red Bourbon Coffee",
+        "url": "https://www.themarriedbeans.com/en/products/ca-phe-red-bourbon",
+        "publisher": "The Married Beans",
+        "accessedAt": "2026-09-09"
+      },
+      {
+        "title": "K’ho Arabica G1 — Lac Duong",
+        "url": "https://www.themarriedbeans.com/en/products/ca-phe-nhan-xanh-ca-phe-s%E1%BB%91ng-ch%C6%B0a-rang-nhan-xanh-arabica-yellow-cherry-lam-d%E1%BB%93ng-goi-500g-copy",
+        "publisher": "The Married Beans",
+        "accessedAt": "2026-09-09"
+      },
+      {
+        "title": "K’ho Roasted Coffee",
+        "url": "https://www.themarriedbeans.com/en/products/ca-phe-kho",
+        "publisher": "The Married Beans",
+        "accessedAt": "2026-09-09"
+      },
+      {
+        "title": "Green Coffee Export — Lạc Dương Red Bourbon",
+        "url": "https://www.themarriedbeans.com/en/pages/green-coffee-export",
+        "publisher": "The Married Beans",
+        "accessedAt": "2026-09-09"
+      }
+    ],
+    "lots": [
+      {
+        "name": "Lạc Dương — Red Bourbon Washed",
+        "producer": "K’ho farmers / The Married Beans",
+        "location": "Lạc Dương, Lâm Đồng",
+        "varieties": [
+          "Red Bourbon"
+        ],
+        "process": {
+          "ko": "워시드",
+          "en": "Washed"
+        },
+        "flavorNotes": {
+          "ko": [
+            "시트러스",
+            "캐러멜",
+            "꽃",
+            "헤이즐넛"
+          ],
+          "en": [
+            "Citrus",
+            "Caramel",
+            "Floral",
+            "Hazelnut"
+          ]
+        },
+        "sources": [
+          {
+            "title": "Red Bourbon Coffee",
+            "url": "https://www.themarriedbeans.com/en/products/ca-phe-red-bourbon",
+            "publisher": "The Married Beans",
+            "accessedAt": "2026-09-09"
+          },
+          {
+            "title": "Green Coffee Export — Lạc Dương Red Bourbon",
+            "url": "https://www.themarriedbeans.com/en/pages/green-coffee-export",
+            "publisher": "The Married Beans",
+            "accessedAt": "2026-09-09"
+          }
+        ]
+      },
+      {
+        "name": "K’ho — Lạc Dương Catimor Washed",
+        "producer": "K’ho farmers / The Married Beans",
+        "location": "Lạc Dương, Lâm Đồng",
+        "varieties": [
+          "Catimor"
+        ],
+        "process": {
+          "ko": "천천히 건조한 워시드",
+          "en": "Washed, slow dried"
+        },
+        "flavorNotes": {
+          "ko": [
+            "캐러멜",
+            "아몬드",
+            "시트러스"
+          ],
+          "en": [
+            "Caramel",
+            "Almond",
+            "Citrus"
+          ]
+        },
+        "sources": [
+          {
+            "title": "K’ho Arabica G1 — Lac Duong",
+            "url": "https://www.themarriedbeans.com/en/products/ca-phe-nhan-xanh-ca-phe-s%E1%BB%91ng-ch%C6%B0a-rang-nhan-xanh-arabica-yellow-cherry-lam-d%E1%BB%93ng-goi-500g-copy",
+            "publisher": "The Married Beans",
+            "accessedAt": "2026-09-09"
+          },
+          {
+            "title": "K’ho Roasted Coffee",
+            "url": "https://www.themarriedbeans.com/en/products/ca-phe-kho",
+            "publisher": "The Married Beans",
+            "accessedAt": "2026-09-09"
+          }
+        ]
+      }
+    ]
+  },
+  "audit": [
+    "Red Bourbon 원문은 Lạc Dương 명시. Cầu Đất나 Da Lat 하위로 강제 배치하지 않음.",
+    "K’ho 원두 페이지는 Lam Dong만 표기, 같은 로스터의 K’ho green bean 제품과 notes Caramel/Almond/Citrus 및 Washed가 일치하고 green page가 Lạc Dương Catimor를 명시.",
+    "고도1500m는 Catimor 제품의 지점 고도이며 지역범위 아님.",
+    "수확연도 미공개. 둘 다 로스터 The Married Beans의 직접 판매 자료이며 생산 공동체는 K’ho. 개별 농장명 미공개."
+  ]
+}

@@ -1,11 +1,13 @@
-import { findCountryPresetBySlug } from "../../data/origin-presets.ts";
+import { findGuideCountryBySlug, findRegionGuideByRoute } from "../../data/origin-guides/index.ts";
 
-/** The origin guide and its HTTP status must use the same finite preset catalog. */
+/** The origin guide and its HTTP status must use the same finite guide catalog. */
 export function isMissingOriginPath(pathname: string): boolean {
-  const match = /^\/(?:ko|en)\/origins\/([^/]+)\/?$/.exec(pathname);
+  const match = /^\/(?:ko|en)\/origins\/([^/]+)(?:\/([^/]+))?\/?$/.exec(pathname);
   if (!match) return false;
   try {
-    return !findCountryPresetBySlug(decodeURIComponent(match[1]));
+    const country = decodeURIComponent(match[1]);
+    if (!findGuideCountryBySlug(country)) return true;
+    return match[2] ? !findRegionGuideByRoute(country, decodeURIComponent(match[2])) : false;
   } catch {
     return true;
   }

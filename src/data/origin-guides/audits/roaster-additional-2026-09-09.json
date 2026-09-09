@@ -1,0 +1,192 @@
+[
+  {
+    "regionId": "bolivia-caranavi",
+    "query": "Caranavi coffee roaster tasting notes Caturra washed",
+    "urls": [
+      "https://muyu.coffee/shop/p/caranavi-aaa"
+    ],
+    "decision": "[MUYU San José AAA](https://muyu.coffee/shop/p/caranavi-aaa), opened. Added Typica/Caturra/Catuai/Icatu washed regional selection, peach/clementine/hazelnut/brown sugar. The image filename contains 2026 but is not a harvest date."
+  },
+  {
+    "regionId": "bolivia-samaipata",
+    "query": "Samaipata Batian coffee",
+    "urls": [
+      "https://onacoffee.com.au/blogs/brewguides/bolivia-finca-floripondio-samaipata-batian-natural",
+      "https://melbournecoffeemerchants.com.au/coffee/los-rodriguez-batian-samaipata/",
+      "https://www.dropcoffee.com/blogs/coffee-archive/samaichacha-caturra-bolivia-2018"
+    ],
+    "decision": "[ONA Floripondio Batian](https://onacoffee.com.au/blogs/brewguides/bolivia-finca-floripondio-samaipata-batian-natural), opened. Added Batian natural and ONA's milk-roast crème brûlée/raisin/Merlot notes. [MCM](https://melbournecoffeemerchants.com.au/coffee/los-rodriguez-batian-samaipata/) independently supports regional Batian production, but its four-farm blend notes were not copied onto ONA's Floripondio. [Drop 2018 Caturra](https://www.dropcoffee.com/blogs/coffee-archive/samaichacha-caturra-bolivia-2018) opened; retained as unadopted historical comparison because its processing label is internally awkward (“washed processed without water”)."
+  },
+  {
+    "regionId": "ecuador-loja",
+    "query": "Loja Ecuador coffee roaster Sidra notes",
+    "urls": [
+      "https://www.valleandinocoffee.com/products/sidra"
+    ],
+    "decision": "[Valle Andino Sidra](https://www.valleandinocoffee.com/products/sidra), opened. Farm-owned Loja roaster supplies natural Sidra; added blueberry/tropical fruit/citrus. Farm name/harvest not supplied. No Bourbon parentage inferred."
+  },
+  {
+    "regionId": "ecuador-pichincha",
+    "query": "Pichincha Ecuador coffee roaster Typica notes",
+    "urls": [
+      "https://www.rigbyroastery.com/product/ecuador-coffee-typica-mejorado",
+      "https://www.midnightbloomcoffee.com/origins/ecuador-pichincha/"
+    ],
+    "decision": "[Rigby Galo Morales](https://www.rigbyroastery.com/product/ecuador-coffee-typica-mejorado), official indexed body read; direct open timeout. Orange sherbet/vanilla custard/lime and Cruz Loma Mejorado found. Held: title says anaerobic washed, body repeatedly traditional washed; exact regional link absent from this page. Existing Cruz Loma and Meridiano traceable records retained. [Midnight Bloom](https://www.midnightbloomcoffee.com/origins/ecuador-pichincha/) was rejected as a cultivar-lineage source: its Sidra ancestry assertion conflicts with better evidence."
+  },
+  {
+    "regionId": "guatemala-acatenango",
+    "query": "Acatenango coffee roasted notes",
+    "urls": [
+      "https://burnettcoffee.com/products/guatemala-gesha-acatenango-90-7"
+    ],
+    "decision": "[Burnett private-estate Gesha](https://burnettcoffee.com/products/guatemala-gesha-acatenango-90-7), opened. Added washed/patio-dried light-medium expression, jasmine/orange blossom/honey/apple/pear/white grape. Producer explicitly confidential, represented as Private estate; no fabricated farmer name, score or certification imported."
+  },
+  {
+    "regionId": "guatemala-fraijanes",
+    "query": "Fraijanes roasters notes",
+    "urls": [
+      "https://tinyhousecoffeeroasters.com/products/guatemala"
+    ],
+    "decision": "[Tiny House San Victor](https://tinyhousecoffeeroasters.com/products/guatemala), opened. Added Raul/Alejandro Molina Red Bourbon + Red Catuai, washed/patio dried, chocolate/cherry/cola. Not merged into El Santo: the same mill can handle different producer lots."
+  },
+  {
+    "regionId": "uganda-rwenzori",
+    "query": "Rwenzori roasters variety",
+    "urls": [
+      "https://www.fcrwholesale.com/product-page/uganda-rwenzori",
+      "https://methods.coffee/products/rwenzori"
+    ],
+    "decision": "[Frazer's Kalingwe](https://www.fcrwholesale.com/product-page/uganda-rwenzori), opened. Named Kalingwe sun-dried cherry process; dried fruit/citrus/strawberry aroma. Held as extra row because existing October 2025 Kalingwe already provides producer-group traceability and no evidence makes this the same harvest. Spelling “Nyasland” was not silently used to alter old lot varieties. [Methods Rwenzori](https://methods.coffee/products/rwenzori) indexed: Kasese SL14/28 natural; redundant against current record."
+  },
+  {
+    "regionId": "uganda-mount-elgon",
+    "query": "Mount Elgon coffee roaster notes variety",
+    "urls": [
+      "https://www.cannoncoffee.co.uk/products/uganda-mt-elgon"
+    ],
+    "decision": "[Cannon Mount Elgon](https://www.cannoncoffee.co.uk/products/uganda-mt-elgon), opened. Added 200 farmers in Friends of Mother's Initiative/Dream Coffee, Mbale, washed SL14/SL28/Nyasaland, strawberry jam/cocoa. Distinct network from existing Kyagalanyi and Mountain Harvest selections."
+  },
+  {
+    "regionId": "china-puer",
+    "query": "Pu'er Yunnan coffee roaster Catimor notes; site:mellowcoffeeroasters.com TianHao Catimor",
+    "urls": [
+      "https://mellowcoffeeroasters.com/products/tianhao-red-natural-anerobic-catimor",
+      "https://www.falconroasters.com/products/china-puer-filter"
+    ],
+    "decision": "[Mellow TianHao Red Natural](https://mellowcoffeeroasters.com/products/tianhao-red-natural-anerobic-catimor), opened. Added separate roaster selection: Catimor, low-temperature sealed fermentation then whole-cherry drying, dried fruit/whisky/brown sugar. No whisky infusion inferred. [Falcon](https://www.falconroasters.com/products/china-puer-filter) indexed page found but direct 404; not adopted."
+  },
+  {
+    "regionId": "china-baoshan",
+    "query": "Baoshan coffee roasters",
+    "urls": [
+      "https://ninthcoffeeroasters.com/products/red-dragon-estate-china"
+    ],
+    "decision": "[Ninth Red Dragon](https://ninthcoffeeroasters.com/products/red-dragon-estate-china), opened. Added separate Red Sparrow roast, Catimor anaerobic natural, chocolate/pineapple/boozy. Existing Harmony “Yun Catimor” was not rewritten: source naming is preserved per selection."
+  },
+  {
+    "regionId": "thailand-chiang-rai",
+    "query": "Chiang Rai Sirinya coffee roaster tasting; Sirinya Washed Bourbon coffee",
+    "urls": [
+      "https://rollingbkk.com/product/sirinya-washed-light-roast-200g/",
+      "https://www.drinkmorning.com/products/good-day-rise-coffee-capsules"
+    ],
+    "decision": "[Rolling Sirinya washed](https://rollingbkk.com/product/sirinya-washed-light-roast-200g/), official search result gives Mae Suai and pear/nectarine/orange/floral/white grape, direct browser-readable response challenge only. Held because lot-specific cultivar not retrieved. [RISE via Morning](https://www.drinkmorning.com/products/good-day-rise-coffee-capsules) blends washed + natural, not used to patch a single existing lot. Existing Sirinya 2025/26 cultivar/process record retained."
+  },
+  {
+    "regionId": "thailand-chiang-mai",
+    "query": "Chiang Mai coffee process notes",
+    "urls": [
+      "https://www.preda-roastinghouse.com/en/blog/11197/soe-ae-drinkable-forest"
+    ],
+    "decision": "[Preda Soe Ae](https://www.preda-roastinghouse.com/en/blog/11197/soe-ae-drinkable-forest), opened. Added named processor Saranyu Wanasomboon, Soe Ae/Mae Tuen/Omkoi, washed 2025–2026, lime/orange/pomelo/honey/coffee blossom. Cultivar array intentionally empty: historical Typica trees in the village do not establish this selected lot's cultivar. This adds a new microregion/processor and crop rather than disguising the field gap."
+  },
+  {
+    "regionId": "timor-leste-ermera",
+    "query": "Ermera roaster coffee",
+    "urls": [
+      "https://presscoffee.com/collections/limited-single-origin/products/east-timor-ermera",
+      "https://genicoffeeroaster.com/id/products/ermera-timor-leste-for-espresso"
+    ],
+    "decision": "[PRESS Ermera](https://presscoffee.com/collections/limited-single-origin/products/east-timor-ermera), official indexed body retrieved; direct open cache miss. Added washed Timor Hybrid/Typica/Catimor/Sarchimor, gingerbread/baker's chocolate/walnut. Source typo “Lefefoho” normalized to Letefoho in established Ermera geography. Producer individual absent: growers only. [Geni](https://genicoffeeroaster.com/id/products/ermera-timor-leste-for-espresso) also indexed, Catimor hybrid wash; held rather than overinterpreting proprietary hybrid-wash method."
+  },
+  {
+    "regionId": "kenya-embu",
+    "query": "Embu roaster notes; site:seycoffee.com Embu Kamavindi 2025",
+    "urls": [
+      "https://www.seycoffee.com/products/2025-mbature-family-kamavindi-estate-sl28-kenya",
+      "https://www.seycoffee.com/products/2026-mbature-family-kamavindi-estate-lot-1-kenya",
+      "https://www.seycoffee.com/products/2026-ndwiga-family-nginda-estate-kenya"
+    ],
+    "decision": "[SEY Kamavindi SL28](https://www.seycoffee.com/products/2025-mbature-family-kamavindi-estate-sl28-kenya), opened. Added single-variety separation, blackberry/rooibos/candied grapefruit, **harvest September 2024**, not 2025 from URL. Newer [Kamavindi field blend](https://www.seycoffee.com/products/2026-mbature-family-kamavindi-estate-lot-1-kenya) and [Nginda](https://www.seycoffee.com/products/2026-ndwiga-family-nginda-estate-kenya) explicitly question assumed SL identities; not converted into verified SL28/34 lists."
+  },
+  {
+    "regionId": "ethiopia-shakiso",
+    "query": "Shakiso coffee roasters notes",
+    "urls": [
+      "https://ramsheadcoffee.com/products/ethiopia-guji-shakiso-gigeso-natural",
+      "https://www.jonescoffeeroasters.com/collections/frontpage/products/ethiopian-natural"
+    ],
+    "decision": "[RamsHead Gigeso](https://ramsheadcoffee.com/products/ethiopia-guji-shakiso-gigeso-natural), full official indexed body read. Natural local landraces, pomegranate/hibiscus/lemon balm/cocoa nib/cedar. Existing Gigesa lot kept; different roast/unknown harvest is not permission to replace its notes or landrace names. [Jones Uddeyi](https://www.jonescoffeeroasters.com/collections/frontpage/products/ethiopian-natural), indexed Tima/Shakiso producer group found, direct cache miss; held pending lot cultivar/processing details."
+  },
+  {
+    "regionId": "panama-renacimiento",
+    "query": "Renacimiento coffee roaster; site:archerscoffee.com Renacimiento HATSUKO",
+    "urls": [
+      "https://archerscoffee.com/products/panama-project-hachi-rocky-mountain-hatsuko"
+    ],
+    "decision": "[Archers HATSUKO](https://archerscoffee.com/products/panama-project-hachi-rocky-mountain-hatsuko), opened. Added Rocky Mountain, Santa Clara, Allan Hartmann/Diego Samuel Bermudez, Green Tip Geisha, washed Symbiotic Process, jasmine/lavender/bergamot/tangerine/honeydew. Harvest absent; roast/release dates not substituted."
+  },
+  {
+    "regionId": "costa-rica-brunca",
+    "query": "Brunca coffee roaster; site:methodicalcoffee.com/products/costa-rica-el-renacer",
+    "urls": [
+      "https://methodicalcoffee.com/collections/limited-releases/products/costa-rica-el-renacer"
+    ],
+    "decision": "[Methodical El Renacer](https://methodicalcoffee.com/collections/limited-releases/products/costa-rica-el-renacer), full official indexed body retrieved; direct cache miss. Added Ureña Rojas family, Chirripó/Brunca, Java natural, floral/mixed berries/orange candy. Exact specialty microregion supported in product body."
+  },
+  {
+    "regionId": "timor-leste-aileu",
+    "query": "Aileu coffee notes",
+    "urls": [
+      "https://wildtimorcoffee.com/pages/about-1",
+      "https://moonshinecoffee.com.au/blogs/moonshine-blog/timor-lestes-coffee-heritage"
+    ],
+    "decision": "[Wild Timor about](https://wildtimorcoffee.com/pages/about-1), opened. Aileu and caramel/chocolate/cherry/citrus/rum found, but cultivar is generic hybrid description and process absent: not attached to existing AL1 or Laclo lot. [Moonshine Laclo](https://moonshinecoffee.com.au/blogs/moonshine-blog/timor-lestes-coffee-heritage) official body indexed names 542 Aileu smallholders and natural tropical/berry; held as same-locality extra tasting expression with no new cultivar identification."
+  },
+  {
+    "regionId": "guatemala-san-marcos",
+    "query": "San Marcos Guatemala coffee roaster notes; San Marcos roasted Bourbon Washed",
+    "urls": [
+      "https://shopbeansandrice.com/pages/farms",
+      "https://www.sozocoffee.com/products/san-marcos-guatemala"
+    ],
+    "decision": "[Beans & Rice farms](https://shopbeansandrice.com/pages/farms), opened. Added named grower associations, washed Bourbon/Catuai/Catimor/Caturra/Costa Rica 95, lavender/lemongrass/lemon/pomelo/rosemary. Calendar November–January is not a crop year. [SoZo](https://www.sozocoffee.com/products/san-marcos-guatemala) opened, ACMI/Rigoberto group found but cultivar/process absent, not adopted."
+  },
+  {
+    "regionId": "guatemala-new-oriente",
+    "query": "New Oriente coffee roaster notes",
+    "urls": [
+      "https://www.dairybeanz.co.nz/products/guatemala-new-oriente-coffee",
+      "https://bigshoulderscoffee.com/products/guatemala"
+    ],
+    "decision": "[Dairy Beanz](https://www.dairybeanz.co.nz/products/guatemala-new-oriente-coffee), opened. Bourbon/Caturra/Catuai washed chocolate/hazelnut/toffee confirmed; held because unnamed regional selection adds less than existing natural, named El Morito washed and Gesha. [Big Shoulders](https://bigshoulderscoffee.com/products/guatemala) mixes Huehuetenango/San Marcos/Nuevo Oriente; its blend notes not assigned to any one region."
+  },
+  {
+    "regionId": "indonesia-kintamani",
+    "query": "Kintamani coffee roaster varieties notes",
+    "urls": [
+      "https://presscoffee.com/products/bali-kintamani-1"
+    ],
+    "decision": "[PRESS Kintamani](https://presscoffee.com/products/bali-kintamani-1), full official indexed body retrieved; direct cache miss. Added separate natural Bourbon/Typica/Catimor selection, plum/plantain/toasted coconut. Not used to overwrite named HEQA Cobra or Royal S795/USDA762 lots."
+  },
+  {
+    "regionId": "peru-puno",
+    "query": "Puno coffee roaster bourbon notes",
+    "urls": [
+      "https://www.ultimocoffee.com/shop/juan-quilla-laura-peru",
+      "https://sweetbloomcoffee.com/products/vilma-chambi"
+    ],
+    "decision": "[Ultimo Juan Quilla Laura](https://www.ultimocoffee.com/shop/juan-quilla-laura-peru), opened. Added Quillabamba/Puno washed Bourbon, bergamot/brown sugar/lemon candy; distinct named producer from prior three. [Sweet Bloom Vilma](https://sweetbloomcoffee.com/products/vilma-chambi) official indexed record also rechecked; no duplicate row."
+  }
+]

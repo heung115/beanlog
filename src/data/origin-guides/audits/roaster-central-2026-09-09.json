@@ -1,0 +1,271 @@
+[
+  {
+    "regionId": "panama-boquete",
+    "query": "Boquete Bonita Springs SL28 coffee roaster tasting",
+    "urls": [
+      "https://assemblycoffee.co.uk/products/panama-bonita-springs",
+      "https://kmen.coffee/product/bonita-springs-sl28/"
+    ],
+    "decision": "기존 Assembly 상품 유지; Kmen 노트를 합치지 않음."
+  },
+  {
+    "regionId": "panama-volcan",
+    "query": "Volcan Janson coffee roaster tasting notes",
+    "urls": [
+      "https://venezianocoffee.com.au/blogs/coffee-information/pinnacle-series-2025-continues-our-2nd-release-from-janson-estate"
+    ],
+    "decision": "기존 Janson Lot 117과 동일 lot 번호가 없어 harvest 보충 보류. 2025는 시리즈 연도."
+  },
+  {
+    "regionId": "panama-jaramillo",
+    "query": "Jaramillo coffee roaster pacamara natural",
+    "urls": [
+      "https://varistacoffee.com/products/alumipack-pacamara-natural-agricola-geisha-200gr"
+    ],
+    "decision": "기존 상품 유지. 같은 농장 다른 포장 상품을 추가 집계하지 않음."
+  },
+  {
+    "regionId": "panama-alto-quiel",
+    "query": "Alto Quiel Black Moon Chiroso coffee roaster",
+    "urls": [
+      "https://mazelabcoffee.com/products/blackmoon"
+    ],
+    "decision": "#49와 구별되는 #50 추가. 2024 대회연도는 harvest로 사용하지 않음."
+  },
+  {
+    "regionId": "panama-bambito",
+    "query": "Bambito roaster Typica coffee",
+    "urls": [
+      "https://idlehandsroasting.com/archive/p/panama-bambito-estate-catuai",
+      "https://www.vulcanroastery.com/products/panama-treasury-set-bambito-estate"
+    ],
+    "decision": "충돌한 후보 보류. 기존 Yellow Catuai·Geisha·Caturra 사례 유지."
+  },
+  {
+    "regionId": "guatemala-antigua",
+    "query": "Antigua coffee roaster Bourbon Gascón",
+    "urls": [
+      "https://www.cafesiboney.com/tienda/guatemala-finca-gascon-specialty-coffee/",
+      "https://badi.coffee/en/products/gascon-nitro-guatemala"
+    ],
+    "decision": "기존 anaerobic natural에 다른 nitro 상품 정보를 합치지 않음."
+  },
+  {
+    "regionId": "guatemala-huehuetenango",
+    "query": "Huehuetenango roaster tasting notes coffee",
+    "urls": [
+      "https://www.blackwaterroasters.com/shop/p/hht-guatemala",
+      "https://www.jaho.com/products/guatemala"
+    ],
+    "decision": "농장 없는 광역 blend보다 기존 El Injerto/La Bolsa/Los Pinos 사례 유지. 기존 lot harvest 추론 안 함."
+  },
+  {
+    "regionId": "guatemala-atitlan",
+    "query": "Atitlan roaster tasting notes",
+    "urls": [
+      "https://www.pinupcoffeeco.com/products/guatemala-atitlan"
+    ],
+    "decision": "기존 La Voz의 다른 로스터 노트·품종을 덮어쓰지 않음."
+  },
+  {
+    "regionId": "guatemala-coban",
+    "query": "Coban Santa Irene coffee",
+    "urls": [
+      "https://manhattan.coffee/catalog/coffee/santa-irene",
+      "https://guillam.co.uk/collections/single-origin-speciality-coffee/products/santa-irene-catuai-speciality-coffee-guatemala"
+    ],
+    "decision": "기존 상품 유지. 별도 Catuai 후보는 [Guillam](https://guillam.co.uk/collections/single-origin-speciality-coffee/products/santa-irene-catuai-speciality-coffee-guatemala) 원문 오류로 보류."
+  },
+  {
+    "regionId": "guatemala-san-pedro-necta",
+    "query": "San Pedro Necta coffee roaster",
+    "urls": [
+      "https://preludecoffeeroasters.com/collections/coffee/products/guatemala-san-pedro"
+    ],
+    "decision": "기존 상세 정보가 충분한 세 상품 유지. Prelude 누락을 다른 농장의 정보로 메우지 않음."
+  },
+  {
+    "regionId": "costa-rica-tarrazu",
+    "query": "Tarrazu Santa Rosa 1900 coffee",
+    "urls": [
+      "https://www.thecoffeeshop.jp/magazine/news/bds277/"
+    ],
+    "decision": "Catuai 기존 상품과 별도로 Villa Sarchi 추가."
+  },
+  {
+    "regionId": "costa-rica-west-valley",
+    "query": "West Valley roaster coffee varieties",
+    "urls": [
+      "https://www.bohee.coffee/products/costa-rica-cordillera-de-fuego-anaerobic",
+      "https://www.horshamcoffeeroaster.co.uk/pages/coffee-producer/San-Juanillo-farm"
+    ],
+    "decision": "기존 광역 사례 유지. 새 San Juanillo 상품은 정확한 하위 Naranjo에 배정."
+  },
+  {
+    "regionId": "costa-rica-central-valley",
+    "query": "Las Lajas Starmaya coffee",
+    "urls": [
+      "https://www.siemasu.coffee/shop/p/plumpearls"
+    ],
+    "decision": "Mariana 별도 상품 추가. 로스터의 유전 계보 주장까지 데이터에 복사하지 않음."
+  },
+  {
+    "regionId": "costa-rica-dota",
+    "query": "Dota Santa Teresa coffee SL28",
+    "urls": [
+      "https://coffeelibre.kr/article/%EC%9B%90%EB%91%90%EC%83%9D%EB%91%90-%EA%B0%80%EC%9D%B4%EB%93%9C/1/16760/"
+    ],
+    "decision": "기존 white honey와 다른 fully washed 추가. 입고일 26.07.16은 harvest 아님."
+  },
+  {
+    "regionId": "costa-rica-naranjo",
+    "query": "Naranjo San Juanillo coffee honey",
+    "urls": [
+      "https://fuglencoffee.jp/en/blogs/coffee-beans/san-juannillo",
+      "https://scenery.coffee/blogs/news/costa-rica-gaia-artisan-milenio"
+    ],
+    "decision": "두 품종 상품 추가. Scenery crop 24/25와 도착 2024-09 표기는 시간상 모호하여 harvest 미입력; 노트·품종·위치·가공만 채택."
+  },
+  {
+    "regionId": "honduras-marcala",
+    "query": "Marcala coffee notes",
+    "urls": [
+      "https://equatorcoffeeroasters.com/blogs/news/single-origin-series-2026-honduras-marcala"
+    ],
+    "decision": "품종 없는 지역 상품으로 기존 명확한 생산 사례를 대체하지 않음. 2026은 판매 시리즈 연도."
+  },
+  {
+    "regionId": "honduras-copan",
+    "query": "Copan coffee notes",
+    "urls": [
+      "https://www.cloudcitycoffee.com/products/new-honduras-finca-la-unica",
+      "https://www.caribecoffeeco.com/products/copanhg"
+    ],
+    "decision": "기존 La Unica Parainema 유지. 다지역 상품을 Copán 단독 사례로 넣지 않음."
+  },
+  {
+    "regionId": "honduras-comayagua",
+    "query": "Comayagua coffee roasters",
+    "urls": [
+      "https://mojocoffeeroasters.com/products/honduras-la-cascada"
+    ],
+    "decision": "La Cascada 추가. Noventa를 근거 없이 IHCAFE90으로 바꾸지 않음."
+  },
+  {
+    "regionId": "honduras-santa-barbara",
+    "query": "Santa Barbara Honduras coffee roasters",
+    "urls": [
+      "https://ritualcoffee.com/shop/coffee/la-pinona-honduras/"
+    ],
+    "decision": "대회 Geisha/SL28 위주였던 목록에 Pacas 추가."
+  },
+  {
+    "regionId": "el-salvador-santa-ana",
+    "query": "Santa Ana coffee roaster bourbon notes",
+    "urls": [
+      "https://sleepymangocoffee.com/products/el-salvador-santa-ana"
+    ],
+    "decision": "희귀 Bernardina/Pacamara와 비교할 전통 품종 워시드 추가."
+  },
+  {
+    "regionId": "el-salvador-chalatenango",
+    "query": "Chalatenango coffee roaster pacas",
+    "urls": [
+      "https://kurasu.pro/blogs/news/el-salvador-don-jaime",
+      "https://samplecoffee.com.au/coffee/gilberto-landaverde"
+    ],
+    "decision": "색인 근거로 독립 Don Jaime Pacas 추가, 기존 2022/23 Pacamara와 합치지 않음. 수확연도 미기재."
+  },
+  {
+    "regionId": "nicaragua-jinotega",
+    "query": "Jinotega La Escondida coffee roaster",
+    "urls": [
+      "https://manhattancoffeeroasters.com/product/coffees/rare/la-escondida/",
+      "https://19grams.coffee/products/nicaragua-laurina-la-escondida"
+    ],
+    "decision": "Ethiosar 추가. Laurina 후보는 가공 충돌로 보류."
+  },
+  {
+    "regionId": "nicaragua-matagalpa",
+    "query": "Matagalpa coffee roaster ethiosar",
+    "urls": [
+      "https://keigancoffee.com/en/products/nicaragua-los-placeres-ethiosar",
+      "https://www.dropcoffee.com/products/limoncillo-washed-carturra-nicaragua"
+    ],
+    "decision": "[Drop Coffee](https://www.dropcoffee.com/products/limoncillo-washed-carturra-nicaragua) Caturra washed 상품도 직접 재열람. 기존 검증된 두 상품 유지. 서로 다른 honey 상품 필드 합치지 않음."
+  },
+  {
+    "regionId": "nicaragua-nueva-segovia",
+    "query": "Nueva Segovia coffee roaster pacamara",
+    "urls": [
+      "https://ozocoffee.com/products/nicaragua-la-pena-pacamara"
+    ],
+    "decision": "Pacamara 추가. 처리 장소 Ocotal을 생산지로 바꾸지 않음."
+  },
+  {
+    "regionId": "nicaragua-dipilto",
+    "query": "Dipilto coffee roaster caturra",
+    "urls": [
+      "https://casetacoffee.com/en/products/nicaragua-natural-nueva-segovia"
+    ],
+    "decision": "자연 가공 지역 상품 추가."
+  },
+  {
+    "regionId": "mexico-chiapas",
+    "query": "Chiapas coffee roasters varietal",
+    "urls": [
+      "https://atomicroastery.com/products/mexico-chiapas"
+    ],
+    "decision": "Sarchimor 별도 상품 추가."
+  },
+  {
+    "regionId": "mexico-oaxaca",
+    "query": "Oaxaca coffee roasters varietal",
+    "urls": [
+      "https://cultcoffeeroasters.orderspace.com/products/25"
+    ],
+    "decision": "북부 산맥 Mazatec 생산자 사례 추가. Pluma Hidalgo에 배정하지 않음."
+  },
+  {
+    "regionId": "mexico-veracruz",
+    "query": "Veracruz coffee roaster notes",
+    "urls": [
+      "https://frontsidecoffee.com/products/mexican-veracruz",
+      "https://thecalaveracoffee.com/products/veracruz-mexico"
+    ],
+    "decision": "기존 Marsellesa·Anacafé14·Gesha 생산 사례 유지."
+  },
+  {
+    "regionId": "mexico-pluma-hidalgo",
+    "query": "Pluma Hidalgo coffee roaster finca",
+    "urls": [
+      "https://cafesros.com/mexico-pluma-hidalgo/"
+    ],
+    "decision": "이를 내추럴 가공으로 오인하지 않고 보류. 기존 세 분리 상품 유지."
+  },
+  {
+    "regionId": "costa-rica-turrialba",
+    "query": "Turrialba Mariana coffee roaster",
+    "urls": [
+      "https://docr.coffee/products/costa-rica-aquiares-estate-mariana-natural"
+    ],
+    "decision": "기존 Mariana washed와 비교할 natural 추가."
+  },
+  {
+    "regionId": "costa-rica-orosi",
+    "query": "Orosi Zalmari coffee",
+    "urls": [
+      "https://www.ninjagirlcoffee.com/shop/p/kimura"
+    ],
+    "decision": "단일 Caturra 상품 추가."
+  },
+  {
+    "regionId": "costa-rica-tres-rios",
+    "query": "Tres Rios coffee roaster varieties",
+    "urls": [
+      "https://cafebocanegra.com/en/products/tres-rios",
+      "https://www.riversbendcoffeeroasters.com/product/tres-rios/"
+    ],
+    "decision": "H17 추가. [Rivers Bend](https://www.riversbendcoffeeroasters.com/product/tres-rios/)는 미국 강 이름을 딴 블렌드라 제외."
+  }
+]

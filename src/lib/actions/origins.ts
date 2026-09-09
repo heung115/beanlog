@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { apiFetch } from "@/lib/api/client";
+import { getGuideSubregionChains, mergeOriginSubregionChains } from "@/data/origin-guides";
 import type {
   OriginCountryOption,
   OriginEntityOption,
@@ -57,7 +58,7 @@ export async function getOriginEntities(
   }
 }
 
-/** Returns this user's previously entered origin subregion chains. */
+/** Combine the user's own labels with researched, country-scoped origin suggestions. */
 export async function getUserOriginSubregions({
   country,
   region,
@@ -68,11 +69,14 @@ export async function getUserOriginSubregions({
   const parsed = subregionQuerySchema.safeParse({ country, region });
   if (!parsed.success) return [];
 
+  const guideChains = getGuideSubregionChains(parsed.data.country, parsed.data.region);
+
   try {
-    return await apiFetch<string[][]>("/api/origins/subregions", {
+    const savedChains = await apiFetch<string[][]>("/api/origins/subregions", {
       query: parsed.data,
     });
+    return mergeOriginSubregionChains(savedChains, guideChains);
   } catch {
-    return [];
+    return guideChains;
   }
 }

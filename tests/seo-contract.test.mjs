@@ -58,10 +58,13 @@ const seoModuleUrl = asModuleUrl(transpile("src/lib/seo.ts"));
 const seo = await import(seoModuleUrl);
 const originModuleUrl = asModuleUrl(transpile("src/data/origin-presets.ts"));
 const origins = await import(originModuleUrl);
+const guideModuleUrl = new URL("../src/data/origin-guides/index.ts", import.meta.url).href;
+const guides = await import(guideModuleUrl);
 const sitemapModule = await import(
   asModuleUrl(
     replaceImports(transpile("src/app/sitemap.ts"), {
       "@/data/origin-presets": originModuleUrl,
+      "@/data/origin-guides": guideModuleUrl,
       "@/lib/seo": seoModuleUrl,
     })
   )
@@ -171,9 +174,9 @@ test("origin detail metadata uses the canonical preset slug and localized facts"
   const english = seo.buildOriginDetailMetadata("en", preset, slug);
 
   assert.match(korean.title, new RegExp(preset.countryKo));
-  assert.match(korean.description, new RegExp(preset.signatureKo));
+  assert.match(korean.description, new RegExp(preset.regions[0].nameKo));
   assert.match(english.title, new RegExp(preset.country));
-  assert.match(english.description, new RegExp(preset.signature));
+  assert.match(english.description, new RegExp(preset.regions[0].name));
   assert.equal(
     korean.alternates.canonical,
     seo.localizedUrl("ko", `/origins/${slug}`)
@@ -203,20 +206,20 @@ test("JSON-LD serialization preserves data without leaving script-breaking text"
   assert.equal(seo.serializeJsonLd(undefined), "null");
 });
 
-test("sitemap has exactly the 44 localized public URLs and reciprocal alternates", () => {
+test("sitemap includes every country, region and microregion with reciprocal alternates", () => {
   const entries = sitemapModule.default();
-  const detailPaths = origins.originPresets.map(
+  const detailPaths = guides.originGuideCountries.map(
     (preset) => `/origins/${origins.originSlug(preset.country)}`
   );
-  const expectedPaths = ["", "/origins", ...detailPaths];
+  const expectedPaths = ["", "/origins", ...detailPaths, ...guides.originRegionGuides.map(guides.regionGuidePath)];
   const expectedUrls = expectedPaths.flatMap((path) => [
     seo.localizedUrl("ko", path),
     seo.localizedUrl("en", path),
   ]);
 
   assert.equal(origins.originPresets.length, 20);
-  assert.equal(entries.length, 44);
-  assert.equal(new Set(entries.map((entry) => entry.url)).size, 44);
+  assert.equal(entries.length, expectedUrls.length);
+  assert.equal(new Set(entries.map((entry) => entry.url)).size, expectedUrls.length);
   assert.deepEqual(
     new Set(entries.map((entry) => entry.url)),
     new Set(expectedUrls)

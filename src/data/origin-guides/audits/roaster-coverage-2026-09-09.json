@@ -1,0 +1,1439 @@
+{
+  "reviewedAt": "2026-09-09",
+  "scope": "All 128 previously published regions were re-searched against roasted-coffee product notes; six sourced geography entries were added.",
+  "before": {
+    "countries": 26,
+    "origins": 128,
+    "microregions": 39,
+    "lotAssignments": 330,
+    "uniqueNameProducerPairs": 304,
+    "varietyProfiles": 71,
+    "linkedVarietyProfiles": 67,
+    "originsWithVarietyProfiles": 128,
+    "originsWithAtLeastTwoLots": 128,
+    "originsWithExplicitHarvestIncluding2025Or2026": 110,
+    "assignmentsWithoutHarvest": 191,
+    "assignmentsWithoutCultivar": 14
+  },
+  "after": {
+    "countries": 26,
+    "origins": 134,
+    "microregions": 41,
+    "lotAssignments": 451,
+    "uniqueNameProducerPairs": 409,
+    "varietyProfiles": 92,
+    "linkedVarietyProfiles": 86,
+    "originsWithVarietyProfiles": 134,
+    "originsWithAtLeastTwoLots": 134,
+    "originsWithExplicitHarvestIncluding2025Or2026": 113,
+    "assignmentsWithoutHarvest": 283,
+    "assignmentsWithoutCultivar": 14
+  },
+  "existingRegionsResearched": 128,
+  "existingRegionsWithAdditionalOfferings": 97,
+  "newRegions": [
+    {
+      "id": "ethiopia-arbegona",
+      "parentId": "ethiopia-sidama"
+    },
+    {
+      "id": "rwanda-gicumbi",
+      "parentId": null
+    },
+    {
+      "id": "colombia-caldas",
+      "parentId": null
+    },
+    {
+      "id": "vietnam-lac-duong",
+      "parentId": null
+    },
+    {
+      "id": "ethiopia-west-arsi",
+      "parentId": null
+    },
+    {
+      "id": "ethiopia-nensebo",
+      "parentId": "ethiopia-west-arsi"
+    }
+  ],
+  "additionalUniqueOfferingNamesAndProducers": 105,
+  "ledger": [
+    {
+      "regionId": "ethiopia-yirgacheffe",
+      "query": "Yirgacheffe Adado site:onyxcoffeelab.com",
+      "urls": [
+        "https://onyxcoffeelab.com/en-int/products/ethiopia-dumerso-black-honey"
+      ],
+      "decision": [
+        "워시드·내추럴에 블랙 허니 가공과 독립 Dumerso 생산자 추가. 수확연도 미기재."
+      ],
+      "beforeLots": 2,
+      "afterLots": 3,
+      "area": "africa"
+    },
+    {
+      "regionId": "ethiopia-guji",
+      "query": "\"Guji\" site:partnerscoffee.com/products/suke-quto",
+      "urls": [
+        "https://www.partnerscoffee.com/products/ethiopia-suke-quto"
+      ],
+      "decision": [
+        "직접 본문의 Suke Quto Kurume/Wolisho 유지, 노트 상세 보강. 수상2026은 수확연도 아님. Heart Gerba 검색은 제3자만이라 미채택."
+      ],
+      "beforeLots": 3,
+      "afterLots": 3,
+      "area": "africa"
+    },
+    {
+      "regionId": "ethiopia-sidama",
+      "query": "\"Sidama\" \"2026\" site:seycoffee.com/products \"REGION\"",
+      "urls": [
+        "https://www.seycoffee.com/products/2026-demeka-becha-ethiopia"
+      ],
+      "decision": [
+        "별도 로스터 사례 추가"
+      ],
+      "beforeLots": 2,
+      "afterLots": 3,
+      "area": "africa"
+    },
+    {
+      "regionId": "ethiopia-limu",
+      "query": "\"Musa Abalulesa\" site:roguewavecoffee.ca",
+      "urls": [
+        "https://roguewavecoffee.ca/products/ethiopia-musa-abalulesa-washed",
+        "https://roguewavecoffee.ca/products/ethiopia-musa-abalulesa-oma-fontule-honey-process"
+      ],
+      "decision": [
+        "동일 생산자 74110·74165의 별도 Washed 사례. 워시드와 허니의 노트를 혼합하지 않음.",
+        "동일 생산자 74110·74165의 별도 Honey 사례. 워시드와 허니의 노트를 혼합하지 않음."
+      ],
+      "beforeLots": 2,
+      "afterLots": 4,
+      "area": "africa"
+    },
+    {
+      "regionId": "ethiopia-harrar",
+      "query": "\"Harrar\" site:paperplanecoffee.com",
+      "urls": [
+        "https://www.paperplanecoffee.com/products/queen-of-harrar-natural-ethiopian"
+      ],
+      "decision": [
+        "Queen City 공식 본문 재대조: Indigenous Heirloom, natural, dried cherry/cocoa/vanilla 그대로 적합. Mamush Grade4 운송2025/26은 기존Grade1와 달라 수확연도 미이식."
+      ],
+      "beforeLots": 2,
+      "afterLots": 2,
+      "area": "africa"
+    },
+    {
+      "regionId": "ethiopia-kochere",
+      "query": "\"Kochere\" coffee roaster variety tasting",
+      "urls": [
+        "https://atomicroastery.com/products/ethiopia-kochere"
+      ],
+      "decision": [
+        "Atomic 제품에서 Ethiopia heirloom/washed/peach/black tea/floral 확인. 스테이션 미공개 지역 상품으로, 기존 이름 있는 3생산자보다 추적성 낮아 추가 안함."
+      ],
+      "beforeLots": 3,
+      "afterLots": 3,
+      "area": "africa"
+    },
+    {
+      "regionId": "ethiopia-gedeb",
+      "query": "Yirgacheffe Adado site:onyxcoffeelab.com",
+      "urls": [
+        "https://onyxcoffeelab.com/en-int/products/ethiopia-yirgacheffe-gotiti-g1"
+      ],
+      "decision": [
+        "제품명 Yirgacheffe보다 본문 Gedeb woreda에 따라 배정. December만 있어 연도 미입력; 페이지 공통 caffeine 템플릿 제외."
+      ],
+      "beforeLots": 2,
+      "afterLots": 3,
+      "area": "africa"
+    },
+    {
+      "regionId": "ethiopia-bensa",
+      "query": "Sidama site:seycoffee.com coffee",
+      "urls": [
+        "https://www.seycoffee.com/products/2026-basha-bekele-badigalo-ethiopia"
+      ],
+      "decision": [
+        "74158 단일품종 허니와 새 생산지 Badigalo 추가. 2026 상품연도와 2025 수확 구분."
+      ],
+      "beforeLots": 3,
+      "afterLots": 4,
+      "area": "africa"
+    },
+    {
+      "regionId": "ethiopia-hambela",
+      "query": "\"Hambela\" coffee roaster variety tasting",
+      "urls": [
+        "https://sweetbloomcoffee.com/products/hambela"
+      ],
+      "decision": [
+        "로스터의 자연가공 비교 사례. 2025 판매·수상·archive 날짜를 수확연도로 옮기지 않음."
+      ],
+      "beforeLots": 3,
+      "afterLots": 4,
+      "area": "africa"
+    },
+    {
+      "regionId": "ethiopia-uraga",
+      "query": "\"Uraga\" coffee roaster variety tasting",
+      "urls": [
+        "https://sweetbloomcoffee.com/products/uraga"
+      ],
+      "decision": [
+        "850농가 Uraga 스테이션 내추럴 추가. 2026 출시를 harvest로 변환하지 않음."
+      ],
+      "beforeLots": 3,
+      "afterLots": 4,
+      "area": "africa"
+    },
+    {
+      "regionId": "rwanda-nyamasheke",
+      "query": "\"Nyamasheke\" coffee roaster variety notes",
+      "urls": [
+        "https://atomicroastery.com/products/rwanda-nyamasheke"
+      ],
+      "decision": [
+        "Rwamatamu Hirwa 피베리 선별 사례. Peaberry는 품종에서 분리하고 Red Bourbon만 기록."
+      ],
+      "beforeLots": 2,
+      "afterLots": 3,
+      "area": "africa"
+    },
+    {
+      "regionId": "rwanda-huye",
+      "query": "\"Huye\" coffee roaster variety notes",
+      "urls": [
+        "https://www.stumptowncoffee.com/products/rwanda-huye-mountain"
+      ],
+      "decision": [
+        "Stumptown 공식 Huye 재열람. 말린 복숭아/다크초콜릿/골든시럽 기존값과 일치. 수확연도 미공개를 다른 판매처 로트로 채우지 않음."
+      ],
+      "beforeLots": 2,
+      "afterLots": 2,
+      "area": "africa"
+    },
+    {
+      "regionId": "rwanda-gakenke",
+      "query": "\"Gakenke\" \"Rwanda\" \"roasters\"",
+      "urls": [
+        "https://www.catskillroasters.com/summer-2026"
+      ],
+      "decision": [
+        "Coko의 12–18시간 건식발효 후 워시드, 품종·향미·수확을 동일 공식 seasonal 페이지에서 확인. Burundi Gakenke와 구분."
+      ],
+      "beforeLots": 2,
+      "afterLots": 3,
+      "area": "africa"
+    },
+    {
+      "regionId": "rwanda-cyato",
+      "query": "\"Cyato\" coffee roaster variety notes",
+      "urls": [
+        "https://silverbirdcoffee.com/products/cyato-rwanda"
+      ],
+      "decision": [
+        "기존 Cupper의 다른 노트에 덧붙이지 않고 Silverbird 로스팅 표현을 별도 사례로 보존."
+      ],
+      "beforeLots": 2,
+      "afterLots": 3,
+      "area": "africa"
+    },
+    {
+      "regionId": "burundi-kayanza",
+      "query": "\"Kayanza\" coffee roaster varieties notes",
+      "urls": [
+        "https://publikcoffee.com/shop/coffee/burundi-kayanza"
+      ],
+      "decision": [
+        "Kibingo만 있던 사례에 다른 스테이션 Nemba 추가."
+      ],
+      "beforeLots": 3,
+      "afterLots": 4,
+      "area": "africa"
+    },
+    {
+      "regionId": "burundi-ngozi",
+      "query": "\"Ngozi\" \"Turihamwe\" \"roasters\"",
+      "urls": [
+        "https://www.novelcoffeeroasters.com/products/turihamwe"
+      ],
+      "decision": [
+        "독립 Turihamwe 여성 생산자 그룹과 워시드 노트 추가. 2019 설립연도는 수확연도 아님."
+      ],
+      "beforeLots": 2,
+      "afterLots": 3,
+      "area": "africa"
+    },
+    {
+      "regionId": "burundi-gatara",
+      "query": "\"Gakenke\" coffee roaster variety notes",
+      "urls": [
+        "https://backstory.coffee/products/burundi-gakenke",
+        "https://www.zencoffeelab.com/boutique/burundi-gakenke"
+      ],
+      "decision": [
+        "Backstory 별도 로스팅 사례. Gatara 위치는 동일 Gakenke 시설의 Zen/KB와 대조; Zen 본문 natural형 공정과 washed 표 충돌은 미채택."
+      ],
+      "beforeLots": 3,
+      "afterLots": 4,
+      "area": "africa"
+    },
+    {
+      "regionId": "burundi-gatukuza",
+      "query": "\"Gatukuza\" coffee roaster",
+      "urls": [
+        "https://creedcoffeeroasters.ie/products/burundi-gatukuza",
+        "https://blacknotescoffeeroasters.com/en/products/burundi-gatukuza"
+      ],
+      "decision": [
+        "공식 상품 검색 본문에 Bourbon/Washed/노트 확인. 직접 open은 Cache miss; 직접 성공으로 집계하지 않음. 별도 Black Notes 공식 본문으로 시설 실재 대조. 수상연도는 수확 미입력."
+      ],
+      "beforeLots": 2,
+      "afterLots": 3,
+      "area": "africa"
+    },
+    {
+      "regionId": "kenya-nyeri",
+      "query": "\"Nyeri\" site:seycoffee.com/products/2026",
+      "urls": [
+        "https://www.seycoffee.com/products/2026-ruarai-aa-separation-kenya"
+      ],
+      "decision": [
+        "별도 로스터 사례 추가"
+      ],
+      "beforeLots": 2,
+      "afterLots": 3,
+      "area": "africa"
+    },
+    {
+      "regionId": "kenya-kirinyaga",
+      "query": "\"Kirinyaga\" site:seycoffee.com/products/2026",
+      "urls": [
+        "https://www.seycoffee.com/products/2026-kamwangi-kenya"
+      ],
+      "decision": [
+        "별도 로스터 사례 추가"
+      ],
+      "beforeLots": 3,
+      "afterLots": 4,
+      "area": "africa"
+    },
+    {
+      "regionId": "kenya-kiambu",
+      "query": "\"Kiambu\" site:seycoffee.com/products",
+      "urls": [
+        "https://www.seycoffee.com/products/kahata-mucau-ab"
+      ],
+      "decision": [
+        "단일 농가 SL28/34 비교 사례. Malaki 2026은 품종에 대해 자체 유보 문구가 있어 품종 추론 미채택."
+      ],
+      "beforeLots": 3,
+      "afterLots": 4,
+      "area": "africa"
+    },
+    {
+      "regionId": "kenya-muranga",
+      "query": "\"Muranga\" coffee roaster notes varieties",
+      "urls": [
+        "https://www.jaho.com/collections/coffee/products/kenya-muranga-githiga-peaberry",
+        "https://www.jaho.com/products/kenya-muranga-githiga-peaberry",
+        "https://www.seycoffee.com/products/kangurumai"
+      ],
+      "decision": [
+        "Jaho Githiga 검색 본문에 SL28/34/Ruiru11과 풋사과·Meyer lemon bar·white strawberry 확인. 직접 추출은 국가 선택기만 반환; 기존 3사례 유지하고 후보보류.",
+        "SEY Kangurumai 공식 본문 직접 열람 성공: Muranga, SL28/34/Batian/Ruiru11, washed, December 2022, blackberry/cranberry/hibiscus 확인. 기존 2025 Kanguya와 다른 오래된 사례라 후보로 보관."
+      ],
+      "beforeLots": 3,
+      "afterLots": 3,
+      "area": "africa"
+    },
+    {
+      "regionId": "kenya-othaya",
+      "query": "\"Othaya\" coffee roaster notes varieties",
+      "urls": [
+        "https://no6coffee.co/products/rukira-factory-washed"
+      ],
+      "decision": [
+        "보조 수확 fly crop의 별도 로스터 사례. 문서에 연도 없어 2025/26 추론 없음."
+      ],
+      "beforeLots": 2,
+      "afterLots": 3,
+      "area": "africa"
+    },
+    {
+      "regionId": "kenya-karatina",
+      "query": "\"Karatina\" coffee roaster notes varieties",
+      "urls": [
+        "https://www.offshootcoffee.com.au/products/karatina"
+      ],
+      "decision": [
+        "로스터가 이 로트에 표기한 3품종만 입력. 지역 일반 SL34를 임의 추가하지 않음."
+      ],
+      "beforeLots": 2,
+      "afterLots": 3,
+      "area": "africa"
+    },
+    {
+      "regionId": "tanzania-kilimanjaro",
+      "query": "\"Tanzania Peaberry\" site:sunergoscoffee.com",
+      "urls": [
+        "https://www.sunergoscoffee.com/products/tanzania-peabody-lyamungo"
+      ],
+      "decision": [
+        "공식 현재 본문 3품종/3노트 채택. 이전 제3자 tastinggrounds SL27와 노트는 현재 상품에 혼합하지 않음. source notes의 Lyamungo/APK를 사용; 일반 plantation 역사 미채택."
+      ],
+      "beforeLots": 2,
+      "afterLots": 3,
+      "area": "africa"
+    },
+    {
+      "regionId": "tanzania-mbeya",
+      "query": "\"Mbeya\" \"Mimba\" coffee roast",
+      "urls": [
+        "https://jimmysjava.com/products/tanpea-md-mbeya-mimba"
+      ],
+      "decision": [
+        "Utengule 밖 Mimba 생산자 추가. 원문 Mbozi, Mbeya 유통 지역 표기 보존; 현대 행정구역으로 주장하지 않음. 더 향긋한 Bespoken 예전 노트는 404라 현재 상품에 혼합하지 않음."
+      ],
+      "beforeLots": 2,
+      "afterLots": 3,
+      "area": "africa"
+    },
+    {
+      "regionId": "ethiopia-bench-maji",
+      "query": "\"Bench Maji\" coffee roaster notes varieties",
+      "urls": [
+        "https://mabo.coffee/en/products/bench-maji-ethiopia-washed-cafea-de-specialitate"
+      ],
+      "decision": [
+        "Gesha Village만 있던 지역에 별도 협동조합과 워시드 사례 추가. 제목 Peaches보다 상품표 Apricot 사용."
+      ],
+      "beforeLots": 3,
+      "afterLots": 4,
+      "area": "africa"
+    },
+    {
+      "regionId": "colombia-huila",
+      "query": "\"Papayo\" \"Huila\" coffee roaster notes",
+      "urls": [
+        "https://ineffablecoffee.com/products/betania-farm-papayo"
+      ],
+      "decision": "채택: Betania / Linarco Rodríguez / Papayo / anaerobic washed / cherimoya·apricot·vanilla / harvest 2026.",
+      "accessedAt": "2026-09-09",
+      "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering.",
+      "area": "south"
+    },
+    {
+      "regionId": "colombia-narino",
+      "query": "coffee roaster Narino Obraje Caturra tasting notes",
+      "urls": [
+        "https://caffegoriziana.it/en/product/colombia-finca-el-obraje-2/"
+      ],
+      "decision": "채택: El Obraje / Caturra / natural / mango·jasmine·honey. 기존 Ally Caturra 로트와 동일 로트라고 간주하지 않음.",
+      "accessedAt": "2026-09-09",
+      "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering.",
+      "area": "south"
+    },
+    {
+      "regionId": "colombia-antioquia",
+      "query": "coffee roaster Antioquia Chiroso tasting notes",
+      "urls": [
+        "https://flowerchildcoffee.com/products/edgar-gonzalez-chiroso"
+      ],
+      "decision": "채택: Edgar Gonzalez / Urrao / Chiroso / washed double fermentation / dried berries·cascara·geranium / harvest March 2026.",
+      "accessedAt": "2026-09-09",
+      "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering.",
+      "area": "south"
+    },
+    {
+      "regionId": "colombia-cauca",
+      "query": "\"Cauca\" coffee roaster \"notes\" \"washed\"; \"Inza\" \"coffee\" \"roaster\" \"variety\"",
+      "urls": [
+        "https://theangryroaster.com/products/colombia-gesha-inza"
+      ],
+      "decision": "채택: La Colina / Rafael Velasquéz & Andrés Martinez / Inzá, Cauca / Gesha / washed / bergamot·clementine·lavender·blueberries.",
+      "accessedAt": "2026-09-09",
+      "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering.",
+      "area": "south"
+    },
+    {
+      "regionId": "colombia-inza",
+      "query": "\"Inza\" \"coffee\" \"roaster\" \"variety\"",
+      "urls": [
+        "https://theangryroaster.com/products/colombia-gesha-inza"
+      ],
+      "decision": "채택: La Colina의 동일 제품. Cauca 상위 지역에도 연결하되 고유 로트는 한 개.",
+      "accessedAt": "2026-09-09",
+      "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering.",
+      "area": "south"
+    },
+    {
+      "regionId": "colombia-pitalito",
+      "query": "\"Pitalito\" \"roasters\" \"Aji\"",
+      "urls": [
+        "https://onyxcoffeelab.com/en-int/products/colombia-yadimir-quiguanas-perez-bourbon-aji"
+      ],
+      "decision": "채택: Los Yarumos / Yadimir Quiguanas Pérez / Bourbon Aji / washed / hibiscus·vanilla·ruby red grapefruit·apple / Early 2024. 본문 인터뷰 Ombligón 노트는 혼입하지 않음.",
+      "accessedAt": "2026-09-09",
+      "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering.",
+      "area": "south"
+    },
+    {
+      "regionId": "colombia-san-agustin",
+      "query": "\"San Agustin\" site:seycoffee.com \"Aruzi\"",
+      "urls": [
+        "https://www.seycoffee.com/products/2025-victor-alfonso-bonilla-la-chorrera-end-of-season-colombia"
+      ],
+      "decision": "채택: La Chorrera / Victor Alfonso Bonilla / Aruzi / washed / chamomile·honeydew·peach / Jan 2025. 유전적 계통 불확정.",
+      "accessedAt": "2026-09-09",
+      "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering.",
+      "area": "south"
+    },
+    {
+      "regionId": "colombia-tolima",
+      "query": "coffee roaster Tolima Jorge Rojas tasting notes; \"Tolima\" \"roasters\" \"Bourbon\"; \"Planadas\" coffee roaster variety tasting",
+      "urls": [
+        "https://patiocoffee.com.au/shop/colombia-planadas/"
+      ],
+      "decision": "채택: Patio의 Planadas / Typica·Castillo·Caturra / natural fermented / red apple·honey·nougat. 생산자 실명·수확연도 미공개.",
+      "accessedAt": "2026-09-09",
+      "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering.",
+      "area": "south"
+    },
+    {
+      "regionId": "colombia-planadas",
+      "query": "\"Planadas\" coffee roaster variety tasting",
+      "urls": [
+        "https://patiocoffee.com.au/shop/colombia-planadas/"
+      ],
+      "decision": "채택: Patio Planadas 제품. Tolima 상위 연결은 같은 로트를 재사용. 농장 이름 추정하지 않음.",
+      "accessedAt": "2026-09-09",
+      "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering.",
+      "area": "south"
+    },
+    {
+      "regionId": "brazil-cerrado",
+      "query": "\"Cerrado\" coffee roaster tasting notes variety; \"Cerrado\" \"roasters\" \"Arara\"",
+      "urls": [
+        "https://www.blackwhiteroasters.com/products/r-daterra-our-plot-project-jan-25"
+      ],
+      "decision": "채택: Daterra Our Plot / Luis N. Pascoal / Yellow Arara / 서로 다른 효모로 발효한 3개 anaerobic natural 혼합 / praline pecan·crème brûléed citrus·aged rum·milk chocolate. URL Jan25를 수확연도로 사용하지 않음.",
+      "accessedAt": "2026-09-09",
+      "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering.",
+      "area": "south"
+    },
+    {
+      "regionId": "brazil-sul-de-minas",
+      "query": "\"Sul de Minas\" coffee roaster tasting notes variety",
+      "urls": [
+        "https://www.parlor.coffee/products/santa-luzia-brazil"
+      ],
+      "decision": "채택: Santa Luzia / 여성 생산자 공동 로트 / Catuai·Catucai·Mundo Novo·Acaia·Arara / natural / almond·brown sugar·caramel·yellow fruit.",
+      "accessedAt": "2026-09-09",
+      "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering.",
+      "area": "south"
+    },
+    {
+      "regionId": "brazil-bahia",
+      "query": "\"Bahia\" coffee roaster tasting notes variety; \"Chapada Diamantina\" coffee roaster tasting variety",
+      "urls": [
+        "https://roastcafes.com/produto/arara-do-paulo-menezes-2024/"
+      ],
+      "decision": "채택: Fazenda Moeté / Paulo Lemos Menezes / Piatã, Chapada Diamantina / Arara / cereja descascado / rapadura·passion fruit·apricot·white flowers / Aug 2024.",
+      "accessedAt": "2026-09-09",
+      "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering.",
+      "area": "south"
+    },
+    {
+      "regionId": "brazil-chapada-diamantina",
+      "query": "\"Chapada Diamantina\" coffee roaster tasting variety",
+      "urls": [
+        "https://roastcafes.com/produto/arara-do-paulo-menezes-2024/"
+      ],
+      "decision": "채택: Moeté Arara. Bahia에도 같은 underlying lot 연결. 2024 표기를 최근 연도로 바꾸지 않음.",
+      "accessedAt": "2026-09-09",
+      "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering.",
+      "area": "south"
+    },
+    {
+      "regionId": "brazil-carmo-de-minas",
+      "query": "\"Carmo de Minas\" coffee roaster tasting notes variety",
+      "urls": [
+        "https://www.partnerscoffee.com/blogs/education/brazil-irmas-pereira-2025"
+      ],
+      "decision": "채택: Irmãs Pereira / Maria Valéria & Maria Rogéria Pereira / Yellow Bourbon / natural / milk chocolate·apricot·pecan. 글 제목 2025는 수확연도 아님.",
+      "accessedAt": "2026-09-09",
+      "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering.",
+      "area": "south"
+    },
+    {
+      "regionId": "brazil-mantiqueira-de-minas",
+      "query": "\"Mantiqueira\" coffee roaster tasting notes variety; \"Carmo de Minas\" coffee roaster tasting notes variety",
+      "urls": [
+        "https://www.partnerscoffee.com/blogs/education/brazil-irmas-pereira-2025"
+      ],
+      "decision": "채택: Partners가 Carmo de Minas를 Mantiqueira range에 명시. Irmãs Pereira 같은 로트를 상위 연결. SUMO 기존 Arara 2025/26도 재대조 일치.",
+      "accessedAt": "2026-09-09",
+      "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering.",
+      "area": "south"
+    },
+    {
+      "regionId": "brazil-alta-mogiana",
+      "query": "\"Alta Mogiana\" coffee roaster \"variety\"",
+      "urls": [
+        "https://www.cafemoscardini.com/en"
+      ],
+      "decision": "채택: Cacau & Castanhas / Sítio Santa Maria da Boa Vista / Elder Moscardini Filho / Mundo Novo / natural / cacao nibs·nuts. 기존 Tupi와 Yellow Obata 제품과 구분.",
+      "accessedAt": "2026-09-09",
+      "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering.",
+      "area": "south"
+    },
+    {
+      "regionId": "peru-jaen",
+      "query": "\"Jaen\" coffee roaster notes varietal",
+      "urls": [
+        "https://beansmiths.com/en/product/el-diamante/"
+      ],
+      "decision": "채택: El Diamante / 여러 생산 가족 / Caturra·Pache / washed 24h / red grape·honey·currant brownie. 지역 일반 품종을 이 로트에 추가하지 않음.",
+      "accessedAt": "2026-09-09",
+      "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering.",
+      "area": "south"
+    },
+    {
+      "regionId": "peru-cajamarca",
+      "query": "\"Cajamarca\" coffee roaster tasting variety; \"Cajamarca\" \"roaster\" \"Marshell\"; \"San Ignacio\" coffee roaster notes variety",
+      "urls": [
+        "https://caffelab.com/peru-san-ignacio/"
+      ],
+      "decision": "채택: Caffèlab San Ignacio 제품을 Cajamarca 상위에 연결. 품종·가공·노트 정확히 같은 사례.",
+      "accessedAt": "2026-09-09",
+      "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering.",
+      "area": "south"
+    },
+    {
+      "regionId": "peru-san-ignacio",
+      "query": "\"San Ignacio\" coffee roaster notes variety",
+      "urls": [
+        "https://caffelab.com/peru-san-ignacio/"
+      ],
+      "decision": "채택: San Francisco·Los Llanos·San Andres·El Sauce 소농 / Caturra·Catuai·Bourbon·Mundo Novo / washed 20–30h / chocolate·tangerine·almond·caramel.",
+      "accessedAt": "2026-09-09",
+      "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering.",
+      "area": "south"
+    },
+    {
+      "regionId": "peru-cusco",
+      "query": "\"Cusco\" coffee roaster tasting variety; \"Cusco\" \"roaster\" \"SL9\"; site:moonwakecoffeeroasters.com \"San Sebastian\"",
+      "urls": [
+        "https://moonwakecoffeeroasters.com/products/san-sebastian-julio-chavez-washed-sl9-peru"
+      ],
+      "decision": "채택: San Sebastian / Julio Chavez / Inkawasi / SL-9 / washed / jasmine·peach·pomelo·sencha. 수확연도 없음. India Selection9와 통합하지 않음.",
+      "accessedAt": "2026-09-09",
+      "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering.",
+      "area": "south"
+    },
+    {
+      "regionId": "peru-junin",
+      "query": "\"Junin\" coffee roaster notes varietal",
+      "urls": [
+        "https://www.redroostercoffee.com/products/peru-highland-select-natural"
+      ],
+      "decision": "채택: Highland Select / COOPAGRY / Caturra·Catimor·Catuai·Obata·Tupi / extended fermentation natural / bing cherry syrup·dried mango·devil’s food cake·strawberry preserves. 48h 산소제한 patio를 밀폐탱크라고 바꾸지 않음.",
+      "accessedAt": "2026-09-09",
+      "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering.",
+      "area": "south"
+    },
+    {
+      "regionId": "colombia-quindio",
+      "query": "\"Quindio\" coffee roaster notes variety",
+      "urls": [
+        "https://passportcoffee.com.au/blogs/roastery-ramblings/colombia-campo-hermoso-wush-wush-natural"
+      ],
+      "decision": "채택: Campo Hermoso / Edwin Noreña / Wush Wush / natural 16h anaerobic / floral·lemon·lychee·milk chocolate.",
+      "accessedAt": "2026-09-09",
+      "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering.",
+      "area": "south"
+    },
+    {
+      "regionId": "colombia-valle-del-cauca",
+      "query": "\"Valle del Cauca\" coffee roaster notes variety",
+      "urls": [
+        "https://www.reframecoffee.com/shop/colombia-lusitania/"
+      ],
+      "decision": "채택: Lusitania / Consuelo Marín & Javier Macias / Caicedonia / Castillo / natural / mango·rum·lime juice. 같은 페이지 관련상품 Los Nogales 정보는 배제.",
+      "accessedAt": "2026-09-09",
+      "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering.",
+      "area": "south"
+    },
+    {
+      "regionId": "brazil-espirito-santo",
+      "query": "\"Espirito Santo\" coffee roaster notes variety; \"Espirito Santo\" \"roasters\" \"Catucai\"",
+      "urls": [
+        "https://www.blacktucanocoffee.com/products/assinatura-cafe-black-tucano-single-origin-torrado-e-em-graos-250g"
+      ],
+      "decision": "채택: Bom Destino / Josiane Lima Bissoli / Afonso Cláudio / Catucaí 2SL Amarelo / washed / floral·honey·rapadura·peach.",
+      "accessedAt": "2026-09-09",
+      "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering.",
+      "area": "south"
+    },
+    {
+      "regionId": "brazil-mogiana",
+      "query": "\"Mogiana\" coffee roaster tasting notes variety; \"Mogiana\" \"roasters\" \"Bourbon\" \"farm\"",
+      "urls": [
+        "https://boxxcoffee.la/products/brazil-sitio-siriema",
+        "https://reykjavikroasters.is/en/portfolio-posts/mogiana-en/"
+      ],
+      "decision": "채택: Boxx Sítio Siriema / Ivan & Rose dos Santos / Arara / natural / red plum·rosehip·red apple. Reykjavík regional Yellow Bourbon은 생산자 불명이라 별도 로트 보류.",
+      "accessedAt": "2026-09-09",
+      "verification": "Official roaster product/archive page opened and read; flavor notes belong to the named offering.",
+      "area": "south"
+    },
+    {
+      "regionId": "panama-boquete",
+      "query": "Boquete Bonita Springs SL28 coffee roaster tasting",
+      "urls": [
+        "https://assemblycoffee.co.uk/products/panama-bonita-springs",
+        "https://kmen.coffee/product/bonita-springs-sl28/"
+      ],
+      "decision": "기존 Assembly 상품 유지; Kmen 노트를 합치지 않음.",
+      "area": "central"
+    },
+    {
+      "regionId": "panama-volcan",
+      "query": "Volcan Janson coffee roaster tasting notes",
+      "urls": [
+        "https://venezianocoffee.com.au/blogs/coffee-information/pinnacle-series-2025-continues-our-2nd-release-from-janson-estate"
+      ],
+      "decision": "기존 Janson Lot 117과 동일 lot 번호가 없어 harvest 보충 보류. 2025는 시리즈 연도.",
+      "area": "central"
+    },
+    {
+      "regionId": "panama-jaramillo",
+      "query": "Jaramillo coffee roaster pacamara natural",
+      "urls": [
+        "https://varistacoffee.com/products/alumipack-pacamara-natural-agricola-geisha-200gr"
+      ],
+      "decision": "기존 상품 유지. 같은 농장 다른 포장 상품을 추가 집계하지 않음.",
+      "area": "central"
+    },
+    {
+      "regionId": "panama-alto-quiel",
+      "query": "Alto Quiel Black Moon Chiroso coffee roaster",
+      "urls": [
+        "https://mazelabcoffee.com/products/blackmoon"
+      ],
+      "decision": "#49와 구별되는 #50 추가. 2024 대회연도는 harvest로 사용하지 않음.",
+      "area": "central"
+    },
+    {
+      "regionId": "panama-bambito",
+      "query": "Bambito roaster Typica coffee",
+      "urls": [
+        "https://idlehandsroasting.com/archive/p/panama-bambito-estate-catuai",
+        "https://www.vulcanroastery.com/products/panama-treasury-set-bambito-estate"
+      ],
+      "decision": "충돌한 후보 보류. 기존 Yellow Catuai·Geisha·Caturra 사례 유지.",
+      "area": "central"
+    },
+    {
+      "regionId": "guatemala-antigua",
+      "query": "Antigua coffee roaster Bourbon Gascón",
+      "urls": [
+        "https://www.cafesiboney.com/tienda/guatemala-finca-gascon-specialty-coffee/",
+        "https://badi.coffee/en/products/gascon-nitro-guatemala"
+      ],
+      "decision": "기존 anaerobic natural에 다른 nitro 상품 정보를 합치지 않음.",
+      "area": "central"
+    },
+    {
+      "regionId": "guatemala-huehuetenango",
+      "query": "Huehuetenango roaster tasting notes coffee",
+      "urls": [
+        "https://www.blackwaterroasters.com/shop/p/hht-guatemala",
+        "https://www.jaho.com/products/guatemala"
+      ],
+      "decision": "농장 없는 광역 blend보다 기존 El Injerto/La Bolsa/Los Pinos 사례 유지. 기존 lot harvest 추론 안 함.",
+      "area": "central"
+    },
+    {
+      "regionId": "guatemala-atitlan",
+      "query": "Atitlan roaster tasting notes",
+      "urls": [
+        "https://www.pinupcoffeeco.com/products/guatemala-atitlan"
+      ],
+      "decision": "기존 La Voz의 다른 로스터 노트·품종을 덮어쓰지 않음.",
+      "area": "central"
+    },
+    {
+      "regionId": "guatemala-coban",
+      "query": "Coban Santa Irene coffee",
+      "urls": [
+        "https://manhattan.coffee/catalog/coffee/santa-irene",
+        "https://guillam.co.uk/collections/single-origin-speciality-coffee/products/santa-irene-catuai-speciality-coffee-guatemala"
+      ],
+      "decision": "기존 상품 유지. 별도 Catuai 후보는 [Guillam](https://guillam.co.uk/collections/single-origin-speciality-coffee/products/santa-irene-catuai-speciality-coffee-guatemala) 원문 오류로 보류.",
+      "area": "central"
+    },
+    {
+      "regionId": "guatemala-san-pedro-necta",
+      "query": "San Pedro Necta coffee roaster",
+      "urls": [
+        "https://preludecoffeeroasters.com/collections/coffee/products/guatemala-san-pedro"
+      ],
+      "decision": "기존 상세 정보가 충분한 세 상품 유지. Prelude 누락을 다른 농장의 정보로 메우지 않음.",
+      "area": "central"
+    },
+    {
+      "regionId": "costa-rica-tarrazu",
+      "query": "Tarrazu Santa Rosa 1900 coffee",
+      "urls": [
+        "https://www.thecoffeeshop.jp/magazine/news/bds277/"
+      ],
+      "decision": "Catuai 기존 상품과 별도로 Villa Sarchi 추가.",
+      "area": "central"
+    },
+    {
+      "regionId": "costa-rica-west-valley",
+      "query": "West Valley roaster coffee varieties",
+      "urls": [
+        "https://www.bohee.coffee/products/costa-rica-cordillera-de-fuego-anaerobic",
+        "https://www.horshamcoffeeroaster.co.uk/pages/coffee-producer/San-Juanillo-farm"
+      ],
+      "decision": "기존 광역 사례 유지. 새 San Juanillo 상품은 정확한 하위 Naranjo에 배정.",
+      "area": "central"
+    },
+    {
+      "regionId": "costa-rica-central-valley",
+      "query": "Las Lajas Starmaya coffee",
+      "urls": [
+        "https://www.siemasu.coffee/shop/p/plumpearls"
+      ],
+      "decision": "Mariana 별도 상품 추가. 로스터의 유전 계보 주장까지 데이터에 복사하지 않음.",
+      "area": "central"
+    },
+    {
+      "regionId": "costa-rica-dota",
+      "query": "Dota Santa Teresa coffee SL28",
+      "urls": [
+        "https://coffeelibre.kr/article/%EC%9B%90%EB%91%90%EC%83%9D%EB%91%90-%EA%B0%80%EC%9D%B4%EB%93%9C/1/16760/"
+      ],
+      "decision": "기존 white honey와 다른 fully washed 추가. 입고일 26.07.16은 harvest 아님.",
+      "area": "central"
+    },
+    {
+      "regionId": "costa-rica-naranjo",
+      "query": "Naranjo San Juanillo coffee honey",
+      "urls": [
+        "https://fuglencoffee.jp/en/blogs/coffee-beans/san-juannillo",
+        "https://scenery.coffee/blogs/news/costa-rica-gaia-artisan-milenio"
+      ],
+      "decision": "두 품종 상품 추가. Scenery crop 24/25와 도착 2024-09 표기는 시간상 모호하여 harvest 미입력; 노트·품종·위치·가공만 채택.",
+      "area": "central"
+    },
+    {
+      "regionId": "honduras-marcala",
+      "query": "Marcala coffee notes",
+      "urls": [
+        "https://equatorcoffeeroasters.com/blogs/news/single-origin-series-2026-honduras-marcala"
+      ],
+      "decision": "품종 없는 지역 상품으로 기존 명확한 생산 사례를 대체하지 않음. 2026은 판매 시리즈 연도.",
+      "area": "central"
+    },
+    {
+      "regionId": "honduras-copan",
+      "query": "Copan coffee notes",
+      "urls": [
+        "https://www.cloudcitycoffee.com/products/new-honduras-finca-la-unica",
+        "https://www.caribecoffeeco.com/products/copanhg"
+      ],
+      "decision": "기존 La Unica Parainema 유지. 다지역 상품을 Copán 단독 사례로 넣지 않음.",
+      "area": "central"
+    },
+    {
+      "regionId": "honduras-comayagua",
+      "query": "Comayagua coffee roasters",
+      "urls": [
+        "https://mojocoffeeroasters.com/products/honduras-la-cascada"
+      ],
+      "decision": "La Cascada 추가. Noventa를 근거 없이 IHCAFE90으로 바꾸지 않음.",
+      "area": "central"
+    },
+    {
+      "regionId": "honduras-santa-barbara",
+      "query": "Santa Barbara Honduras coffee roasters",
+      "urls": [
+        "https://ritualcoffee.com/shop/coffee/la-pinona-honduras/"
+      ],
+      "decision": "대회 Geisha/SL28 위주였던 목록에 Pacas 추가.",
+      "area": "central"
+    },
+    {
+      "regionId": "el-salvador-santa-ana",
+      "query": "Santa Ana coffee roaster bourbon notes",
+      "urls": [
+        "https://sleepymangocoffee.com/products/el-salvador-santa-ana"
+      ],
+      "decision": "희귀 Bernardina/Pacamara와 비교할 전통 품종 워시드 추가.",
+      "area": "central"
+    },
+    {
+      "regionId": "el-salvador-chalatenango",
+      "query": "Chalatenango coffee roaster pacas",
+      "urls": [
+        "https://kurasu.pro/blogs/news/el-salvador-don-jaime",
+        "https://samplecoffee.com.au/coffee/gilberto-landaverde"
+      ],
+      "decision": "색인 근거로 독립 Don Jaime Pacas 추가, 기존 2022/23 Pacamara와 합치지 않음. 수확연도 미기재.",
+      "area": "central"
+    },
+    {
+      "regionId": "nicaragua-jinotega",
+      "query": "Jinotega La Escondida coffee roaster",
+      "urls": [
+        "https://manhattancoffeeroasters.com/product/coffees/rare/la-escondida/",
+        "https://19grams.coffee/products/nicaragua-laurina-la-escondida"
+      ],
+      "decision": "Ethiosar 추가. Laurina 후보는 가공 충돌로 보류.",
+      "area": "central"
+    },
+    {
+      "regionId": "nicaragua-matagalpa",
+      "query": "Matagalpa coffee roaster ethiosar",
+      "urls": [
+        "https://keigancoffee.com/en/products/nicaragua-los-placeres-ethiosar",
+        "https://www.dropcoffee.com/products/limoncillo-washed-carturra-nicaragua"
+      ],
+      "decision": "[Drop Coffee](https://www.dropcoffee.com/products/limoncillo-washed-carturra-nicaragua) Caturra washed 상품도 직접 재열람. 기존 검증된 두 상품 유지. 서로 다른 honey 상품 필드 합치지 않음.",
+      "area": "central"
+    },
+    {
+      "regionId": "nicaragua-nueva-segovia",
+      "query": "Nueva Segovia coffee roaster pacamara",
+      "urls": [
+        "https://ozocoffee.com/products/nicaragua-la-pena-pacamara"
+      ],
+      "decision": "Pacamara 추가. 처리 장소 Ocotal을 생산지로 바꾸지 않음.",
+      "area": "central"
+    },
+    {
+      "regionId": "nicaragua-dipilto",
+      "query": "Dipilto coffee roaster caturra",
+      "urls": [
+        "https://casetacoffee.com/en/products/nicaragua-natural-nueva-segovia"
+      ],
+      "decision": "자연 가공 지역 상품 추가.",
+      "area": "central"
+    },
+    {
+      "regionId": "mexico-chiapas",
+      "query": "Chiapas coffee roasters varietal",
+      "urls": [
+        "https://atomicroastery.com/products/mexico-chiapas"
+      ],
+      "decision": "Sarchimor 별도 상품 추가.",
+      "area": "central"
+    },
+    {
+      "regionId": "mexico-oaxaca",
+      "query": "Oaxaca coffee roasters varietal",
+      "urls": [
+        "https://cultcoffeeroasters.orderspace.com/products/25"
+      ],
+      "decision": "북부 산맥 Mazatec 생산자 사례 추가. Pluma Hidalgo에 배정하지 않음.",
+      "area": "central"
+    },
+    {
+      "regionId": "mexico-veracruz",
+      "query": "Veracruz coffee roaster notes",
+      "urls": [
+        "https://frontsidecoffee.com/products/mexican-veracruz",
+        "https://thecalaveracoffee.com/products/veracruz-mexico"
+      ],
+      "decision": "기존 Marsellesa·Anacafé14·Gesha 생산 사례 유지.",
+      "area": "central"
+    },
+    {
+      "regionId": "mexico-pluma-hidalgo",
+      "query": "Pluma Hidalgo coffee roaster finca",
+      "urls": [
+        "https://cafesros.com/mexico-pluma-hidalgo/"
+      ],
+      "decision": "이를 내추럴 가공으로 오인하지 않고 보류. 기존 세 분리 상품 유지.",
+      "area": "central"
+    },
+    {
+      "regionId": "costa-rica-turrialba",
+      "query": "Turrialba Mariana coffee roaster",
+      "urls": [
+        "https://docr.coffee/products/costa-rica-aquiares-estate-mariana-natural"
+      ],
+      "decision": "기존 Mariana washed와 비교할 natural 추가.",
+      "area": "central"
+    },
+    {
+      "regionId": "costa-rica-orosi",
+      "query": "Orosi Zalmari coffee",
+      "urls": [
+        "https://www.ninjagirlcoffee.com/shop/p/kimura"
+      ],
+      "decision": "단일 Caturra 상품 추가.",
+      "area": "central"
+    },
+    {
+      "regionId": "costa-rica-tres-rios",
+      "query": "Tres Rios coffee roaster varieties",
+      "urls": [
+        "https://cafebocanegra.com/en/products/tres-rios",
+        "https://www.riversbendcoffeeroasters.com/product/tres-rios/"
+      ],
+      "decision": "H17 추가. [Rivers Bend](https://www.riversbendcoffeeroasters.com/product/tres-rios/)는 미국 강 이름을 딴 블렌드라 제외.",
+      "area": "central"
+    },
+    {
+      "regionId": "indonesia-sumatra",
+      "query": "Gayo roaster varieties natural; Nusa Sumatra Gayo",
+      "urls": [
+        "https://nusacoffeecompany.com/products/sumatra-gayo"
+      ],
+      "decision": "[Nusa Arinagata](https://nusacoffeecompany.com/products/sumatra-gayo): Central Aceh, Gayo 1, semi washed, 백포도·바닐라·꽃·향신료   별도 협동조합 원두 추가. Gayo 1의 괄호 Timtim을 별도 품종으로 늘리지 않음",
+      "area": "asia"
+    },
+    {
+      "regionId": "indonesia-java",
+      "query": "West Java coffee roaster Sigarar",
+      "urls": [
+        "https://www.horshamcoffeeroaster.co.uk/products/west-java-frinsa-collective-fermented-washed"
+      ],
+      "decision": "[Horsham Frinsa Collective](https://www.horshamcoffeeroaster.co.uk/products/west-java-frinsa-collective-fermented-washed): 주변 소농 체리, Borbor/Lini S/Ateng Super/Timor/Sigarar Utang/P88, 유산균 워시드   기존 농장 단일 품종 Frinsa Sarapan과 구분해 추가",
+      "area": "asia"
+    },
+    {
+      "regionId": "indonesia-sulawesi",
+      "query": "Toraja Sapan coffee roaster notes variety",
+      "urls": [
+        "https://www.tanameracoffee.com.sg/products/sulawesi-toraja-sapan-250g",
+        "https://nusacoffeecompany.com/products/sulawesi-toraja"
+      ],
+      "decision": "[Tanamera Sapan](https://www.tanameracoffee.com.sg/products/sulawesi-toraja-sapan-250g), [Nusa Sulotco](https://nusacoffeecompany.com/products/sulawesi-toraja) 직접 확인   Tanamera는 라임·생강·블랙커런트 있으나 가공·품종 미공개. Nusa는 Sulotco 워시드 있으나 개별 로트 연결 불명. 기존 Sulotco 원두에 임의 병합하지 않음",
+      "area": "asia"
+    },
+    {
+      "regionId": "indonesia-flores",
+      "query": "Flores Bajawa roaster coffee variety honey",
+      "urls": [
+        "https://nusacoffeecompany.com/products/flores-bajawa",
+        "https://www.sanagustin.com/en/product/bajawa/"
+      ],
+      "decision": "[Nusa Beiposo](https://nusacoffeecompany.com/products/flores-bajawa), [San Agustín UPH Wongawali](https://www.sanagustin.com/en/product/bajawa/)   S795 워시드와 Typica/Catimor/S795 웻헐드 2개 추가",
+      "area": "asia"
+    },
+    {
+      "regionId": "indonesia-gayo",
+      "query": "Gayo roaster varieties natural; Nusa Sumatra Gayo",
+      "urls": [
+        "https://nusacoffeecompany.com/products/sumatra-gayo"
+      ],
+      "decision": "[Nusa Arinagata](https://nusacoffeecompany.com/products/sumatra-gayo) 직접 확인   Sumatra와 같은 실제 원두 연결",
+      "area": "asia"
+    },
+    {
+      "regionId": "indonesia-lintong",
+      "query": "Lintong coffee roasters variety tasting notes",
+      "urls": [
+        "https://coffeetgc.com/2021/03/25/lintong/"
+      ],
+      "decision": "[TGC Jejak Toba](https://coffeetgc.com/2021/03/25/lintong/): Line S, full washed, 견과류·흑설탕·꽃·캐러멜   기존 웻헐드·숙성 비교에 풀 워시드 추가. Line S를 S795로 좁히지 않음. 페이지 아래 품절 과거 원두의 허브 프로필과 혼합하지 않음",
+      "area": "asia"
+    },
+    {
+      "regionId": "indonesia-west-java",
+      "query": "West Java coffee roaster Sigarar",
+      "urls": [
+        "https://www.horshamcoffeeroaster.co.uk/products/west-java-frinsa-collective-fermented-washed"
+      ],
+      "decision": "[Horsham Frinsa Collective](https://www.horshamcoffeeroaster.co.uk/products/west-java-frinsa-collective-fermented-washed) 직접 확인   자바와 동일 원두 연결",
+      "area": "asia"
+    },
+    {
+      "regionId": "indonesia-toraja",
+      "query": "Toraja Sapan coffee roaster notes variety; Toraja S795 roasted coffee",
+      "urls": [
+        "https://www.tanameracoffee.com.sg/products/sulawesi-toraja-sapan-250g",
+        "https://nusacoffeecompany.com/products/sulawesi-toraja"
+      ],
+      "decision": "[Tanamera](https://www.tanameracoffee.com.sg/products/sulawesi-toraja-sapan-250g), [Nusa](https://nusacoffeecompany.com/products/sulawesi-toraja)   새 검색 대조 완료. 노트와 기존 수입사 lot ID 동일성 부족으로 추가 병합 보류. 블렌드 Eyckman 32도 배제",
+      "area": "asia"
+    },
+    {
+      "regionId": "indonesia-bajawa",
+      "query": "Flores Bajawa roaster coffee variety honey",
+      "urls": [
+        "https://nusacoffeecompany.com/products/flores-bajawa",
+        "https://www.sanagustin.com/en/product/bajawa/"
+      ],
+      "decision": "[Nusa](https://nusacoffeecompany.com/products/flores-bajawa), [San Agustín](https://www.sanagustin.com/en/product/bajawa/)   플로레스와 동일한 2개 원두 연결. Nusa의 'East Flores' 문구는 행정 East Flores Regency로 해석하지 않고 Beiposo/Bajawa까지만 사용",
+      "area": "asia"
+    },
+    {
+      "regionId": "papua-new-guinea-eastern-highlands",
+      "query": "Eastern Highlands roaster Variety; site:gabrielcoffee.com.au Baroida Geisha",
+      "urls": [
+        "https://gabrielcoffee.com.au/products/baroida-estate-papua-new-guinea-espresso-500g"
+      ],
+      "decision": "[Gabriel Baroida](https://gabrielcoffee.com.au/products/baroida-estate-papua-new-guinea-espresso-500g)   Colbran family Geisha 워시드 추가. 만다린·핵과류·홍차·재스민. 특정 Panama T2722 계통 추정 안 함",
+      "area": "asia"
+    },
+    {
+      "regionId": "papua-new-guinea-western-highlands",
+      "query": "Mong Papua coffee roaster washed",
+      "urls": [
+        "https://enjoycoffeeroasters.com/products/mong"
+      ],
+      "decision": "[Enjoy Mong](https://enjoycoffeeroasters.com/products/mong)   Rexson Raguni, Blue Mountain/Mundo Novo/Caturra, slow-dried washed, 배·콜라·레몬그라스. 별도 로스터 표현으로 추가. 생산관계 2025 설명을 harvest로 전환 안 함",
+      "area": "asia"
+    },
+    {
+      "regionId": "india-karnataka",
+      "query": "Kerehaklu coffee roaster notes",
+      "urls": [
+        "https://korerocoffee.com/products/kerehaklu-mosto-culture-washed",
+        "https://aviary.coffee/products/016-kerehaklu"
+      ],
+      "decision": "[Korero SLN10](https://korerocoffee.com/products/kerehaklu-mosto-culture-washed), [Aviary 016](https://aviary.coffee/products/016-kerehaklu)   SLN10 모스토 워시드, Selection 9 Lot E 37h 워시드 추가. Aviary 실제 체리수확 2024-12-02 확인",
+      "area": "asia"
+    },
+    {
+      "regionId": "india-kerala",
+      "query": "Wayanad specialty robusta roasted coffee variety; Luna Black Baza coffee",
+      "urls": [
+        "https://www.blackbazacoffee.com/products/luna",
+        "https://www.westmountcaffe.com/products/specialty/424770000009581034"
+      ],
+      "decision": "[Black Baza Luna](https://www.blackbazacoffee.com/products/luna), [Westmount](https://www.westmountcaffe.com/products/specialty/424770000009581034)   Luna의 Thomas/내추럴/다크초콜릿·담배·향신료 재확인. Kent 표기는 Robusta 본문과 충돌하여 배제. Westmount는 구체 cultivar/producer 없음, 기존보다 정보가 얕아 보류",
+      "area": "asia"
+    },
+    {
+      "regionId": "india-chikmagalur",
+      "query": "Kerehaklu coffee roaster notes",
+      "urls": [
+        "https://korerocoffee.com/products/kerehaklu-mosto-culture-washed",
+        "https://aviary.coffee/products/016-kerehaklu"
+      ],
+      "decision": "[Korero](https://korerocoffee.com/products/kerehaklu-mosto-culture-washed), [Aviary](https://aviary.coffee/products/016-kerehaklu)   Karnataka와 동일 2개 원두 연결. SLN10와 Selection 9 구분",
+      "area": "asia"
+    },
+    {
+      "regionId": "india-bababudangiri",
+      "query": "Ratnagiri Bababudangiri notes coffee",
+      "urls": [
+        "https://cafeirreverentes.com/en/product/elsinverguenza/",
+        "https://naivo.in/product/ratnagiri-estate-double-washed-classic/"
+      ],
+      "decision": "[IRREVERENTES El Sinvergüenza](https://cafeirreverentes.com/en/product/elsinverguenza/), [Naivo Double Washed](https://naivo.in/product/ratnagiri-estate-double-washed-classic/)   Cauvery 허니 추가. IRREVERENTES 직접 open cache miss이나 공식 페이지 검색 본문에 생산자·지역·가공·품종·4개 노트 일치. Naivo 미상 품종은 다른 Ratnagiri 제품에서 가져오지 않음",
+      "area": "asia"
+    },
+    {
+      "regionId": "india-coorg",
+      "query": "Coorg Harangal coffee roaster varieties",
+      "urls": [
+        "https://www.pinupcoffeeco.com/products/india"
+      ],
+      "decision": "[Pinup Harangal](https://www.pinupcoffeeco.com/products/india)   Petu Kariappa Chandragiri 내추럴, 천도복숭아·자두·건포도·캐러멜 추가. 직접 open cache miss이나 공식 검색 본문 대조. 기존 Harangal 워시드 2025와 별도 원두",
+      "area": "asia"
+    },
+    {
+      "regionId": "india-wayanad",
+      "query": "Wayanad specialty robusta roasted coffee variety; Luna Black Baza",
+      "urls": [
+        "https://www.blackbazacoffee.com/products/luna"
+      ],
+      "decision": "[Black Baza Luna](https://www.blackbazacoffee.com/products/luna) 직접 확인   Kerala와 동일 로스터 대조. 가격지급 2026은 harvest 아님; Kent 종 충돌은 남겨 두지 않고 채택 안 함",
+      "area": "asia"
+    },
+    {
+      "regionId": "vietnam-da-lat",
+      "query": "Cau Dat Catimor roasters; Cau Dat washed notes coffee",
+      "urls": [
+        "https://www.themarriedbeans.com/en/products/viet-nam-arabica-coffee",
+        "https://www.themarriedbeans.com/en/collections/all",
+        "https://bosgauruscoffee.com/blogs/Stewpen",
+        "https://www.themarriedbeans.com/en/products/ca-phe-nhan-xanh-honey",
+        "https://www.themarriedbeans.com/en/pages/green-coffee-export"
+      ],
+      "decision": "[The Married Beans roasted Cầu Đất](https://www.themarriedbeans.com/en/products/viet-nam-arabica-coffee), [roaster catalogue](https://www.themarriedbeans.com/en/collections/all), [Bosgaurus Stewpen](https://bosgauruscoffee.com/blogs/Stewpen) 직접 확인   기존 Cầu Đất Catimor green lot와 원두 동일성 미확정으로 노트 병합 안 함. Stewpen은 Trạm Hành로 명시하므로 Cầu Đất에 좁혀 연결하지 않음; 추가 대조로 Catimor Honey Red 별도 원두 채택(향신료/당밀/다크초콜릿/핵과류).",
+      "area": "asia"
+    },
+    {
+      "regionId": "vietnam-buon-ma-thuot",
+      "query": "Buon Ma Thuot TR4 coffee roasted; site:soulcoffee.vn Nồng Robusta",
+      "urls": [
+        "https://soulcoffee.vn/products/soulful2025-nong-espresso-fine-ro-top7-vietnam-coffee-producer"
+      ],
+      "decision": "[Soul Nồng](https://soulcoffee.vn/products/soulful2025-nong-espresso-fine-ro-top7-vietnam-coffee-producer) 직접 확인   미상 varieties에 원문 'Robusta TR' 보충. TR4 clone으로 추정하지 않음. 2026 Collection도 수확연도로 전환 안 함",
+      "area": "asia"
+    },
+    {
+      "regionId": "vietnam-cau-dat",
+      "query": "Cau Dat Catimor roasters; Cau Dat washed notes coffee",
+      "urls": [
+        "https://www.themarriedbeans.com/en/products/viet-nam-arabica-coffee",
+        "https://airworkscoffee.com/products/grandmum-cafe-washed-catimor-cau-dat-vietnam-100g",
+        "https://www.themarriedbeans.com/en/products/ca-phe-nhan-xanh-honey",
+        "https://www.themarriedbeans.com/en/pages/green-coffee-export"
+      ],
+      "decision": "[The Married Beans](https://www.themarriedbeans.com/en/products/viet-nam-arabica-coffee), [Airworks Grandmum](https://airworkscoffee.com/products/grandmum-cafe-washed-catimor-cau-dat-vietnam-100g)   로스터 원두 판매 자료 대조. Airworks는 공식 유통사의 Grandmum washed Catimor지만 생산자 미공개, 기존보다 구체성 낮아 보류. Red Bourbon은 실제 Lạc Dương라 Cầu Đất에 넣지 않음; 추가 대조로 Catimor Honey Red 별도 원두 채택(향신료/당밀/다크초콜릿/핵과류).",
+      "area": "asia"
+    },
+    {
+      "regionId": "yemen-haraaz",
+      "query": "Haraz roaster variety",
+      "urls": [
+        "https://www.caffefusari.it/en/product/yemen-da-tradurre-en"
+      ],
+      "decision": "[Caffè Fusari](https://www.caffefusari.it/en/product/yemen-da-tradurre-en) 직접 확인   Jadi/Jufni 내추럴, 자몽·자두·포도·정향 추가. Jufni를 다른 표기 품종과 유전적으로 동치 취급하지 않음",
+      "area": "asia"
+    },
+    {
+      "regionId": "yemen-mattari",
+      "query": "Mattari coffee natural roasted; Bani Matar coffee roaster tasting",
+      "urls": [
+        "https://lccroastery.com/2020/05/15/yemen-mocha-matari/",
+        "https://coffeetree.ca/products/yemen-matari",
+        "https://www.dalalcoffee.com/yemen-matari"
+      ],
+      "decision": "[LCC Muslot](https://lccroastery.com/2020/05/15/yemen-mocha-matari/), [Coffee Tree](https://coffeetree.ca/products/yemen-matari), [Dalal](https://www.dalalcoffee.com/yemen-matari)   LCC 역사 원두 추가. Fatoum Muslot는 농장주라고 단정 안 함. 게시일 2020은 harvest로 안 씀. 본문의 Matari/Sanani를 품종이라 하는 역사 설명은 재사용 안 함",
+      "area": "asia"
+    },
+    {
+      "regionId": "bolivia-caranavi",
+      "query": "Caranavi coffee roaster tasting notes Caturra washed",
+      "urls": [
+        "https://muyu.coffee/shop/p/caranavi-aaa"
+      ],
+      "decision": "[MUYU San José AAA](https://muyu.coffee/shop/p/caranavi-aaa), opened. Added Typica/Caturra/Catuai/Icatu washed regional selection, peach/clementine/hazelnut/brown sugar. The image filename contains 2026 but is not a harvest date.",
+      "area": "additional"
+    },
+    {
+      "regionId": "bolivia-samaipata",
+      "query": "Samaipata Batian coffee",
+      "urls": [
+        "https://onacoffee.com.au/blogs/brewguides/bolivia-finca-floripondio-samaipata-batian-natural",
+        "https://melbournecoffeemerchants.com.au/coffee/los-rodriguez-batian-samaipata/",
+        "https://www.dropcoffee.com/blogs/coffee-archive/samaichacha-caturra-bolivia-2018"
+      ],
+      "decision": "[ONA Floripondio Batian](https://onacoffee.com.au/blogs/brewguides/bolivia-finca-floripondio-samaipata-batian-natural), opened. Added Batian natural and ONA's milk-roast crème brûlée/raisin/Merlot notes. [MCM](https://melbournecoffeemerchants.com.au/coffee/los-rodriguez-batian-samaipata/) independently supports regional Batian production, but its four-farm blend notes were not copied onto ONA's Floripondio. [Drop 2018 Caturra](https://www.dropcoffee.com/blogs/coffee-archive/samaichacha-caturra-bolivia-2018) opened; retained as unadopted historical comparison because its processing label is internally awkward (“washed processed without water”).",
+      "area": "additional"
+    },
+    {
+      "regionId": "ecuador-loja",
+      "query": "Loja Ecuador coffee roaster Sidra notes",
+      "urls": [
+        "https://www.valleandinocoffee.com/products/sidra"
+      ],
+      "decision": "[Valle Andino Sidra](https://www.valleandinocoffee.com/products/sidra), opened. Farm-owned Loja roaster supplies natural Sidra; added blueberry/tropical fruit/citrus. Farm name/harvest not supplied. No Bourbon parentage inferred.",
+      "area": "additional"
+    },
+    {
+      "regionId": "ecuador-pichincha",
+      "query": "Pichincha Ecuador coffee roaster Typica notes",
+      "urls": [
+        "https://www.rigbyroastery.com/product/ecuador-coffee-typica-mejorado",
+        "https://www.midnightbloomcoffee.com/origins/ecuador-pichincha/"
+      ],
+      "decision": "[Rigby Galo Morales](https://www.rigbyroastery.com/product/ecuador-coffee-typica-mejorado), official indexed body read; direct open timeout. Orange sherbet/vanilla custard/lime and Cruz Loma Mejorado found. Held: title says anaerobic washed, body repeatedly traditional washed; exact regional link absent from this page. Existing Cruz Loma and Meridiano traceable records retained. [Midnight Bloom](https://www.midnightbloomcoffee.com/origins/ecuador-pichincha/) was rejected as a cultivar-lineage source: its Sidra ancestry assertion conflicts with better evidence.",
+      "area": "additional"
+    },
+    {
+      "regionId": "guatemala-acatenango",
+      "query": "Acatenango coffee roasted notes",
+      "urls": [
+        "https://burnettcoffee.com/products/guatemala-gesha-acatenango-90-7"
+      ],
+      "decision": "[Burnett private-estate Gesha](https://burnettcoffee.com/products/guatemala-gesha-acatenango-90-7), opened. Added washed/patio-dried light-medium expression, jasmine/orange blossom/honey/apple/pear/white grape. Producer explicitly confidential, represented as Private estate; no fabricated farmer name, score or certification imported.",
+      "area": "additional"
+    },
+    {
+      "regionId": "guatemala-fraijanes",
+      "query": "Fraijanes roasters notes",
+      "urls": [
+        "https://tinyhousecoffeeroasters.com/products/guatemala"
+      ],
+      "decision": "[Tiny House San Victor](https://tinyhousecoffeeroasters.com/products/guatemala), opened. Added Raul/Alejandro Molina Red Bourbon + Red Catuai, washed/patio dried, chocolate/cherry/cola. Not merged into El Santo: the same mill can handle different producer lots.",
+      "area": "additional"
+    },
+    {
+      "regionId": "uganda-rwenzori",
+      "query": "Rwenzori roasters variety",
+      "urls": [
+        "https://www.fcrwholesale.com/product-page/uganda-rwenzori",
+        "https://methods.coffee/products/rwenzori"
+      ],
+      "decision": "[Frazer's Kalingwe](https://www.fcrwholesale.com/product-page/uganda-rwenzori), opened. Named Kalingwe sun-dried cherry process; dried fruit/citrus/strawberry aroma. Held as extra row because existing October 2025 Kalingwe already provides producer-group traceability and no evidence makes this the same harvest. Spelling “Nyasland” was not silently used to alter old lot varieties. [Methods Rwenzori](https://methods.coffee/products/rwenzori) indexed: Kasese SL14/28 natural; redundant against current record.",
+      "area": "additional"
+    },
+    {
+      "regionId": "uganda-mount-elgon",
+      "query": "Mount Elgon coffee roaster notes variety",
+      "urls": [
+        "https://www.cannoncoffee.co.uk/products/uganda-mt-elgon"
+      ],
+      "decision": "[Cannon Mount Elgon](https://www.cannoncoffee.co.uk/products/uganda-mt-elgon), opened. Added 200 farmers in Friends of Mother's Initiative/Dream Coffee, Mbale, washed SL14/SL28/Nyasaland, strawberry jam/cocoa. Distinct network from existing Kyagalanyi and Mountain Harvest selections.",
+      "area": "additional"
+    },
+    {
+      "regionId": "china-puer",
+      "query": "Pu'er Yunnan coffee roaster Catimor notes; site:mellowcoffeeroasters.com TianHao Catimor",
+      "urls": [
+        "https://mellowcoffeeroasters.com/products/tianhao-red-natural-anerobic-catimor",
+        "https://www.falconroasters.com/products/china-puer-filter"
+      ],
+      "decision": "[Mellow TianHao Red Natural](https://mellowcoffeeroasters.com/products/tianhao-red-natural-anerobic-catimor), opened. Added separate roaster selection: Catimor, low-temperature sealed fermentation then whole-cherry drying, dried fruit/whisky/brown sugar. No whisky infusion inferred. [Falcon](https://www.falconroasters.com/products/china-puer-filter) indexed page found but direct 404; not adopted.",
+      "area": "additional"
+    },
+    {
+      "regionId": "china-baoshan",
+      "query": "Baoshan coffee roasters",
+      "urls": [
+        "https://ninthcoffeeroasters.com/products/red-dragon-estate-china"
+      ],
+      "decision": "[Ninth Red Dragon](https://ninthcoffeeroasters.com/products/red-dragon-estate-china), opened. Added separate Red Sparrow roast, Catimor anaerobic natural, chocolate/pineapple/boozy. Existing Harmony “Yun Catimor” was not rewritten: source naming is preserved per selection.",
+      "area": "additional"
+    },
+    {
+      "regionId": "thailand-chiang-rai",
+      "query": "Chiang Rai Sirinya coffee roaster tasting; Sirinya Washed Bourbon coffee",
+      "urls": [
+        "https://rollingbkk.com/product/sirinya-washed-light-roast-200g/",
+        "https://www.drinkmorning.com/products/good-day-rise-coffee-capsules"
+      ],
+      "decision": "[Rolling Sirinya washed](https://rollingbkk.com/product/sirinya-washed-light-roast-200g/), official search result gives Mae Suai and pear/nectarine/orange/floral/white grape, direct browser-readable response challenge only. Held because lot-specific cultivar not retrieved. [RISE via Morning](https://www.drinkmorning.com/products/good-day-rise-coffee-capsules) blends washed + natural, not used to patch a single existing lot. Existing Sirinya 2025/26 cultivar/process record retained.",
+      "area": "additional"
+    },
+    {
+      "regionId": "thailand-chiang-mai",
+      "query": "Chiang Mai coffee process notes",
+      "urls": [
+        "https://www.preda-roastinghouse.com/en/blog/11197/soe-ae-drinkable-forest"
+      ],
+      "decision": "[Preda Soe Ae](https://www.preda-roastinghouse.com/en/blog/11197/soe-ae-drinkable-forest), opened. Added named processor Saranyu Wanasomboon, Soe Ae/Mae Tuen/Omkoi, washed 2025–2026, lime/orange/pomelo/honey/coffee blossom. Cultivar array intentionally empty: historical Typica trees in the village do not establish this selected lot's cultivar. This adds a new microregion/processor and crop rather than disguising the field gap.",
+      "area": "additional"
+    },
+    {
+      "regionId": "timor-leste-ermera",
+      "query": "Ermera roaster coffee",
+      "urls": [
+        "https://presscoffee.com/collections/limited-single-origin/products/east-timor-ermera",
+        "https://genicoffeeroaster.com/id/products/ermera-timor-leste-for-espresso"
+      ],
+      "decision": "[PRESS Ermera](https://presscoffee.com/collections/limited-single-origin/products/east-timor-ermera), official indexed body retrieved; direct open cache miss. Added washed Timor Hybrid/Typica/Catimor/Sarchimor, gingerbread/baker's chocolate/walnut. Source typo “Lefefoho” normalized to Letefoho in established Ermera geography. Producer individual absent: growers only. [Geni](https://genicoffeeroaster.com/id/products/ermera-timor-leste-for-espresso) also indexed, Catimor hybrid wash; held rather than overinterpreting proprietary hybrid-wash method.",
+      "area": "additional"
+    },
+    {
+      "regionId": "kenya-embu",
+      "query": "Embu roaster notes; site:seycoffee.com Embu Kamavindi 2025",
+      "urls": [
+        "https://www.seycoffee.com/products/2025-mbature-family-kamavindi-estate-sl28-kenya",
+        "https://www.seycoffee.com/products/2026-mbature-family-kamavindi-estate-lot-1-kenya",
+        "https://www.seycoffee.com/products/2026-ndwiga-family-nginda-estate-kenya"
+      ],
+      "decision": "[SEY Kamavindi SL28](https://www.seycoffee.com/products/2025-mbature-family-kamavindi-estate-sl28-kenya), opened. Added single-variety separation, blackberry/rooibos/candied grapefruit, **harvest September 2024**, not 2025 from URL. Newer [Kamavindi field blend](https://www.seycoffee.com/products/2026-mbature-family-kamavindi-estate-lot-1-kenya) and [Nginda](https://www.seycoffee.com/products/2026-ndwiga-family-nginda-estate-kenya) explicitly question assumed SL identities; not converted into verified SL28/34 lists.",
+      "area": "additional"
+    },
+    {
+      "regionId": "ethiopia-shakiso",
+      "query": "Shakiso coffee roasters notes",
+      "urls": [
+        "https://ramsheadcoffee.com/products/ethiopia-guji-shakiso-gigeso-natural",
+        "https://www.jonescoffeeroasters.com/collections/frontpage/products/ethiopian-natural"
+      ],
+      "decision": "[RamsHead Gigeso](https://ramsheadcoffee.com/products/ethiopia-guji-shakiso-gigeso-natural), full official indexed body read. Natural local landraces, pomegranate/hibiscus/lemon balm/cocoa nib/cedar. Existing Gigesa lot kept; different roast/unknown harvest is not permission to replace its notes or landrace names. [Jones Uddeyi](https://www.jonescoffeeroasters.com/collections/frontpage/products/ethiopian-natural), indexed Tima/Shakiso producer group found, direct cache miss; held pending lot cultivar/processing details.",
+      "area": "additional"
+    },
+    {
+      "regionId": "panama-renacimiento",
+      "query": "Renacimiento coffee roaster; site:archerscoffee.com Renacimiento HATSUKO",
+      "urls": [
+        "https://archerscoffee.com/products/panama-project-hachi-rocky-mountain-hatsuko"
+      ],
+      "decision": "[Archers HATSUKO](https://archerscoffee.com/products/panama-project-hachi-rocky-mountain-hatsuko), opened. Added Rocky Mountain, Santa Clara, Allan Hartmann/Diego Samuel Bermudez, Green Tip Geisha, washed Symbiotic Process, jasmine/lavender/bergamot/tangerine/honeydew. Harvest absent; roast/release dates not substituted.",
+      "area": "additional"
+    },
+    {
+      "regionId": "costa-rica-brunca",
+      "query": "Brunca coffee roaster; site:methodicalcoffee.com/products/costa-rica-el-renacer",
+      "urls": [
+        "https://methodicalcoffee.com/collections/limited-releases/products/costa-rica-el-renacer"
+      ],
+      "decision": "[Methodical El Renacer](https://methodicalcoffee.com/collections/limited-releases/products/costa-rica-el-renacer), full official indexed body retrieved; direct cache miss. Added Ureña Rojas family, Chirripó/Brunca, Java natural, floral/mixed berries/orange candy. Exact specialty microregion supported in product body.",
+      "area": "additional"
+    },
+    {
+      "regionId": "timor-leste-aileu",
+      "query": "Aileu coffee notes",
+      "urls": [
+        "https://wildtimorcoffee.com/pages/about-1",
+        "https://moonshinecoffee.com.au/blogs/moonshine-blog/timor-lestes-coffee-heritage"
+      ],
+      "decision": "[Wild Timor about](https://wildtimorcoffee.com/pages/about-1), opened. Aileu and caramel/chocolate/cherry/citrus/rum found, but cultivar is generic hybrid description and process absent: not attached to existing AL1 or Laclo lot. [Moonshine Laclo](https://moonshinecoffee.com.au/blogs/moonshine-blog/timor-lestes-coffee-heritage) official body indexed names 542 Aileu smallholders and natural tropical/berry; held as same-locality extra tasting expression with no new cultivar identification.",
+      "area": "additional"
+    },
+    {
+      "regionId": "guatemala-san-marcos",
+      "query": "San Marcos Guatemala coffee roaster notes; San Marcos roasted Bourbon Washed",
+      "urls": [
+        "https://shopbeansandrice.com/pages/farms",
+        "https://www.sozocoffee.com/products/san-marcos-guatemala"
+      ],
+      "decision": "[Beans & Rice farms](https://shopbeansandrice.com/pages/farms), opened. Added named grower associations, washed Bourbon/Catuai/Catimor/Caturra/Costa Rica 95, lavender/lemongrass/lemon/pomelo/rosemary. Calendar November–January is not a crop year. [SoZo](https://www.sozocoffee.com/products/san-marcos-guatemala) opened, ACMI/Rigoberto group found but cultivar/process absent, not adopted.",
+      "area": "additional"
+    },
+    {
+      "regionId": "guatemala-new-oriente",
+      "query": "New Oriente coffee roaster notes",
+      "urls": [
+        "https://www.dairybeanz.co.nz/products/guatemala-new-oriente-coffee",
+        "https://bigshoulderscoffee.com/products/guatemala"
+      ],
+      "decision": "[Dairy Beanz](https://www.dairybeanz.co.nz/products/guatemala-new-oriente-coffee), opened. Bourbon/Caturra/Catuai washed chocolate/hazelnut/toffee confirmed; held because unnamed regional selection adds less than existing natural, named El Morito washed and Gesha. [Big Shoulders](https://bigshoulderscoffee.com/products/guatemala) mixes Huehuetenango/San Marcos/Nuevo Oriente; its blend notes not assigned to any one region.",
+      "area": "additional"
+    },
+    {
+      "regionId": "indonesia-kintamani",
+      "query": "Kintamani coffee roaster varieties notes",
+      "urls": [
+        "https://presscoffee.com/products/bali-kintamani-1"
+      ],
+      "decision": "[PRESS Kintamani](https://presscoffee.com/products/bali-kintamani-1), full official indexed body retrieved; direct cache miss. Added separate natural Bourbon/Typica/Catimor selection, plum/plantain/toasted coconut. Not used to overwrite named HEQA Cobra or Royal S795/USDA762 lots.",
+      "area": "additional"
+    },
+    {
+      "regionId": "peru-puno",
+      "query": "Puno coffee roaster bourbon notes",
+      "urls": [
+        "https://www.ultimocoffee.com/shop/juan-quilla-laura-peru",
+        "https://sweetbloomcoffee.com/products/vilma-chambi"
+      ],
+      "decision": "[Ultimo Juan Quilla Laura](https://www.ultimocoffee.com/shop/juan-quilla-laura-peru), opened. Added Quillabamba/Puno washed Bourbon, bergamot/brown sugar/lemon candy; distinct named producer from prior three. [Sweet Bloom Vilma](https://sweetbloomcoffee.com/products/vilma-chambi) official indexed record also rechecked; no duplicate row.",
+      "area": "additional"
+    }
+  ],
+  "sourceAccessCorrections": [
+    {
+      "publishers": [
+        "PRESS Coffee",
+        "Methodical Coffee"
+      ],
+      "status": "Public original product JSON/HTML read by integrator; original indexed-only restriction resolved."
+    },
+    {
+      "publisher": "Kurasu",
+      "status": "Official indexed full text; direct HTTP403 remains documented."
+    }
+  ],
+  "dataSha256": "9f8322a6e83758cc90cd0eafc927ccbd61114e8039d9122560cd23f9b48dada0"
+}

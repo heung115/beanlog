@@ -1,0 +1,1614 @@
+{
+  "reviewedAt": "2026-09-09",
+  "purpose": "산지 이름 발견과 기존 지리 목록 대조만 수행. 상품명 검색·가격·향미·상품 소개문 없음. 미등록 이름은 산지 페이지로 자동 발행하지 않음.",
+  "counts": {
+    "roastersReviewed": 10,
+    "observations": 61,
+    "distinctNames": 55,
+    "existingNames": 27,
+    "unregisteredNames": 28
+  },
+  "names": [
+    {
+      "country": "Colombia",
+      "name": "El Pital",
+      "nameKo": null,
+      "parent": "Huila",
+      "regionId": null,
+      "status": "candidate-region",
+      "roasters": [
+        "프릳츠"
+      ],
+      "sources": [
+        "https://fritz.co.kr/product/detail.html?product_no=795"
+      ]
+    },
+    {
+      "country": "Colombia",
+      "name": "Huila",
+      "nameKo": null,
+      "parent": null,
+      "regionId": "colombia-huila",
+      "status": "existing",
+      "roasters": [
+        "앤트러사이트"
+      ],
+      "sources": [
+        "https://anthracitecoffee.com/shop"
+      ]
+    },
+    {
+      "country": "Colombia",
+      "name": "Tierradentro",
+      "nameKo": "티에라덴트로",
+      "parent": null,
+      "regionId": null,
+      "status": "needs-lot-geography-confirmation",
+      "roasters": [
+        "펠트"
+      ],
+      "sources": [
+        "https://feltcoffee.com/",
+        "https://www.allycoffee.com/coffees/tierradentro/"
+      ]
+    },
+    {
+      "country": "Costa Rica",
+      "name": "Chirripó",
+      "nameKo": null,
+      "parent": null,
+      "regionId": "costa-rica-chirripo",
+      "status": "existing",
+      "roasters": [
+        "프릳츠"
+      ],
+      "sources": [
+        "https://fritz.co.kr/product/detail.html?product_no=2201"
+      ]
+    },
+    {
+      "country": "Costa Rica",
+      "name": "Tarrazú",
+      "nameKo": null,
+      "parent": null,
+      "regionId": "costa-rica-tarrazu",
+      "status": "existing",
+      "roasters": [
+        "프릳츠"
+      ],
+      "sources": [
+        "https://fritz.co.kr/product/detail.html?product_no=1989"
+      ]
+    },
+    {
+      "country": "Costa Rica",
+      "name": "West Valley",
+      "nameKo": null,
+      "parent": null,
+      "regionId": "costa-rica-west-valley",
+      "status": "existing",
+      "roasters": [
+        "프릳츠",
+        "펠트"
+      ],
+      "sources": [
+        "https://fritz.co.kr/product/detail.html?product_no=2086",
+        "https://feltcoffee.com/product/%EC%BD%94%EC%8A%A4%ED%83%80%EB%A6%AC%EC%B9%B4-%EC%97%98%EC%82%AC%EB%A5%B4-%EB%8D%B0-%EC%82%AC%EB%A5%B4%EC%84%B8%EB%A1%9C-%ED%99%94%EC%9D%B4%ED%8A%B8-%ED%97%88%EB%8B%88-%EB%94%94%EC%B9%B4%ED%8E%98%EC%9D%B8/513/category/1/display/2/?icid=MAIN.product_listmain_1"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Agaro",
+      "nameKo": null,
+      "parent": "Gomma",
+      "regionId": null,
+      "status": "candidate-region",
+      "roasters": [
+        "커피리브레",
+        "테라로사"
+      ],
+      "sources": [
+        "https://m.coffeelibre.kr/article/원두가이드/1/300",
+        "https://terarosa.com/product/detail/?ItemCode=100543"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Arbegona",
+      "nameKo": "아르베고나",
+      "parent": null,
+      "regionId": "ethiopia-arbegona",
+      "status": "existing",
+      "roasters": [
+        "커피몽타주"
+      ],
+      "sources": [
+        "https://www.coffeemontage.com/goods/goods_view.php?goodsNo=1000000125"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Aricha",
+      "nameKo": null,
+      "parent": "Yirgacheffe",
+      "regionId": "ethiopia-aricha",
+      "status": "existing",
+      "roasters": [
+        "테라로사"
+      ],
+      "sources": [
+        "https://terarosa.com/product/detail/?ItemCode=100499"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Banko Taratu",
+      "nameKo": "방코 타라투",
+      "parent": "Gedeb",
+      "regionId": "ethiopia-banko-taratu",
+      "status": "existing",
+      "roasters": [
+        "펠트",
+        "센터커피"
+      ],
+      "sources": [
+        "https://feltcoffee.com/",
+        "https://fuglencoffee.jp/en/blogs/coffee-beans/banko-taratu-ethiopia",
+        "https://www.centercoffee.co.kr/shop_view/409"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Bishan Dimo",
+      "nameKo": null,
+      "parent": "Guji",
+      "regionId": null,
+      "status": "place-type-unverified",
+      "roasters": [
+        "모모스"
+      ],
+      "sources": [
+        "https://m.momos.co.kr/skin-skin1/article/생두-리스트/101/30590/"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Bode",
+      "nameKo": null,
+      "parent": "Bensa",
+      "regionId": null,
+      "status": "candidate-region",
+      "roasters": [
+        "커피리브레"
+      ],
+      "sources": [
+        "https://m.coffeelibre.kr/product/zoom.html?product_no=7828"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Bombe",
+      "nameKo": null,
+      "parent": "Sidama",
+      "regionId": "ethiopia-bombe",
+      "status": "existing",
+      "roasters": [
+        "모모스"
+      ],
+      "sources": [
+        "https://m.momos.co.kr/skin-skin1/article/생두-리스트/101/30590/"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Buku Sayisa",
+      "nameKo": null,
+      "parent": "Guji",
+      "regionId": "ethiopia-buku-sayisa",
+      "status": "existing",
+      "roasters": [
+        "모모스"
+      ],
+      "sources": [
+        "https://m.momos.co.kr/skin-skin1/article/생두-리스트/101/30590/"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Chelbesa",
+      "nameKo": null,
+      "parent": "Yirgacheffe",
+      "regionId": "ethiopia-chelbesa",
+      "status": "existing",
+      "roasters": [
+        "모모스"
+      ],
+      "sources": [
+        "https://m.momos.co.kr/skin-skin1/article/생두-리스트/101/30590/"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Dalecho",
+      "nameKo": null,
+      "parent": "Agaro",
+      "regionId": null,
+      "status": "candidate-region",
+      "roasters": [
+        "커피리브레"
+      ],
+      "sources": [
+        "https://m.coffeelibre.kr/article/원두생두-가이드/1/2573/"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Gedeb",
+      "nameKo": "게뎁",
+      "parent": null,
+      "regionId": "ethiopia-gedeb",
+      "status": "existing",
+      "roasters": [
+        "나무사이로"
+      ],
+      "sources": [
+        "https://namusairo.com/category/coffee/91/"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Gomma",
+      "nameKo": null,
+      "parent": "Jimma",
+      "regionId": null,
+      "status": "candidate-region",
+      "roasters": [
+        "커피리브레"
+      ],
+      "sources": [
+        "https://m.coffeelibre.kr/article/원두가이드/1/300"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Gotiti",
+      "nameKo": null,
+      "parent": "Gedeb",
+      "regionId": null,
+      "status": "candidate-region",
+      "roasters": [
+        "프릳츠"
+      ],
+      "sources": [
+        "https://fritz.co.kr/product/detail.html?product_no=2210"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Goyo",
+      "nameKo": null,
+      "parent": "Hambela",
+      "regionId": null,
+      "status": "place-type-unverified",
+      "roasters": [
+        "모모스"
+      ],
+      "sources": [
+        "https://m.momos.co.kr/skin-skin1/article/생두-리스트/101/30590/"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Guji",
+      "nameKo": "구지",
+      "parent": null,
+      "regionId": "ethiopia-guji",
+      "status": "existing",
+      "roasters": [
+        "커피몽타주"
+      ],
+      "sources": [
+        "https://coffeemontage.com/goods/goods_view.php?goodsNo=1000000176&mtn=7%5E%7C%5E%EC%8B%B1%EA%B8%80+%EC%98%A4%EB%A6%AC%EC%A7%84%5E%7C%5En"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Halo Beriti",
+      "nameKo": null,
+      "parent": "Yirgacheffe",
+      "regionId": "ethiopia-halo-beriti",
+      "status": "existing",
+      "roasters": [
+        "커피리브레"
+      ],
+      "sources": [
+        "https://www.coffeelibre.kr/board/원두가이드/1/?page=1"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Hama",
+      "nameKo": null,
+      "parent": "Kochere",
+      "regionId": null,
+      "status": "candidate-region",
+      "roasters": [
+        "커피리브레"
+      ],
+      "sources": [
+        "https://m.coffeelibre.kr/product/detail.html?cate_no=57&display_group=1&product_no=7757"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Hure",
+      "nameKo": null,
+      "parent": null,
+      "regionId": "ethiopia-hure",
+      "status": "existing",
+      "roasters": [
+        "모모스"
+      ],
+      "sources": [
+        "https://momos.co.kr/"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Jimma",
+      "nameKo": null,
+      "parent": null,
+      "regionId": null,
+      "status": "candidate-region",
+      "roasters": [
+        "앤트러사이트"
+      ],
+      "sources": [
+        "https://anthracitecoffee.com/21/?idx=135"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Kaffa",
+      "nameKo": null,
+      "parent": null,
+      "regionId": "ethiopia-kaffa",
+      "status": "existing",
+      "roasters": [
+        "커피리브레"
+      ],
+      "sources": [
+        "https://m.coffeelibre.kr/product/detail.html?cate_no=56&display_group=1&product_no=7830"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Kedamessa",
+      "nameKo": null,
+      "parent": "Agaro",
+      "regionId": null,
+      "status": "candidate-region",
+      "roasters": [
+        "커피리브레"
+      ],
+      "sources": [
+        "https://m.coffeelibre.kr/article/원두가이드/1/300"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Kota",
+      "nameKo": null,
+      "parent": "Gomma",
+      "regionId": null,
+      "status": "candidate-region",
+      "roasters": [
+        "커피리브레"
+      ],
+      "sources": [
+        "https://m.coffeelibre.kr/product/detail.html?cate_no=48&display_group=1&product_no=7990"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Lada",
+      "nameKo": null,
+      "parent": "Uraga",
+      "regionId": null,
+      "status": "place-type-unverified",
+      "roasters": [
+        "모모스"
+      ],
+      "sources": [
+        "https://m.momos.co.kr/skin-skin1/article/생두-리스트/101/30590/"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Mulish",
+      "nameKo": null,
+      "parent": "Guji",
+      "regionId": null,
+      "status": "place-type-unverified",
+      "roasters": [
+        "모모스"
+      ],
+      "sources": [
+        "https://m.momos.co.kr/skin-skin1/article/생두-리스트/101/30590/"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Murago",
+      "nameKo": null,
+      "parent": "Bensa",
+      "regionId": "ethiopia-murago",
+      "status": "existing",
+      "roasters": [
+        "커피리브레"
+      ],
+      "sources": [
+        "https://www.coffeelibre.kr/board/원두가이드/1/?page=1"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Nensebo",
+      "nameKo": null,
+      "parent": "West Arsi",
+      "regionId": "ethiopia-nensebo",
+      "status": "existing",
+      "roasters": [
+        "커피리브레"
+      ],
+      "sources": [
+        "https://m.coffeelibre.kr/product/detail.html?cate_no=48&display_group=1&product_no=7977"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Raro Boda",
+      "nameKo": null,
+      "parent": "Guji",
+      "regionId": null,
+      "status": "place-type-unverified",
+      "roasters": [
+        "모모스"
+      ],
+      "sources": [
+        "https://m.momos.co.kr/skin-skin1/article/생두-리스트/101/30590/"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Refisa",
+      "nameKo": null,
+      "parent": "Arisi",
+      "regionId": null,
+      "status": "place-type-unverified",
+      "roasters": [
+        "모모스"
+      ],
+      "sources": [
+        "https://m.momos.co.kr/skin-skin1/article/생두-리스트/101/30590/"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Safo",
+      "nameKo": null,
+      "parent": null,
+      "regionId": null,
+      "status": "place-type-unverified",
+      "roasters": [
+        "모모스"
+      ],
+      "sources": [
+        "https://momos.co.kr/"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Sisole",
+      "nameKo": null,
+      "parent": "Gedeb",
+      "regionId": null,
+      "status": "place-type-unverified",
+      "roasters": [
+        "모모스"
+      ],
+      "sources": [
+        "https://m.momos.co.kr/skin-skin1/article/생두-리스트/101/30590/"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Tero",
+      "nameKo": null,
+      "parent": "Shakiso",
+      "regionId": null,
+      "status": "candidate-region",
+      "roasters": [
+        "커피리브레"
+      ],
+      "sources": [
+        "https://m.coffeelibre.kr/article/원두가이드/1/264"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Uraga",
+      "nameKo": null,
+      "parent": "Guji",
+      "regionId": "ethiopia-uraga",
+      "status": "existing",
+      "roasters": [
+        "프릳츠",
+        "나무사이로",
+        "커피몽타주"
+      ],
+      "sources": [
+        "https://fritz.co.kr/product/detail.html?product_no=1889",
+        "https://namusairo.com/category/coffee/91/",
+        "https://coffeemontage.com/goods/goods_view.php?goodsNo=1000000176&mtn=7%5E%7C%5E%EC%8B%B1%EA%B8%80+%EC%98%A4%EB%A6%AC%EC%A7%84%5E%7C%5En"
+      ]
+    },
+    {
+      "country": "Ethiopia",
+      "name": "Yirgacheffe",
+      "nameKo": null,
+      "parent": null,
+      "regionId": "ethiopia-yirgacheffe",
+      "status": "existing",
+      "roasters": [
+        "프릳츠",
+        "센터커피"
+      ],
+      "sources": [
+        "https://fritz.co.kr/product/detail.html?product_no=1711",
+        "https://www.centercoffee.co.kr/shop_view/409"
+      ]
+    },
+    {
+      "country": "Guatemala",
+      "name": "Concepcion Pixcaya",
+      "nameKo": null,
+      "parent": null,
+      "regionId": null,
+      "status": "place-type-unverified",
+      "roasters": [
+        "앤트러사이트"
+      ],
+      "sources": [
+        "https://anthracitecoffee.com/shop"
+      ]
+    },
+    {
+      "country": "Guatemala",
+      "name": "San Cristobal",
+      "nameKo": null,
+      "parent": "Alta Verapaz",
+      "regionId": null,
+      "status": "candidate-region",
+      "roasters": [
+        "프릳츠"
+      ],
+      "sources": [
+        "https://fritz.co.kr/product/detail.html?product_no=1801"
+      ]
+    },
+    {
+      "country": "Guatemala",
+      "name": "Unión Cantinil",
+      "nameKo": null,
+      "parent": "Huehuetenango",
+      "regionId": "guatemala-union-cantinil",
+      "status": "existing",
+      "roasters": [
+        "커피리브레"
+      ],
+      "sources": [
+        "https://m.coffeelibre.kr/"
+      ]
+    },
+    {
+      "country": "Honduras",
+      "name": "Trojes",
+      "nameKo": null,
+      "parent": "El Paraíso",
+      "regionId": "honduras-trojes",
+      "status": "existing",
+      "roasters": [
+        "커피리브레"
+      ],
+      "sources": [
+        "https://coffeelibre.kr/product/detail_weekly.html"
+      ]
+    },
+    {
+      "country": "India",
+      "name": "Araku",
+      "nameKo": null,
+      "parent": null,
+      "regionId": null,
+      "status": "candidate-region",
+      "roasters": [
+        "커피리브레"
+      ],
+      "sources": [
+        "https://coffeelibre.kr/about/us.html"
+      ]
+    },
+    {
+      "country": "Kenya",
+      "name": "Gathaithi",
+      "nameKo": null,
+      "parent": null,
+      "regionId": null,
+      "status": "place-type-unverified",
+      "roasters": [
+        "앤트러사이트"
+      ],
+      "sources": [
+        "https://anthracitecoffee.com/shop"
+      ]
+    },
+    {
+      "country": "Kenya",
+      "name": "Kirinyaga",
+      "nameKo": "키리냐가",
+      "parent": null,
+      "regionId": "kenya-kirinyaga",
+      "status": "existing",
+      "roasters": [
+        "펠트"
+      ],
+      "sources": [
+        "https://feltcoffee.com/product/%EC%BC%80%EB%83%90-%EC%B9%B4%EA%B5%AC%EB%AA%A8-sl28-sl34-ruiru-11-batian-%EC%9B%8C%EC%8B%9C%EB%93%9C/515/category/1/display/2/?icid=MAIN.product_listmain_1"
+      ]
+    },
+    {
+      "country": "Kenya",
+      "name": "Nginda",
+      "nameKo": null,
+      "parent": null,
+      "regionId": null,
+      "status": "place-type-unverified",
+      "roasters": [
+        "모모스"
+      ],
+      "sources": [
+        "https://m.en.momos.co.kr/product/kenya-nginda-ab-fully-washed/2265/category/56/display/1/"
+      ]
+    },
+    {
+      "country": "Nicaragua",
+      "name": "Mozonte",
+      "nameKo": null,
+      "parent": null,
+      "regionId": "nicaragua-mozonte",
+      "status": "existing",
+      "roasters": [
+        "커피리브레"
+      ],
+      "sources": [
+        "https://coffeelibre.kr/about/us.html"
+      ]
+    },
+    {
+      "country": "Peru",
+      "name": "Cajamarca",
+      "nameKo": "카하마르카",
+      "parent": null,
+      "regionId": "peru-cajamarca",
+      "status": "existing",
+      "roasters": [
+        "펠트"
+      ],
+      "sources": [
+        "https://feltcoffee.com/product/%ED%8E%98%EB%A3%A8-%EC%97%98-%EB%9D%BC%EC%9A%B0%EB%A0%90-%EA%B2%8C%EC%9D%B4%EC%83%A4-%EC%95%84%EB%82%98%EB%A1%9C%EB%B9%85-%EC%9B%8C%EC%8B%9C%EB%93%9C-100g/507/category/1/display/2/?icid=MAIN.product_listmain_1"
+      ]
+    },
+    {
+      "country": "Peru",
+      "name": "Colasay",
+      "nameKo": "콜라사이",
+      "parent": "Jaén",
+      "regionId": "peru-colasay",
+      "status": "existing",
+      "roasters": [
+        "펠트"
+      ],
+      "sources": [
+        "https://feltcoffee.com/product/%ED%8E%98%EB%A3%A8-%EC%97%98-%EB%9D%BC%EC%9A%B0%EB%A0%90-%EA%B2%8C%EC%9D%B4%EC%83%A4-%EC%95%84%EB%82%98%EB%A1%9C%EB%B9%85-%EC%9B%8C%EC%8B%9C%EB%93%9C-100g/507/category/1/display/2/?icid=MAIN.product_listmain_1"
+      ]
+    },
+    {
+      "country": "Peru",
+      "name": "El Vencedor",
+      "nameKo": "엘 벤세도르",
+      "parent": "Colasay",
+      "regionId": null,
+      "status": "verified-new-candidate",
+      "roasters": [
+        "펠트"
+      ],
+      "sources": [
+        "https://feltcoffee.com/product/%ED%8E%98%EB%A3%A8-%EC%97%98-%EB%9D%BC%EC%9A%B0%EB%A0%90-%EA%B2%8C%EC%9D%B4%EC%83%A4-%EC%95%84%EB%82%98%EB%A1%9C%EB%B9%85-%EC%9B%8C%EC%8B%9C%EB%93%9C-100g/507/category/1/display/2/?icid=MAIN.product_listmain_1",
+        "https://cdn.www.gob.pe/uploads/document/file/300357/d43671_opt.pdf",
+        "https://wholesale.roundhillroastery.com/products/612"
+      ]
+    },
+    {
+      "country": "Peru",
+      "name": "Jaén",
+      "nameKo": "하엔",
+      "parent": "Cajamarca",
+      "regionId": "peru-jaen",
+      "status": "existing",
+      "roasters": [
+        "펠트"
+      ],
+      "sources": [
+        "https://feltcoffee.com/product/%ED%8E%98%EB%A3%A8-%EC%97%98-%EB%9D%BC%EC%9A%B0%EB%A0%90-%EA%B2%8C%EC%9D%B4%EC%83%A4-%EC%95%84%EB%82%98%EB%A1%9C%EB%B9%85-%EC%9B%8C%EC%8B%9C%EB%93%9C-100g/507/category/1/display/2/?icid=MAIN.product_listmain_1"
+      ]
+    },
+    {
+      "country": "Yemen",
+      "name": "Bani Merrah",
+      "nameKo": "바니 메라",
+      "parent": "Manakha",
+      "regionId": null,
+      "status": "verified-new-candidate",
+      "roasters": [
+        "커피몽타주"
+      ],
+      "sources": [
+        "https://www.coffeemontage.com/goods/goods_view.php?goodsNo=1000000151&mtn=7%5E%7C%5E%EC%8B%B1%EA%B8%80+%EC%98%A4%EB%A6%AC%EC%A7%84%5E%7C%5En",
+        "https://coffeelibre.kr/product/detail.html?cate_no=48&display_group=1&product_no=6755"
+      ]
+    },
+    {
+      "country": "Yemen",
+      "name": "East Haraaz",
+      "nameKo": "동부 하라즈",
+      "parent": null,
+      "regionId": "yemen-haraaz",
+      "status": "existing",
+      "roasters": [
+        "커피몽타주"
+      ],
+      "sources": [
+        "https://www.coffeemontage.com/goods/goods_view.php?goodsNo=1000000151&mtn=7%5E%7C%5E%EC%8B%B1%EA%B8%80+%EC%98%A4%EB%A6%AC%EC%A7%84%5E%7C%5En"
+      ]
+    },
+    {
+      "country": "Yemen",
+      "name": "Manakha",
+      "nameKo": "마나카",
+      "parent": "Haraaz",
+      "regionId": null,
+      "status": "verified-new-candidate",
+      "roasters": [
+        "커피몽타주"
+      ],
+      "sources": [
+        "https://www.coffeemontage.com/goods/goods_view.php?goodsNo=1000000151&mtn=7%5E%7C%5E%EC%8B%B1%EA%B8%80+%EC%98%A4%EB%A6%AC%EC%A7%84%5E%7C%5En"
+      ]
+    }
+  ],
+  "observations": [
+    {
+      "roaster": "커피리브레",
+      "country": "Ethiopia",
+      "name": "Nensebo",
+      "nameKo": null,
+      "parent": "West Arsi",
+      "regionId": "ethiopia-nensebo",
+      "status": "existing",
+      "sourceUrl": "https://m.coffeelibre.kr/product/detail.html?cate_no=48&display_group=1&product_no=7977",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "커피리브레",
+      "country": "Ethiopia",
+      "name": "Kaffa",
+      "nameKo": null,
+      "parent": null,
+      "regionId": "ethiopia-kaffa",
+      "status": "existing",
+      "sourceUrl": "https://m.coffeelibre.kr/product/detail.html?cate_no=56&display_group=1&product_no=7830",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "커피리브레",
+      "country": "Ethiopia",
+      "name": "Gomma",
+      "nameKo": null,
+      "parent": "Jimma",
+      "regionId": null,
+      "status": "candidate-region",
+      "sourceUrl": "https://m.coffeelibre.kr/article/원두가이드/1/300",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "커피리브레",
+      "country": "Ethiopia",
+      "name": "Agaro",
+      "nameKo": null,
+      "parent": "Gomma",
+      "regionId": null,
+      "status": "candidate-region",
+      "sourceUrl": "https://m.coffeelibre.kr/article/원두가이드/1/300",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "커피리브레",
+      "country": "Ethiopia",
+      "name": "Kedamessa",
+      "nameKo": null,
+      "parent": "Agaro",
+      "regionId": null,
+      "status": "candidate-region",
+      "sourceUrl": "https://m.coffeelibre.kr/article/원두가이드/1/300",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "커피리브레",
+      "country": "Ethiopia",
+      "name": "Hama",
+      "nameKo": null,
+      "parent": "Kochere",
+      "regionId": null,
+      "status": "candidate-region",
+      "sourceUrl": "https://m.coffeelibre.kr/product/detail.html?cate_no=57&display_group=1&product_no=7757",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "커피리브레",
+      "country": "Ethiopia",
+      "name": "Tero",
+      "nameKo": null,
+      "parent": "Shakiso",
+      "regionId": null,
+      "status": "candidate-region",
+      "sourceUrl": "https://m.coffeelibre.kr/article/원두가이드/1/264",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "커피리브레",
+      "country": "Ethiopia",
+      "name": "Kota",
+      "nameKo": null,
+      "parent": "Gomma",
+      "regionId": null,
+      "status": "candidate-region",
+      "sourceUrl": "https://m.coffeelibre.kr/product/detail.html?cate_no=48&display_group=1&product_no=7990",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "커피리브레",
+      "country": "Ethiopia",
+      "name": "Dalecho",
+      "nameKo": null,
+      "parent": "Agaro",
+      "regionId": null,
+      "status": "candidate-region",
+      "sourceUrl": "https://m.coffeelibre.kr/article/원두생두-가이드/1/2573/",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "커피리브레",
+      "country": "Ethiopia",
+      "name": "Bode",
+      "nameKo": null,
+      "parent": "Bensa",
+      "regionId": null,
+      "status": "candidate-region",
+      "sourceUrl": "https://m.coffeelibre.kr/product/zoom.html?product_no=7828",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "커피리브레",
+      "country": "Nicaragua",
+      "name": "Mozonte",
+      "nameKo": null,
+      "parent": null,
+      "regionId": "nicaragua-mozonte",
+      "status": "existing",
+      "sourceUrl": "https://coffeelibre.kr/about/us.html",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "커피리브레",
+      "country": "India",
+      "name": "Araku",
+      "nameKo": null,
+      "parent": null,
+      "regionId": null,
+      "status": "candidate-region",
+      "sourceUrl": "https://coffeelibre.kr/about/us.html",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "커피리브레",
+      "country": "Honduras",
+      "name": "Trojes",
+      "nameKo": null,
+      "parent": "El Paraíso",
+      "regionId": "honduras-trojes",
+      "status": "existing",
+      "sourceUrl": "https://coffeelibre.kr/product/detail_weekly.html",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "커피리브레",
+      "country": "Guatemala",
+      "name": "Unión Cantinil",
+      "nameKo": null,
+      "parent": "Huehuetenango",
+      "regionId": "guatemala-union-cantinil",
+      "status": "existing",
+      "sourceUrl": "https://m.coffeelibre.kr/",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "커피리브레",
+      "country": "Ethiopia",
+      "name": "Halo Beriti",
+      "nameKo": null,
+      "parent": "Yirgacheffe",
+      "regionId": "ethiopia-halo-beriti",
+      "status": "existing",
+      "sourceUrl": "https://www.coffeelibre.kr/board/원두가이드/1/?page=1",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "커피리브레",
+      "country": "Ethiopia",
+      "name": "Murago",
+      "nameKo": null,
+      "parent": "Bensa",
+      "regionId": "ethiopia-murago",
+      "status": "existing",
+      "sourceUrl": "https://www.coffeelibre.kr/board/원두가이드/1/?page=1",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "모모스",
+      "country": "Ethiopia",
+      "name": "Chelbesa",
+      "nameKo": null,
+      "parent": "Yirgacheffe",
+      "regionId": "ethiopia-chelbesa",
+      "status": "existing",
+      "sourceUrl": "https://m.momos.co.kr/skin-skin1/article/생두-리스트/101/30590/",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "모모스",
+      "country": "Ethiopia",
+      "name": "Bombe",
+      "nameKo": null,
+      "parent": "Sidama",
+      "regionId": "ethiopia-bombe",
+      "status": "existing",
+      "sourceUrl": "https://m.momos.co.kr/skin-skin1/article/생두-리스트/101/30590/",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "모모스",
+      "country": "Ethiopia",
+      "name": "Mulish",
+      "nameKo": null,
+      "parent": "Guji",
+      "regionId": null,
+      "status": "place-type-unverified",
+      "sourceUrl": "https://m.momos.co.kr/skin-skin1/article/생두-리스트/101/30590/",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "모모스",
+      "country": "Ethiopia",
+      "name": "Sisole",
+      "nameKo": null,
+      "parent": "Gedeb",
+      "regionId": null,
+      "status": "place-type-unverified",
+      "sourceUrl": "https://m.momos.co.kr/skin-skin1/article/생두-리스트/101/30590/",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "모모스",
+      "country": "Ethiopia",
+      "name": "Bishan Dimo",
+      "nameKo": null,
+      "parent": "Guji",
+      "regionId": null,
+      "status": "place-type-unverified",
+      "sourceUrl": "https://m.momos.co.kr/skin-skin1/article/생두-리스트/101/30590/",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "모모스",
+      "country": "Ethiopia",
+      "name": "Goyo",
+      "nameKo": null,
+      "parent": "Hambela",
+      "regionId": null,
+      "status": "place-type-unverified",
+      "sourceUrl": "https://m.momos.co.kr/skin-skin1/article/생두-리스트/101/30590/",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "모모스",
+      "country": "Ethiopia",
+      "name": "Lada",
+      "nameKo": null,
+      "parent": "Uraga",
+      "regionId": null,
+      "status": "place-type-unverified",
+      "sourceUrl": "https://m.momos.co.kr/skin-skin1/article/생두-리스트/101/30590/",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "모모스",
+      "country": "Ethiopia",
+      "name": "Buku Sayisa",
+      "nameKo": null,
+      "parent": "Guji",
+      "regionId": "ethiopia-buku-sayisa",
+      "status": "existing",
+      "sourceUrl": "https://m.momos.co.kr/skin-skin1/article/생두-리스트/101/30590/",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "모모스",
+      "country": "Ethiopia",
+      "name": "Raro Boda",
+      "nameKo": null,
+      "parent": "Guji",
+      "regionId": null,
+      "status": "place-type-unverified",
+      "sourceUrl": "https://m.momos.co.kr/skin-skin1/article/생두-리스트/101/30590/",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "모모스",
+      "country": "Ethiopia",
+      "name": "Refisa",
+      "nameKo": null,
+      "parent": "Arisi",
+      "regionId": null,
+      "status": "place-type-unverified",
+      "sourceUrl": "https://m.momos.co.kr/skin-skin1/article/생두-리스트/101/30590/",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "모모스",
+      "country": "Ethiopia",
+      "name": "Hure",
+      "nameKo": null,
+      "parent": null,
+      "regionId": "ethiopia-hure",
+      "status": "existing",
+      "sourceUrl": "https://momos.co.kr/",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "모모스",
+      "country": "Ethiopia",
+      "name": "Safo",
+      "nameKo": null,
+      "parent": null,
+      "regionId": null,
+      "status": "place-type-unverified",
+      "sourceUrl": "https://momos.co.kr/",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "모모스",
+      "country": "Kenya",
+      "name": "Nginda",
+      "nameKo": null,
+      "parent": null,
+      "regionId": null,
+      "status": "place-type-unverified",
+      "sourceUrl": "https://m.en.momos.co.kr/product/kenya-nginda-ab-fully-washed/2265/category/56/display/1/",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "프릳츠",
+      "country": "Ethiopia",
+      "name": "Yirgacheffe",
+      "nameKo": null,
+      "parent": null,
+      "regionId": "ethiopia-yirgacheffe",
+      "status": "existing",
+      "sourceUrl": "https://fritz.co.kr/product/detail.html?product_no=1711",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "프릳츠",
+      "country": "Ethiopia",
+      "name": "Gotiti",
+      "nameKo": null,
+      "parent": "Gedeb",
+      "regionId": null,
+      "status": "candidate-region",
+      "sourceUrl": "https://fritz.co.kr/product/detail.html?product_no=2210",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "프릳츠",
+      "country": "Ethiopia",
+      "name": "Uraga",
+      "nameKo": null,
+      "parent": "Guji",
+      "regionId": "ethiopia-uraga",
+      "status": "existing",
+      "sourceUrl": "https://fritz.co.kr/product/detail.html?product_no=1889",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "프릳츠",
+      "country": "Colombia",
+      "name": "El Pital",
+      "nameKo": null,
+      "parent": "Huila",
+      "regionId": null,
+      "status": "candidate-region",
+      "sourceUrl": "https://fritz.co.kr/product/detail.html?product_no=795",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "프릳츠",
+      "country": "Costa Rica",
+      "name": "West Valley",
+      "nameKo": null,
+      "parent": null,
+      "regionId": "costa-rica-west-valley",
+      "status": "existing",
+      "sourceUrl": "https://fritz.co.kr/product/detail.html?product_no=2086",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "프릳츠",
+      "country": "Costa Rica",
+      "name": "Chirripó",
+      "nameKo": null,
+      "parent": null,
+      "regionId": "costa-rica-chirripo",
+      "status": "existing",
+      "sourceUrl": "https://fritz.co.kr/product/detail.html?product_no=2201",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "프릳츠",
+      "country": "Costa Rica",
+      "name": "Tarrazú",
+      "nameKo": null,
+      "parent": null,
+      "regionId": "costa-rica-tarrazu",
+      "status": "existing",
+      "sourceUrl": "https://fritz.co.kr/product/detail.html?product_no=1989",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "프릳츠",
+      "country": "Guatemala",
+      "name": "San Cristobal",
+      "nameKo": null,
+      "parent": "Alta Verapaz",
+      "regionId": null,
+      "status": "candidate-region",
+      "sourceUrl": "https://fritz.co.kr/product/detail.html?product_no=1801",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "앤트러사이트",
+      "country": "Colombia",
+      "name": "Huila",
+      "nameKo": null,
+      "parent": null,
+      "regionId": "colombia-huila",
+      "status": "existing",
+      "sourceUrl": "https://anthracitecoffee.com/shop",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "앤트러사이트",
+      "country": "Ethiopia",
+      "name": "Jimma",
+      "nameKo": null,
+      "parent": null,
+      "regionId": null,
+      "status": "candidate-region",
+      "sourceUrl": "https://anthracitecoffee.com/21/?idx=135",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "앤트러사이트",
+      "country": "Kenya",
+      "name": "Gathaithi",
+      "nameKo": null,
+      "parent": null,
+      "regionId": null,
+      "status": "place-type-unverified",
+      "sourceUrl": "https://anthracitecoffee.com/shop",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "앤트러사이트",
+      "country": "Guatemala",
+      "name": "Concepcion Pixcaya",
+      "nameKo": null,
+      "parent": null,
+      "regionId": null,
+      "status": "place-type-unverified",
+      "sourceUrl": "https://anthracitecoffee.com/shop",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "테라로사",
+      "country": "Ethiopia",
+      "name": "Agaro",
+      "nameKo": null,
+      "parent": "Limu",
+      "regionId": null,
+      "status": "candidate-region",
+      "sourceUrl": "https://terarosa.com/product/detail/?ItemCode=100543",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "테라로사",
+      "country": "Ethiopia",
+      "name": "Aricha",
+      "nameKo": null,
+      "parent": "Yirgacheffe",
+      "regionId": "ethiopia-aricha",
+      "status": "existing",
+      "sourceUrl": "https://terarosa.com/product/detail/?ItemCode=100499",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "나무사이로",
+      "country": "Ethiopia",
+      "name": "Gedeb",
+      "nameKo": "게뎁",
+      "parent": null,
+      "regionId": "ethiopia-gedeb",
+      "status": "existing",
+      "sourceUrl": "https://namusairo.com/category/coffee/91/",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "나무사이로",
+      "country": "Ethiopia",
+      "name": "Uraga",
+      "nameKo": "우라가",
+      "parent": null,
+      "regionId": "ethiopia-uraga",
+      "status": "existing",
+      "sourceUrl": "https://namusairo.com/category/coffee/91/",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "펠트",
+      "country": "Ethiopia",
+      "name": "Banko Taratu",
+      "nameKo": "방코 타라투",
+      "parent": "Gedeb",
+      "regionId": "ethiopia-banko-taratu",
+      "status": "existing",
+      "sourceUrl": "https://feltcoffee.com/",
+      "verificationUrls": [
+        "https://fuglencoffee.jp/en/blogs/coffee-beans/banko-taratu-ethiopia"
+      ]
+    },
+    {
+      "roaster": "펠트",
+      "country": "Kenya",
+      "name": "Kirinyaga",
+      "nameKo": "키리냐가",
+      "parent": null,
+      "regionId": "kenya-kirinyaga",
+      "status": "existing",
+      "sourceUrl": "https://feltcoffee.com/product/%EC%BC%80%EB%83%90-%EC%B9%B4%EA%B5%AC%EB%AA%A8-sl28-sl34-ruiru-11-batian-%EC%9B%8C%EC%8B%9C%EB%93%9C/515/category/1/display/2/?icid=MAIN.product_listmain_1",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "펠트",
+      "country": "Costa Rica",
+      "name": "West Valley",
+      "nameKo": "웨스트 밸리",
+      "parent": null,
+      "regionId": "costa-rica-west-valley",
+      "status": "existing",
+      "sourceUrl": "https://feltcoffee.com/product/%EC%BD%94%EC%8A%A4%ED%83%80%EB%A6%AC%EC%B9%B4-%EC%97%98%EC%82%AC%EB%A5%B4-%EB%8D%B0-%EC%82%AC%EB%A5%B4%EC%84%B8%EB%A1%9C-%ED%99%94%EC%9D%B4%ED%8A%B8-%ED%97%88%EB%8B%88-%EB%94%94%EC%B9%B4%ED%8E%98%EC%9D%B8/513/category/1/display/2/?icid=MAIN.product_listmain_1",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "펠트",
+      "country": "Peru",
+      "name": "Cajamarca",
+      "nameKo": "카하마르카",
+      "parent": null,
+      "regionId": "peru-cajamarca",
+      "status": "existing",
+      "sourceUrl": "https://feltcoffee.com/product/%ED%8E%98%EB%A3%A8-%EC%97%98-%EB%9D%BC%EC%9A%B0%EB%A0%90-%EA%B2%8C%EC%9D%B4%EC%83%A4-%EC%95%84%EB%82%98%EB%A1%9C%EB%B9%85-%EC%9B%8C%EC%8B%9C%EB%93%9C-100g/507/category/1/display/2/?icid=MAIN.product_listmain_1",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "펠트",
+      "country": "Peru",
+      "name": "Jaén",
+      "nameKo": "하엔",
+      "parent": "Cajamarca",
+      "regionId": "peru-jaen",
+      "status": "existing",
+      "sourceUrl": "https://feltcoffee.com/product/%ED%8E%98%EB%A3%A8-%EC%97%98-%EB%9D%BC%EC%9A%B0%EB%A0%90-%EA%B2%8C%EC%9D%B4%EC%83%A4-%EC%95%84%EB%82%98%EB%A1%9C%EB%B9%85-%EC%9B%8C%EC%8B%9C%EB%93%9C-100g/507/category/1/display/2/?icid=MAIN.product_listmain_1",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "펠트",
+      "country": "Peru",
+      "name": "Colasay",
+      "nameKo": "콜라사이",
+      "parent": "Jaén",
+      "regionId": "peru-colasay",
+      "status": "existing",
+      "sourceUrl": "https://feltcoffee.com/product/%ED%8E%98%EB%A3%A8-%EC%97%98-%EB%9D%BC%EC%9A%B0%EB%A0%90-%EA%B2%8C%EC%9D%B4%EC%83%A4-%EC%95%84%EB%82%98%EB%A1%9C%EB%B9%85-%EC%9B%8C%EC%8B%9C%EB%93%9C-100g/507/category/1/display/2/?icid=MAIN.product_listmain_1",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "펠트",
+      "country": "Peru",
+      "name": "El Vencedor",
+      "nameKo": "엘 벤세도르",
+      "parent": "Colasay",
+      "regionId": null,
+      "status": "verified-new-candidate",
+      "sourceUrl": "https://feltcoffee.com/product/%ED%8E%98%EB%A3%A8-%EC%97%98-%EB%9D%BC%EC%9A%B0%EB%A0%90-%EA%B2%8C%EC%9D%B4%EC%83%A4-%EC%95%84%EB%82%98%EB%A1%9C%EB%B9%85-%EC%9B%8C%EC%8B%9C%EB%93%9C-100g/507/category/1/display/2/?icid=MAIN.product_listmain_1",
+      "verificationUrls": [
+        "https://cdn.www.gob.pe/uploads/document/file/300357/d43671_opt.pdf",
+        "https://wholesale.roundhillroastery.com/products/612"
+      ]
+    },
+    {
+      "roaster": "펠트",
+      "country": "Colombia",
+      "name": "Tierradentro",
+      "nameKo": "티에라덴트로",
+      "parent": null,
+      "regionId": null,
+      "status": "needs-lot-geography-confirmation",
+      "sourceUrl": "https://feltcoffee.com/",
+      "verificationUrls": [
+        "https://www.allycoffee.com/coffees/tierradentro/"
+      ]
+    },
+    {
+      "roaster": "센터커피",
+      "country": "Ethiopia",
+      "name": "Yirgacheffe",
+      "nameKo": "예가체프",
+      "parent": null,
+      "regionId": "ethiopia-yirgacheffe",
+      "status": "existing",
+      "sourceUrl": "https://www.centercoffee.co.kr/shop_view/409",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "센터커피",
+      "country": "Ethiopia",
+      "name": "Banko Taratu",
+      "nameKo": "방코 타라투",
+      "parent": "Gedeb",
+      "regionId": "ethiopia-banko-taratu",
+      "status": "existing",
+      "sourceUrl": "https://www.centercoffee.co.kr/shop_view/409",
+      "verificationUrls": [
+        "https://fuglencoffee.jp/en/blogs/coffee-beans/banko-taratu-ethiopia"
+      ]
+    },
+    {
+      "roaster": "커피몽타주",
+      "country": "Ethiopia",
+      "name": "Guji",
+      "nameKo": "구지",
+      "parent": null,
+      "regionId": "ethiopia-guji",
+      "status": "existing",
+      "sourceUrl": "https://coffeemontage.com/goods/goods_view.php?goodsNo=1000000176&mtn=7%5E%7C%5E%EC%8B%B1%EA%B8%80+%EC%98%A4%EB%A6%AC%EC%A7%84%5E%7C%5En",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "커피몽타주",
+      "country": "Ethiopia",
+      "name": "Uraga",
+      "nameKo": "우라가",
+      "parent": "Guji",
+      "regionId": "ethiopia-uraga",
+      "status": "existing",
+      "sourceUrl": "https://coffeemontage.com/goods/goods_view.php?goodsNo=1000000176&mtn=7%5E%7C%5E%EC%8B%B1%EA%B8%80+%EC%98%A4%EB%A6%AC%EC%A7%84%5E%7C%5En",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "커피몽타주",
+      "country": "Yemen",
+      "name": "East Haraaz",
+      "nameKo": "동부 하라즈",
+      "parent": null,
+      "regionId": "yemen-haraaz",
+      "status": "existing",
+      "sourceUrl": "https://www.coffeemontage.com/goods/goods_view.php?goodsNo=1000000151&mtn=7%5E%7C%5E%EC%8B%B1%EA%B8%80+%EC%98%A4%EB%A6%AC%EC%A7%84%5E%7C%5En",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "커피몽타주",
+      "country": "Yemen",
+      "name": "Manakha",
+      "nameKo": "마나카",
+      "parent": "Haraaz",
+      "regionId": null,
+      "status": "verified-new-candidate",
+      "sourceUrl": "https://www.coffeemontage.com/goods/goods_view.php?goodsNo=1000000151&mtn=7%5E%7C%5E%EC%8B%B1%EA%B8%80+%EC%98%A4%EB%A6%AC%EC%A7%84%5E%7C%5En",
+      "verificationUrls": []
+    },
+    {
+      "roaster": "커피몽타주",
+      "country": "Yemen",
+      "name": "Bani Merrah",
+      "nameKo": "바니 메라",
+      "parent": "Manakha",
+      "regionId": null,
+      "status": "verified-new-candidate",
+      "sourceUrl": "https://www.coffeemontage.com/goods/goods_view.php?goodsNo=1000000151&mtn=7%5E%7C%5E%EC%8B%B1%EA%B8%80+%EC%98%A4%EB%A6%AC%EC%A7%84%5E%7C%5En",
+      "verificationUrls": [
+        "https://coffeelibre.kr/product/detail.html?cate_no=48&display_group=1&product_no=6755"
+      ]
+    },
+    {
+      "roaster": "커피몽타주",
+      "country": "Ethiopia",
+      "name": "Arbegona",
+      "nameKo": "아르베고나",
+      "parent": null,
+      "regionId": "ethiopia-arbegona",
+      "status": "existing",
+      "sourceUrl": "https://www.coffeemontage.com/goods/goods_view.php?goodsNo=1000000125",
+      "verificationUrls": []
+    }
+  ],
+  "reviewRecords": [
+    {
+      "checkedAt": "2026-09-09",
+      "scope": "공식 로스터 공개 페이지에서 국가·지역·세부 지명만 수작업 선별. 상품명·가격·품종·노트·설명문은 저장하지 않음. 후보는 미등록이며 행정구역 검증이 아님.",
+      "coverage": [
+        {
+          "roaster": "커피리브레",
+          "queries": [
+            "site:coffeelibre.kr 지역 에티오피아",
+            "site:coffeelibre.kr 원두 지역"
+          ],
+          "limitations": "일부 오래된 공식 가이드 포함. 판매 전체 목록을 복제하지 않음."
+        },
+        {
+          "roaster": "모모스",
+          "queries": [
+            "site:momos.co.kr 원두 지역",
+            "site:momos.co.kr Sidama",
+            "site:momos.co.kr Uraga Lada",
+            "site:momos.co.kr Bishan Dimo"
+          ],
+          "limitations": "홈 직접 열기는 403으로 중단. 공개 검색 결과와 접근 가능한 공식 2023 생두 가이드에서 지명만 선별. Farm 열의 이름을 행정지역으로 간주하지 않음."
+        },
+        {
+          "roaster": "프릳츠",
+          "queries": [
+            "site:fritz.co.kr 지역 Region 에티오피아",
+            "site:fritz.co.kr Region Costa",
+            "site:fritz.co.kr Guatemala Region"
+          ],
+          "limitations": "공식 Region 필드만 선별. San Cristobal의 정식 행정명은 별도 확인 필요."
+        },
+        {
+          "roaster": "앤트러사이트",
+          "queries": [
+            "site:anthracitecoffee.com coffee",
+            "site:anthracitecoffee.com Gathaithi",
+            "site:anthracitecoffee.com 짐마"
+          ],
+          "limitations": "공식 shop 직접 열기 403으로 중단. 공식 검색 색인 3개 경로(shop,21,21/?idx=135)의 지명만 사용. Gathaithi·Concepcion Pixcaya는 가공소/농장 여부 미검증."
+        },
+        {
+          "roaster": "테라로사",
+          "queries": [
+            "site:terarosa.com 케냐",
+            "site:terarosa.com 예가체프",
+            "site:terarosa.com 과테말라",
+            "site:terarosa.com 브라질"
+          ],
+          "limitations": "공식 홈과 원두 상세 2개 직접 확인. 상세 이미지는 복제하거나 OCR하지 않음. Alejando는 생산자 가능성이 있어 제외."
+        }
+      ]
+    },
+    {
+      "checkedAt": "2026-09-09",
+      "scope": "공개 한국 로스터 공식 페이지에서 산지 이름과 지리 관계만 확인. 상품명·가격·향미·설명문 보관 없음.",
+      "roasters": [
+        {
+          "name": "나무사이로",
+          "pagesAttempted": 6,
+          "usablePages": 3,
+          "queries": [
+            "site.namusairo.com 에티오피아 지역",
+            "site.namusairo.com/product Region",
+            "site.namusairo.com/product Huila",
+            "site.namusairo.com/product Antioquia"
+          ],
+          "limits": "현행 목록과 구아마 페이지 확인. 콜롬비아 상세 3개는 cache miss 뒤 non-retryable로 중지. 구아마·기티투·와이칸·볼리바르 등 상품 표기만으로 지리지역 추정하지 않음."
+        },
+        {
+          "name": "펠트",
+          "pagesAttempted": 7,
+          "usablePages": 5,
+          "queries": [
+            "site.feltcoffee.com 원두 지역",
+            "site.feltcoffee.com Tierradentro",
+            "site.feltcoffee.com Banko Taratu"
+          ],
+          "limits": "티에라덴트로 상세는 cache miss. 같은 이름의 지리·상품 존재만으로 특정 마을에 매핑하지 않음. El Laurel은 이 출처에서 농장명이므로 기존 La Coipa의 El Laurel 지역과 구분."
+        },
+        {
+          "name": "센터커피",
+          "pagesAttempted": 3,
+          "usablePages": 2,
+          "evidenceMode": "search-index-only",
+          "queries": [
+            "site.centercoffee.co.kr 지역 원두",
+            "site.centercoffee.co.kr Region Ethiopia",
+            "site.centercoffee.co.kr 예가체프",
+            "site.centercoffee.co.kr Yirgacheffe Banko"
+          ],
+          "limits": "홈과 409 공식 검색색인에서 산지명 확인. 상세 직접열기는 403으로 중지. Santos는 무역명일 수 있어 재배지로 등록하지 않음. 농장명 Lerida·El Mirador로 지역추정하지 않음."
+        },
+        {
+          "name": "커피몽타주",
+          "pagesAttempted": 6,
+          "usablePages": 4,
+          "queries": [
+            "site.coffeemontage.com 커피 산지",
+            "site.coffeemontage.com 바니",
+            "Bani Merrah coffee"
+          ],
+          "limits": "키에니·라 르세르바 상세 cache miss. 라로는 가공소로 명시되어 구지·우라가만 채택. 바니 메라는 본문에서 마을로 명시."
+        },
+        {
+          "name": "로우키",
+          "pagesAttempted": 1,
+          "usablePages": 0,
+          "queries": [
+            "로우키 커피 공식 원두 지역",
+            "site.lowkeycoffee.com 에티오피아",
+            "site.lowkeycoffee.co.kr 산지",
+            "site.lowkeycoffee.com 첼첼레",
+            "site.lowkeycoffee.com/shop/item 산지"
+          ],
+          "limits": "현행 공식몰은 회원전용 로그인 페이지. 접근 중지. 제3자 판매페이지·리뷰의 산지명을 공식 확인값으로 채택하지 않음."
+        }
+      ]
+    }
+  ],
+  "extraAttempt": {
+    "roaster": "커피템플",
+    "status": "no-location-found-in-checked-pages",
+    "sourceUrl": "https://www.coffeetemple.co.kr/",
+    "queries": [
+      "site:coffeetemple.co.kr 에티오피아",
+      "site:coffeetemple.co.kr 구지",
+      "site:coffeetemple.co.kr 우일라"
+    ]
+  }
+}

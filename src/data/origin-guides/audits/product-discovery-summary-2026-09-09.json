@@ -1,0 +1,3450 @@
+{
+  "reviewedAt": "2026-09-09",
+  "baseline": {
+    "regions": 134,
+    "countries": 26,
+    "uniqueNameProducerPairs": 409,
+    "lotAssignments": 451
+  },
+  "current": {
+    "regions": 389,
+    "countries": 29,
+    "lotAssignments": 708,
+    "uniqueNameProducerPairs": 633,
+    "searchLinks": 1363,
+    "productNameDecisions": 1602,
+    "linkedDecisions": 1413,
+    "uniqueSearchLinks": 1363
+  },
+  "catalogProducts": 278,
+  "sourceUrls": [
+    "https://www.cafeimports.com/north-america/ethiopia",
+    "https://sucafina.com/na/offerings/gedeb-gr-2-fully-washed",
+    "https://sucafina.com/na/offerings/adisu-halchaye-kochere-natural-gr-1",
+    "https://cdn.royalcoffee.com/wp-content/uploads/2018/10/21123013/CJ1246_Ethiopia-Banko-Chelchele-Tariku-Mengesha-Raised-Bed-Natural-Crown-Jewel.pdf",
+    "https://www.touton-specialty-coffee.com/en/p11556",
+    "https://counterculturecoffee.com/products/idido",
+    "https://sucafina.com/na/offerings/adado-yirgacheffe-natural",
+    "https://onyxcoffeelab.com/en-int/products/ethiopia-dumerso-black-honey",
+    "https://sucafina.com/na/offerings/boji-kochere-fully-washed",
+    "https://ritualcoffee.com/shop/coffee/rako-ethiopia/",
+    "https://onyxcoffeelab.com/en-int/products/ethiopia-yirgacheffe-gotiti-g1",
+    "https://www.allycoffee.com/coffees/yirgacheffe-chelbesa-washed-organic/",
+    "https://www.thecoffeeshop.jp/magazine/news/singleorigin-00561/",
+    "https://royalcoffee.com/product/3427097000009443621/",
+    "https://www.allycoffee.com/wp-content/uploads/2026/02/ALLY-UK-OFFERING-20FEB26.pdf",
+    "https://boocoffeeroasters.com/products/ethiopia-chelchele",
+    "https://shop.squareonecoffee.com/products/ethiopia-halo-beriti-coffee",
+    "https://fuglencoffee.jp/en/products/banko-taratu-ethiopia",
+    "https://www.seycoffee.com/products/kubi",
+    "https://samplecoffee.com.au/coffee/idido",
+    "https://casinomocca.com/termek/koke-shalaye-washed/?lang=en",
+    "https://www.allycoffee.com/coffees/idido-washed/",
+    "https://sucafina.com/na/offerings/tima-shakiso-guji-fw-gr-1",
+    "https://sucafina.com/na/offerings/uraga-natural",
+    "https://sucafina.com/na/offerings/hambela-gr-1-fully-washed",
+    "https://www.trabocca.com/our-coffees/ethiopia/guji/suke-quto-farm/",
+    "https://sucafina.com/na/offerings/kebede-genale-hambela-natural-gr-1",
+    "https://www.allycoffee.com/coffees/guji-uraga-natural/",
+    "https://melbournecoffeemerchants.com.au/coffee/hadeso-washed/",
+    "https://www.partnerscoffee.com/products/ethiopia-suke-quto",
+    "https://www.gringonordic.se/en/product/etiopien-dimtu-tero-farm/",
+    "https://sucafina.com/na/offerings/deri-fahmi-guji-hambela-natural-premium-soma-project",
+    "https://www.allycoffee.com/coffees/guji-buku-sayisa-washed/",
+    "https://www.seycoffee.com/products/2025-benti-nenka-ethiopia",
+    "https://sweetbloomcoffee.com/products/hambela",
+    "https://sucafina.com/na/offerings/wolichu-sodu-guji-fw",
+    "https://bigsurcafe.com/products/25-26-new-season-ethiopia-suke-faysel-abdosh-g1-premium-washed-150g",
+    "https://sweetbloomcoffee.com/products/uraga",
+    "https://melbournecoffeemerchants.com.au/wp-content/uploads/2025/05/MCM-Web-List-2.05.25.pdf",
+    "https://haceacoffee.com/products/ethiopia-guji-shakiso-gigesa-natural-2025",
+    "https://royalcoffee.com/product/3427097000012399144/",
+    "https://www.vervecoffee.com/products/gogogu",
+    "https://morrowcoffee.com/products/ethiopia-buku-sayisa-espresso",
+    "https://pilgrimroasters.com/products/yabitu-koba-heirloom",
+    "https://www.adrenaline.coffee/product-page/siko-%C3%A9thiopie",
+    "https://thecrackpots.com/products/ethiopia-hambela-wamena-tirtira-goyo",
+    "https://wholesale.roundhillroastery.com/products/638",
+    "https://sucafina.com/na/offerings/alemayehu-barasa-sidamo-natural-gr-1-lalisaa",
+    "https://sucafina.com/apac/offerings/bensa-sidamo-anaerobic-natural",
+    "https://www.dayebensacoffee.com/shantawene-2",
+    "https://www.seycoffee.com/products/2025-elora-lot-156-ethiopia",
+    "https://www.allycoffee.com/coffees/sidamo-taferi-kela-fully-washed-grade-2/",
+    "https://www.seycoffee.com/products/2026-demeka-becha-ethiopia",
+    "https://www.sucafina.com/emea/offerings/kanura-kayeso-sidamo-natural-gr-1-lalisaa",
+    "https://enjoylunacoffee.com/products/jarc-landrace-varieties-from-keramo-village-in-bensa-sidama-ethiopia-2022",
+    "https://www.hedge.coffee/store/p/shantawene",
+    "https://www.seycoffee.com/products/2026-basha-bekele-badigalo-ethiopia",
+    "https://www.unspecialty.com/product/detail.html?product_no=862",
+    "https://scenery.coffee/blogs/coffee-archive/102-ethiopia-rumudamo-natural-24-25",
+    "https://stitch.coffee/products/ethiopia-yaye-26",
+    "https://kimacoffee.com/products/daye-bensa-etiopia-cafe-de-especialidad-con-notas-florales-y-frutales",
+    "https://mazelabcoffee.com/products/green-bursa-unique-cold",
+    "https://mazelabcoffee.com/products/green-basha-bekele-murago",
+    "https://keigancoffee.com/en/collections/coffee-beans/products/ethiopia-nigusse-gemeda-morke",
+    "https://hoppenworth-ploch.de/en/products/bombe-athiopien",
+    "https://www.pro-filecoffee.com/archived-coffee/bensa-hamasho",
+    "https://www.apexcoffeeroasters.com/product-page/ethiopia-arbegona-rumudamo-natural",
+    "https://www.terraformcoffee.com/products/ethiopia-hure-74158",
+    "https://stillcoffeeroasters.com/products/alo-alache",
+    "https://store.coffee-wrights.jp/items/139607680",
+    "https://mazelabcoffee.com/collections/coffee/products/kokose",
+    "https://mazelabcoffee.com/products/green-gonjobe-bensa",
+    "https://fuglencoffee.jp/en/blogs/coffee-beans/bona-zuria-ethiopia",
+    "https://sucafina.com/na/offerings/limu-gr-2-fully-washed",
+    "https://sucafina.com/na/offerings/ethiopia-duromina-fw-limu-g1",
+    "https://thissideup.coffee/coffee-passport-special-roast-ethiopia",
+    "https://counterculturecoffee.com/products/duromina",
+    "https://roguewavecoffee.ca/products/ethiopia-musa-abalulesa-washed",
+    "https://roguewavecoffee.ca/products/ethiopia-musa-abalulesa-oma-fontule-honey-process",
+    "https://keffacoffee.com/coffees/ethiopia-harrar-gr-1",
+    "https://www.paperplanecoffee.com/products/queen-of-harrar-natural-ethiopian",
+    "https://sucafina.com/na/offerings/chelelektu-yirgacheffe-g2-fw",
+    "https://sucafina.com/na/offerings/gedeb-natural-gr-3",
+    "https://sucafina.com/na/offerings/gotiti-gedeb-natural-gr-1",
+    "https://sucafina.com/na/offerings/uraga-guji-oro-natural-gr-1",
+    "https://sucafina.com/na/offerings/uraga-guji-carbonic-maceration",
+    "https://www.cafeimports.com/europe/blog/2020/07/30/harvest-report-kenya-2020-complicated-is-beautiful/",
+    "https://sucafina.com/na/offerings/kagere-nyeri-ab",
+    "https://sucafina.com/emea/offerings/ichuga-nyeri-aa",
+    "https://sucafina.com/na/offerings/kimabara-nyeri-aa",
+    "https://www.coffeekilimanjaro.com/kenya-kiandu-aa.html",
+    "https://sucafina.com/apac/offerings/gichathaini-nyeri-aa",
+    "https://www.seycoffee.com/products/2026-ruarai-aa-separation-kenya",
+    "https://www.monogramroasters.gr/product/perseas/",
+    "https://no6coffee.co/products/rukira-factory-washed",
+    "https://www.coffeekilimanjaro.com/kenya-karatina-ab.html",
+    "https://www.offshootcoffee.com.au/products/karatina",
+    "https://leichtcoffeeroasters.com/products/kenya-thunguri-natural-heavy",
+    "https://www.covoyacoffee.com/p609479-2-kenya-mungaria-aa.html",
+    "https://sucafina.com/na/offerings/kiangothe-kirinyaga-aa",
+    "https://sucafina.com/apac/offerings/koirara-kirinyaga-aa",
+    "https://www.coffeekilimanjaro.com/kenya-kiunyu-aa.html",
+    "https://www.seycoffee.com/products/2026-kamwangi-kenya",
+    "https://sucafina.com/emea/offerings/ibonia-estate-aa",
+    "https://www.sucafina.com/emea/offerings/wamuguma-kiambu-pb",
+    "https://www.coffeekilimanjaro.com/kenya-wamuguma-pb.html",
+    "https://www.coffeekilimanjaro.com/kenya-mchana-natural.html",
+    "https://www.seycoffee.com/products/kahata-mucau-ab",
+    "https://biz.koke.kr/products/11216",
+    "https://sucafina.com/na/offerings/murarandia-muranga-aa",
+    "https://sucafina.com/na/offerings/theri-murang-a-pb",
+    "https://sucafina.com/emea/offerings/gatagua-muranga-pb",
+    "https://www.coffeekilimanjaro.com/kenia-murarandia-pb.html",
+    "https://royalcoffee.com/product/3427097000022727039/",
+    "https://20gramscoffeeroastery.com/pages/kenya-kanguya-sl28-sl34-red-honey",
+    "https://sucafina.com/apac/offerings/rukira-aa",
+    "https://cdn.royalcoffee.com/wp-content/uploads/2020/08/28155822/47253-CJ1376-Kenya-Nyeri-Rukira-PB-14TY0005-30kg-Vacuum-Pack-.pdf",
+    "https://sucafina.com/na/offerings/ndaro-ini-nyeri-ab",
+    "https://sucafina.com/emea/offerings/karambi-fw",
+    "https://sucafina.com/na/offerings/macuba-natural",
+    "https://sucafina.com/emea/offerings/cyato-nyamasheke-anaerobic-natural",
+    "https://georgehowellcoffee.com/products/kanzu-lot-26-medium-rwanda",
+    "https://www.sweetmarias.com/products/rwanda-dry-process-macuba-8168",
+    "https://atomicroastery.com/products/rwanda-nyamasheke",
+    "https://cuppersjourney.com/abadatezuka-rwanda/",
+    "https://silverbirdcoffee.com/products/cyato-rwanda",
+    "https://camelliacoffeeroasters.com/shop/coffee/rwanda-kanzu-no1341/",
+    "https://www.covoyacoffee.com/p612865-2-rwanda-natural-huye-mountain.html",
+    "https://www.covoyacoffee.com/p610067-6-rwanda-huye-mountain.html",
+    "https://www.njdouek.com/fr/product/default?id=0Pm8AUfrl9B8Y1q2SM79",
+    "https://www.covoyacoffee.com/p614504-4-rwanda-natural-huye.html",
+    "https://www.stumptowncoffee.com/products/rwanda-huye-mountain",
+    "https://www.stumptowncoffee.com/pages/producer-david-rubanzangabo",
+    "https://sucafina.com/na/offerings/muzo-fully-washed",
+    "https://sucafina.com/na/offerings/gakenke-fully-washed",
+    "https://thissideup.coffee/rushashi",
+    "https://www.touton-specialty-coffee.com/en/p11583",
+    "https://www.catskillroasters.com/summer-2026",
+    "https://ptscoffee.com/products/abadatezuka-coop-washed",
+    "https://sucafina.com/emea/offerings/kibingo-natural",
+    "https://sucafina.com/na/offerings/burundi-kibingo-fully-washed",
+    "https://sucafina.com/emea/offerings/kibingo-honey-impact-beyond-flagship",
+    "https://obadiahcoffee.com/products/kibingo",
+    "https://publikcoffee.com/shop/coffee/burundi-kayanza",
+    "https://sucafina.com/na/offerings/gakenke-natural",
+    "https://thecaptainscoffee.com/products/burundi-kayanza-masha-anaerobic-natural",
+    "https://backstory.coffee/products/burundi-gakenke",
+    "https://sucafina.com/na/offerings/ngozi-fully-washed",
+    "https://sucafina.com/apac/offerings/rama-women-association-ngozi-natural",
+    "https://allianceforcoffeeexcellence.org/burundi-2019/",
+    "https://www.list-beisler.coffee/media/pdf/BUR_FW_Scr15_Long_Miles_Coffee_Washed_Gatukuza_POSTCARD.pdf",
+    "https://flowerchildcoffee.com/products/nkanda",
+    "https://ascension.coffee/products/rama-women-of-ngozi",
+    "https://www.novelcoffeeroasters.com/products/turihamwe",
+    "https://static1.squarespace.com/static/57a4cd746a496311f31cf815/t/5e96fd98b990fc5b6c5a5246/1586953624898/Gatukuza%2BLot%2B20.pdf",
+    "https://cafesgranell.es/es/especialidad/857-burundi-gatukuza-cafe-especialidad-250-g.html",
+    "https://creedcoffeeroasters.ie/products/burundi-gatukuza",
+    "https://sucafina.com/na/offerings/gakenke-honey",
+    "https://sucafina.com/na/offerings/kilimanjaro-fw-pb",
+    "https://bunicoffee.com/en/produkt/kilimanjaro-2/",
+    "https://kilimanjaro-plantation.com/?page_id=25",
+    "https://www.ictcoffee.com/wp-content/uploads/2023/06/Tanzania-Kilimanjaro-Peaberry-P114771.pdf",
+    "https://www.redroostercoffee.com/products/tanzania-lyamungo-peaberry-washed",
+    "https://www.sunergoscoffee.com/products/tanzania-peabody-lyamungo",
+    "https://sucafina.com/na/offerings/mbeya-aa-fully-washed",
+    "https://sucafina.com/na/offerings/utengule-estate-fw-ab",
+    "https://www.atlascoffee.com/coffees/idiwili-amcos/",
+    "https://www.bodhileafcoffee.com/collections/coffee/products/tanzania-utengule-estate-ab-green",
+    "https://www.genuineorigin.com/tanzania-utengule-estate-natural-2026",
+    "https://jimmysjava.com/products/tanpea-md-mbeya-mimba",
+    "https://cafedecolombia.com/denominacion-de-origen-regional/",
+    "https://cafedecolombia.com/regiones-cafeteras/",
+    "https://www.cafeimports.com/north-america/blog/2024/05/24/genesis-coffee-sourcing-of-huila-colombia/",
+    "https://sucafina.com/na/offerings/luis-anibal-papayo-fw",
+    "https://mastefi.com/",
+    "https://www.allycoffee.com/coffees/la-loma-laurina-natual/",
+    "https://www.touton-specialty-coffee.com/en/p11552",
+    "https://www.kundecoffee.com/shop/ruiz-018/",
+    "https://www.allycoffee.com/coffees/las-veraneras-pink-bourbon-natural/",
+    "https://ineffablecoffee.com/products/betania-farm-papayo",
+    "https://www.sweetmarias.com/products/colombia-pitalito-franky-pena-8587",
+    "https://onyxcoffeelab.com/en-int/products/colombia-yadimir-quiguanas-perez-bourbon-aji",
+    "https://www.wadi.coffee/products/colombia-angel-ortega-gesha",
+    "https://silverbirdcoffee.com/products/faiber-bolanos-colombia-gold-label-reserve",
+    "https://swerl.se/products/odd-b-jhon-jairo-espresso-colombia",
+    "https://www.seycoffee.com/products/2025-victor-alfonso-bonilla-la-chorrera-end-of-season-colombia",
+    "https://yellowroostercoffee.com/product/juliana-guevara-chiroso-washed/",
+    "https://m.coffeelibre.kr/product/detail.html?cate_no=70&display_group=1&product_no=7657",
+    "https://unspecialty.com/product/detail.html?product_no=875",
+    "https://unspecialty.com/product/detail.html?product_no=749",
+    "https://www.desarrolladores.cafe/cafes/salvaje/?v=0741d11972e4",
+    "https://watchhouse.com/products/jhonatan-gasca",
+    "https://scenery.coffee/blogs/coffee-archive/166-colombia-hugo-gonzalezs-gesha-copa-de-oro-grand-champion-crop-25-26-archive",
+    "https://www.seycoffee.com/products/villa-diana",
+    "https://melbournecoffeemerchants.com.au/wp-content/uploads/2024/01/MCM-Web-List-18.01.24.pdf",
+    "https://www.allycoffee.com/coffees/obraje-maracaturra/",
+    "https://www.allycoffee.com/coffees/obraje-gesha-washed/",
+    "https://www.allycoffee.com/wp-content/uploads/2026/03/ALLY-EU-OFFERINGS-06MAR26.pdf",
+    "https://caffegoriziana.it/en/product/colombia-finca-el-obraje-2/",
+    "https://www.beanbrothers.co.kr/info/coffeewiki_detail?cateCd=006008001&goodsNo=1000001524",
+    "https://moimcoffee.com/products/el-obraje-colombia-caturra",
+    "https://ozonecoffee.co.nz/blogs/in-my-mug/266-colombia-aponte-caturra-honey",
+    "https://thoughtfulcoffee.co/products/el-turpial-semi-washed-sl28",
+    "https://www.seycoffee.com/products/buesaco",
+    "https://m.coffeelibre.kr/article/%EC%9B%90%EB%91%90%EA%B0%80%EC%9D%B4%EB%93%9C/1/12933",
+    "https://cafetales.jp/collections/ranking-best-sellers/products/narino-la-cruz-washed",
+    "https://www.allycoffee.com/coffees/la-reserva-caturra-chiroso-anaerobic-honey/",
+    "https://www.allycoffee.com/coffees/la-secreta-sugar-cane-decaf/",
+    "https://www.allycoffee.com/coffees/el-zacatin-chiroso-natural/",
+    "https://www.allycoffee.com/coffees/el-zacatin-pink-bourbon-natural/",
+    "https://www.seycoffee.com/products/2025-david-berrio-la-casita-new-season-colombia",
+    "https://flowerchildcoffee.com/products/edgar-gonzalez-chiroso",
+    "https://www.wonderroom.co.kr/bean/40356",
+    "https://www.justincoffee.com.tw/en/products/colombia_antioquia_urrao_la_manga_chiroso",
+    "https://unspecialty.com/product/detail.html?product_no=740",
+    "https://melbournecoffeemerchants.com.au/coffee/el-faldon/",
+    "https://moonwakecoffeeroasters.com/products/liliana-ramirez-finca-el-yolombo-washed-chiroso-colombia",
+    "https://www.allycoffee.com/coffees/capilla-del-rosario-colombia-caturra-castillo-washed-apricot/",
+    "https://www.harpandbowlcoffee.com/shop/p/la-reserva-double-anaerobic-geisha",
+    "https://www.coffea.co.kr/coffea-single/%EC%BD%9C%EB%A1%AC%EB%B9%84%EC%95%84-%EB%AA%A8%EB%82%98%EB%A5%B4%EC%B9%B4-%ED%8C%8C%ED%8C%8C%EC%9A%94-%EB%AC%B4%EC%82%B0%EC%86%8C-%ED%97%88%EB%8B%88",
+    "https://eu.covoyacoffee.com/seleccion-planadas-organic-eu.html",
+    "https://sedeelectronica.sic.gov.co/temas/propiedad-industrial/direccion-de-signos-distintivos/denominaciones-de-origen/cafe-de-tolima",
+    "https://racafe.com.co/documents/28/MONTEVERDE_GESHA_HONEY_ENG_compressed.pdf",
+    "https://freshfarmer.com/la-roca-state/?lang=es",
+    "https://september.coffee/en-us/products/jorge-rojas-2025",
+    "https://patiocoffee.com.au/shop/colombia-planadas/",
+    "https://friedhats.com/products/2025-colombia-aristobulo-rayo-omni",
+    "https://www.micoffee.co.kr/goods/goods_view.php?goodsNo=1000005391",
+    "https://detourcoffeeroasters.com/products/asmucafe-el-tambo-colombia",
+    "https://www.sweetmarias.com/products/colombia-inza-el-tabor-8601",
+    "https://olisipo.coffee/product/manos-juntas/",
+    "https://www.banexport.com/farm-juan-martin",
+    "https://melbournecoffeemerchants.com.au/coffee/gesha-del-pueblo/",
+    "https://www.rumblecoffee.com.au/blogs/transparency-project/colombia-paola-trujillo-typica",
+    "https://theangryroaster.com/products/colombia-gesha-inza",
+    "https://www.covoyacoffee.com/p615205-4-colombia-cauca-org-asobombo-nj.html",
+    "https://unspecialty.com/product/detail.html?product_no=796",
+    "https://monogramcoffee.com/en-us/collections/all-coffees/products/popayan-decaf-espresso",
+    "https://www.dogwoodcoffee.com/products/colombia-patio-bonito-washed",
+    "https://mantaraycoffee.com.au/products/colombia-juan-martin-washed-gesha-sotara-cauca",
+    "https://www.coffea.co.kr/coffea-single/%EC%BD%9C%EB%A1%AC%EB%B9%84%EC%95%84-%EC%82%B0%ED%83%80-%EB%A7%88%EB%A5%B4%EC%83%A4-%EB%82%B4%EC%B8%84%EB%9F%B4",
+    "https://duluthcoffeecompany.com/pages/producers/jaime-burbano",
+    "https://drwakefield.com/wp-content/uploads/2017/02/Inza.pdf",
+    "https://www.belco.fr/en/cafes/012000303700000/yuppie",
+    "https://www.cafedocerrado.org/index.php?pg=nossoterroir",
+    "https://www.gov.br/agricultura/pt-br/assuntos/sustentabilidade/indicacao-geografica/arquivos-publicacoes-ig/brazilian-coffees-with-geographical-indication",
+    "https://www.allycoffee.com/coffees/fazenda-santo-antonio-do-capao-seco/",
+    "https://www.allycoffee.com/coffees/fazenda-pantano-mauro-galheri-maragogipe-natural/",
+    "https://www.allycoffee.com/coffees/fazenda-caixetas-vinicius-wagner-ignotti-acaua-natural/",
+    "https://mareterracoffee.com/es/cafe-verde/laurina-bv19-anaerobic-65h_pro3648/",
+    "https://www.blackwhiteroasters.com/products/r-daterra-our-plot-project-jan-25",
+    "https://www.wonderroom.co.kr/bean/39496",
+    "https://evermorethee.nl/product/daterra/",
+    "https://casabrasilcoffees.com/product/sul-de-minas/",
+    "https://www.list-beisler.coffee/media/pdf/BRA_Pulped-Natural_Sul_de_Minas_Arara_Coopervitae_POSTCARD.pdf",
+    "https://www.allycoffee.com/coffees/fazenda-brejinho-orestina-silva-reis-red-catuai-natural/",
+    "https://cafeorfeu.com.br/en/blogs/news/as-fazendas",
+    "https://www.allycoffee.com/coffees/sitio-engenho-arara/",
+    "https://farmdirectory.cupofexcellence.org/listing/27-fazenda-irmas-pereira-maria-rogeria-costa-pereira-e-outros-brazil-2021/",
+    "https://allianceforcoffeeexcellence.org/farm-directory/87-63/",
+    "https://www.roastmasters.com/brazil-estevab-mario.html",
+    "https://www.parlor.coffee/products/santa-luzia-brazil",
+    "https://www.sumocoffeeroasters.com/product-page/arara-natural-anaerobic-santo-ant%C3%B4nio-brazil-1",
+    "https://www.allycoffee.com/coffees/sitio-engenho-red-catuai/",
+    "https://www.allycoffee.com/coffees/sitio-tres-barras/",
+    "https://www.partnerscoffee.com/blogs/education/brazil-irmas-pereira-2025",
+    "https://www.alemcoffee.cl/products/cafe-ss110326",
+    "https://www.carmocoffees.com.br/our-farms/fazenda-sertao/?lang=pt-br",
+    "https://allianceforcoffeeexcellence.org/brazil-2021/",
+    "https://www.coffea.co.kr/coffea-single/브라질-산타-이자벨-아라라-무산소-허니",
+    "https://en-asia.falcon-micro.com/products/pedro-gabarra-fazenda-pinhal-brazil-honey-mmy-0261",
+    "https://cdn.cafeimports.com/images/Cafe-Imports-EUR-Spot-1.pdf",
+    "https://bourboncoffees.com.br/en/the-alta-mogiana-region/",
+    "https://farmdirectory.cupofexcellence.org/listing/15-fazenda-recreio-homero-teixeira-de-macedo-junior-brazil-2021/",
+    "https://terracotacoffee.com.br/en/",
+    "https://capitalcoffee.co.uk/products/brazil-volcanic-fermentation-patricia",
+    "https://boxxcoffee.la/products/brazil-sitio-siriema",
+    "https://www.cafemoscardini.com/",
+    "https://capricorniotrace.com/traceability/432593550254",
+    "https://www.cafemoscardini.com/en",
+    "https://reykjavikroasters.is/en/portfolio-posts/mogiana-en/",
+    "https://melbournecoffeemerchants.com.au/spotlight-on-chapada-diamantina/",
+    "https://melbournecoffeemerchants.com.au/coffee/diamantina/",
+    "https://melbournecoffeemerchants.com.au/coffee/sitio-tanque/",
+    "https://www.allycoffee.com/coffees/fazenda-mimoso-ricardo-tavares-decaf/",
+    "https://melbournecoffeemerchants.com.au/coffee/sitio-canaa-pulped-natural-acaua/",
+    "https://roastcafes.com/produto/catuai-do-samuel-2025/",
+    "https://roastcafes.com/produto/arara-do-paulo-menezes-2024/",
+    "https://www.covoyacoffee.com/p613504-2-brazil-agenito-lot2.html",
+    "https://acave.com.br/images/Cartilha-reg-brasileiras.pdf",
+    "https://procafe.com.br/en/nossas-regioes/",
+    "https://www.amsc.com.br/",
+    "https://www.cafeimports.com/europe/peru",
+    "https://falconcoffees.com/wp-content/uploads/2024/12/Exporter_Bio_039_s_Peru_compressed_1.pdf",
+    "https://www.cafeimports.com/europe/offerings?view=beanology.view.david-guevara-finca-flor-de-montana-chirinos-caturra-cbc-pe-bio-178-25270",
+    "https://uk.covoyacoffee.com/peru-los-quispe-gesha-anaerobic-washed.html",
+    "https://uk.covoyacoffee.com/peru-la-perla-gesha-natural-uk.html",
+    "https://korea.falcon-micro.com/products/efrain-carhuallocllo-yellow-caturra-el-corazon-peru-washed-fsk-0053",
+    "https://caffelab.com/peru-san-ignacio/",
+    "https://www.commonfolkcoffee.com.au/products/elias-sanchez-gayoso-aa",
+    "https://www.touton-specialty-coffee.com/en/p11586",
+    "https://beansmiths.com/en/product/el-diamante/",
+    "https://m.coffeelibre.kr/article/%EC%9B%90%EB%91%90%EA%B0%80%EC%9D%B4%EB%93%9C/1/385",
+    "https://beanbrothers.co.kr/info/coffeewiki_detail?cateCd=006008001&cateNm=SEASONAL&goodsNo=1000001531",
+    "https://www.brew92.com/productdetails/Peru-La-Lima",
+    "https://kissthehippo.com/collections/coffee/products/peru-la-ponderosa-gesha",
+    "https://unspecialty.com/product/detail.html?product_no=753",
+    "https://www.falcon-micro.com/products/marcelino-chinguel-el-laurel-peru-natural-fsc-8487",
+    "https://songdocoffee.com/shop_view/?idx=979",
+    "https://en.coffeelibre.kr/product/goldmund-peru-las-etiopes-ethiopian-natural/8058/?cate_no=47&display_group=1",
+    "https://www.micoffee.co.kr/goods/goods_view.php?goodsNo=1000005500",
+    "https://fuglencoffee.jp/en/blogs/coffee-beans/merci-fernandez-peru",
+    "https://established.coffee/products/el-romerillo-peru",
+    "https://www.wonderroom.co.kr/bean/33753",
+    "https://www.newbean.co.kr/goods/goods_view.php?goodsNo=1000000739",
+    "https://mariagecoffee.kr/product/페루-엘-로블-게이샤/644/",
+    "https://www.stouthauscoffee.com/products/peru-familia-riojas",
+    "https://cooperativaamoju.pe/es/galeria/",
+    "https://aviary.coffee/products/014-maria-nieves",
+    "https://www.woodberrycoffee.com/products/mirador_g_w",
+    "https://andina.pe/ingles/noticia-taza-excelencia-peru-2023-mejor-cafe-es-del-productor-cajamarquino-yoniser-mego-961876.aspx",
+    "https://darkponycoffee.com/products/gesha-la-palma",
+    "https://sucafina.com/na/offerings/peru-la-huaca-(coopagro)-fw",
+    "https://coffeelibre.kr/article/원두생두-가이드/1/12505/",
+    "https://cocla.pe/wp-content/uploads/2023/06/1-BROCHURE-COCLA-2023.pdf",
+    "https://nitido.coffee/cusco/",
+    "https://cafequillabamba.com/nosotros/",
+    "https://cupofexcellence.org/peru-2021/",
+    "https://projectorigin.coffee/wp-content/uploads/2026/03/PER_DwightAguilarMasias_NuevaAlianza__2025.pdf",
+    "https://www.seycoffee.com/products/2026-georgina-puma-monte-verde-peru",
+    "https://moonwakecoffeeroasters.com/products/san-sebastian-julio-chavez-washed-sl9-peru",
+    "https://www.baristashopen.se/shop/4461/art33/159557833-9f2396-NFR_Peru_Apayalla_A5_web.pdf",
+    "https://sigmacoffee.co.uk/collections/single-origin/products/tanat-hugo-pareja-gesha-washed",
+    "https://khipucoffee.co.uk/products/finca-chiriloma-edwin-quea-paco-nanolot",
+    "https://onyxcoffeelab.com/en-int/products/peru-la-margarita-gesha-26",
+    "https://www.queonda.coffee/h6-familia-solorzano",
+    "https://www.seycoffee.com/products/2026-armando-hurtado-los-pinos-peru",
+    "https://cdn.www.gob.pe/uploads/document/file/4460211/ilovepdf_merged.pdf",
+    "https://ritualcoffee.com/shop/coffee/oyara-peru/",
+    "https://elephantcollective.co.uk/products/andres-bazos",
+    "https://repositorio.promperu.gob.pe/server/api/core/bitstreams/f5bcee1a-59ba-4655-b36e-b9c5b0cde895/content",
+    "https://allianceforcoffeeexcellence.org/farm-directory/88-23-4/",
+    "https://thoumayest.com/products/peru-seasonal-release",
+    "https://www.redroostercoffee.com/products/peru-highland-select-natural",
+    "https://royalcoffee.com/product/3427097000010940099/",
+    "https://www.coffeesjaen.com/cafe.php",
+    "https://drwakefield.com/coffees/peru-frontera-san-ignacio/",
+    "https://unicafec.com/la-cooperativa/",
+    "https://scap-panama.com/about-scap/",
+    "https://scap-panama.com/agricola-geisha/",
+    "https://haciendaesmeralda.com/",
+    "https://www.panamavarietals.coffee/copy-of-finca-la-aurora",
+    "https://www.offshootcoffee.com.au/products/hacienda-la-esmeralda-mario-5-rare",
+    "https://interamericancoffee.de/wp-content/uploads/2024/12/FactSheet_Panama_Anselmito_Estate.pdf",
+    "https://scap-panama.com/lamastus-coffees/",
+    "https://braveroasters.com/products/panama-blackmoon-chiroso-n49-100g",
+    "https://scap-panama.com/cafe-geisha-de-panama-sacude-al-mundo-con-impresionantes-records-mundiales/",
+    "https://assemblycoffee.co.uk/products/panama-bonita-springs",
+    "https://watchhouse.com/products/bonita-springs",
+    "https://tanat.coffee/en/boutique/lost-origin-abu-x-tanat-lot-232/",
+    "https://www.justincoffee.com.tw/en/products/panama_la_esmeralda_geisha",
+    "https://varistacoffee.com/products/refill-varista-origin-series-pacamara-natural-200gr-agricola-geisha-copy",
+    "https://samplecoffee.com.au/coffee/elida-estate",
+    "https://flowerchildcoffee.com/products/elida-estate-gesha",
+    "https://mazelabcoffee.com/products/blackmoon",
+    "https://blackboardcoffee.com.au/blogs/the-coffee-board/kotowa-coffee-panama-geisha-collaboration",
+    "https://www.glyphsupply.co/greens/p/abu-gw3210",
+    "https://49thcoffee.com/blogs/blog/origin-update-panama-field-visit",
+    "https://unspecialty.com/product/detail.html?product_no=807",
+    "https://thatcoffeecompany.com.au/product/panama-la-berlina-estate/",
+    "https://www.rossocoffeeroasters.com/products/longboard-misty-mountain-washed-geisha-lot-17a-100g",
+    "https://www.motobean.com.au/products/panama-geisha-finca-don-benjie",
+    "https://www.damarliestate.com/product-page/colobri",
+    "https://scap-panama.com/janson/",
+    "https://www.reyachcoffee.com/en/store/panama-volcan-chiriqui-janson-coffee-farm-washed-geisha/",
+    "https://scap-panama.com/bambito-estate-coffee/",
+    "https://acidcoffee.stores.jp/items/6623833a00d7d53f54721931",
+    "https://www.lf.coffee/en-in/products/specialty-coffee-filter-coffee-panama-geisha-aril",
+    "https://greencoffeecollective.com/products/bambito-estate-coffee-yellow-catuai-natural",
+    "https://www.stb.coffee/blogs/news/spill-the-beans-wins-best-of-panama-bambito-coffee-estate",
+    "https://hatchcrafted.com/blog/2025-november-box",
+    "https://tanat.coffee/boutique/finca-sophia-gw2-estacion/",
+    "https://omacoffeeroaster.com/products/panama-santamaria-geisha-natural-oma-lot-1901",
+    "https://moonwakecoffeeroasters.com/products/hartmann-mi-finquita-gesha-washed",
+    "https://www.coffeeincommon.com.au/pages/nintey-plus-coffees",
+    "https://archerscoffee.com/products/panama-finca-nahaliel-geisha-washed-lot-030425",
+    "https://haciendaesmeralda.com/jaramillo-farm/",
+    "https://www.guatemalancoffees.com/main/regions-and-profiles/antigua-coffee/",
+    "https://burmancoffee.com/product/green-coffee-beans/guatemalan-volcanes/",
+    "https://fincagascon.com/",
+    "https://www.allycoffee.com/coffees/los-volcanes-covadonga-bourbon-caturra-catuai-washed/",
+    "https://www.cafesiboney.com/tienda/guatemala-finca-gascon-specialty-coffee/",
+    "https://unspecialty.com/product/detail.html?product_no=828",
+    "https://www.vervecoffee.com/products/santa-clara",
+    "https://melbournecoffeemerchants.com.au/coffee/santa-clara-estate/",
+    "https://melbournecoffeemerchants.com.au/get-excited-for-guate/",
+    "https://www.guatemalancoffees.com/main/regions-and-profiles/highland-huehue/",
+    "https://cdn.royalcoffee.com/wp-content/uploads/2018/06/21124732/CJ1206-Guatemala-San-Pedro-Necta-Maximiliano-Palacios-Fully-Washed-Crown-Jewel.pdf",
+    "https://www.sucafina.com/na/offerings/huehuetenango-la-union-pacamara-fw",
+    "https://allianceforcoffeeexcellence.org/el-injerto-2024-pca/",
+    "https://www.allycoffee.com/coffees/finca-la-bolsa/",
+    "https://www.covoyacoffee.com/p615670-1-guatemala-huehue-mario-cano-ca.html",
+    "https://melbournecoffeemerchants.com.au/coffee/calahute-maragogype/",
+    "https://www.proudmarycoffee.com.au/products/guatemala-cascada-encantada-geisha-natural",
+    "https://www.algrano.com/en/products/6579-guatemala-la-poza-fw-arabica-fully-washed-jan-apr-2025",
+    "https://coffeemeup.kr/m/2465",
+    "https://www.anacafe.org/subasta-cup-of-excellence-2025/",
+    "https://auction.allianceforcoffeeexcellence.org/en/lots/las-macadamias-2",
+    "https://carrierroasting.com/collections/whole-bean-coffee/products/guatemala-union-cantinil",
+    "https://allianceforcoffeeexcellence.org/farm-directory/90-73-3/",
+    "https://www.covoyacoffee.com/p612385-4-guatemala-huehue-gonzalo-lot1-ca.html",
+    "https://www.guatemalancoffees.com/main/regions-and-profiles/traditional-atitlan/",
+    "https://www.nkgquality.com/wp-content/uploads/2020/04/FS_Guatemala-SHB-Atitlan-La-Voz.pdf",
+    "https://chacaya.com/",
+    "https://pdfs.squaremilecoffee.com/SQMC-pdf/2024/OurPickFilter/Weeks/31/coffee.pdf",
+    "https://www.taylorlane.com/pages/guatemala-la-voz",
+    "https://1do.co.kr/article/%EB%89%B4%EC%8A%A4%EC%9D%B4%EB%B2%A4%ED%8A%B8/1/10124/",
+    "https://www.guatemalancoffees.com/main/regions-and-profiles/rainforest-coban/",
+    "https://www.covoyacoffee.com/mwdownloads/download/link/id/247",
+    "https://manhattan.coffee/catalog/coffee/santa-irene",
+    "https://cafe-sucre.tokyo/en/products/guatemala_coban",
+    "https://melbournecoffeemerchants.com.au/coffee/santa-isabel-estate-las-flores/",
+    "https://www.icafe.cr/nuestro-cafe/regiones-cafetaleras/lossantos/",
+    "https://docafetarrazu.com/",
+    "https://www.atlascoffee.com/coffees/santa-elena-estate/",
+    "https://exclusivecoffeecr.com/relationships_tarrazu.html",
+    "https://sucafina.com/emea/offerings/solis-cordero-higueronal-f1-anaerobic-natural",
+    "https://www.vervecoffee.com/products/santa-rosa-1900-espresso",
+    "https://www.allycoffee.com/coffees/la-paila-catigua-honey/",
+    "https://www.thecoffeeshop.jp/magazine/news/bds277/",
+    "https://opal.coffee/selections/costa-rica/",
+    "https://opal.coffee/wp-content/uploads/2024/10/Santa-Teresa-Typica-White-Honey-Opal-Coffee.pdf",
+    "https://craftcoffeeroaster.hk/collections/coffee/products/costa-rica-santa-teresa-sl28-white-honey",
+    "https://coffeelibre.kr/article/%EC%9B%90%EB%91%90%EC%83%9D%EB%91%90-%EA%B0%80%EC%9D%B4%EB%93%9C/1/16760/",
+    "https://moklair.fr/product/finca-voo-cup-of-excellence/",
+    "https://www.dotacoffeecompany.com/highaltitudecoffee",
+    "https://www.icafe.cr/nuestro-cafe/regiones-cafetaleras/valle-occidental/",
+    "https://www.allycoffee.com/coffees/los-coyotes-natural/",
+    "https://docnursecoffee.com/villa-sarchi-washed-shb-coffee/",
+    "https://www.changeoftone.coffee/farms/familia-salazar-los-cipreses",
+    "https://www.horshamcoffeeroaster.co.uk/pages/coffee-producer/aguilera-brothers",
+    "https://www.allycoffee.com/coffees/la-isla-micromill-catigua-semi-washed/",
+    "https://www.bohee.coffee/products/costa-rica-cordillera-de-fuego-anaerobic",
+    "https://wasacoffee.com/blogs/brew/costa-rica-azul-origin-story",
+    "https://www.allycoffee.com/coffees/swd-volcan-azul-caturra-honey-microlot-decaf/",
+    "https://fuglencoffee.jp/en/blogs/coffee-beans/san-juannillo",
+    "https://scenery.coffee/blogs/news/costa-rica-gaia-artisan-milenio",
+    "https://unspecialty.com/product/detail.html?product_no=868",
+    "https://www.fontecoffee.com/coffee/costa-rica-monte-brisas-danto/",
+    "https://coffeelibre.kr/article/%EC%9B%90%EB%91%90%EC%83%9D%EB%91%90-%EA%B0%80%EC%9D%B4%EB%93%9C/1/17282/",
+    "https://www.allycoffee.com/coffees/brumas-del-zurqui-villa-sarchi-washed/",
+    "https://www.allycoffee.com/coffees/brumas-del-zurqui-geisha-honey/",
+    "https://www.touton-specialty-coffee.com/en/p11379",
+    "https://friedrichscoffee.com/product/costa-rica-las-lajas-finca-el-cerro/",
+    "https://www.siemasu.coffee/shop/p/plumpearls",
+    "https://medium.com/ally-coffee/costa-rica-guanacaste-from-coopedota-a62749a94e2a",
+    "https://www.dotacoffeecompany.com/",
+    "https://www.dotacoffeecompany.com/product-page/geisha-340-g",
+    "https://www.horshamcoffeeroaster.co.uk/products/la-isla-catigua",
+    "https://royalcoffee.com/product/3427097000048416145/",
+    "https://www.lafortunafincasycafe.com/",
+    "https://www.partnerscoffee.com/blogs/education/honduras-las-flores-2026",
+    "https://home.lamarzoccousa.com/recluse-roasting-project-x-la-marzocco-home/",
+    "https://www.candycane.coffee/en/products/caballero-francisca-honduras",
+    "https://www.allycoffee.com/coffees/san-isidro-triple-fermentation/",
+    "https://sucafina.com/na/offerings/mauricio-salazar-el-meson-parainema-fw-organic",
+    "https://www.cloudcitycoffee.com/products/new-honduras-finca-la-unica",
+    "https://peixotocoffee.com/product/katia-duke/",
+    "https://sucafina.com/na/offerings/comayagua-shg-fully-washed",
+    "https://farmdirectory.cupofexcellence.org/listing/10-los-romero-honduras-2026-parainema-catracha/",
+    "https://www.delafincacoffee.com/honduran-coffee/la-esmeralda-washed-de-la-finca-coffee-importers",
+    "https://thecaptainscoffee.com/collections/green-coffee/products/honduras-comayagua-finca-la-esmeralda-72hour-anaerobic-natural",
+    "https://mojocoffeeroasters.com/products/honduras-la-cascada",
+    "https://manhattan.coffee/catalog/coffee/cerro-azul",
+    "https://www.allycoffee.com/coffees/el-pino-washed/",
+    "https://onyxcoffeelab.com/products/honduras-edgardo-reyes-old",
+    "https://farmdirectory.cupofexcellence.org/listing/5-el-mango-honduras-2026-honduras-exotic/",
+    "https://farmdirectory.cupofexcellence.org/listing/2-la-salsa-honduras-2026-honduras-exotic/",
+    "https://88graines.com/pl/producer/finca-el-nino/",
+    "https://scenery.coffee/blogs/coffee-archive/120-honduras-pedro-morenos-gesha-crop-25-26-archive",
+    "https://ritualcoffee.com/shop/coffee/la-pinona-honduras/",
+    "https://www.cafeimports.com/europe/blog/2017/11/14/chalate-2017-the-project/",
+    "https://www.cafeimports.com/north-america/offerings?view=beanology.view.santa-ana-25788",
+    "https://regiones.cafedeelsalvador.com/finca.php?id=82",
+    "https://www.proudmarycoffee.com.au/products/el-salvador-los-bellotos-bernardina-anaerobic-honey-sunset-filter-100g-2",
+    "https://sucafina.com/apac/offerings/el-salvador-pacamara-natural",
+    "https://sleepymangocoffee.com/products/el-salvador-santa-ana",
+    "https://www.cafeimports.com/europe/blog/2019/05/29/el-salvador-harvest-report-2019/",
+    "https://www.cafeimports.com/north-america/offerings?view=beanology.view.efrain-solis-finca-el-amoton-pacamara-washed-26496",
+    "https://www.cafeimports.com/north-america/offerings?view=beanology.view.luis-hernandez-finca-cerro-negro-pacas-washed-26504",
+    "https://allianceforcoffeeexcellence.org/farm-directory/87-48-2/",
+    "https://samplecoffee.com.au/coffee/gilberto-landaverde",
+    "https://shikishima.coffee/en/blogs/beans/el-salvador-jaime-guevara-pacamara",
+    "https://kurasu.pro/blogs/news/el-salvador-don-jaime",
+    "https://coffeelibre.kr/article/원두생두-가이드/1/14970/",
+    "https://royalcoffee.com/product/3427097000031047013/",
+    "https://www.haciendasajonia.com/the-estate/",
+    "https://farmdirectory.cupofexcellence.org/listing/8-la-laguna-nicaragua-2026-wet/",
+    "https://www.covoyacoffee.com/p612423-2-nicaragua-rfa-la-bastilla-estate-natural.html",
+    "https://www.allycoffee.com/coffees/la-escondida-javanica-washed/",
+    "https://www.covoyacoffee.com/origins/latin-america-caribbean/p615293-1-nicaragua-rfa-papales-ca.html",
+    "https://manhattancoffeeroasters.com/product/coffees/rare/la-escondida/",
+    "https://ozonecoffee.co.uk/blogs/in-my-mug-episodes/927-nicaragua-finca-limoncillo-ethiosar-washed",
+    "https://www.laminita.com/farms-mills/placeres",
+    "https://www.dropcoffee.com/products/limoncillo-washed-carturra-nicaragua",
+    "https://espressolabmicroroasters.com/products/nicaragua-limoncillo-matagalpa-copy",
+    "https://www.allycoffee.com/coffees/regional-nueva-segovia-caturra-catuai-washed-2026/",
+    "https://farmdirectory.cupofexcellence.org/listing/6-el-rosario-nicaragua-2026-dry/",
+    "https://farmdirectory.cupofexcellence.org/listing/8-un-regalo-de-dios-nicaragua-2026-dry/",
+    "https://www.thegoodsourcing.com/suyates",
+    "https://farmdirectory.cupofexcellence.org/listing/5-el-poste-nicaragua-2026-wet/",
+    "https://www.sweetmarias.com/nicaragua-ojo-de-agua-8445.html",
+    "https://rowancoffee.com/products/nicaragua-regalo-de-dios-2023",
+    "https://mareterracoffee.com/es/cafe-verde/albireo-cfwc_pro4311/",
+    "https://ozocoffee.com/products/nicaragua-la-pena-pacamara",
+    "https://counterculturecoffee.com/products/finca-la-victoria-java-variety",
+    "https://casetacoffee.com/en/products/nicaragua-natural-nueva-segovia",
+    "https://no6coffee.co/products/nicaragua-finca-libre-carbonic-maceration",
+    "https://allianceforcoffeeexcellence.org/farm-directory/87-22-3/",
+    "https://www.allycoffee.com/coffees/cafeologia-nelson-jimenez-bourbon-caturra-washed/",
+    "https://sucafina.com/emea/offerings/finca-santa-cruz-geisha-fw",
+    "https://www.allycoffee.com/coffees/cafeologia-la-finca-marsellesa-honey/",
+    "https://ritualcoffee.com/shop/coffee/finca-santa-cruz-mexico/",
+    "https://atomicroastery.com/products/mexico-chiapas",
+    "https://www.rutasdecafe.mx/product-page/chiapas-la-concordia",
+    "https://allianceforcoffeeexcellence.org/mexico-2022/",
+    "https://allianceforcoffeeexcellence.org/mexico-2026/",
+    "https://royalcoffee.com/product/3427097000052393319/",
+    "https://royalcoffee.com/product/3427097000052393331/",
+    "https://dof.gob.mx/nota_detalle_popup.php?codigo=5585437",
+    "https://farmdirectory.cupofexcellence.org/listing/4-finca-el-encino-mexico-2026-experimenta/",
+    "https://www.cafepluma.com.mx/",
+    "https://counterculturecoffee.com/products/pompilio-garcia-luna",
+    "https://cafen.co.uk/products/chelin-hydro-natural",
+    "https://cultcoffeeroasters.orderspace.com/products/25",
+    "https://montecoyote.com/shop/moonstar",
+    "https://www.cafelanacional.com/tienda/p/tklah9f6gfzst50kgxb6lxl6bqv4yr",
+    "https://almanegra.cafe/products/oaxaca-manto-niebla-hnos-villareal-lavado",
+    "https://cdn.royalcoffee.com/wp-content/uploads/2025/09/23081035/Crown-Jewel-Mexico-Washed-Marsellesa-Givette-Perez-Orea-CJ1636.pdf",
+    "https://densocafe.com/producto/adolfo/",
+    "https://lacoladera.com.mx/producto/cafe-finca-el-izote/",
+    "https://allianceforcoffeeexcellence.org/farm-directory/89-76-2/",
+    "https://www.sucafina.com/na/news/about-indonesia",
+    "https://www.covoyacoffee.com/p613877-1-indonesia-sumatra-lintong-nj.html",
+    "https://sucafina.com/na/offerings/sumatra-gayo-dp-gr-1",
+    "https://www.sucafina.com/na/offerings/trenggiling-wet-hulled",
+    "https://degayotour.com/gayo-arabica-specialty-coffee-producer-by-degayo-group/",
+    "https://www.covoyacoffee.com/p612744-2-indonesia-sumatra-lintong-wethulled.html",
+    "https://www.suedhang.org/en/product/asman-gayo/",
+    "https://nusacoffeecompany.com/products/sumatra-gayo",
+    "https://www.sweetmarias.com/collections/southeast-asia-coffee-shrub/products/sumatra-dry-process-ribang-gayo-8331",
+    "https://www.sweetmarias.com/collections/sumatra/products/sumatra-aged-lintong-5-year-vintage-8679?_fid=dab37de3c&_pos=1&_ss=c",
+    "https://coffeetgc.com/2021/03/25/lintong/",
+    "https://kunjaninaples.com/products/sumatra-buana-mandiri",
+    "https://www.horshamcoffeeroaster.co.uk/products/pagasing-anaerobic-natural",
+    "https://www.tradingpostcoffee.co.uk/collections/coffee/products/kerinci-indonesia-single-origin-speciality-coffee",
+    "https://parakarta.com/product/avatara-gayo-abyss-anoxia-natural-150gr-for-filter/",
+    "https://royalcoffee.com/product/3427097000019024025/",
+    "https://www.nordicapproach.no/post/what-makes-our-indonesian-coffee-so-special",
+    "https://drwakefield.com/coffees/java-kayumas/",
+    "https://www.nordicapproach.no/origin/indonesia",
+    "https://fountainrockcoffee.co.uk/collections/our-speciality-coffees/products/frinsa-sarapan-indonesia",
+    "https://roguewavecoffee.ca/products/indonesia-java-frinsa-estate-natural",
+    "https://www.horshamcoffeeroaster.co.uk/products/west-java-frinsa-collective-fermented-washed",
+    "https://paris-coffee-roasting-university.com/index.php/frinsa-edun-2-72-hours-fermentation/",
+    "https://toraja.coffee/id/produk/",
+    "https://thissideup.coffee/torajabuntuledo",
+    "https://app.tastify.com/sample-report/daf44b73-7c27-4840-9f9d-6f9462f1df34?id=891e0d6b-3c88-4b1c-9234-46922b7f03bb",
+    "https://royalcoffee.com/10-off-green-coffee/",
+    "https://sucafina.com/na/offerings/flores-laga-lizu-anaerobic-honey",
+    "https://indochinacoffee.com/coffee/indonesia-nola-wonga-2024/",
+    "https://www.lbfgroupitalia.com/en/indonesia-bajawa-forest-coffee---fully-washed.c499",
+    "https://nusacoffeecompany.com/products/flores-bajawa",
+    "https://www.sanagustin.com/en/product/bajawa/",
+    "https://kafedeflores.com/products/signature-limited",
+    "https://sucafina.com/na/news/sucafina-opens-wet-hulling-and-dry-mill-in-takengon",
+    "https://interamericancoffee.de/wp-content/uploads/2025/04/iac_offerlist_17-11-2025.pdf",
+    "https://www.nordicapproach.no/post/meet-the-producers-at-frinsa-estate-in-indonesia-innovation-quality-and-complete-control-from-seed-to-export",
+    "https://sucafina.com/na/offerings/lamari-washed",
+    "https://sucafina.com/emea/offerings/konkua-washed-organic",
+    "https://www.ictcoffee.com/product/papua-new-guinea-18376/",
+    "https://shop.zhyvagocoffeeroastery.coffee/products/beans-single-origin-papua-new-guinea-washed",
+    "https://gabrielcoffee.com.au/products/baroida-estate-papua-new-guinea-espresso-500g",
+    "https://www.wilsoncoffeeroasting.com/product-page/papua-new-guinea-purosa-a-fto",
+    "https://sucafina.com/na/offerings/western-highlands-washed",
+    "https://www.croptocup.com/community/mong-coffee/?community=161735",
+    "https://enjoycoffeeroasters.com/products/mong",
+    "https://www.dandycoffee.ca/shop/p/rexson-raguni-png-natural",
+    "https://coffeeboard.gov.in/coffee-regions-india.html",
+    "https://www.pib.gov.in/PressNoteDetails.aspx?ModuleId=3&NoteId=156255&id=156255&lang=1&reg=37",
+    "https://indiacoffee.co/our-coffees/coorg-robusta-washed-fermented-sandalkad-estate/",
+    "https://indiacoffee.co/",
+    "https://bluetokaicoffee.com/pages/kerehaklu-estate",
+    "https://uk.covoyacoffee.com/india-ratnagiri-vacuum-process-nano.html",
+    "https://www.agastyacoffee.com/product-page/kent-microlot",
+    "https://southindiacoffeeco.com/germplasm/selection-6/",
+    "https://hcikl.gov.in/pdf/Winning_Coffees_Brochure.pdf",
+    "https://bluetokaicoffee.com/products/kerehaklu-estate-blossom-culture",
+    "https://korerocoffee.com/products/kerehaklu-mosto-culture-washed",
+    "https://aviary.coffee/products/016-kerehaklu",
+    "https://cafeirreverentes.com/en/product/elsinverguenza/",
+    "https://gshotcoffeeroastery.com/collections/speciality-coffee/products/harangal-estate-washed",
+    "https://www.pinupcoffeeco.com/products/india",
+    "https://eu.covoyacoffee.com/origins/asia-pacific-islands/india-ratnagiri-estate-ab-eu.html",
+    "https://wayanad.gov.in/en/wayanad-robusta-coffee/",
+    "https://indiacoffee.co/our-coffees/wayanad-robusta-natural/",
+    "https://www.blackbazacoffee.com/products/luna",
+    "https://www.touton-specialty-coffee.com/en/p11792",
+    "https://bloomcoffeeroasters.in/products/hoysala-estate",
+    "https://drwakefield.com/coffees/india-bababudangiri/",
+    "https://www.origin-gi.com/wp-content/uploads/2022/02/608-bababudangiri-arabica.pdf",
+    "https://naivo.in/product/ratnagiri-estate-double-washed-classic/",
+    "https://www.khocoffee.com/new-page",
+    "https://republic.coffee/product/bourbon-dalat/",
+    "https://thecoffeevine.com/blog/giving-you-a-taste-of-vietnams-finest-coffees/",
+    "https://www.themarriedbeans.com/en/products/ca-phe-nhan-xanh-cau-dat",
+    "https://www.themarriedbeans.com/en/pages/about",
+    "https://chau-coffee.com/products/radar-farms-tha-1-reserve",
+    "https://visty.vn/san-pham/mountain-soul-ca-phe-nui-min/",
+    "https://www.themarriedbeans.com/en/pages/green-coffee-export",
+    "https://www.themarriedbeans.com/en/products/ca-phe-nhan-xanh-honey",
+    "https://fatmiilk.com/products/charisma",
+    "https://daklak.gov.vn/web/english/-/vietnam-s-specialty-robusta-coffee-selected-to-participate-in-coffee-baristas-competition-in-the-united-states",
+    "https://ipvietnam.gov.vn/documents/20195/811934/Ch%E1%BB%89%2Bd%E1%BA%ABn%2B%C4%91%E1%BB%8Ba%2Bl%C3%BD%2B%E2%80%93%2BDi%2Bs%E1%BA%A3n%2Bthi%C3%AAn%2Bnhi%C3%AAn%2Bv%C3%A0%2Bv%C4%83n%2Bh%C3%B3a%2BVi%E1%BB%87t%2B%28ti%E1%BA%BFng%2BAnh%29.pdf/1b470795-c617-4229-ba74-7c1b5f20457a",
+    "https://caphedacsanvietnam.vn/products/dam-coffee-farm-1",
+    "https://www.ipvietnam.gov.vn/vi/web/english/domestic-ip-activities/-/asset_publisher/ZMuTgR44COLR/content/amendment-of-geographical-indication-registration-certificate-buon-ma-thuot-for-coffee-products?inheritRedirect=false",
+    "https://www.everyhalf.vn/post/4cc48115",
+    "https://www.everyhalf.vn/post/crop-of-bravery-h%C6%B0%C6%A1ng-v%E1%BB%8B-c%C3%A0-ph%C3%AA-qu%C3%AA-h%C6%B0%C6%A1ng",
+    "https://soulcoffee.vn/products/soulful2025-nong-espresso-fine-ro-top7-vietnam-coffee-producer",
+    "https://mtexpor.com/en/arabica-full-washed/",
+    "https://www.honestmocha.com/coffee-varieties",
+    "https://coffee-yemen.com/coffee-types/",
+    "https://cdn.royalcoffee.com/wp-content/uploads/2025/10/20193140/Crown-Jewel-Yemen-Anaerobic-Natural-Sharqi-Haraz-Cooperative-CJ1645.pdf",
+    "https://cdn.royalcoffee.com/wp-content/uploads/2026/06/15164206/Crown-Jewel-Yemen-Washed-Sharqi-Haraz-Cooperative-CJ1677.pdf",
+    "https://www.caffefusari.it/en/product/yemen-da-tradurre-en",
+    "https://m.coffeelibre.kr/product/detail.html?cate_no=100&display_group=1&product_no=6749",
+    "https://www.almokha.com/pages/bani-matar",
+    "https://library.sweetmarias.com/coffee-producing-countries/arabian-coffee-overview/yemen-coffee-overview/",
+    "https://www.coffee-tech.co.nz/product/yemen-udaini-ameer-al-matari-lot-205/",
+    "https://qahwahclub.com/products/yemen-bani-matar",
+    "https://lccroastery.com/2020/05/15/yemen-mocha-matari/",
+    "https://cafe-torifa.fr/en/products/cafe-yemen-al-haymah-al-kharijiyah-copy-1",
+    "https://melbournecoffeemerchants.com.au/coffee/juana-mamani/",
+    "https://melbournecoffeemerchants.com.au/coffee/la-linda-java/",
+    "https://melbournecoffeemerchants.com.au/harvest-update-bolivia/",
+    "https://melbournecoffeemerchants.com.au/coffee/la-llama-coco-natural/",
+    "https://swansongcoffee.squarespace.com/coffee/p/bolivia-senda-sevaje",
+    "https://muyu.coffee/shop/p/caranavi-aaa",
+    "https://typica.coffee/es/lots/bo-2024-011-finca-senda-salvaje-java-doublewashed",
+    "https://muyu.coffee/shop/p/geisha-washed-finca-isabel",
+    "https://melbournecoffeemerchants.com.au/coffee/floripondio-java-coco-natural/",
+    "https://melbournecoffeemerchants.com.au/coffee/los-rodriguez-washed/",
+    "https://melbournecoffeemerchants.com.au/coffee/floripondio-sl34-washed/",
+    "https://www.exposuretherapycoffee.com/shop/p/guatemala-guacamaya-dzffb-tlzmx-sdf8e-sxnx6",
+    "https://onacoffee.com.au/blogs/brewguides/bolivia-finca-floripondio-samaipata-batian-natural",
+    "https://cafexporto.com/hacienda-la-papaya/",
+    "https://cafexporto.com/lots/ref-19-la-papaya-typica-mejorado",
+    "https://ptscoffee.com/products/la-papaya-gesha-washed",
+    "https://allianceforcoffeeexcellence.org/ecuador-farmers-collection-2026/",
+    "https://royalcoffee.com/product/3427097000010940059/",
+    "https://www.seycoffee.com/products/2026-mery-garcito-finca-la-bendicion-ecuador",
+    "https://www.valleandinocoffee.com/products/sidra",
+    "https://driproasters.ch/products/ecuador-la-papaya",
+    "https://shop.gardellicoffee.com/sold-out/592-yambamine-sidra-ecuador",
+    "https://idlehandsroasting.com/archive/p/ecuador-el-dorado-anaerobic-washed-sl28",
+    "https://philsebastian.com/collections/producer-coffees/products/clara-luz-geisha-natural",
+    "https://coffeesensory.co/products/vinka-sidra",
+    "https://mokcoffee.be/products/ecuador-el-alisal-sidra-washed",
+    "https://qimacoffee.v-auction.com/en/lots/servio-gonzales---geisha-1",
+    "https://origin.caravela.coffee/ec_loja-copy",
+    "https://typica.coffee/en/lots/ec-2023-009-carlos-realpe-sidra-bourbon-washed",
+    "https://www.thecoffeequest.com/finca-cruz-loma/",
+    "https://www.seycoffee.com/products/cruz-loma",
+    "https://www.algrano.com/en/products/8812-ecuador-meridiano-typica-mejorado-washed-arabica-fully-washed-may-sep-2025",
+    "https://roguewavecoffee.ca/blogs/education-journal/origin-ecuador-finca-cruz-loma-galo-morales-flores",
+    "https://amativo.com/sanagustine/",
+    "https://www.genuineorigin.com/uganda-mt-elgon-aa-washed-2024",
+    "https://wholesale.roundhillroastery.com/products/442",
+    "https://counterculturecoffee.com/products/mountain-harvest",
+    "https://www.cannoncoffee.co.uk/products/uganda-mt-elgon",
+    "https://www.genuineorigin.com/site/images/factsheets/factsheet-GEN20UGA.pdf",
+    "https://www.genuineorigin.com/site/images/factsheets/factsheet-GEN21UGA.pdf",
+    "https://www.genuineorigin.com/site/images/factsheets/factsheet-GEN22UGA.pdf",
+    "https://www.genuineorigin.com/uganda-rwenzori-kasese-natural-2026",
+    "https://www.genuineorigin.com/uganda-rwenzori-bugoye-washed-2023",
+    "https://agrievolve.com/kalingwe-natural-2/",
+    "https://johnburton.co.nz/wp-content/uploads/2025/08/CHI01-China-SIMAO-G1.pdf",
+    "https://kbcoffeeroasters.com/products/chine-ximen-cimizhu-copie",
+    "https://indochinacoffee.com/coffee/china-fuyan-2024/",
+    "https://shufromyunnan.com/pages/roasters-green-bean-is-here",
+    "https://mellowcoffeeroasters.com/products/tianhao-red-natural-anerobic-catimor",
+    "https://ynmz.yn.gov.cn/cms/binzangfuwu.html",
+    "https://www.fao.org/one-country-one-priority-product/asia-pacific/good-practices/detail/coffee-xinzhai-baoshan-yunnan-china/en",
+    "https://www.specialtycoffee.jp/beans/3159.html",
+    "https://www.harmonycoffee.co.uk/products/red-sparrow-1",
+    "https://www.baoshan.gov.cn/info/5730/9907384.htm",
+    "https://obadiahcoffee.com/products/red-dragon-estate",
+    "https://ninthcoffeeroasters.com/products/red-dragon-estate-china",
+    "https://indochinacoffee.com/coffee/thailand-sirinya-natural-2024/",
+    "https://itdfinternational.org/green-bean-buyers/",
+    "https://allianceforcoffeeexcellence.org/thailand-2023/",
+    "https://allianceforcoffeeexcellence.org/thailand-2026/",
+    "https://www.lbfgroupitalia.com/tailandia-thailand-sirinya-natural-anaerobic.c511",
+    "https://utopiancoffee.com/collections/all/products/thai-huai-mae-liam",
+    "https://indochinacoffee.com/coffees/thailand_origins/",
+    "https://ceresiacoffeeroasters.com/product/mae-toey/",
+    "https://www.preda-roastinghouse.com/en/blog/11197/soe-ae-drinkable-forest",
+    "https://cdn.royalcoffee.com/wp-content/uploads/2025/03/07102427/Crown-Jewel-Timor-Leste-Organic-Ducurai-Cafe-Brisa-Serena-Washed-CJ1603.pdf",
+    "https://www.northstarroast.com/products/timor-leste-samoro-washed",
+    "https://www.deargreencoffee.com/products/specialty-coffee-timor-leste-washed",
+    "https://presscoffee.com/collections/limited-single-origin/products/east-timor-ermera",
+    "https://projectorigin.coffee/wp-content/uploads/2022/07/TIM_Aileu_2023.pdf",
+    "https://blackboardcoffee.com.au/blogs/the-coffee-board/our-natural-timor-leste",
+    "https://www.guatemalancoffees.com/main/regions-and-profiles/acatenango-valley/",
+    "https://www.unexguatemala.com/en/",
+    "https://www.chalabalestrella.com/export",
+    "https://www.allycoffee.com/coffees/mercedes-de-catalan-red-bourbon-washed/",
+    "https://www.allycoffee.com/coffees/finca-tehuya/",
+    "https://haceacoffee.com/collections/green-coffee/products/guatemala-acatenango-finca-el-mirador-stuardo-coto-gesha-washed",
+    "https://burnettcoffee.com/products/guatemala-gesha-acatenango-90-7",
+    "https://coffeelibre.kr/article/%EC%9B%90%EB%91%90%EC%83%9D%EB%91%90-%EA%B0%80%EC%9D%B4%EB%93%9C/1/13864/",
+    "https://melbournecoffeemerchants.com.au/coffee/la-merced-natural/",
+    "https://www.guatemalancoffees.com/main/regions-and-profiles/volcanic-san-marcos/",
+    "https://royalcoffee.com/product/3427097000010928491/",
+    "https://www.anacafe.org/premiacion-Region-I-2025/",
+    "https://boldbeancoffee.com/pages/el-platanillo-anaerobic-pacamara-rcc",
+    "https://www.rastshop.ch/de/herminio-bio",
+    "https://shopbeansandrice.com/pages/farms",
+    "https://www.guatemalancoffees.com/main/regions-and-profiles/fraijanes-plateau/",
+    "https://www.primavera.coffee/news/2019/01/16/2019-1-21-new-name-same-core-values",
+    "https://fincalasilusiones.com/en/lasiIlusioneshistoria/",
+    "https://scenery.coffee/products/guatemala-fredy-orantes-buena-vista-pacamara-25-26",
+    "https://interamericancoffee.com/guatemala-el-santo/",
+    "https://tinyhousecoffeeroasters.com/products/guatemala",
+    "https://hola.coffee/products/guatemala-nueva-montana",
+    "https://www.guatemalancoffees.com/main/regions-and-profiles/new-oriente/",
+    "https://sucafina.com/apac/offerings/boqueron-oriente-natural",
+    "https://www.belco.fr/cafes/012001102600000/los-manantiales",
+    "https://melbournecoffeemerchants.com.au/coffee/el-morito/",
+    "https://www.peacockscoffee.com/coffee/p/el-morito-guatemala",
+    "https://redfoxcoffeemerchants.com/puno-better-than-ever/",
+    "https://drwakefield.com/wp-content/uploads/2022/02/Puno-Coffee-Conservation-Project-1.pdf",
+    "https://flowerchildcoffee.com/products/joaquin-lipa-bourbon",
+    "https://friedhats.com/products/peru-anastacio-mamani-omni",
+    "https://sweetbloomcoffee.com/products/vilma-chambi",
+    "https://www.ultimocoffee.com/shop/juan-quilla-laura-peru",
+    "https://www.atp.gob.pa/wp-content/uploads/2025/03/7-El-Mejor-Cafe_ingles.pdf",
+    "https://www.father.coffee/products/finca-hartmann-washed-geisha-chiriqui",
+    "https://www.panamavarietals.coffee/copy-of-finca-bernardina",
+    "https://www.sucafina.com/na/offerings/hartmann-pacamara-winey",
+    "https://archerscoffee.com/products/panama-project-hachi-rocky-mountain-hatsuko",
+    "https://unspecialty.com/product/detail.html?product_no=839",
+    "https://www.seycoffee.com/products/2025-jose-gallardo-nuguo-lot-850nws-panama",
+    "https://archerscoffee.com/products/finca-auromar-firestone-geisha-washed",
+    "https://melbournecoffeemerchants.com.au/coffee/kimbo-aa/",
+    "https://sucafina.com/emea/offerings/ndunduri-embu-ab",
+    "https://www.seycoffee.com/products/2026-guchienda-estate-aa-separation-kenya",
+    "https://www.seycoffee.com/products/2025-mbature-family-kamavindi-estate-sl28-kenya",
+    "https://www.sucafina.com/emea/offerings/guji-shakiso-fw-gr-2-organic",
+    "https://www.atlascoffee.com/coffee/bali/",
+    "https://opal.coffee/selections/bloom-coffee-project/",
+    "https://olisipo.coffee/product/karana/",
+    "https://royalcoffee.com/product/3427097000042473242/",
+    "https://www.heqa.coffee/products/mi-006-1-cm-pulped-natural",
+    "https://presscoffee.com/products/bali-kintamani-1",
+    "https://www.allycoffee.com/coffees/imperio-rojo-micromill-las-brisas-kenia-honey/",
+    "https://www.allycoffee.com/coffees/don-senel-micromill-cola-roja-catigua-natural-reposa/",
+    "https://www.allycoffee.com/coffees/corazon-de-jesus-el-salitre-typica-geo-natural/",
+    "https://methodicalcoffee.com/collections/limited-releases/products/costa-rica-el-renacer",
+    "https://unspecialty.com/product/detail.html?product_no=822",
+    "https://tastepuravida.com/cafe-la-chelita/",
+    "https://www.geshavillage.com/the-village/",
+    "https://www.geshavillage.com/",
+    "https://www.geshavillage.com/product/lot-number-26-116/",
+    "https://www.geshavillage.com/product/lot-number-26-063/",
+    "https://en.thepickychemist.com/product-page/ethiopia-gesha-village-lot-25-046",
+    "https://mabo.coffee/en/products/bench-maji-ethiopia-washed-cafea-de-specialitate",
+    "https://shop.gardellicoffee.com/sold-out/640-el-placer-pink-bourbon-colombia",
+    "https://scenery.coffee/blogs/coffee-archive/66-plot-x-scenery-el-fenix-wush-wush-crop-24-25-archive",
+    "https://greencoffeecollective.com/products/colombia-el-fenix-tabi-washed-anoxic",
+    "https://rawmaterial.coffee/el-fenix-info",
+    "https://darkwoodscoffee.co.uk/blogs/news/producer-focus-sebastian-ramirezs-el-placer",
+    "https://boterocoffee.com/products/strawberry-shake-green-coffee",
+    "https://passportcoffee.com.au/blogs/roastery-ramblings/colombia-campo-hermoso-wush-wush-natural",
+    "https://unspecialty.com/product/detail.html?product_no=765",
+    "https://www.cafequindio.com.co/products/geisha",
+    "https://namusairo.com/article/아카이브/13/4250/",
+    "https://thebarn.de/products/casa-negra",
+    "https://cafegranjalaesperanza.com/products/sudan-rume-hybrid-washed",
+    "https://cafegranjalaesperanza.com/products/geisha-napoleon",
+    "https://xliiicoffee.com/en/product/cerro-azul-00281-by-cgle/",
+    "https://ptscoffee.com/products/sudan-rume-natural",
+    "https://valle.federaciondecafeteros.org/listado-noticias/cafes-vallecaucanos-ganaron-importante-distincion-internacional/?lang=en",
+    "https://www.reframecoffee.com/shop/colombia-lusitania/",
+    "https://cafegranjalaesperanza.com/pages/coffees",
+    "https://nomadcoffee.es/products/eugenioides",
+    "https://incaper.es.gov.br/cafeicultura",
+    "https://incaper.es.gov.br/centro-de-cafes-especiais-do-espirito-santo-cecafes",
+    "https://www.allycoffee.com/coffees/sitio-bela-vista-red-catuai/",
+    "https://www.allycoffee.com/coffees/sitio-alto-lagoa-delio-sering-catucai-washed/",
+    "https://www.algrano.com/en/products/8822-brazil-rota-do-lagarto-alto-santa-rosa-arabica-fully-washed-sep-2025",
+    "https://www.blacktucanocoffee.com/products/assinatura-cafe-black-tucano-single-origin-torrado-e-em-graos-250g",
+    "https://www.allycoffee.com/coffees/sitio-bateia-jose-fernando-fortunato-red-catucai-pulped-natural/",
+    "https://www.aquiares.com/",
+    "https://kissthehippo.com/products/aquiares-estate",
+    "https://www.allycoffee.com/coffees/aquiares-estate-centroamericano-anaerobic-honey/",
+    "https://docr.coffee/products/costa-rica-aquiares-estate-mariana-natural",
+    "https://www.icafe.cr/nuestro-cafe/regiones-cafetaleras/orosi/",
+    "https://www.cafeconamor-cr.com/zalmari",
+    "https://www.cultivacoffee.com/americas/costacca-z3jnn",
+    "https://www.honest.coffee/marcelleza-honey",
+    "https://www.ninjagirlcoffee.com/shop/p/kimura",
+    "https://www.icafe.cr/nuestro-cafe/regiones-cafetaleras/tres-rios/",
+    "https://www.laminita.com/farms-mills/la-magnolia",
+    "https://torque.coffee/blogs/coffee-drops/coffee-set-2",
+    "https://cafebocanegra.com/en/products/tres-rios",
+    "https://www.botacoffee.eu/rwanda-gicumbi/",
+    "https://www.freshroastedcoffee.com/blogs/roasters-choice/rwanda-washed-rwamiko-july-2026",
+    "https://teso.coffee/en/coffee/gicumbi-3/",
+    "https://cafeberriondo.com/product/cafe-especial-finca-la-esperanza-lavado/",
+    "https://www.roastedrecord.com/products/laderas-del-tapias-natural-catiope",
+    "https://timbertraincoffeeroasters.com/shop/laderas-del-tapias-colombia/",
+    "https://goodhustlecoffee.com.au/products/colombia-anserma-caldas-sugarcane-decaf-washed",
+    "https://atricoffee.com/products/colombia-geisha-1",
+    "https://yume.coffee/en_US/shop/product/cafea-col-mis-250g-colombia-mauricio-duque-dulce-misterio-geisha-washed-250g-1798",
+    "https://www.themarriedbeans.com/en/products/ca-phe-red-bourbon",
+    "https://www.themarriedbeans.com/en/products/ca-phe-nhan-xanh-ca-phe-s%E1%BB%91ng-ch%C6%B0a-rang-nhan-xanh-arabica-yellow-cherry-lam-d%E1%BB%93ng-goi-500g-copy",
+    "https://www.themarriedbeans.com/en/products/ca-phe-kho",
+    "https://www.cumpa.de/en/p/00164/",
+    "https://www.bluehourcoffee.co.uk/shop-coffee/p/vietnam-double-washed-9wzbs",
+    "https://www.seycoffee.com/products/refisa",
+    "https://fuglencoffee.jp/en/blogs/coffee-beans/riripa-organic",
+    "https://www.littlefish.coffee/shop/p/riripaorganic",
+    "https://www.allycoffee.com/coffees/west-arsi-riripa-natural/",
+    "https://hscoffeeroasters.com/products/peru-efrain-carhuallocllo",
+    "https://allianceforcoffeeexcellence.org/farm-directory/92-71/",
+    "https://www.jacoffee.com/pages/mikava",
+    "https://onyxcoffeelab.com/products/colombia-la-riviera-sl28",
+    "https://typica.coffee/en/lots/co-2024-144-caf-uba-castillo-other",
+    "https://elobraje.com/",
+    "https://shikishima.coffee/en/blogs/beans/bolivia-finca-isabel-geisha",
+    "https://bursaspecialitycoffee.com/",
+    "https://snap-coffee.com/chelbesa/",
+    "https://www.dayebensacoffee.com/kormakontoma",
+    "https://tarikucoffee.com/product/",
+    "https://royalcoffee.com/product/3427097000009444035/",
+    "https://allianceforcoffeeexcellence.org/farm-directory/91-04-3/",
+    "https://www.wonderroom.co.kr/bean/40260",
+    "https://fliphtml5.com/Feleke/rnrr/TDBG_-_Company_Profile/",
+    "https://www.allycoffee.com/coffees/aricha-washed/",
+    "https://blessbean.com/page/3/",
+    "https://www.eaagads.co.ke/",
+    "https://www.wonderroom.co.kr/promotion/295",
+    "https://www.belco.fr/en/cafes/012203700100100/oreti-estate",
+    "https://archerscoffee.com/products/guatemala-finca-la-serrania-kimono-natural",
+    "https://laserrania.com.gt/ja/specialty-coffee/",
+    "https://melbournecoffeemerchants.com.au/coffee/la-bella/",
+    "https://nylon.coffee/products/honduras-el-puente",
+    "https://boldbeancoffee.com/en-ca/pages/honduras-sl28-rcc",
+    "https://www.fincaelpuentecoffee.com/our-coffee/farms",
+    "https://acidcoffee.stores.jp/items/68711a95b8b299620e522b21",
+    "https://ipvietnam.gov.vn/tin-tuc-su-kien/-/asset_publisher/7xsjBfqhCDAV/content/bao-ho-chi-dan-ia-ly-lam-ong-cho-san-pham-ca-phe/pop_up%3F_101_INSTANCE_7xsjBfqhCDAV_viewMode%3Dprint",
+    "https://www.cumpa.de/en/p/00168/",
+    "https://chloe-caphe.com/products/coffea-canephora",
+    "https://sucafina.com/na/offerings/acacia-hills-fw",
+    "https://nomadcoffee.es/en/products/acacia-hills-gesha",
+    "https://www.derivacoffee.com/en/shop/p/acacia-hills-gesha",
+    "https://www.cumpa.de/en/origin-story/loc-rung/",
+    "https://www.croptocup.com/community/loc-rung/",
+    "https://pariwisata.manggaraikab.go.id/destinasi/mbohang/",
+    "https://sucafina.com/na/offerings/eastern-highlands-tabua-ax-washed",
+    "https://zanyacoffee.com/",
+    "https://www.croptocup.com/community/zanya-coffee/",
+    "https://kimacoffee.com/products/al-subaih-special-reserve-yemenia-cafe-de-yemen-tostado-en-malaga-por-kima-coffee",
+    "https://www.tribesofmokha.com/products/hayma-dakhiliya",
+    "https://smaycoffee.au/products/china-yao-de-xian-the-nest-manor-mercury",
+    "https://hscoffeeroasters.com/products/yemen-al-ofairi",
+    "https://unspecialty.com/product/detail.html?product_no=867",
+    "https://allianceforcoffeeexcellence.org/farm-directory/91-81-2/",
+    "https://www.micoffee.co.kr/goods/goods_view.php?goodsNo=1000006238",
+    "https://no6coffee.co/en-us/products/puerta-verde-bourbon-washed",
+    "https://sucafina.com/emea/offerings/corazon-de-jesus-vista-paraiso-catigua-red-honey",
+    "https://www.fincaaguilarperalta.com/",
+    "https://atomicroastery.com/products/guatemala-ayarza",
+    "https://www.thehuboug.com/product/honduras-el-puente-washed/",
+    "https://thewordcoffee.com/products/tepanguare-anaerobic-honey-honduras",
+    "https://detourcoffee.com/collections/dark-horse/products/honduras-el-pedregal-espresso",
+    "https://www.altiericoffee.com/lotes-geisha",
+    "https://theespressolab.com/products/finca-nuguo-453-panama-d94-8oz",
+    "https://www.agricoladelcafetal.com/",
+    "https://www.microroastery.co.uk/blogs/news/behind-the-beans-finca",
+    "https://cdn.royalcoffee.com/wp-content/uploads/2017/03/21133204/CJ1119PanamaHorquetaLaBerlinaNaturalGeishaCrownJewel.pdf",
+    "https://momoscoffee.net/products/ecuador-lugmapata-sidra-washed-lot-2",
+    "https://haceacoffee.com/products/ecuador-chimborazo-pallatanga-finca-lugmapata-enrique-merino-typica-mejorado",
+    "https://thewordcoffee.com/en/products/coe-2025-santa-teresa-geisha-peru",
+    "https://fincamiraflores.com/wp-content/uploads/2025/10/Geisha-natural.pdf",
+    "https://cdn.royalcoffee.com/wp-content/uploads/2023/11/05135148/Crown-Jewel-Peru-Organic-Palomar-Dagoberto-Marin-Ludena-Biodynamic-Washed-CJO1544.pdf",
+    "https://schotcoffeeroasters.nl/webwinkel/coffee/peru/peru-blanca-campos/",
+    "https://www.penstockcoffee.com/archive/p/la-palma-y-el-tucan-gesha-2019-coffee",
+    "https://www.cremaandcream.ph/products/finca-soledad-sidra-wave-natural-copy",
+    "https://www.adr.gov.co/cafe-el-turpial-asociacion-de-caficultores-de-cafe-especial-de-cumbitara-es/",
+    "https://entropicacoffee.com/products/coffee-collective-takesi-gesha-120g",
+    "https://scenery.coffee/blogs/coffee-archive/169-ecuador-chorora-red-washed-mejorado-crop-25-26-archive",
+    "https://goodwith.us/products/peru-chaupe-alto",
+    "https://sites.google.com/view/coffeeplacearchive/커피플레이스-아카이브/오늘의-커피/2025년/페루-엘-나랑호-게이샤-peru-el-naranjo-geisha-2024-coe-10",
+    "https://allianceforcoffeeexcellence.org/peru-2024/",
+    "https://piuraemprendedora.regionpiura.gob.pe/noticias/11503",
+    "https://www.micoffee.co.kr/goods/goods_view.php?goodsNo=1000005497",
+    "https://sangoamsterdam.com/products/kenya-nyamira",
+    "https://tuloncoffee.com/products/nandi-coffee",
+    "https://www.pro-filecoffee.com/projects/busanze-washing-station",
+    "https://mareterracoffee.com/es/cafe-verde/segin-ffr_pro3899/",
+    "https://idlehandsroasting.com/archive/p/ethiopia-halo-beriti-natural-gr1",
+    "https://valor.coffee/shop/ambrosia-ethiopia",
+    "https://karamocoffeeexport.com/index.php/washing-station/",
+    "https://atomicroastery.com/products/ethiopia-gelana-abaya",
+    "https://burmancoffee.com/ethiopian-yirgacheffe-gr-2-washed-gelana-abaya/",
+    "https://www.dayebensacoffee.com/rumudamo",
+    "https://www.trabocca.com/our-coffees/ethiopia/guji/gogogu/",
+    "https://redfoxcoffeemerchants.com/three-forests-the-guji-uraga-story/",
+    "https://constance.coffee/product/gisanga/",
+    "https://nylon.coffee/shop",
+    "https://nylon.coffee/blogs/transparency/2025-price-transparency-report",
+    "https://mariagecoffee.kr/product/%EC%BC%80%EB%83%90-%EB%9A%B1%EA%B5%AC%EB%A6%AC/764/category/90/display/1/",
+    "https://mareterracoffee.com/en/green-coffee/icarus-nsb-padre_pro4520/",
+    "https://www.joebyschmo.com/product/kenya-nyeri--tetu-mungaria-ab/",
+    "https://www.nyeri.go.ke/wp-content/uploads/2026/02/Approved-ADP-2026-2027.pdf",
+    "https://stellarkl.com/products/my-liberica-jh",
+    "https://myliberica.com.my/farm-visit/",
+    "https://donalfredocoffee.com/products/las-mercedes-farm-winey-single-origin",
+    "https://dominican.coffee/producto/don-alfredo-diaz-winey/",
+    "https://www.linkedin.com/posts/qima-caf%C3%A9_few-places-in-the-world-hold-as-much-coffee-activity-7393605822565498882-__pH",
+    "https://unspecialty.com/product/detail.html?product_no=389",
+    "https://madagascarcoffeecompany.com/pages/our-coffees",
+    "https://beanslookercoffee.com/blogs/news/maneepruek-village-thailand-specialty-coffee",
+    "https://buicoffeesupply.com/ve-chung-toi/",
+    "https://www.inmaculadacoffeefarms.com/about-us",
+    "https://fuglencoffee.live/en/blogs/coffee-beans/jaguara-brazil-1",
+    "https://cafetipica.com/producto/gesha-lavado-domingo-torres/",
+    "https://www.desarrolladores.cafe/en/aliados/liliana-ramirez/",
+    "https://vinkacoffee.com/es",
+    "https://cumbres.com.co/our-farms/lareserva/",
+    "https://elevate.coffee/2023/12/05/bolivianita/",
+    "https://coffeelibre.kr/product/소분-브라질-노사-세뇨라-다-아파레시다-내추럴/5849/",
+    "https://longboardcoffees.com/the-coffee/",
+    "https://scap-panama.com/finca-sophia/",
+    "https://mazelabcoffee.com/products/los-cenizos",
+    "https://scap-panama.com/finca-los-cenizos/",
+    "https://scap-panama.com/santamaria-estate-coffee/",
+    "https://scap-panama.com/cafe-don-benjie/",
+    "https://philsebastian.com/collections/producer-coffees/products/mario-foneca-pacamara-natural",
+    "https://pht.coffee/",
+    "https://scap-panama.com/damarli-estate-panama/",
+    "https://www.auromarpanama.com/auromarcontact",
+    "https://sucafina.com/emea/offerings/mi-finquita-caturra-natural",
+    "https://www.ninetypluscoffee.com/",
+    "https://xn--cafguerra-d4a.com/",
+    "https://omacoffeeroaster.com/products/panama-hacienda-barbara-los-brujos-catuai-washed",
+    "https://www.aprilcoffeeroasters.com/pages/el-soccoro-gesha-infos",
+    "https://allianceforcoffeeexcellence.org/farm-directory/91-53-2/",
+    "https://sucafina.com/emea/offerings/el-pinal-maracaturra-fw",
+    "https://awsus.opal.coffee/selections/guatemala/",
+    "https://sucafina.com/na/offerings/finca-vizcaya-fw",
+    "https://greencoffeecollective.com/products/guatemala-amatillo-natural-coffee",
+    "https://burmancoffee.com/product/green-coffee-beans/guatemalan-stardust/",
+    "https://worldcoffeeresearch.org/download/dc738b50-8024-438f-8699-0b95cd9cb71a",
+    "https://www.freshroastedcoffee.com/blogs/roasters-choice/mar-2023",
+    "https://fincalosconejos.com/inicio/",
+    "https://ihcafe.hn/lote-25/",
+    "https://cafetenango.net/2026/05/13/parainema_tasting/",
+    "https://coffeelibre.cafe24.com/about/us.html",
+    "https://www.ilustrecoffee.com/en-us/pages/jose-arguello",
+    "https://allianceforcoffeeexcellence.org/farm-directory/90-47-4/",
+    "https://coa.coffee/product/edomex-la-ilusion/",
+    "https://caminocoffee.nl/en/products/finca-el-conacaste",
+    "https://regiones.cafedeelsalvador.com/finca.php?id=149",
+    "https://www.neighbourhoodcoffee.com/products/kenya-kirurumwe-farmers-cooperative-society-washed-copy",
+    "https://www.artisangreenbean.com/project-origin/el-salvador/plan-del-hoyo",
+    "https://districtroasters.com/products/el-salvador-san-antonio-honey-process",
+    "https://allianceforcoffeeexcellence.org/el-salvador-2024/",
+    "https://www.orcoffee.com/pages/discover-the-essence-of-el-salvador-el-angel-a-specialty-coffee-for-espresso",
+    "https://www.gsc.coffee/goods/goods_view.php?goodsNo=1000001147",
+    "https://cdn-pro-web-211-225.cdn-nhncommerce.com/doyhwatr3512_godomall_com/data/editor/goods/241030/17ffa06d75692098f2eca8b7bdd8c545_113521.jpg",
+    "https://cdn-pro-web-211-225.cdn-nhncommerce.com/doyhwatr3512_godomall_com/data/editor/goods/241030/7a80027d45c4b66257559a8ea93cd6ce_113522.jpg",
+    "https://www.covoyacoffee.com/p609557-5-honduras-glenda-suyapa-hernandez.html",
+    "https://vimeo.com/862582585",
+    "https://projectorigin.coffee/wp-content/uploads/2024/04/COL_DidierFierro_FincaVillaDiana_2023.pdf",
+    "https://warawul.coffee/en/products/el-rodeo-gesha",
+    "https://coffeespell.co.kr/product/detail.html?product_no=917",
+    "https://coffeespell.co.kr/web/upload/NNEditor/20260413/0024735dcb0303757ec71b3ad427aa4e.jpg"
+  ],
+  "unresolved": [
+    {
+      "productNo": 811,
+      "originalName": "[8.10 오픈] #15 케냐 뚱구리 SL28 SL34 AA 풀리 워시드",
+      "regionId": null,
+      "decision": "보류: 동명 Thunguri 밀 및 공개 판매자료 Nyeri/Kirinyaga 충돌. 이 상품의 협동조합/수입사 또는 원문 산지 카드 필요. 독립검증된 Mariage·Leicht·Mare Terra 자료의 무쿠르웨이니는 별도 신규지역으로 등록 가능하나 811 원두의 확정 귀속은 보류.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://leichtcoffeeroasters.com/products/kenya-thunguri-natural-heavy",
+        "https://mareterracoffee.com/en/green-coffee/icarus-nsb-padre_pro4520/",
+        "https://mariagecoffee.kr/product/%EC%BC%80%EB%83%90-%EB%9A%B1%EA%B5%AC%EB%A6%AC/764/category/90/display/1/",
+        "https://proudmarycoffee.com/products/kenya-thunguri-sl28-sl34-natural"
+      ]
+    },
+    {
+      "productNo": 811,
+      "originalName": "[8.17 오픈] #20 케냐 뚱구리 SL28 SL34 내추럴 헤비",
+      "regionId": null,
+      "decision": "보류: 15번과 동일한 동명/지역 충돌. 내추럴이라는 이유만으로 Rumukia에 귀속하지 않음. 독립검증된 Mariage·Leicht·Mare Terra 자료의 무쿠르웨이니는 별도 신규지역으로 등록 가능하나 811 원두의 확정 귀속은 보류.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://leichtcoffeeroasters.com/products/kenya-thunguri-natural-heavy",
+        "https://mareterracoffee.com/en/green-coffee/icarus-nsb-padre_pro4520/",
+        "https://mariagecoffee.kr/product/%EC%BC%80%EB%83%90-%EB%9A%B1%EA%B5%AC%EB%A6%AC/764/category/90/display/1/",
+        "https://proudmarycoffee.com/products/kenya-thunguri-sl28-sl34-natural"
+      ]
+    },
+    {
+      "productNo": 811,
+      "originalName": "#36 온두라스 엘 푸엔테 산 이시드로 게이샤 워시드 108J",
+      "regionId": null,
+      "decision": "생산자는 Chinacla·San José·Marcala·Santa Ana 여러 지역에서 재배. 108J San Isidro 정확 구획 위치 미확정. 상품의 세부 지역 검색 연결 보류; Chinacla는 별도 Nylon 로트로 등록.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://www.fincaelpuentecoffee.com/our-coffee/farms"
+      ]
+    },
+    {
+      "productNo": 811,
+      "originalName": "[8.7 깜짝 오픈] #56 콜롬비아 엘 파라이소 게이샤 워시드",
+      "regionId": null,
+      "decision": "보류: Diego Bermudez Cauca 후보가 있으나 811에는 생산자 식별자 없고 동명농장 다수. 이 자료만으로 Piendamo 배정 금지.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://www.fincaelparaiso.com/product-detail/7-clasic-geisha-washed"
+      ]
+    },
+    {
+      "productNo": 520,
+      "originalName": "India Mysore Nuggets Washed 50%",
+      "regionId": null,
+      "decision": "grade/trade name or overly broad highlands; no specific geographic origin established",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": []
+    },
+    {
+      "productNo": 400,
+      "originalName": "Papua New Guinea Highland WNM Selection Washed 20%",
+      "regionId": null,
+      "decision": "grade/trade name or overly broad highlands; no specific geographic origin established",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": []
+    },
+    {
+      "productNo": 400,
+      "originalName": "India Plantation B Washed 20%",
+      "regionId": null,
+      "decision": "grade/trade name or overly broad highlands; no specific geographic origin established",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": []
+    },
+    {
+      "productNo": 859,
+      "originalName": "[기획상품] 운남 익스페리멘탈 세트 (15g*6ea)",
+      "regionId": null,
+      "decision": "Yunnan too broad; Zhuoyuan farm identity unresolved; no auto-map to Pu’er/Baoshan",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": []
+    },
+    {
+      "productNo": 702,
+      "originalName": "#26 중국 윈난 쭈어위안 게이샤 워시드",
+      "regionId": null,
+      "decision": "원문은 윈난까지 확인. 쭈어위안 영문·한자와 실제 지역 불명. Zhuoyuan/Zhuo Yuan/卓园/卓源 및 노띵 공식 도메인 검색에서 해당 생산자 지리 근거 없음. 대만 Zou Zhou Yuan과 합치지 않음. 상세 이미지 12개는 브랜드·행사·안내이며 개별 커피 카드 없음(parent 확인).",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://nothincoffee.com/",
+        "https://unspecialty.com/product/detail.html?product_no=702"
+      ]
+    },
+    {
+      "productNo": 662,
+      "originalName": "[4.28 오픈] 태국 디스커버리 게이샤 워시드 & 내추럴 2종 세트",
+      "regionId": null,
+      "decision": "farm not geographic region; no verified detailed location in this pass",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://allianceforcoffeeexcellence.org/thailand-2025/"
+      ]
+    },
+    {
+      "productNo": 251,
+      "originalName": "중국 윈난 게이샤 워시드",
+      "regionId": null,
+      "decision": "Yunnan too broad; Zhuoyuan farm identity unresolved; no auto-map to Pu’er/Baoshan",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": []
+    },
+    {
+      "productNo": 298,
+      "originalName": "#13 예멘 부두르 우다이니 진테제 바서가이스트",
+      "regionId": null,
+      "decision": "Budoor Nano Lot 판매 상품은 확인했으나 국가 Yemen 이외 실제 지역 미표기. 농장·지역·상표 중 어느 것인지 단정 불가. 지명을 추측해 등록하지 않음.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://m.elcafe.co.kr/product/detail.html?cate_no=47&display_group=1&product_no=995",
+        "https://zernouae.com/product/budoor-nano-lot/"
+      ]
+    },
+    {
+      "productNo": 330,
+      "originalName": "[10.22 오픈] #35 인도네시아 알라민 아비시니아 워시드 30h HASD",
+      "regionId": null,
+      "decision": "producer/station name; do not assume location of same-name lot",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": []
+    },
+    {
+      "productNo": 520,
+      "originalName": "[코스피어] 드링커블 (하우스 블렌드)",
+      "regionId": null,
+      "decision": "Multi-origin blend title; ingredient origins tracked separately; no single origin assigned to entire blend.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=520"
+      ]
+    },
+    {
+      "productNo": 762,
+      "originalName": "[트레커스빈] 블랙잭 블렌드",
+      "regionId": null,
+      "decision": "Multi-origin blend title; ingredient origins tracked separately; no single origin assigned to entire blend.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=762"
+      ]
+    },
+    {
+      "productNo": 484,
+      "originalName": "[고로커피 로스터스] 그레코로만 블렌드 (하우스 블렌드)",
+      "regionId": null,
+      "decision": "Multi-origin blend title; ingredient origins tracked separately; no single origin assigned to entire blend.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=484"
+      ]
+    },
+    {
+      "productNo": 400,
+      "originalName": "[아이덴티티 커피랩] 칠린 블렌드",
+      "regionId": null,
+      "decision": "Multi-origin blend title; ingredient origins tracked separately; no single origin assigned to entire blend.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=400"
+      ]
+    },
+    {
+      "productNo": 761,
+      "originalName": "[트레커스빈] 디디 블렌드",
+      "regionId": null,
+      "decision": "Multi-origin blend title; ingredient origins tracked separately; no single origin assigned to entire blend.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=761"
+      ]
+    },
+    {
+      "productNo": 758,
+      "originalName": "[무우수 커피 로스터스] 유타 블렌드 (하우스 블렌드)",
+      "regionId": null,
+      "decision": "Multi-origin blend title; ingredient origins tracked separately; no single origin assigned to entire blend.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=758"
+      ]
+    },
+    {
+      "productNo": 882,
+      "originalName": "[말릭커피] 로지 체리 (언스페셜티 블렌드)",
+      "regionId": null,
+      "decision": "Multi-origin blend title; ingredient origins tracked separately; no single origin assigned to entire blend.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=882"
+      ]
+    },
+    {
+      "productNo": 470,
+      "originalName": "[무우수 커피 로스터스] 패터슨 블렌드 (하우스 블렌드)",
+      "regionId": null,
+      "decision": "Multi-origin blend title; ingredient origins tracked separately; no single origin assigned to entire blend.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=470"
+      ]
+    },
+    {
+      "productNo": 417,
+      "originalName": "[말릭커피] 마일드 블렌드",
+      "regionId": null,
+      "decision": "Multi-origin blend title; ingredient origins tracked separately; no single origin assigned to entire blend.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=417"
+      ]
+    },
+    {
+      "productNo": 853,
+      "originalName": "[커피화 로스터스] 에티오피아 구지 샤키소 타데 GG 쿠루메 내추럴 마운틴 워터 디카페인",
+      "regionId": null,
+      "decision": "Country filter false positive from related products in detail text; title is Ethiopian or Colombian coffee, outside Central America scope.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=853"
+      ]
+    },
+    {
+      "productNo": 577,
+      "originalName": "[루베르 로스터리] 파나마 심비오시스 게이샤 무산소 내추럴 (랏 13)",
+      "regionId": null,
+      "decision": "ambiguous_processing_project; Symbiosis_used_by_Savage_and_Bambito_BlackMoon_projects; cannot_identify_farm_from_lot_label",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://coffeemeup.kr/1697",
+        "https://en.blackroad.kr/",
+        "https://unspecialty.com/product/detail.html?product_no=577"
+      ]
+    },
+    {
+      "productNo": 859,
+      "originalName": "[기획상품] 파나마 세트 (15g*3ea)",
+      "regionId": null,
+      "decision": "multiple_or_unspecified_origins_in_set; no_single_region_assignment",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=859"
+      ]
+    },
+    {
+      "productNo": 851,
+      "originalName": "[기획상품] 경험 Set 1: 온두라스와 에티오피아",
+      "regionId": null,
+      "decision": "Two-country assortment; no individual farm specified by set name, so no single region link.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=851"
+      ]
+    },
+    {
+      "productNo": 851,
+      "originalName": "[9.7 오픈] [기획상품] 경험 Set 2: 볼리비아와 파나마",
+      "regionId": null,
+      "decision": "Grade, decaffeination method, package or multi-coffee set; no single producing geographic identity in seed. Commodity grading/processing label is not an origin.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=851"
+      ]
+    },
+    {
+      "productNo": 745,
+      "originalName": "[6.29 오픈] #35 파나마 티에라스 알타스 우드랜즈 게이샤 내추럴",
+      "regionId": null,
+      "decision": "conflicting_geography; SCAP_and_Pulpa_collection_say_Nueva_California_but_Pulpa_lot_says_Silla_de_Pando_Renacimiento; needs_reconciliation",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://pulpa.coffee/products/geisha-woodlands-competition-lot",
+        "https://scap-panama.com/panama-woodlands-estate-coffee/",
+        "https://unspecialty.com/product/detail.html?product_no=745"
+      ]
+    },
+    {
+      "productNo": 654,
+      "originalName": "#2 온두라스 로스 나랑호스 콜롬비아노 아마릴로 워시드",
+      "regionId": null,
+      "decision": "Honduras Los Naranjos Colombiano Amarillo exact Korean/English searches did not establish farmer; town Los Naranjos or similarly named Colombian farm cannot establish this lot.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=654",
+        "https://www.gsc.coffee/goods/beans_select.php"
+      ]
+    },
+    {
+      "productNo": 654,
+      "originalName": "#3 온두라스 데이지 무뇨즈 파라이네마 워시드",
+      "regionId": null,
+      "decision": "Exact Korean original product 592 found but no farm geography in accessible page; Doña Daisy Los Andes roaster lot is Pacas, insufficient to identify Daisy Muñoz Parainema.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://lccroastery.com/2021/03/27/honduras-los-andes-dona-daisy/",
+        "https://unspecialty.com/product/detail.html?product_no=592",
+        "https://unspecialty.com/product/detail.html?product_no=654"
+      ]
+    },
+    {
+      "productNo": 566,
+      "originalName": "[3.27 오픈] #37 파나마 트롬포 카페 크리스피 게이샤 내추럴 15-1-25",
+      "regionId": null,
+      "decision": "researched_unresolved_precise_production_geography; original product and alternate producer/roaster searches checked",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=566"
+      ]
+    },
+    {
+      "productNo": 548,
+      "originalName": "#2 온두라스 클라우디오 사가스투메 콜롬비아노 아마릴로 워시드",
+      "regionId": null,
+      "decision": "Exact Signpost Coffee offering confirms producer and notes but no farm location; Sagastume surname alone does not prove Pedro Sagastume geography.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://biz.koke.kr/products/10352",
+        "https://unspecialty.com/product/detail.html?product_no=548"
+      ]
+    },
+    {
+      "productNo": 548,
+      "originalName": "#7 과테말라 보니또 아나카페 14 내추럴",
+      "regionId": null,
+      "decision": "Secondary exact Anacafe14 listing says Jutiapa; primary Red Rock El Bonito is Conguaco but variety/process differ and identity not established.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://redrockroasters.com/products/guatemala-el-bonito",
+        "https://unspecialty.com/product/detail.html?product_no=548",
+        "https://www.wonderroom.co.kr/bean/38073"
+      ]
+    },
+    {
+      "productNo": 573,
+      "originalName": "[4.25 오픈] 커넥츠커피 코스타리카 싱글 오리진 3종 세트 (50g * 3ea)",
+      "regionId": null,
+      "decision": "unresolved_bundle: title says three Costa Rica coffees without farm identification",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=573"
+      ]
+    },
+    {
+      "productNo": 573,
+      "originalName": "[4.15 깜짝 오픈] #44 파나마 핀카 베르데 비엔토 게이샤 워시드",
+      "regionId": null,
+      "decision": "researched_unresolved_precise_production_geography; original product and alternate producer/roaster searches checked",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=573"
+      ]
+    },
+    {
+      "productNo": 202,
+      "originalName": "파나마 새비지 게이샤 Anthem CM 내츄럴",
+      "regionId": null,
+      "decision": "multi_farm_producer_program; published_Anthem_origin_spans_Volcan_and_Boquete",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=202",
+        "https://www.ambersoncoffee.com/savage-anthem22"
+      ]
+    },
+    {
+      "productNo": 209,
+      "originalName": "온두라스 엘 아구아카테 버번 워시드",
+      "regionId": null,
+      "decision": "El Aguacate homonyms: Covoya Glenda Suyapa Hernandez lot in Lempira is not confirmed as archived Bourbon lot; Semilla Bourbon offering lacks accessible matching producer/location.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=209",
+        "https://www.covoyacoffee.com/p609557-5-honduras-glenda-suyapa-hernandez.html",
+        "https://www.semilla.ca/spotOfferings"
+      ]
+    },
+    {
+      "productNo": 209,
+      "originalName": "[6.24 오픈] 코스타리카 코페아 디버사 리베리카 언에어로빅 내추럴",
+      "regionId": null,
+      "decision": "researched_unresolved: Coffea Diversa operates both Biolley and Jerico gardens; Liberica product footer Biolley is insufficient to assign this historical anaerobic lot",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://coffeadiversa.com/",
+        "https://unspecialty.com/product/detail.html?product_no=209"
+      ]
+    },
+    {
+      "productNo": 244,
+      "originalName": "파나마 세비지 앤썸 게이샤 내추럴",
+      "regionId": null,
+      "decision": "multi_farm_producer_program; published_Anthem_origin_spans_Volcan_and_Boquete",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=244",
+        "https://www.ambersoncoffee.com/savage-anthem22"
+      ]
+    },
+    {
+      "productNo": 252,
+      "originalName": "[11.11 오픈] 파나마 핀카 클라비토 데 오레 파카마라 내추럴",
+      "regionId": null,
+      "decision": "researched_unresolved_precise_production_geography; original product and alternate producer/roaster searches checked",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=252"
+      ]
+    },
+    {
+      "productNo": 262,
+      "originalName": "[12.16 오픈] 파나마 로스트 오리진 돈 마누엘 게이샤 내추럴",
+      "regionId": null,
+      "decision": "roaster_identifies_only_Chiriqui; no_precise_region",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=262",
+        "https://www.rossocoffeeroasters.com/products/lost-origin-don-manuel-washed-geisha-lot-81-100g"
+      ]
+    },
+    {
+      "productNo": 286,
+      "originalName": "[3.12 오픈] 온두라스 로스 코네조스 파라이네마 무산소 내추럴",
+      "regionId": null,
+      "decision": "Exact Honduras Parainema identity unresolved; verified Guatemala Los Conejos Gesha/Catuai farm is a different country and cannot link this offering.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://fincalosconejos.com/",
+        "https://unspecialty.com/product/detail.html?product_no=286"
+      ]
+    },
+    {
+      "productNo": 286,
+      "originalName": "[3.00 오픈] 파나마 하치 프로젝트 카투아이 엔자임 플로우 내추럴",
+      "regionId": null,
+      "decision": "researched_unresolved_precise_production_geography; original product and alternate producer/roaster searches checked",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=286"
+      ]
+    },
+    {
+      "productNo": 289,
+      "originalName": "[4.14 오픈] #99 파나마 어나니머스 3 게이샤 내추럴",
+      "regionId": null,
+      "decision": "anonymous_lot; producer_geography_not_published",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=289"
+      ]
+    },
+    {
+      "productNo": 296,
+      "originalName": "코스타리카 조이카페 엘 밤부 카투아이 화이트 허니",
+      "regionId": null,
+      "decision": "researched_unresolved: Joicafe producer located Brunca Chirripo but exact El Bambu estate not independently located; other farms handled by same mill not assigned",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://opal.coffee/selections/costa-rica/",
+        "https://unspecialty.com/product/detail.html?product_no=296"
+      ]
+    },
+    {
+      "productNo": 308,
+      "originalName": "[기획상품] 2024 Best of Panama 3종 10g 레시피팩",
+      "regionId": null,
+      "decision": "multiple_or_unspecified_origins_in_set; no_single_region_assignment",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=308"
+      ]
+    },
+    {
+      "productNo": 308,
+      "originalName": "[7.14 오픈] #17 코스타리카 빈 보야지 티피카 매호라도 워시드",
+      "regionId": null,
+      "decision": "researched_unresolved: Bean Voyage is multi-farm organization; Typica Mejorado menu confirms lot but no producer or subregion",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://cdn.ananti.kr/plf/ui/file/vlg_tastycoffee_menu_2504.pdf",
+        "https://unspecialty.com/product/detail.html?product_no=308"
+      ]
+    },
+    {
+      "productNo": 308,
+      "originalName": "[7.14 오픈] #34 과테말라 비스타 헤르모사 게이샤 내추럴",
+      "regionId": null,
+      "decision": "Geisha-natural farm candidate independently verified as Fredy Orantes, Casillas; original option omits producer, so the farm identity still needs original lot-sheet comparison.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://burmancoffee.com/product/green-coffee-beans/guatemalan-stardust/",
+        "https://elementroasters.com/products/o-guatemala-vista-hermosa-geisha-natural",
+        "https://unspecialty.com/product/detail.html?product_no=308",
+        "https://www.koke.kr/products/10173"
+      ]
+    },
+    {
+      "productNo": 313,
+      "originalName": "[8.20 오픈] #47 더 게이샤 테루아 컬렉션 (파나마 2ea 페루 2ea)",
+      "regionId": null,
+      "decision": "Multi-coffee collection, not a single producing origin.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": []
+    },
+    {
+      "productNo": 324,
+      "originalName": "#24 과테말라 비스타 에르모사 게이샤 내추럴",
+      "regionId": null,
+      "decision": "Geisha-natural farm candidate independently verified as Fredy Orantes, Casillas; original option omits producer, so the farm identity still needs original lot-sheet comparison.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://burmancoffee.com/product/green-coffee-beans/guatemalan-stardust/",
+        "https://elementroasters.com/products/o-guatemala-vista-hermosa-geisha-natural",
+        "https://unspecialty.com/product/detail.html?product_no=324",
+        "https://www.koke.kr/products/10173"
+      ]
+    },
+    {
+      "productNo": 330,
+      "originalName": "[10.15 오픈] #32 코스타리카 코페아 디베르사 리베리카 무산소 와이니",
+      "regionId": null,
+      "decision": "researched_unresolved: Coffea Diversa operates both Biolley and Jerico gardens; Liberica product footer Biolley is insufficient to assign this historical anaerobic lot",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://coffeadiversa.com/",
+        "https://unspecialty.com/product/detail.html?product_no=330"
+      ]
+    },
+    {
+      "productNo": 331,
+      "originalName": "#1 과테말라 SHB 디카페인",
+      "regionId": null,
+      "decision": "SHB decaf country/grade only: no farm, producer or geographic traceability available in original product option.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=331"
+      ]
+    },
+    {
+      "productNo": 341,
+      "originalName": "#1 온두라스 로스 세드로스 파라이네마 워시드 (2024 Best Parainema #17)",
+      "regionId": null,
+      "decision": "Exact Gachi Coffee 2024 Best Parainema #17 found; geography not readable (403 direct fetch). Other Los Cedros Pacas/Catuai farms differ and were excluded.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=341",
+        "https://www.gachicoffee.com/shop/?idx=138"
+      ]
+    },
+    {
+      "productNo": 389,
+      "originalName": "#27 파나마 심비오시스 게이샤 무산소 내추럴 '녹턴'",
+      "regionId": null,
+      "decision": "ambiguous_processing_project; Symbiosis_used_by_Savage_and_Bambito_BlackMoon_projects; cannot_identify_farm_from_lot_label",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://coffeemeup.kr/1697",
+        "https://en.blackroad.kr/",
+        "https://unspecialty.com/product/detail.html?product_no=389"
+      ]
+    },
+    {
+      "productNo": 389,
+      "originalName": "[1.22 오픈] #31 파나마 핀카 데 라 크루즈 게이샤 내추럴 알루나 랏",
+      "regionId": null,
+      "decision": "researched_unresolved_precise_production_geography; original product and alternate producer/roaster searches checked",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=389"
+      ]
+    },
+    {
+      "productNo": 371,
+      "originalName": "#9 엘살바도르 엘 로블레 게이샤 허니",
+      "regionId": null,
+      "decision": "Coffea confirms El Roble Pacamara Honey; no readable region. Jose Roberto Deras El Roble in Chalatenango and Los Nogales El Roble plot in Apaneca are distinct candidates, unresolved matching producer.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=371",
+        "https://www.bluecoffeebox.com/blogs/learn-blue-coffee/el-roble-el-salvador-coffee",
+        "https://www.coffea.co.kr/recipes"
+      ]
+    },
+    {
+      "productNo": 371,
+      "originalName": "[1.7 오픈] #14 엘살바도르 란다베르데 파카마라 무산소 세미 워시드",
+      "regionId": null,
+      "decision": "Surname alone matches Gilberto Landaverde, Jose Angelino Landaverde, Carlos Mauricio Lemus Landaverde with distinct farms. Exact anaerobic semi-washed Pacamara producer unresolved.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://allianceforcoffeeexcellence.org/farm-directory/88-94-6/",
+        "https://samplecoffee.com.au/coffee/gilberto-landaverde",
+        "https://unspecialty.com/product/detail.html?product_no=371",
+        "https://www.onelinecoffee.com/blogs/news/new-coffee-releases"
+      ]
+    },
+    {
+      "productNo": 371,
+      "originalName": "[1.12 오픈] #20 엘살바도르 엘 로블레 파카마라 허니",
+      "regionId": null,
+      "decision": "Coffea confirms El Roble Pacamara Honey; no readable region. Jose Roberto Deras El Roble in Chalatenango and Los Nogales El Roble plot in Apaneca are distinct candidates, unresolved matching producer.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=371",
+        "https://www.bluecoffeebox.com/blogs/learn-blue-coffee/el-roble-el-salvador-coffee",
+        "https://www.coffea.co.kr/recipes"
+      ]
+    },
+    {
+      "productNo": 358,
+      "originalName": "[12.8 오픈] #33 (저니) 파나마 에일라 365 게이샤 내추럴",
+      "regionId": null,
+      "decision": "producer_has_multiple_farms_Volcan_and_Rio_Sereno; original_generic_lot_not_matched_to_exact_farm",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://pht.coffee/",
+        "https://unspecialty.com/product/detail.html?product_no=358"
+      ]
+    },
+    {
+      "productNo": 606,
+      "originalName": "[커피 생두] 파나마 트롬포 카페 크리스피 게이샤 내추럴(28-3-25)",
+      "regionId": null,
+      "decision": "researched_unresolved_precise_production_geography; original product and alternate producer/roaster searches checked",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=606"
+      ]
+    },
+    {
+      "productNo": 606,
+      "originalName": "Panama Trompo Cafe Crispi Geisha Natural(28-3-25)",
+      "regionId": null,
+      "decision": "researched_unresolved_precise_production_geography; original product and alternate producer/roaster searches checked",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=606"
+      ]
+    },
+    {
+      "productNo": 745,
+      "originalName": "티에라스 알타스",
+      "regionId": null,
+      "decision": "Product745 Woodlands precise farm location conflicts between producer Nueva California and roaster Silla de Pando/Renacimiento. Broad district alone does not resolve identity.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": []
+    },
+    {
+      "productNo": 776,
+      "originalName": "[아이덴티티 커피랩] 콜롬비아 엑셀소 마운틴 워터 디카페인",
+      "regionId": null,
+      "decision": "Grade, decaffeination method, package or multi-coffee set; no single producing geographic identity in seed. Commodity grading/processing label is not an origin.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=776"
+      ]
+    },
+    {
+      "productNo": 798,
+      "originalName": "[고로커피 로스터스] 콜롬비아 수프리모 마운틴 워터 디카페인",
+      "regionId": null,
+      "decision": "Grade, decaffeination method, package or multi-coffee set; no single producing geographic identity in seed. Commodity grading/processing label is not an origin.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=798"
+      ]
+    },
+    {
+      "productNo": 737,
+      "originalName": "[고로커피 로스터스] 콜롬비아 로스 노갈레스 자바 애너로빅 내추럴",
+      "regionId": null,
+      "decision": "ambiguous-locality-name",
+      "reason": "Goro는 Hambela와 다른 생산자/농장 맥락에 함께 등장. 원문 제품별 explicitParentRegionId만 사용하고 글로벌 별칭 연결 금지.",
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://88grainescoffee.com/product/guji-goro/",
+        "https://burnettcoffee.com/products/ethiopia-guji-goro-bedessa-specialty-coffee",
+        "https://fr.wikipedia.org/wiki/Hambela_Wamena",
+        "https://servantcoffee.com/product/goro-hambela/"
+      ]
+    },
+    {
+      "productNo": 736,
+      "originalName": "[고로커피 로스터스] 콜롬비아 비야 카롤리나 핑크버번 워시드",
+      "regionId": null,
+      "decision": "ambiguous-locality-name",
+      "reason": "Goro는 Hambela와 다른 생산자/농장 맥락에 함께 등장. 원문 제품별 explicitParentRegionId만 사용하고 글로벌 별칭 연결 금지.",
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://88grainescoffee.com/product/guji-goro/",
+        "https://burnettcoffee.com/products/ethiopia-guji-goro-bedessa-specialty-coffee",
+        "https://fr.wikipedia.org/wiki/Hambela_Wamena",
+        "https://servantcoffee.com/product/goro-hambela/"
+      ]
+    },
+    {
+      "productNo": 674,
+      "originalName": "[가치커피] 콜롬비아 라 에스메랄다 게이샤 무산소 워시드",
+      "regionId": null,
+      "decision": "La Esmeralda is shared by unrelated Colombian estates. Sidra was separately tied to Acevedo, but no exact source ties these Gesha / Buena Vista Castillo seed products to that producer. Do not transfer Sidra geography.",
+      "reason": null,
+      "searchQueries": [
+        "Colombia La Esmeralda Geisha anaerobic",
+        "콜롬비아 라 에스메랄다 게이샤 가치",
+        "Buena Vista La Esmeralda Castillo Wild Citrus"
+      ],
+      "verificationUrls": [
+        "https://pullandpourcoffee.com/brew-guide/kodawari-geisha-nordaggios-coffee/",
+        "https://skillissue.coffee/shop/p/colombia-la-esmeralda-sidra-semiwashed",
+        "https://unspecialty.com/product/detail.html?product_no=674"
+      ]
+    },
+    {
+      "productNo": 720,
+      "originalName": "[클라리멘토] 페루 라 팔마 카투라, 버번, 파체 백 퍼먼티드 워시드",
+      "regionId": null,
+      "decision": "La Palma and Shanti collection located in catalogs but producer/geography of these exact offerings not established; no homonym merge.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://allianceforcoffeeexcellence.org/farm-directory/87-18-5/",
+        "https://www.newbean.co.kr/goods/goods_view.php?goodsNo=1000000739"
+      ]
+    },
+    {
+      "productNo": 670,
+      "originalName": "[커피화 로스터스] 페루 엘 세드로 게이샤 풀리 워시드",
+      "regionId": null,
+      "decision": "El Cedro homonyms in Amazonas and Cajamarca; original label lacks producer needed to disambiguate.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://allianceforcoffeeexcellence.org/directory/88-64-5/",
+        "https://festcoffeemission.com/wp-content/uploads/2024/03/en-30-1141-0359-peru-el-cedro.pdf"
+      ]
+    },
+    {
+      "productNo": 852,
+      "originalName": "[8.24 오픈] #11 콜롬비아 엘 트레볼 데보시온 핑크 버번 워시드",
+      "regionId": null,
+      "decision": "Exact Korean and English farm/product searches did not identify a producing location for the Devocion Pink Bourbon product. Similar El Trebol names are insufficient.",
+      "reason": null,
+      "searchQueries": [
+        "El Trebol Devocion coffee",
+        "엘 트레볼 커피"
+      ],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=852"
+      ]
+    },
+    {
+      "productNo": 852,
+      "originalName": "#28 콜롬비아 인마쿨라다 펠로우즈 팜즈 게이샤 내추럴",
+      "regionId": null,
+      "decision": "Fellow Farms is a purchased-cherry network. Producer headquarters Pichindé cannot establish cultivation location. Partner lots explicitly originate in Huila/Cauca; seed gives no partner/lot identity.",
+      "reason": null,
+      "searchQueries": [
+        "Fellow Farms Inmaculada Huila Cauca Narino",
+        "Inmaculada Gesha Natural Pichinde"
+      ],
+      "verificationUrls": [
+        "https://archerscoffee.com/collections/inmaculada-coffee-farms",
+        "https://saficoffeeroasters.com/products/cafe-geisha-colombia?variant=42284795527246",
+        "https://unspecialty.com/product/detail.html?product_no=852"
+      ]
+    },
+    {
+      "productNo": 852,
+      "originalName": "[8.27 오픈] #33 콜롬비아 인마쿨라다 펠로우즈 팜즈 게이샤 워시드",
+      "regionId": null,
+      "decision": "Fellow Farms is a purchased-cherry network. Producer headquarters Pichindé cannot establish cultivation location. Partner lots explicitly originate in Huila/Cauca; seed gives no partner/lot identity.",
+      "reason": null,
+      "searchQueries": [
+        "Fellow Farms Inmaculada Huila Cauca Narino",
+        "Inmaculada Gesha Natural Pichinde"
+      ],
+      "verificationUrls": [
+        "https://archerscoffee.com/collections/inmaculada-coffee-farms",
+        "https://saficoffeeroasters.com/products/cafe-geisha-colombia?variant=42284795527246",
+        "https://unspecialty.com/product/detail.html?product_no=852"
+      ]
+    },
+    {
+      "productNo": 851,
+      "originalName": "[9.7 오픈] #51 페루 엘 미라도르 게이샤 워시드 Lot.4",
+      "regionId": null,
+      "decision": "unresolved: El Mirador is homonymous across Peruvian producers. Yoniser Mego Lot 5 is documented, but no producer or matching numbered-lot evidence links these Lot 3/4/plain rows.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://allianceforcoffeeexcellence.org/peru-2024/",
+        "https://unspecialty.com/product/detail.html?product_no=851",
+        "https://www.woodberrycoffee.com/products/mirador_g_w"
+      ]
+    },
+    {
+      "productNo": 775,
+      "originalName": "[7.13 오픈] #14 콜롬비아 인마쿨라다 펠로우즈 팜즈 게이샤 워시드",
+      "regionId": null,
+      "decision": "Fellow Farms is a purchased-cherry network. Producer headquarters Pichindé cannot establish cultivation location. Partner lots explicitly originate in Huila/Cauca; seed gives no partner/lot identity.",
+      "reason": null,
+      "searchQueries": [
+        "Fellow Farms Inmaculada Huila Cauca Narino",
+        "Inmaculada Gesha Natural Pichinde"
+      ],
+      "verificationUrls": [
+        "https://archerscoffee.com/collections/inmaculada-coffee-farms",
+        "https://saficoffeeroasters.com/products/cafe-geisha-colombia?variant=42284795527246",
+        "https://unspecialty.com/product/detail.html?product_no=775"
+      ]
+    },
+    {
+      "productNo": 775,
+      "originalName": "#35 브라질 파젠다 엄 카투카이 785 다크룸 펄프드 내추럴 (2025 옥션 1위)",
+      "regionId": null,
+      "decision": "Fazenda Um operates Minas Gerais and Espírito Santo farms. Exact domestic Yellow Bourbon Darkroom trade listing does not state cultivation origin; summaries disagree and the unnamed 2025 auction #1 785 lot is not tied to an auction catalog. Keep farm unresolved at municipality level.",
+      "reason": null,
+      "searchQueries": [
+        "파젠다 엄 785 2025 옥션",
+        "Fazenda Um yellow bourbon dark room origin"
+      ],
+      "verificationUrls": [
+        "https://alwaysau8ust.co.kr/product/brazil-fazenda-um-dark-room-브라질-파젠다-엄-다크룸-100g/169/",
+        "https://eng.firescope.cropster.com/review/brazil-fazenda-um-yellow-bourbon-dark-room",
+        "https://unspecialty.com/product/detail.html?product_no=775",
+        "https://www.gsc.coffee/goods/goods_view.php?goodsNo=1000001108"
+      ]
+    },
+    {
+      "productNo": 775,
+      "originalName": "[7.14 깜짝 오픈] #55 페루 엘 미라도르 게이샤 워시드 Lot.4",
+      "regionId": null,
+      "decision": "unresolved: El Mirador is homonymous across Peruvian producers. Yoniser Mego Lot 5 is documented, but no producer or matching numbered-lot evidence links these Lot 3/4/plain rows.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://allianceforcoffeeexcellence.org/peru-2024/",
+        "https://unspecialty.com/product/detail.html?product_no=775",
+        "https://www.woodberrycoffee.com/products/mirador_g_w"
+      ]
+    },
+    {
+      "productNo": 745,
+      "originalName": "#2 콜롬비아 엑셀소 슈가케인 프로세스 디카페인",
+      "regionId": null,
+      "decision": "Grade, decaffeination method, package or multi-coffee set; no single producing geographic identity in seed. Commodity grading/processing label is not an origin.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=745"
+      ]
+    },
+    {
+      "productNo": 703,
+      "originalName": "#4 콜롬비아 시에라 모레나 치로소 워시드",
+      "regionId": null,
+      "decision": "Exact seed confirmed as Doan Chiroso through seller Q&A; independently found Wilson Alba Sierra Morena lots are Pink Bourbon and do not establish this Chiroso lot identity.",
+      "reason": null,
+      "searchQueries": [
+        "시에라 모레나 치로소",
+        "Sierra Morena Chiroso Doan coffee"
+      ],
+      "verificationUrls": [
+        "https://unspecialty.com/board/product/read.html?board_no=6&no=91852",
+        "https://unspecialty.com/product/detail.html?product_no=703"
+      ]
+    },
+    {
+      "productNo": 662,
+      "originalName": "#24 에콰도르 핀카 쟈비코차 게이샤 워시드",
+      "regionId": null,
+      "decision": "Korean farm and Javicocha/Jabicocha/Chavicocha/Yabicocha variants did not recover a traceable Ecuador Gesha source. Spelling/producer unresolved.",
+      "reason": null,
+      "searchQueries": [
+        "쟈비코차 커피",
+        "Javicocha coffee",
+        "Jabicocha Ecuador coffee",
+        "Chavicocha Ecuador Geisha"
+      ],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=662"
+      ]
+    },
+    {
+      "productNo": 654,
+      "originalName": "#4 콜롬비아 비야마리아 시드라 워시드",
+      "regionId": null,
+      "decision": "Exact Sidra Washed found at Pont Coffee, but structured origin incorrectly says Guatemala and reveals no cultivation municipality. Ortega-Gomez Villa Maria in San Agustin grows Sidra, yet seed producer identity remains unconfirmed.",
+      "reason": null,
+      "searchQueries": [
+        "Villa Maria Sidra Washed coffee",
+        "비야마리아 시드라 지역"
+      ],
+      "verificationUrls": [
+        "https://pontcoffee.com/product/detail.html?cate_no=29&display_group=1&product_no=192",
+        "https://thearterycommunityroasters.com/pages/about-familia-ortega-gomez",
+        "https://unspecialty.com/product/detail.html?product_no=654"
+      ]
+    },
+    {
+      "productNo": 654,
+      "originalName": "#6 페루 라 치리모야 게이샤 내추럴",
+      "regionId": null,
+      "decision": "unresolved: La Chirimoya Gesha Natural lacks a producer. Orlando Pedraza Caturra/Catuai and Henry Arica Chirimolla cannot be substituted.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=654",
+        "https://www.exportar.com.pe/bajar/Exportar-Ed-130.pdf"
+      ]
+    },
+    {
+      "productNo": 654,
+      "originalName": "[5.11 오픈] #14 콜롬비아 핀카 엘 보스케 핑크버번 무산소 허니",
+      "regionId": null,
+      "decision": "Pink Bourbon farms named El Bosque exist under Linarco Rodriguez and Alexander; available verified source is washed, not exact anaerobic-honey seed. No producer fingerprint permits selection.",
+      "reason": null,
+      "searchQueries": [
+        "El Bosque pink bourbon honey",
+        "콜롬비아 엘 보스케 핑크"
+      ],
+      "verificationUrls": [
+        "https://ptscoffee.com/products/el-bosque-pink-bourbon-washed",
+        "https://royaltycoffees.com/royalty-sourcing-colombia/",
+        "https://unspecialty.com/product/detail.html?product_no=654"
+      ]
+    },
+    {
+      "productNo": 654,
+      "originalName": "[5.11 오픈] #15 콜롬비아 라 에스트레야 게이샤 내추럴",
+      "regionId": null,
+      "decision": "Gesha Natural source at Ally identifies Nariño while other Las Estrella Gesha trade offerings identify Quindio. Seed has no producer/altitude; homonymous farm unresolved.",
+      "reason": null,
+      "searchQueries": [
+        "La Estrella Gesha Natural Colombia"
+      ],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=654",
+        "https://www.allycoffee.com/coffees/la-estrella-gesha-natural/",
+        "https://www.col-spirit.com/_files/ugd/bcdb1b_286e616cd9564935b4b75124f3499c2f.pdf"
+      ]
+    },
+    {
+      "productNo": 654,
+      "originalName": "#22 콜롬비아 핀카 라 미리암 게이샤 워시드",
+      "regionId": null,
+      "decision": "Exact Korean and La Miriam/Miriam Gesha variants returned no matching specialty producer with cultivation geography.",
+      "reason": null,
+      "searchQueries": [
+        "콜롬비아 라 미리암",
+        "Colombia La Miriam coffee",
+        "Finca Miriam Gesha washed"
+      ],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=654"
+      ]
+    },
+    {
+      "productNo": 566,
+      "originalName": "[3.27 오픈] #15 콜롬비아 라 에스메랄다 게샤 무산소 워시드",
+      "regionId": null,
+      "decision": "La Esmeralda is shared by unrelated Colombian estates. Sidra was separately tied to Acevedo, but no exact source ties these Gesha / Buena Vista Castillo seed products to that producer. Do not transfer Sidra geography.",
+      "reason": null,
+      "searchQueries": [
+        "Colombia La Esmeralda Geisha anaerobic",
+        "콜롬비아 라 에스메랄다 게이샤 가치",
+        "Buena Vista La Esmeralda Castillo Wild Citrus"
+      ],
+      "verificationUrls": [
+        "https://pullandpourcoffee.com/brew-guide/kodawari-geisha-nordaggios-coffee/",
+        "https://skillissue.coffee/shop/p/colombia-la-esmeralda-sidra-semiwashed",
+        "https://unspecialty.com/product/detail.html?product_no=566"
+      ]
+    },
+    {
+      "productNo": 548,
+      "originalName": "#8 콜롬비아 엑셀소 마운틴 워터 디카페인",
+      "regionId": null,
+      "decision": "Grade, decaffeination method, package or multi-coffee set; no single producing geographic identity in seed. Commodity grading/processing label is not an origin.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=548"
+      ]
+    },
+    {
+      "productNo": 548,
+      "originalName": "#24 (스플릿) 페루 엘 미라도르 게이샤 워시드 (Lot 3)",
+      "regionId": null,
+      "decision": "unresolved: El Mirador is homonymous across Peruvian producers. Yoniser Mego Lot 5 is documented, but no producer or matching numbered-lot evidence links these Lot 3/4/plain rows.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://allianceforcoffeeexcellence.org/peru-2024/",
+        "https://unspecialty.com/product/detail.html?product_no=548",
+        "https://www.woodberrycoffee.com/products/mirador_g_w"
+      ]
+    },
+    {
+      "productNo": 548,
+      "originalName": "#25 페루 라 포마로사 게이샤 워시드 (Lot 11) (브릴리언트)",
+      "regionId": null,
+      "decision": "Homonymous La Pomarrosa farms; Lot 11 producer not established. Merci farm geography registered separately.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://cafedefincaperu.com/es",
+        "https://fuglencoffee.jp/en/blogs/coffee-beans/merci-fernandez-peru"
+      ]
+    },
+    {
+      "productNo": 548,
+      "originalName": "[3.16 오픈] #33 페루 엘 로메리요 게이샤 버번 워시드",
+      "regionId": null,
+      "decision": "Homonymous El Romerillo farms in Huabal and Chirinos; producer absent from original label.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://caravanandco.com/pages/el-romerillo",
+        "https://established.coffee/products/el-romerillo-peru"
+      ]
+    },
+    {
+      "productNo": 202,
+      "originalName": "콜롬비아 시그니쳐 디카페인 셀렉션",
+      "regionId": null,
+      "decision": "Grade, decaffeination method, package or multi-coffee set; no single producing geographic identity in seed. Commodity grading/processing label is not an origin.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=202"
+      ]
+    },
+    {
+      "productNo": 209,
+      "originalName": "콜롬비아 라 에스메랄다 게이샤 언에어로빅 내추럴",
+      "regionId": null,
+      "decision": "La Esmeralda is shared by unrelated Colombian estates. Sidra was separately tied to Acevedo, but no exact source ties these Gesha / Buena Vista Castillo seed products to that producer. Do not transfer Sidra geography.",
+      "reason": null,
+      "searchQueries": [
+        "Colombia La Esmeralda Geisha anaerobic",
+        "콜롬비아 라 에스메랄다 게이샤 가치",
+        "Buena Vista La Esmeralda Castillo Wild Citrus"
+      ],
+      "verificationUrls": [
+        "https://pullandpourcoffee.com/brew-guide/kodawari-geisha-nordaggios-coffee/",
+        "https://skillissue.coffee/shop/p/colombia-la-esmeralda-sidra-semiwashed",
+        "https://unspecialty.com/product/detail.html?product_no=209"
+      ]
+    },
+    {
+      "productNo": 210,
+      "originalName": "콜롬비아 엘 트리운포 게이샤",
+      "regionId": null,
+      "decision": "El Triunfo Gesha/decaf are not necessarily the Israel Hernandez Sudan Rume estate. Other actual farms occur at San Agustin (Yeni Anacona) and Dolores Tolima (Insignia); original producer absent.",
+      "reason": null,
+      "searchQueries": [
+        "El Triunfo Gesha Colombia",
+        "El Triunfo Pink Bourbon decaf"
+      ],
+      "verificationUrls": [
+        "https://coffeesouq1.com/ZqZPwNb",
+        "https://insignia.coffee/en",
+        "https://unspecialty.com/product/detail.html?product_no=210"
+      ]
+    },
+    {
+      "productNo": 216,
+      "originalName": "콜롬비아 엑셀소 디카페인",
+      "regionId": null,
+      "decision": "Grade, decaffeination method, package or multi-coffee set; no single producing geographic identity in seed. Commodity grading/processing label is not an origin.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=216"
+      ]
+    },
+    {
+      "productNo": 223,
+      "originalName": "콜롬비아 핀카 보네르 시드라 버번 무산소 내추럴",
+      "regionId": null,
+      "decision": "Exact Cobinz Sidra Bourbon product found, but readable listing carries no growing location. Boner/Bonner/Bonaire variants did not establish producer geography.",
+      "reason": null,
+      "searchQueries": [
+        "핀카 보네르 시드라",
+        "Finca Boner coffee",
+        "Finca Bonner sidra coffee"
+      ],
+      "verificationUrls": [
+        "https://biz.koke.kr/products/5214",
+        "https://unspecialty.com/product/detail.html?product_no=223"
+      ]
+    },
+    {
+      "productNo": 224,
+      "originalName": "페루 엘 미라도르 워시드",
+      "regionId": null,
+      "decision": "unresolved: El Mirador is homonymous across Peruvian producers. Yoniser Mego Lot 5 is documented, but no producer or matching numbered-lot evidence links these Lot 3/4/plain rows.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://allianceforcoffeeexcellence.org/peru-2024/",
+        "https://unspecialty.com/product/detail.html?product_no=224",
+        "https://www.woodberrycoffee.com/products/mirador_g_w"
+      ]
+    },
+    {
+      "productNo": 224,
+      "originalName": "콜롬비아 엘 플라세 워시드",
+      "regionId": null,
+      "decision": "El Placer is both a farm and a processing network. Sources explicitly describe Huila-purchased Gesha processed in Quindio; seed has no producer or parcel. Cannot equate beneficio location with cultivation.",
+      "reason": null,
+      "searchQueries": [
+        "El Placer Gesha honey region"
+      ],
+      "verificationUrls": [
+        "https://moonwakecoffeeroasters.com/products/sebastian-ramirez-el-placer-cm-white-honey-yeast-gesha-colombia-brian-quan-collab",
+        "https://unspecialty.com/product/detail.html?product_no=224"
+      ]
+    },
+    {
+      "productNo": 224,
+      "originalName": "[8.6 오픈] 페루 엘 로메리요 워시드",
+      "regionId": null,
+      "decision": "Homonymous El Romerillo farms in Huabal and Chirinos; producer absent from original label.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://caravanandco.com/pages/el-romerillo",
+        "https://established.coffee/products/el-romerillo-peru"
+      ]
+    },
+    {
+      "productNo": 224,
+      "originalName": "[8.12 오픈] 콜롬비아 벨라 비스타 언에어로빅 워시드",
+      "regionId": null,
+      "decision": "Bella Vista Chiroso is produced by more than one farmer/region; Carmen Patiño Urrao material does not establish seed producer. Plain anaerobic-washed also lacks producer identity.",
+      "reason": null,
+      "searchQueries": [
+        "Bella Vista Chiroso Colombia Carmen",
+        "Bella Vista Chiroso Garzon"
+      ],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=224",
+        "https://utahcoffee.com/wp-content/uploads/2021/09/Coffee-Newsletter-September-Guest-copy-final.pdf"
+      ]
+    },
+    {
+      "productNo": 224,
+      "originalName": "[8.16 오픈] 콜롬비아 엘 실렌시오 내추럴",
+      "regionId": null,
+      "decision": "Only separately named Gesha lot has Piendamo evidence. Plain natural El Silencio has no producer and multiple unrelated farms share the name.",
+      "reason": null,
+      "searchQueries": [
+        "El Silencio Natural Colombia region"
+      ],
+      "verificationUrls": [
+        "https://artisancoffee.es/products/gesha-el-silencio-cafe-de-especialidad-de-colombia-natural",
+        "https://unspecialty.com/product/detail.html?product_no=224"
+      ]
+    },
+    {
+      "productNo": 224,
+      "originalName": "콜롬비아 엘 플라세 게이샤 허니",
+      "regionId": null,
+      "decision": "El Placer is both a farm and a processing network. Sources explicitly describe Huila-purchased Gesha processed in Quindio; seed has no producer or parcel. Cannot equate beneficio location with cultivation.",
+      "reason": null,
+      "searchQueries": [
+        "El Placer Gesha honey region"
+      ],
+      "verificationUrls": [
+        "https://moonwakecoffeeroasters.com/products/sebastian-ramirez-el-placer-cm-white-honey-yeast-gesha-colombia-brian-quan-collab",
+        "https://unspecialty.com/product/detail.html?product_no=224"
+      ]
+    },
+    {
+      "productNo": 224,
+      "originalName": "[8.19 오픈] 콜롬비아 엘 트리운포 게이샤 워시드",
+      "regionId": null,
+      "decision": "El Triunfo Gesha/decaf are not necessarily the Israel Hernandez Sudan Rume estate. Other actual farms occur at San Agustin (Yeni Anacona) and Dolores Tolima (Insignia); original producer absent.",
+      "reason": null,
+      "searchQueries": [
+        "El Triunfo Gesha Colombia",
+        "El Triunfo Pink Bourbon decaf"
+      ],
+      "verificationUrls": [
+        "https://coffeesouq1.com/ZqZPwNb",
+        "https://insignia.coffee/en",
+        "https://unspecialty.com/product/detail.html?product_no=224"
+      ]
+    },
+    {
+      "productNo": 234,
+      "originalName": "브라질 캄포 알레그리 카투아이 무산소 내추럴",
+      "regionId": null,
+      "decision": "Farm name shared by Bernardes at Patrocinio and Henrique Cambraia / Sancoffee in southern Minas. Exact Korean seed anaerobic/yeast lot has no recovered producer identity.",
+      "reason": null,
+      "searchQueries": [
+        "Campo Alegre yellow catucai coffee",
+        "Campo Alegre yeast coffee",
+        "캄포 알레그레 이스트",
+        "캄포 알레그리 카투아이"
+      ],
+      "verificationUrls": [
+        "https://bernardescoffee.com/en/",
+        "https://unspecialty.com/product/detail.html?product_no=234",
+        "https://www.algrano.com/pt/products/1070-brazil-henrique-cambraia-fazenda-campo-alegre-yellow-catucai-natural-arabica-natural-secado-ao-sol-jul-2020",
+        "https://www.koke.kr/products/225"
+      ]
+    },
+    {
+      "productNo": 234,
+      "originalName": "[9.9 오픈] 페루 엘 로렐 게이샤 워시드",
+      "regionId": null,
+      "decision": "unresolved: Felt El Laurel Gesha listing found only through secondary transcription to Cajamarca. El Laurel village La Coipa and other farms of that name do not identify this original product.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://cherrybookcoffee.com/coffee/felt-507",
+        "https://unspecialty.com/product/detail.html?product_no=234"
+      ]
+    },
+    {
+      "productNo": 244,
+      "originalName": "콜롬비아 라 시마 디카페인",
+      "regionId": null,
+      "decision": "unresolved-after-search",
+      "reason": "Bolshe Coffee의 La Cima sugarcane decaf 소개를 찾았으나 생산 지리 미기재. La Plata Pink Bourbon 동명 사례는 가공·품종 및 로스터 다르므로 연결 보류.",
+      "searchQueries": [
+        "\"라 시마\" \"디카페인\"",
+        "\"La Cima\" decaf Colombia",
+        "site:coffea.co.kr \"Cima\""
+      ],
+      "verificationUrls": [
+        "https://mycoffeenation.ru/blog/letsstart/caffeine-free-coffee-decaf/"
+      ]
+    },
+    {
+      "productNo": 244,
+      "originalName": "콜롬비아 벨렌 카투라 워시드",
+      "regionId": null,
+      "decision": "unresolved-after-search",
+      "reason": "Belén/Inzá/Cauca, Belén de Umbría/Risaralda, Belén/El Tablón/Nariño 등 동명 후보가 존재. Coffea Caturra washed를 특정 생산자에 연결할 증거를 찾지 못하여 보류.",
+      "searchQueries": [
+        "\"코페아\" \"벨렌\"",
+        "\"Belen\" \"Caturra\" washed Colombia",
+        "site:coffea.co.kr \"Belen\""
+      ],
+      "verificationUrls": []
+    },
+    {
+      "productNo": 244,
+      "originalName": "콜롬비아 시드라 바이오리액터 워시드(2024 WBC 컴피티션 랏)",
+      "regionId": null,
+      "decision": "unresolved-after-search",
+      "reason": "Sucafina Julio Madrid Sakura/Risaralda가 Mathieu Theis 2024 WBC 및 bioreactor washed를 명시하지만 원문에 Sakura·Julio 이름 없음. Wilton Benitez Sidra bioreactor도 존재하여 확정 보류.",
+      "searchQueries": [
+        "\"Sidra\" \"bioreactor\" \"2024\" Coffea",
+        "\"코페아\" \"시드라\"",
+        "\"Sidra\" \"WBC 2024\""
+      ],
+      "verificationUrls": [
+        "https://roguewavecoffee.ca/products/colombia-granja-paraiso-92-p-18-sidra-anaerobic-washed-100g",
+        "https://sucafina.com/na/offerings/julio-madrid-bourbon-sidra-sakura-fw"
+      ]
+    },
+    {
+      "productNo": 244,
+      "originalName": "[10.7 오픈] 콜롬비아 에이프릴 피치 바이오리액터 허니",
+      "regionId": null,
+      "decision": "unresolved-after-search",
+      "reason": "Tremor는 Santa Rosa April Peach, Jeonju Coffee는 Hafid×MiaSelection/double culturing maceration honey와 2024 WBC 사용을 확인. Santa Rosa가 동명 지리인지 농장인지 특정되지 않아 지역 강제 연결 보류.",
+      "searchQueries": [
+        "\"에이프릴 피치\" \"농장\"",
+        "\"April Peach\" coffee Santa Rosa",
+        "\"에이프릴 피치\" \"바이오리액터\""
+      ],
+      "verificationUrls": [
+        "https://pf.kakao.com/_xcJQWT/105848698",
+        "https://pf.kakao.com/_yxfbbxl/104826705",
+        "https://tremorcoffee.com/45"
+      ]
+    },
+    {
+      "productNo": 252,
+      "originalName": "페루 로스 산토스 게이샤 워시드",
+      "regionId": null,
+      "decision": "unresolved: Los Santos name occurs for Jose Requejo in Amazonas and Anibal Alarcon/OCL. Washed product lacks producer, and Wasa describes a black-honey lot, so no forced regional match.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=252",
+        "https://wasacoffee.com/products/peru-los-santos-gesha"
+      ]
+    },
+    {
+      "productNo": 252,
+      "originalName": "브라질 캄포 알레그레 옐로우 카투카이 무산소 내추럴 with 이스트",
+      "regionId": null,
+      "decision": "Farm name shared by Bernardes at Patrocinio and Henrique Cambraia / Sancoffee in southern Minas. Exact Korean seed anaerobic/yeast lot has no recovered producer identity.",
+      "reason": null,
+      "searchQueries": [
+        "Campo Alegre yellow catucai coffee",
+        "Campo Alegre yeast coffee",
+        "캄포 알레그레 이스트",
+        "캄포 알레그리 카투아이"
+      ],
+      "verificationUrls": [
+        "https://bernardescoffee.com/en/",
+        "https://unspecialty.com/product/detail.html?product_no=252",
+        "https://www.algrano.com/pt/products/1070-brazil-henrique-cambraia-fazenda-campo-alegre-yellow-catucai-natural-arabica-natural-secado-ao-sol-jul-2020",
+        "https://www.koke.kr/products/225"
+      ]
+    },
+    {
+      "productNo": 252,
+      "originalName": "콜롬비아 아로마나티보 EMV2 1200 게이샤 허니 락틱 퍼먼테이션",
+      "regionId": null,
+      "decision": "unresolved-after-search",
+      "reason": "Picky Chemist EMV23058은 Acevedo/Huila/Luis Marcelino Veci/Geisha/honey lactic. 원문 EMV2 1200과 코드가 달라 동일 농장 로트 확인 불가. Aroma Nativo 프로젝트는 여러 지역을 취급하므로 Acevedo를 강제 연결하지 않음.",
+      "searchQueries": [
+        "\"Aroma Nativo\" \"EMV2\"",
+        "\"EMV21200\" coffee",
+        "\"EMV2 1200\" Geisha",
+        "\"블랙업\" \"EMV\""
+      ],
+      "verificationUrls": [
+        "https://en.thepickychemist.com/product-page/colombia-geisha-emv-250g"
+      ]
+    },
+    {
+      "productNo": 252,
+      "originalName": "브라질 드립백 1box(8ea)",
+      "regionId": null,
+      "decision": "Grade, decaffeination method, package or multi-coffee set; no single producing geographic identity in seed. Commodity grading/processing label is not an origin.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=252"
+      ]
+    },
+    {
+      "productNo": 262,
+      "originalName": "콜롬비아 슈가케인 디카페인",
+      "regionId": null,
+      "decision": "Grade, decaffeination method, package or multi-coffee set; no single producing geographic identity in seed. Commodity grading/processing label is not an origin.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=262"
+      ]
+    },
+    {
+      "productNo": 262,
+      "originalName": "콜롬비아 벨라 비스타 치로소 워시드",
+      "regionId": null,
+      "decision": "Bella Vista Chiroso is produced by more than one farmer/region; Carmen Patiño Urrao material does not establish seed producer. Plain anaerobic-washed also lacks producer identity.",
+      "reason": null,
+      "searchQueries": [
+        "Bella Vista Chiroso Colombia Carmen",
+        "Bella Vista Chiroso Garzon"
+      ],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=262",
+        "https://utahcoffee.com/wp-content/uploads/2021/09/Coffee-Newsletter-September-Guest-copy-final.pdf"
+      ]
+    },
+    {
+      "productNo": 268,
+      "originalName": "콜롬비아 엘 포르베니르 핑크 버번 워시드",
+      "regionId": null,
+      "decision": "El Porvenir Pink Bourbon farms found in Palestina and La Unión, Nariño; original Momos producer not established.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://primegreencoffee.org/product/colombia-el-porvenir/",
+        "https://www.seycoffee.com/products/2026-juan-jimenez-el-porvenir-colombia"
+      ]
+    },
+    {
+      "productNo": 274,
+      "originalName": "[기획상품] 토치 콜롬비아 셀렉션",
+      "regionId": null,
+      "decision": "Grade, decaffeination method, package or multi-coffee set; no single producing geographic identity in seed. Commodity grading/processing label is not an origin.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=274"
+      ]
+    },
+    {
+      "productNo": 274,
+      "originalName": "콜롬비아 핀카 리바다비아 디카프 워시드",
+      "regionId": null,
+      "decision": "Momos Castillo listing confirms trade name but no exact farm geography. Korean and Rivadavia/Ribadavia searches did not identify the decaf producer; accommodation records excluded.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/article/%EA%B3%B5%EC%A7%80%EC%82%AC%ED%95%AD/1/45843/"
+      ]
+    },
+    {
+      "productNo": 275,
+      "originalName": "[2.12 오픈] 페루 라 에스페란자 우쉬우쉬 워시드",
+      "regionId": null,
+      "decision": "unresolved: no primary Peru La Esperanza Wush Wush matching product found. Similar Colombian La Esperanza Wush Wush (Argemiro Hernandez, Tolima) is a different country and cannot be assigned.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://allianceforcoffeeexcellence.org/peru-2024/",
+        "https://unspecialty.com/product/detail.html?product_no=275"
+      ]
+    },
+    {
+      "productNo": 275,
+      "originalName": "[2.17 오픈] 콜롬비아 라 팔마 엘 투칸 이퀘이션 핑크 버번 내추럴",
+      "regionId": null,
+      "decision": "La Palma y El Tucan includes neighboring growers and processing-only products. Specific Equation/Pink Bourbon/HWA/Warrior Java labels did not resolve farm or village; estate Zipacon address cannot establish partner cultivation.",
+      "reason": null,
+      "searchQueries": [
+        "La Palma Warrior Java coffee",
+        "La Palma Equation Pink coffee",
+        "La Palma El Tucan HWA Pink Bourbon"
+      ],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=275"
+      ]
+    },
+    {
+      "productNo": 275,
+      "originalName": "[2.10 오픈] 콜롬비아 라 팔마 엘 투칸 핑크 버번 락틱 워시드 (프로듀싱 HWA)",
+      "regionId": null,
+      "decision": "La Palma y El Tucan includes neighboring growers and processing-only products. Specific Equation/Pink Bourbon/HWA/Warrior Java labels did not resolve farm or village; estate Zipacon address cannot establish partner cultivation.",
+      "reason": null,
+      "searchQueries": [
+        "La Palma Warrior Java coffee",
+        "La Palma Equation Pink coffee",
+        "La Palma El Tucan HWA Pink Bourbon"
+      ],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=275"
+      ]
+    },
+    {
+      "productNo": 275,
+      "originalName": "[2.17 오픈] 콜롬비아 라 팔마 엘 투칸 워리어 시리즈 자바 PH Clarity",
+      "regionId": null,
+      "decision": "La Palma y El Tucan includes neighboring growers and processing-only products. Specific Equation/Pink Bourbon/HWA/Warrior Java labels did not resolve farm or village; estate Zipacon address cannot establish partner cultivation.",
+      "reason": null,
+      "searchQueries": [
+        "La Palma Warrior Java coffee",
+        "La Palma Equation Pink coffee",
+        "La Palma El Tucan HWA Pink Bourbon"
+      ],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=275"
+      ]
+    },
+    {
+      "productNo": 286,
+      "originalName": "콜롬비아 슈가케인 E.A 디카페인",
+      "regionId": null,
+      "decision": "Grade, decaffeination method, package or multi-coffee set; no single producing geographic identity in seed. Commodity grading/processing label is not an origin.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=286"
+      ]
+    },
+    {
+      "productNo": 286,
+      "originalName": "[3.12 오픈] 페루 엘 세드로 문도노보 파체 워시드",
+      "regionId": null,
+      "decision": "El Cedro homonyms in Amazonas and Cajamarca; original label lacks producer needed to disambiguate.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://allianceforcoffeeexcellence.org/directory/88-64-5/",
+        "https://festcoffeemission.com/wp-content/uploads/2024/03/en-30-1141-0359-peru-el-cedro.pdf"
+      ]
+    },
+    {
+      "productNo": 286,
+      "originalName": "[3.00 오픈] 콜롬비아 라스 마리아스 핑크버번 삼중 무산소 워시드",
+      "regionId": null,
+      "decision": "José Giraldo Las Marias is a Quindio estate and processing brand, but importer explicitly identifies purchased Pink Bourbon cherries grown by Huila partners. Exact seed triple anaerobic / anaerobic-washed product is not tied to an identified partner lot, so neither estate municipality Pijao nor Huila is inferred for these seeds.",
+      "reason": null,
+      "searchQueries": [
+        "Las Marias Pink Bourbon triple anaerobic washed origin",
+        "Jose Giraldo Pink Bourbon Huila"
+      ],
+      "verificationUrls": [
+        "https://musacoffee.com/coffee/panela-sticky",
+        "https://unspecialty.com/product/detail.html?product_no=286",
+        "https://yellowroostercoffee.com/product/jose-giraldo-pink-bourbon-panela-sticky-washed/"
+      ]
+    },
+    {
+      "productNo": 286,
+      "originalName": "페루 엘 미라로드 게이샤 워시드",
+      "regionId": null,
+      "decision": "unresolved: El Mirador is homonymous across Peruvian producers. Yoniser Mego Lot 5 is documented, but no producer or matching numbered-lot evidence links these Lot 3/4/plain rows.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://allianceforcoffeeexcellence.org/peru-2024/",
+        "https://unspecialty.com/product/detail.html?product_no=286",
+        "https://www.woodberrycoffee.com/products/mirador_g_w"
+      ]
+    },
+    {
+      "productNo": 288,
+      "originalName": "[기획상품] 페루 시그니처 셀렉션",
+      "regionId": null,
+      "decision": "Multi-coffee collection, not a single producing origin.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": []
+    },
+    {
+      "productNo": 288,
+      "originalName": "콜롬비아 알레한드리아 게이샤 애너로빅 워시드",
+      "regionId": null,
+      "decision": "Bella Alejandria / Wilder Lazo importer confirmed Huila, but seed omits Bella and producer. No exact seed equivalence located; shortened homonymous farm name insufficient.",
+      "reason": null,
+      "searchQueries": [
+        "Alejandria Geisha Colombia washed",
+        "콜롬비아 알레한드리아 게이샤"
+      ],
+      "verificationUrls": [
+        "https://coffeemeup.kr/2155",
+        "https://unspecialty.com/product/detail.html?product_no=288"
+      ]
+    },
+    {
+      "productNo": 289,
+      "originalName": "[4.14 오픈] #126 콜롬비아 엘 레퀴에르도 게이샤 워시드",
+      "regionId": null,
+      "decision": "Two Colombian El Recuerdo Gesha producers found in Bruselas and Anolaima; original offerings lack producer identity.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://cafe1750.com/casa-de-la-abuela",
+        "https://www.kundecoffee.com/es/shop/rcd-005/"
+      ]
+    },
+    {
+      "productNo": 289,
+      "originalName": "#136 페루 라 마르가리타스 M10 게이샤 워시드",
+      "regionId": null,
+      "decision": "unresolved: La Margaritas M10 spelling/plot not found in primary source. La Margarita Solorzano is a candidate, but M10 is not established.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://onyxcoffeelab.com/en-int/products/peru-la-margarita-gesha-26",
+        "https://unspecialty.com/product/detail.html?product_no=289",
+        "https://www.queonda.coffee/h6-familia-solorzano"
+      ]
+    },
+    {
+      "productNo": 289,
+      "originalName": "콜롬비아 슈가케인 디카페인",
+      "regionId": null,
+      "decision": "Grade, decaffeination method, package or multi-coffee set; no single producing geographic identity in seed. Commodity grading/processing label is not an origin.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=289"
+      ]
+    },
+    {
+      "productNo": 294,
+      "originalName": "콜롬비아 엘 레큐에르도 게이샤 워시드",
+      "regionId": null,
+      "decision": "Two Colombian El Recuerdo Gesha producers found in Bruselas and Anolaima; original offerings lack producer identity.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://cafe1750.com/casa-de-la-abuela",
+        "https://www.kundecoffee.com/es/shop/rcd-005/"
+      ]
+    },
+    {
+      "productNo": 296,
+      "originalName": "[5.12 오픈] 콜롬비아 로스 피노스 게이샤 워시드",
+      "regionId": null,
+      "decision": "Los Pinos Gesha homonyms in Inzá and San Agustín; original producer not established.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://hydrangea.coffee/products/gesha-washed-los-pinos",
+        "https://noxcoffeelab.cl/blogs/noticias/la-historia-de-draco"
+      ]
+    },
+    {
+      "productNo": 303,
+      "originalName": "콜롬비아 디카페인 블렌드",
+      "regionId": null,
+      "decision": "Grade, decaffeination method, package or multi-coffee set; no single producing geographic identity in seed. Commodity grading/processing label is not an origin.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=303"
+      ]
+    },
+    {
+      "productNo": 307,
+      "originalName": "#8 콜롬비아 부에나비스타 라 에스메랄다 카스티요 애너로빅 워시드(와일드 시트러스)",
+      "regionId": null,
+      "decision": "La Esmeralda is shared by unrelated Colombian estates. Sidra was separately tied to Acevedo, but no exact source ties these Gesha / Buena Vista Castillo seed products to that producer. Do not transfer Sidra geography.",
+      "reason": null,
+      "searchQueries": [
+        "Colombia La Esmeralda Geisha anaerobic",
+        "콜롬비아 라 에스메랄다 게이샤 가치",
+        "Buena Vista La Esmeralda Castillo Wild Citrus"
+      ],
+      "verificationUrls": [
+        "https://pullandpourcoffee.com/brew-guide/kodawari-geisha-nordaggios-coffee/",
+        "https://skillissue.coffee/shop/p/colombia-la-esmeralda-sidra-semiwashed",
+        "https://unspecialty.com/product/detail.html?product_no=307"
+      ]
+    },
+    {
+      "productNo": 308,
+      "originalName": "[7.14 오픈] #13 페루 라 팔마 게이샤 워시드",
+      "regionId": null,
+      "decision": "unresolved: multiple La Palma washed Gesha farms (Miguel Lopez in Chirinos; Segundo Pintado in Tabaconas; Oscar Abad). Missing producer prevents specific mapping.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://darkponycoffee.com/products/gesha-la-palma",
+        "https://sucafina.com/apac/offerings/la-palma-segundo-pintado-geisha-fw",
+        "https://unspecialty.com/product/detail.html?product_no=308"
+      ]
+    },
+    {
+      "productNo": 313,
+      "originalName": "[8.8 오픈] #24 콜롬비아 엘 트리운포 핑크 부르봉 디카페인",
+      "regionId": null,
+      "decision": "El Triunfo Gesha/decaf are not necessarily the Israel Hernandez Sudan Rume estate. Other actual farms occur at San Agustin (Yeni Anacona) and Dolores Tolima (Insignia); original producer absent.",
+      "reason": null,
+      "searchQueries": [
+        "El Triunfo Gesha Colombia",
+        "El Triunfo Pink Bourbon decaf"
+      ],
+      "verificationUrls": [
+        "https://coffeesouq1.com/ZqZPwNb",
+        "https://insignia.coffee/en",
+        "https://unspecialty.com/product/detail.html?product_no=313"
+      ]
+    },
+    {
+      "productNo": 313,
+      "originalName": "[8.25 오픈] #21 콜롬비아 엘 파라이소 로사도 핑크 부르봉 워시드",
+      "regionId": null,
+      "decision": "Official Zeo/Sake/Antimaceration product names matched separately. Generic Gesha Natural/Pink Rosado lack producer identity; numerous El Paraiso estates and purchased-cherry processing exist.",
+      "reason": null,
+      "searchQueries": [
+        "El Paraiso Geisha Natural Colombia",
+        "El Paraiso Rosado Pink Bourbon"
+      ],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=313",
+        "https://www.coffeemontage.com/goods/goods_view.php?goodsNo=1000000138",
+        "https://www.fincaelparaiso.com/products"
+      ]
+    },
+    {
+      "productNo": 313,
+      "originalName": "#34 콜롬비아 엘 파라이소 게이샤 내추럴",
+      "regionId": null,
+      "decision": "Official Zeo/Sake/Antimaceration product names matched separately. Generic Gesha Natural/Pink Rosado lack producer identity; numerous El Paraiso estates and purchased-cherry processing exist.",
+      "reason": null,
+      "searchQueries": [
+        "El Paraiso Geisha Natural Colombia",
+        "El Paraiso Rosado Pink Bourbon"
+      ],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=313",
+        "https://www.coffeemontage.com/goods/goods_view.php?goodsNo=1000000138",
+        "https://www.fincaelparaiso.com/products"
+      ]
+    },
+    {
+      "productNo": 324,
+      "originalName": "[9.8 오픈] #10 콜롬비아 부에노스 아이레스 게이샤 워시드",
+      "regionId": null,
+      "decision": "CGLE-qualified Buenos Aires matched separately. Unqualified seed Buenos Aires lacks farm owner and multiple Colombian farms use the name; cannot import CGLE location.",
+      "reason": null,
+      "searchQueries": [
+        "부에노스 아이레스 게이샤 콜롬비아",
+        "Buenos Aires Geisha Colombia"
+      ],
+      "verificationUrls": [
+        "https://coffeedot.stores.jp/items/66fe32bce7836e02b26c805f",
+        "https://unspecialty.com/product/detail.html?product_no=324"
+      ]
+    },
+    {
+      "productNo": 324,
+      "originalName": "#16 콜롬비아 수프리모 슈가케인 디카페인",
+      "regionId": null,
+      "decision": "Grade, decaffeination method, package or multi-coffee set; no single producing geographic identity in seed. Commodity grading/processing label is not an origin.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=324"
+      ]
+    },
+    {
+      "productNo": 330,
+      "originalName": "[10.15 오픈] #31 콜롬비아 라 에스메랄다 게이샤 무산소 내추럴",
+      "regionId": null,
+      "decision": "La Esmeralda is shared by unrelated Colombian estates. Sidra was separately tied to Acevedo, but no exact source ties these Gesha / Buena Vista Castillo seed products to that producer. Do not transfer Sidra geography.",
+      "reason": null,
+      "searchQueries": [
+        "Colombia La Esmeralda Geisha anaerobic",
+        "콜롬비아 라 에스메랄다 게이샤 가치",
+        "Buena Vista La Esmeralda Castillo Wild Citrus"
+      ],
+      "verificationUrls": [
+        "https://pullandpourcoffee.com/brew-guide/kodawari-geisha-nordaggios-coffee/",
+        "https://skillissue.coffee/shop/p/colombia-la-esmeralda-sidra-semiwashed",
+        "https://unspecialty.com/product/detail.html?product_no=330"
+      ]
+    },
+    {
+      "productNo": 331,
+      "originalName": "#9 콜롬비아 엘 아티스타 아히 버번 워시드",
+      "regionId": null,
+      "decision": "Korean and El Artista/Aji/Ahi Bourbon searches identify coffee reviews but no producer-owned farm location; no geographic registration from review notes.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=331"
+      ]
+    },
+    {
+      "productNo": 341,
+      "originalName": "#22 콜롬비아 라스 마리아스 핑크 버번 무산소 워시드",
+      "regionId": null,
+      "decision": "José Giraldo Las Marias is a Quindio estate and processing brand, but importer explicitly identifies purchased Pink Bourbon cherries grown by Huila partners. Exact seed triple anaerobic / anaerobic-washed product is not tied to an identified partner lot, so neither estate municipality Pijao nor Huila is inferred for these seeds.",
+      "reason": null,
+      "searchQueries": [
+        "Las Marias Pink Bourbon triple anaerobic washed origin",
+        "Jose Giraldo Pink Bourbon Huila"
+      ],
+      "verificationUrls": [
+        "https://musacoffee.com/coffee/panela-sticky",
+        "https://unspecialty.com/product/detail.html?product_no=341",
+        "https://yellowroostercoffee.com/product/jose-giraldo-pink-bourbon-panela-sticky-washed/"
+      ]
+    },
+    {
+      "productNo": 346,
+      "originalName": "#2 브라질 산토스 문도 노보 마운틴 워터 디카페인",
+      "regionId": null,
+      "decision": "Santos is a trade/port designation. Mundo Novo + water-decaf process does not resolve coffee-growing geography.",
+      "reason": null,
+      "searchQueries": [
+        "Brazil Santos Mundo Novo mountain water decaf"
+      ],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=346"
+      ]
+    },
+    {
+      "productNo": 357,
+      "originalName": "[11.26 오픈] #29 페루 라 무쉬카 게이샤 워시드",
+      "regionId": null,
+      "decision": "unresolved original product: La Mushca occurs as one farm supplying Tabaconas Hygieia Geisha blend; no named producer ties the original standalone product to that farm.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=357",
+        "https://www.io-cafe.com/menu/Cajamarca--W"
+      ]
+    },
+    {
+      "productNo": 390,
+      "originalName": "[2.5 오픈] #11 콜롬비아 라 파르셀라 핑크 버번 내추럴",
+      "regionId": null,
+      "decision": "Exact lot 1341/1342/1344 and Korean name searches did not identify Coffee Place supply origin. La Parcela at La Plata grows Castillo, and similarly named Honduras/Costa Rica estates cannot establish these Colombian Gesha/Pink Bourbon lots.",
+      "reason": null,
+      "searchQueries": [
+        "La Parcela 1342 coffee",
+        "라 파르셀라 커피",
+        "Finca La Parcela Colombia coffee"
+      ],
+      "verificationUrls": [
+        "https://aromamontealegre.com/en/nuestra-historia/",
+        "https://projectorigin.coffee/directory/",
+        "https://unspecialty.com/product/detail.html?product_no=390"
+      ]
+    },
+    {
+      "productNo": 390,
+      "originalName": "#22 콜롬비아 라 파르셀라 게이샤 워시드 (Lot 1342)",
+      "regionId": null,
+      "decision": "Exact lot 1341/1342/1344 and Korean name searches did not identify Coffee Place supply origin. La Parcela at La Plata grows Castillo, and similarly named Honduras/Costa Rica estates cannot establish these Colombian Gesha/Pink Bourbon lots.",
+      "reason": null,
+      "searchQueries": [
+        "La Parcela 1342 coffee",
+        "라 파르셀라 커피",
+        "Finca La Parcela Colombia coffee"
+      ],
+      "verificationUrls": [
+        "https://aromamontealegre.com/en/nuestra-historia/",
+        "https://projectorigin.coffee/directory/",
+        "https://unspecialty.com/product/detail.html?product_no=390"
+      ]
+    },
+    {
+      "productNo": 390,
+      "originalName": "[2.5 오픈] #29 콜롬비아 라 파르셀라 게이샤 워시드 (Lot 1344)",
+      "regionId": null,
+      "decision": "Exact lot 1341/1342/1344 and Korean name searches did not identify Coffee Place supply origin. La Parcela at La Plata grows Castillo, and similarly named Honduras/Costa Rica estates cannot establish these Colombian Gesha/Pink Bourbon lots.",
+      "reason": null,
+      "searchQueries": [
+        "La Parcela 1342 coffee",
+        "라 파르셀라 커피",
+        "Finca La Parcela Colombia coffee"
+      ],
+      "verificationUrls": [
+        "https://aromamontealegre.com/en/nuestra-historia/",
+        "https://projectorigin.coffee/directory/",
+        "https://unspecialty.com/product/detail.html?product_no=390"
+      ]
+    },
+    {
+      "productNo": 390,
+      "originalName": "[2.9 오픈] #32 콜롬비아 라 파르셀라 게이샤 내추럴 (Lot 1341)",
+      "regionId": null,
+      "decision": "Exact lot 1341/1342/1344 and Korean name searches did not identify Coffee Place supply origin. La Parcela at La Plata grows Castillo, and similarly named Honduras/Costa Rica estates cannot establish these Colombian Gesha/Pink Bourbon lots.",
+      "reason": null,
+      "searchQueries": [
+        "La Parcela 1342 coffee",
+        "라 파르셀라 커피",
+        "Finca La Parcela Colombia coffee"
+      ],
+      "verificationUrls": [
+        "https://aromamontealegre.com/en/nuestra-historia/",
+        "https://projectorigin.coffee/directory/",
+        "https://unspecialty.com/product/detail.html?product_no=390"
+      ]
+    },
+    {
+      "productNo": 358,
+      "originalName": "#1 콜롬비아 엑셀소 마운틴 워터 디카페인",
+      "regionId": null,
+      "decision": "Grade, decaffeination method, package or multi-coffee set; no single producing geographic identity in seed. Commodity grading/processing label is not an origin.",
+      "reason": null,
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=358"
+      ]
+    },
+    {
+      "productNo": 358,
+      "originalName": "[12.15 오픈] #35 콜롬비아 알레한드리아 게이샤 무산소 워시드",
+      "regionId": null,
+      "decision": "Bella Alejandria / Wilder Lazo importer confirmed Huila, but seed omits Bella and producer. No exact seed equivalence located; shortened homonymous farm name insufficient.",
+      "reason": null,
+      "searchQueries": [
+        "Alejandria Geisha Colombia washed",
+        "콜롬비아 알레한드리아 게이샤"
+      ],
+      "verificationUrls": [
+        "https://coffeemeup.kr/2155",
+        "https://unspecialty.com/product/detail.html?product_no=358"
+      ]
+    },
+    {
+      "productNo": 278,
+      "originalName": "[커피 생두] 브라질 파젠다 엄 옐로우 버번 다크룸 내추럴",
+      "regionId": null,
+      "decision": "Fazenda Um operates Minas Gerais and Espírito Santo farms. Exact domestic Yellow Bourbon Darkroom trade listing does not state cultivation origin; summaries disagree and the unnamed 2025 auction #1 785 lot is not tied to an auction catalog. Keep farm unresolved at municipality level.",
+      "reason": null,
+      "searchQueries": [
+        "파젠다 엄 785 2025 옥션",
+        "Fazenda Um yellow bourbon dark room origin"
+      ],
+      "verificationUrls": [
+        "https://alwaysau8ust.co.kr/product/brazil-fazenda-um-dark-room-브라질-파젠다-엄-다크룸-100g/169/",
+        "https://eng.firescope.cropster.com/review/brazil-fazenda-um-yellow-bourbon-dark-room",
+        "https://unspecialty.com/product/detail.html?product_no=278",
+        "https://www.gsc.coffee/goods/goods_view.php?goodsNo=1000001108"
+      ]
+    },
+    {
+      "productNo": 278,
+      "originalName": "브라질 파젠다 엄 옐로우 버번 다크룸 내추럴",
+      "regionId": null,
+      "decision": "Fazenda Um operates Minas Gerais and Espírito Santo farms. Exact domestic Yellow Bourbon Darkroom trade listing does not state cultivation origin; summaries disagree and the unnamed 2025 auction #1 785 lot is not tied to an auction catalog. Keep farm unresolved at municipality level.",
+      "reason": null,
+      "searchQueries": [
+        "파젠다 엄 785 2025 옥션",
+        "Fazenda Um yellow bourbon dark room origin"
+      ],
+      "verificationUrls": [
+        "https://alwaysau8ust.co.kr/product/brazil-fazenda-um-dark-room-브라질-파젠다-엄-다크룸-100g/169/",
+        "https://eng.firescope.cropster.com/review/brazil-fazenda-um-yellow-bourbon-dark-room",
+        "https://unspecialty.com/product/detail.html?product_no=278",
+        "https://www.gsc.coffee/goods/goods_view.php?goodsNo=1000001108"
+      ]
+    },
+    {
+      "productNo": 700,
+      "originalName": "[존스몰 로스터리] 에티오피아 아르베고나 두완초 74158 내추럴",
+      "regionId": null,
+      "decision": "ambiguous-trade-lot-name",
+      "reason": "같은 이름이 Arbegona 마을/가공소와 Keramo 과일 유래 로트 등 다른 생산 맥락에 쓰인다. 개별 상품 생산자 확인 없이 일괄 연결하지 않음.",
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://jbccoffeeroasters.com/new-duwancho-ethiopia-natural/",
+        "https://roastdb.com/beans/sey-duwancho",
+        "https://shop.gardellicoffee.com/sold-out/576-duwancho-ethiopia",
+        "https://www.dayebensacoffee.com/duwancho-gattafarm",
+        "https://www.sleepyhollowcoffeeroasters.com/duwancho"
+      ]
+    },
+    {
+      "productNo": 727,
+      "originalName": "[토치커피] 에티오피아 두완초 74158 내추럴",
+      "regionId": null,
+      "decision": "ambiguous-trade-lot-name",
+      "reason": "같은 이름이 Arbegona 마을/가공소와 Keramo 과일 유래 로트 등 다른 생산 맥락에 쓰인다. 개별 상품 생산자 확인 없이 일괄 연결하지 않음.",
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://jbccoffeeroasters.com/new-duwancho-ethiopia-natural/",
+        "https://roastdb.com/beans/sey-duwancho",
+        "https://shop.gardellicoffee.com/sold-out/576-duwancho-ethiopia",
+        "https://www.dayebensacoffee.com/duwancho-gattafarm",
+        "https://www.sleepyhollowcoffeeroasters.com/duwancho"
+      ]
+    },
+    {
+      "productNo": 851,
+      "originalName": "#7 에티오피아 니구세 게메다 시다마 부라 두완초 74158 내추럴",
+      "regionId": null,
+      "decision": "ambiguous-trade-lot-name",
+      "reason": "같은 이름이 Arbegona 마을/가공소와 Keramo 과일 유래 로트 등 다른 생산 맥락에 쓰인다. 개별 상품 생산자 확인 없이 일괄 연결하지 않음.",
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://jbccoffeeroasters.com/new-duwancho-ethiopia-natural/",
+        "https://roastdb.com/beans/sey-duwancho",
+        "https://shop.gardellicoffee.com/sold-out/576-duwancho-ethiopia",
+        "https://www.dayebensacoffee.com/duwancho-gattafarm",
+        "https://www.sleepyhollowcoffeeroasters.com/duwancho"
+      ]
+    },
+    {
+      "productNo": 775,
+      "originalName": "#7 에티오피아 시다마 아르베고나 물루게타 문타샤 두완초 74158 내추럴",
+      "regionId": null,
+      "decision": "ambiguous-trade-lot-name",
+      "reason": "같은 이름이 Arbegona 마을/가공소와 Keramo 과일 유래 로트 등 다른 생산 맥락에 쓰인다. 개별 상품 생산자 확인 없이 일괄 연결하지 않음.",
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://jbccoffeeroasters.com/new-duwancho-ethiopia-natural/",
+        "https://roastdb.com/beans/sey-duwancho",
+        "https://shop.gardellicoffee.com/sold-out/576-duwancho-ethiopia",
+        "https://www.dayebensacoffee.com/duwancho-gattafarm",
+        "https://www.sleepyhollowcoffeeroasters.com/duwancho"
+      ]
+    },
+    {
+      "productNo": 262,
+      "originalName": "에티오피아 시다마 벤사 두완초 내추럴",
+      "regionId": null,
+      "decision": "ambiguous-trade-lot-name",
+      "reason": "같은 이름이 Arbegona 마을/가공소와 Keramo 과일 유래 로트 등 다른 생산 맥락에 쓰인다. 개별 상품 생산자 확인 없이 일괄 연결하지 않음.",
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://jbccoffeeroasters.com/new-duwancho-ethiopia-natural/",
+        "https://roastdb.com/beans/sey-duwancho",
+        "https://shop.gardellicoffee.com/sold-out/576-duwancho-ethiopia",
+        "https://www.dayebensacoffee.com/duwancho-gattafarm",
+        "https://www.sleepyhollowcoffeeroasters.com/duwancho"
+      ]
+    },
+    {
+      "productNo": 307,
+      "originalName": "[6/26 오픈] #17 에티오피아 니구세 시다마 벤사 두완초 내추럴",
+      "regionId": null,
+      "decision": "ambiguous-trade-lot-name",
+      "reason": "같은 이름이 Arbegona 마을/가공소와 Keramo 과일 유래 로트 등 다른 생산 맥락에 쓰인다. 개별 상품 생산자 확인 없이 일괄 연결하지 않음.",
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://jbccoffeeroasters.com/new-duwancho-ethiopia-natural/",
+        "https://roastdb.com/beans/sey-duwancho",
+        "https://shop.gardellicoffee.com/sold-out/576-duwancho-ethiopia",
+        "https://www.dayebensacoffee.com/duwancho-gattafarm",
+        "https://www.sleepyhollowcoffeeroasters.com/duwancho"
+      ]
+    },
+    {
+      "productNo": 313,
+      "originalName": "[8.6 오픈] #23 에티오피아 시다마 벤사 두완초 74158 내추럴",
+      "regionId": null,
+      "decision": "ambiguous-trade-lot-name",
+      "reason": "같은 이름이 Arbegona 마을/가공소와 Keramo 과일 유래 로트 등 다른 생산 맥락에 쓰인다. 개별 상품 생산자 확인 없이 일괄 연결하지 않음.",
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://jbccoffeeroasters.com/new-duwancho-ethiopia-natural/",
+        "https://roastdb.com/beans/sey-duwancho",
+        "https://shop.gardellicoffee.com/sold-out/576-duwancho-ethiopia",
+        "https://www.dayebensacoffee.com/duwancho-gattafarm",
+        "https://www.sleepyhollowcoffeeroasters.com/duwancho"
+      ]
+    },
+    {
+      "productNo": 390,
+      "originalName": "#5 에티오피아 니구세 게메다 두완초 74110 74158 내추럴",
+      "regionId": null,
+      "decision": "ambiguous-trade-lot-name",
+      "reason": "같은 이름이 Arbegona 마을/가공소와 Keramo 과일 유래 로트 등 다른 생산 맥락에 쓰인다. 개별 상품 생산자 확인 없이 일괄 연결하지 않음.",
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://jbccoffeeroasters.com/new-duwancho-ethiopia-natural/",
+        "https://roastdb.com/beans/sey-duwancho",
+        "https://shop.gardellicoffee.com/sold-out/576-duwancho-ethiopia",
+        "https://www.dayebensacoffee.com/duwancho-gattafarm",
+        "https://www.sleepyhollowcoffeeroasters.com/duwancho"
+      ]
+    },
+    {
+      "productNo": 224,
+      "originalName": "[8.6 오픈] 에티오피아 우쉬우쉬 워시드",
+      "regionId": null,
+      "decision": "reviewed-cultivar-origin-ambiguous",
+      "reason": "원문224에는 Ethiopian Wush Wush Washed만 있고 생산자/워싱스테이션/지리가 없다. Wush Wush는 품종명으로도 사용되고 별도 로스터의 Kaffa/Wush Wush 로트가 원문224와 같은 로트라는 증거가 없어 마을/Kaffa로 연결하지 않는다.",
+      "searchQueries": [
+        "Ethiopia Wush Wush Washed origin"
+      ],
+      "verificationUrls": [
+        "https://beanbench.coffee/learn/wush-wush-coffee/",
+        "https://musacoffee.com/coffee/wush-wush",
+        "https://projectorigin.coffee/wp-content/uploads/2022/01/ETH_Keffa_WushWush_2022.pdf",
+        "https://unspecialty.com/product/detail.html?product_no=224",
+        "https://wushwush.coffee/en/project/",
+        "https://www.newordercoffee.com/coffee/p/wushwush1",
+        "https://www.redroostercoffee.com/products/ethiopia-wush-wush-washed"
+      ]
+    },
+    {
+      "productNo": 506,
+      "originalName": "[커피 생두] 에티오피아 하이시아 샤페타 74158 무산소 내추럴",
+      "regionId": null,
+      "decision": "reviewed-unresolved-lot-identity",
+      "reason": "원문506은 Haisia Shafeta74158 Anaerobic Natural이나 상세 본문과 상세 이미지가 비어 있다. Haisia를 명시한 동일 로트의 일차 자료를 찾지 못했다. 해외 Shafeta(Bekele Kachara/Murago)를 Niguse/Haisia 로트에 대입하지 않는다.",
+      "searchQueries": [
+        "\"Haisia\" \"Shafeta\" coffee",
+        "\"Haisia\" coffee Ethiopia"
+      ],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=506",
+        "https://www.clandestino.com.au/products/sidama-shafeta-anaerobic-natural",
+        "https://www.motobean.com.au/products/ethiopia-sidama-shafeta-espresso-coffee"
+      ]
+    },
+    {
+      "productNo": 506,
+      "originalName": "Ethiopia Haisia Shafeta 74158 Anaerobic Natural",
+      "regionId": null,
+      "decision": "reviewed-unresolved-lot-identity",
+      "reason": "원문506은 Haisia Shafeta74158 Anaerobic Natural이나 상세 본문과 상세 이미지가 비어 있다. Haisia를 명시한 동일 로트의 일차 자료를 찾지 못했다. 해외 Shafeta(Bekele Kachara/Murago)를 Niguse/Haisia 로트에 대입하지 않는다.",
+      "searchQueries": [
+        "\"Haisia\" \"Shafeta\" coffee",
+        "\"Haisia\" coffee Ethiopia"
+      ],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=506",
+        "https://www.clandestino.com.au/products/sidama-shafeta-anaerobic-natural",
+        "https://www.motobean.com.au/products/ethiopia-sidama-shafeta-espresso-coffee"
+      ]
+    },
+    {
+      "productNo": 515,
+      "originalName": "샤페타",
+      "regionId": null,
+      "decision": "researched-unresolved-homonymous-processing-label",
+      "reason": "Shafeta는 여러 생산자의 가공 로트명으로 쓰입니다. 구성 원두의 Keramo는 별도 연결했으나 Shafeta 단독 명칭에는 한 지역을 부여하지 않습니다.",
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=515"
+      ]
+    },
+    {
+      "productNo": 262,
+      "originalName": "[12.16 오픈] 에티오피아 샤페타 내추럴",
+      "regionId": null,
+      "decision": "reviewed-unresolved-lot-identity",
+      "reason": "원문262 샤페타 내추럴/동결건조 커피는 생산자와 지역이 생략된 상품명. 해외 로스터의 Bekele Kachara/Murago Shafeta와 동일한 원두라는 연결 근거가 없고 다른 원문에는 Niguse/Haisia/Karamo Shafeta도 존재하므로 이름만으로 지역 확정하지 않는다.",
+      "searchQueries": [
+        "\"Shafeta\" coffee Ethiopia",
+        "\"샤페타\" 내추럴"
+      ],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=262",
+        "https://www.clandestino.com.au/products/sidama-shafeta-anaerobic-natural",
+        "https://www.motobean.com.au/products/ethiopia-sidama-shafeta-espresso-coffee"
+      ]
+    },
+    {
+      "productNo": 262,
+      "originalName": "동결건조 커피 : 에티오피아 샤페타 내추럴 30g",
+      "regionId": null,
+      "decision": "reviewed-unresolved-lot-identity",
+      "reason": "원문262 샤페타 내추럴/동결건조 커피는 생산자와 지역이 생략된 상품명. 해외 로스터의 Bekele Kachara/Murago Shafeta와 동일한 원두라는 연결 근거가 없고 다른 원문에는 Niguse/Haisia/Karamo Shafeta도 존재하므로 이름만으로 지역 확정하지 않는다.",
+      "searchQueries": [
+        "\"Shafeta\" coffee Ethiopia",
+        "\"샤페타\" 내추럴"
+      ],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=262",
+        "https://www.clandestino.com.au/products/sidama-shafeta-anaerobic-natural",
+        "https://www.motobean.com.au/products/ethiopia-sidama-shafeta-espresso-coffee"
+      ]
+    },
+    {
+      "productNo": 286,
+      "originalName": "에티오피아 니구세-샤페타 이노큘레이트 내추럴",
+      "regionId": null,
+      "decision": "reviewed-unresolved-lot-identity",
+      "reason": "원문은 Niguse-Shafeta Inoculated Natural이며 해외 공식 Shafeta 자료는 Bekele Kachara/Murago Anaerobic Natural이다. 생산자와 가공이 다르고 동일 로트를 뒷받침하는 원자료가 없어 Murago 또는 다른 Niguse 농장 지역에 연결하지 않는다.",
+      "searchQueries": [
+        "\"Shafeta\" \"Niguse\" coffee",
+        "\"니구세\" \"샤페타\""
+      ],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=286",
+        "https://www.clandestino.com.au/products/sidama-shafeta-anaerobic-natural",
+        "https://www.motobean.com.au/products/ethiopia-sidama-shafeta-espresso-coffee"
+      ]
+    },
+    {
+      "productNo": 371,
+      "originalName": "[1.12 오픈] #34 에티오피아 카라모 샤페타 74158 무산소 내추럴",
+      "regionId": null,
+      "decision": "reviewed-unresolved-lot-identity",
+      "reason": "원문371 Karamo Shafeta74158 Anaerobic Natural은 같은 상품 내 Keramo/케라모 병기가 확인되지 않았다. 다른 상품515의 Karamo/케라모 병기를 이 로트에 전역 적용하지 않는다. 별도 Bekele Kachara/Murago Shafeta와 동일 생산자/로트 근거도 없다.",
+      "searchQueries": [
+        "\"Karamo\" \"Shafeta\" coffee"
+      ],
+      "verificationUrls": [
+        "https://unspecialty.com/product/detail.html?product_no=371",
+        "https://www.clandestino.com.au/products/sidama-shafeta-anaerobic-natural",
+        "https://www.motobean.com.au/products/ethiopia-sidama-shafeta-espresso-coffee"
+      ]
+    },
+    {
+      "productNo": 274,
+      "originalName": "에티오피아 제키 라이 셀렉션 74110 74112 내추럴",
+      "regionId": null,
+      "decision": "selection-trade-name",
+      "reason": "원문에서 셀렉션 이름으로 표시. 독립 재배 마을임을 확인하지 못함.",
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://www.kulturosbarai.lt/uploads/news/id38/KB_2012_2_web.pdf"
+      ]
+    },
+    {
+      "productNo": 735,
+      "originalName": "[고로커피 로스터스] 에티오피아 부르사 문타샤 74158 피베리 내추럴",
+      "regionId": null,
+      "decision": "ambiguous-locality-name",
+      "reason": "Goro는 Hambela와 다른 생산자/농장 맥락에 함께 등장. 원문 제품별 explicitParentRegionId만 사용하고 글로벌 별칭 연결 금지.",
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://88grainescoffee.com/product/guji-goro/",
+        "https://burnettcoffee.com/products/ethiopia-guji-goro-bedessa-specialty-coffee",
+        "https://fr.wikipedia.org/wiki/Hambela_Wamena",
+        "https://servantcoffee.com/product/goro-hambela/"
+      ]
+    },
+    {
+      "productNo": 705,
+      "originalName": "[고로커피 로스터스] 에티오피아 예가체프 첼베사 워시드",
+      "regionId": null,
+      "decision": "ambiguous-locality-name",
+      "reason": "Goro는 Hambela와 다른 생산자/농장 맥락에 함께 등장. 원문 제품별 explicitParentRegionId만 사용하고 글로벌 별칭 연결 금지.",
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://88grainescoffee.com/product/guji-goro/",
+        "https://burnettcoffee.com/products/ethiopia-guji-goro-bedessa-specialty-coffee",
+        "https://fr.wikipedia.org/wiki/Hambela_Wamena",
+        "https://servantcoffee.com/product/goro-hambela/"
+      ]
+    },
+    {
+      "productNo": 483,
+      "originalName": "[고로커피 로스터스] 슈톨렌 블렌드 (언스페셜티 블렌드)",
+      "regionId": null,
+      "decision": "ambiguous-locality-name",
+      "reason": "Goro는 Hambela와 다른 생산자/농장 맥락에 함께 등장. 원문 제품별 explicitParentRegionId만 사용하고 글로벌 별칭 연결 금지.",
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://88grainescoffee.com/product/guji-goro/",
+        "https://burnettcoffee.com/products/ethiopia-guji-goro-bedessa-specialty-coffee",
+        "https://fr.wikipedia.org/wiki/Hambela_Wamena",
+        "https://servantcoffee.com/product/goro-hambela/"
+      ]
+    },
+    {
+      "productNo": 484,
+      "originalName": "고로",
+      "regionId": null,
+      "decision": "ambiguous-locality-name",
+      "reason": "Goro는 Hambela와 다른 생산자/농장 맥락에 함께 등장. 원문 제품별 explicitParentRegionId만 사용하고 글로벌 별칭 연결 금지.",
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://88grainescoffee.com/product/guji-goro/",
+        "https://burnettcoffee.com/products/ethiopia-guji-goro-bedessa-specialty-coffee",
+        "https://fr.wikipedia.org/wiki/Hambela_Wamena",
+        "https://servantcoffee.com/product/goro-hambela/"
+      ]
+    },
+    {
+      "productNo": 485,
+      "originalName": "[고로커피 로스터스] 대공원 블렌드 (하우스 블렌드)",
+      "regionId": null,
+      "decision": "ambiguous-locality-name",
+      "reason": "Goro는 Hambela와 다른 생산자/농장 맥락에 함께 등장. 원문 제품별 explicitParentRegionId만 사용하고 글로벌 별칭 연결 금지.",
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://88grainescoffee.com/product/guji-goro/",
+        "https://burnettcoffee.com/products/ethiopia-guji-goro-bedessa-specialty-coffee",
+        "https://fr.wikipedia.org/wiki/Hambela_Wamena",
+        "https://servantcoffee.com/product/goro-hambela/"
+      ]
+    },
+    {
+      "productNo": 485,
+      "originalName": "고로",
+      "regionId": null,
+      "decision": "ambiguous-locality-name",
+      "reason": "Goro는 Hambela와 다른 생산자/농장 맥락에 함께 등장. 원문 제품별 explicitParentRegionId만 사용하고 글로벌 별칭 연결 금지.",
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://88grainescoffee.com/product/guji-goro/",
+        "https://burnettcoffee.com/products/ethiopia-guji-goro-bedessa-specialty-coffee",
+        "https://fr.wikipedia.org/wiki/Hambela_Wamena",
+        "https://servantcoffee.com/product/goro-hambela/"
+      ]
+    },
+    {
+      "productNo": 702,
+      "originalName": "#7 에티오피아 구지 고로 베데사 월리쇼 쿠루메 내추럴",
+      "regionId": null,
+      "decision": "ambiguous-locality-name",
+      "reason": "Goro는 Hambela와 다른 생산자/농장 맥락에 함께 등장. 원문 제품별 explicitParentRegionId만 사용하고 글로벌 별칭 연결 금지.",
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://88grainescoffee.com/product/guji-goro/",
+        "https://burnettcoffee.com/products/ethiopia-guji-goro-bedessa-specialty-coffee",
+        "https://fr.wikipedia.org/wiki/Hambela_Wamena",
+        "https://servantcoffee.com/product/goro-hambela/"
+      ]
+    },
+    {
+      "productNo": 566,
+      "originalName": "#2 에티오피아 합타무 페카두 아가 고로 사이트 74112 쿠루메 워시드",
+      "regionId": null,
+      "decision": "ambiguous-locality-name",
+      "reason": "Goro는 Hambela와 다른 생산자/농장 맥락에 함께 등장. 원문 제품별 explicitParentRegionId만 사용하고 글로벌 별칭 연결 금지.",
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://88grainescoffee.com/product/guji-goro/",
+        "https://burnettcoffee.com/products/ethiopia-guji-goro-bedessa-specialty-coffee",
+        "https://fr.wikipedia.org/wiki/Hambela_Wamena",
+        "https://servantcoffee.com/product/goro-hambela/"
+      ]
+    },
+    {
+      "productNo": 200,
+      "originalName": "에티오피아 구지 함벨라 고로 언에어로빅 내추럴",
+      "regionId": null,
+      "decision": "ambiguous-locality-name",
+      "reason": "Goro는 Hambela와 다른 생산자/농장 맥락에 함께 등장. 원문 제품별 explicitParentRegionId만 사용하고 글로벌 별칭 연결 금지.",
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://88grainescoffee.com/product/guji-goro/",
+        "https://burnettcoffee.com/products/ethiopia-guji-goro-bedessa-specialty-coffee",
+        "https://fr.wikipedia.org/wiki/Hambela_Wamena",
+        "https://servantcoffee.com/product/goro-hambela/"
+      ]
+    },
+    {
+      "productNo": 307,
+      "originalName": "[판매 종료] 고로커피 로스터스 (6/22 ~ 6/30)",
+      "regionId": null,
+      "decision": "ambiguous-locality-name",
+      "reason": "Goro는 Hambela와 다른 생산자/농장 맥락에 함께 등장. 원문 제품별 explicitParentRegionId만 사용하고 글로벌 별칭 연결 금지.",
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://88grainescoffee.com/product/guji-goro/",
+        "https://burnettcoffee.com/products/ethiopia-guji-goro-bedessa-specialty-coffee",
+        "https://fr.wikipedia.org/wiki/Hambela_Wamena",
+        "https://servantcoffee.com/product/goro-hambela/"
+      ]
+    },
+    {
+      "productNo": 307,
+      "originalName": "#1 에티오피아 구지 함벨라 고로 워시드",
+      "regionId": null,
+      "decision": "ambiguous-locality-name",
+      "reason": "Goro는 Hambela와 다른 생산자/농장 맥락에 함께 등장. 원문 제품별 explicitParentRegionId만 사용하고 글로벌 별칭 연결 금지.",
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://88grainescoffee.com/product/guji-goro/",
+        "https://burnettcoffee.com/products/ethiopia-guji-goro-bedessa-specialty-coffee",
+        "https://fr.wikipedia.org/wiki/Hambela_Wamena",
+        "https://servantcoffee.com/product/goro-hambela/"
+      ]
+    },
+    {
+      "productNo": 323,
+      "originalName": "#2 에티오피아 구지 함벨라 고로 워시드",
+      "regionId": null,
+      "decision": "ambiguous-locality-name",
+      "reason": "Goro는 Hambela와 다른 생산자/농장 맥락에 함께 등장. 원문 제품별 explicitParentRegionId만 사용하고 글로벌 별칭 연결 금지.",
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://88grainescoffee.com/product/guji-goro/",
+        "https://burnettcoffee.com/products/ethiopia-guji-goro-bedessa-specialty-coffee",
+        "https://fr.wikipedia.org/wiki/Hambela_Wamena",
+        "https://servantcoffee.com/product/goro-hambela/"
+      ]
+    },
+    {
+      "productNo": 373,
+      "originalName": "[12.26 오픈] #9 에티오피아 합타무 페카두 아가 고로 사이트 74112 Kurume 워시드",
+      "regionId": null,
+      "decision": "ambiguous-locality-name",
+      "reason": "Goro는 Hambela와 다른 생산자/농장 맥락에 함께 등장. 원문 제품별 explicitParentRegionId만 사용하고 글로벌 별칭 연결 금지.",
+      "searchQueries": [],
+      "verificationUrls": [
+        "https://88grainescoffee.com/product/guji-goro/",
+        "https://burnettcoffee.com/products/ethiopia-guji-goro-bedessa-specialty-coffee",
+        "https://fr.wikipedia.org/wiki/Hambela_Wamena",
+        "https://servantcoffee.com/product/goro-hambela/"
+      ]
+    },
+    {
+      "productNo": 308,
+      "originalName": "#23 에티오피아 마테 마테오스 74158 가타 리버 콜드 퍼먼테이션 내추럴",
+      "regionId": null,
+      "decision": "producer-unresolved",
+      "reason": "마테 마테오스의 Gata River 가공명. Daye Bensa Gatta Farm과 같은 이름만으로 연결하면 안 됨. 실제 농장 지리 추가 확인 필요.",
+      "searchQueries": [],
+      "verificationUrls": []
+    },
+    {
+      "productNo": 358,
+      "originalName": "#21 에티오피아 마테 마테오스 74158 가타 리버 콜드 퍼먼테이션",
+      "regionId": null,
+      "decision": "producer-unresolved",
+      "reason": "마테 마테오스의 Gata River 가공명. Daye Bensa Gatta Farm과 같은 이름만으로 연결하면 안 됨. 실제 농장 지리 추가 확인 필요.",
+      "searchQueries": [],
+      "verificationUrls": []
+    }
+  ],
+  "coverageLimits": [
+    "The inventory covers the 278 discovered public whole-bean, monthly-pick and green-coffee product pages, not every roaster or growing place worldwide.",
+    "A catalog option is not necessarily one coffee: sizes, bundles, blends and duplicate listings are not new origins.",
+    "Country-specific scans can produce overlapping candidate rows; the decisions ledger deduplicates product number plus original label.",
+    "Ambiguous farm names, unlocated trade labels and missing producer identity are retained without inventing a location.",
+    "Independent offerings used to enrich a region retain their own lot-specific processing, variety and flavor evidence. Original product labels are search terms, not geographic aliases.",
+    "Some public pages were verified using indexed primary-source text when live fetching was unavailable."
+  ]
+}

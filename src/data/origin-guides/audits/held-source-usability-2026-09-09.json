@@ -1,0 +1,2681 @@
+{
+  "reviewedAt": "2026-09-09",
+  "scope": "Reassessment of all 114 host-level hold recommendations for the current fact-only presentation, not automatic lot restoration.",
+  "legalClearance": false,
+  "counts": {
+    "keep-held": 29,
+    "usable-facts-with-conditions": 73,
+    "insufficient-evidence": 12
+  },
+  "conditions": [
+    "Conditional usability is a practical assessment of selected facts, not a publisher license or a guarantee of enforceability.",
+    "Past acquisition, future collection and present publication are separate questions. Rewriting does not cure prior extraction.",
+    "Original creative descriptions, their translations, photos, catalog structures and bulk datasets are outside the conditional fact-only assessment.",
+    "Other-source corroboration is not permission to reuse the original publisher dataset.",
+    "Existing factual verification holds remain independent of source rights decisions."
+  ],
+  "rows": [
+    {
+      "host": "11thhourcoffee.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "콘텐츠 복제 제한과 자동 도구 접근 제한은 유지하지만 개별 사실의 독립 서술 전체 금지로 확대하지 않습니다."
+      ],
+      "conditions": [
+        "지명·품종·가공 및 통상적인 짧은 향미어만 독립적으로 서술하고 원문 문장·번역·사진·표·목록 편집·고유한 판매 표현은 복제하지 않습니다.",
+        "출처별 누적 추출이 데이터베이스의 상당 부분이나 반복 추출에 해당하는지 별도 확인합니다. 출처 표시는 이용 허락을 대신하지 않습니다.",
+        "조건부 게시 판단은 과거 수집의 적법성 보증이나 새 자동 수집 허락이 아닙니다."
+      ],
+      "acquisitionRestriction": "명시 자동 접근 제한 유지. 과거 자동 수집의 허락·약관 적용·취득 경위는 별도 미해결이며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "기록상 과거 조사 목록만 있고 현재 공개 사용은 확인되지 않습니다. 제시된 사실 중심 화면 범위에는 조건부 게시 가능으로 판단하되 실제 모든 문장의 원문 유사성 및 과거 취득 경위를 확인했다는 뜻은 아닙니다.",
+      "evidenceUrls": [
+        "https://www.11thhourcoffee.com/policies/terms-of-service"
+      ],
+      "currentUse": false,
+      "confidence": "medium",
+      "referencedInCurrentData": false,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "49thcoffee.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "재열람한 조항은 개인식별 정보 수집 및 사전서면동의 없는 상업적 사이트 사용을 제한한다. 농장·산지 사실 1건과 개인정보 수집은 다르다. 다만 정보 사이트의 상업성 판단은 별도로 충족해야 한다.",
+        "기록된 원출처 URL 1개; 현행 맥락 URL 1개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다.",
+        "보호 콘텐츠 자체나 서비스의 상업적 활용에 해당하면 별도 허가가 필요하다. 판매 기능이 없다는 사실만으로 모든 상업성 조건이 충족된 것으로 보지 않는다."
+      ],
+      "acquisitionRestriction": "일반 자동 접근 금지는 기존 근거에서 확정되지 않았다. 이는 자동 취득 허가를 의미하지 않는다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 지정된 독립 사실 사용만 조건부 허용 판단이다. 기존 자동 취득까지 적법하다는 판단은 아니다.",
+      "evidenceUrls": [
+        "https://49thcoffee.com/pages/terms-of-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "sourceCount": 1,
+      "checkedAt": "2026-09-09T05:32:46.880039+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "adr.gov.co",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "확인된 제한은 자동접근 또는 서비스·보호 콘텐츠의 복제·상업적 배포에 관한 것이다. 짧은 산지명·품종·가공 사실 전체를 외부에 독립 서술하지 못한다는 근거로 확대하지 않는다.",
+        "텍스트 등 콘텐츠의 복제·번역·전송·저장에 사전 서면허가 요구. 개인 비상업 이용과 기관 표기만 예외로 명시. 자동수집 특정 조항 미확인."
+      ],
+      "conditions": [
+        "산지·품종·가공 등 짧은 개별 사실만 사용하고 원문 문장·번역·설명 구조·사진·가격표·상품 설명 또는 목록 편집물을 복제하지 않는다.",
+        "향미는 짧은 일반 어휘에 한정하고 해당 로트의 관능 기록으로 표시한다. 독특한 표현이나 노트 묶음·순서를 대량 복제하지 않는다.",
+        "현재 판단은 게시 형태에 관한 실무 판단이다. 이미 이루어진 자동수집의 계약상 적법성·취득 당시 조건·권한은 별도 기록으로 확인하며 재작성으로 정당화되지 않는다."
+      ],
+      "acquisitionRestriction": "자동접근 특정 제한은 기존 근거에서 미확인. 이는 자동수집 허가가 아니며 과거 취득 권한 확인은 별도.",
+      "existingPublicationAssessment": "제공된 현재 사용 형태라면 보호 표현 복제와 구별되는 소량 사실의 독립 서술은 조건부 사용 후보다. 해당 호스트의 전체 자료·목록이나 과거 취득 방식까지 허가되었다는 뜻은 아니다.",
+      "evidenceUrls": [
+        "https://www.adr.gov.co/politicas-de-privacidad-y-condiciones-de-uso/"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "adrenaline.coffee",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "텍스트·시각 요소 복제 제한은 보호 표현물에 관한 것으로 읽고 짧은 독립 사실과 구분합니다. 링크는 별도 서면허가 조건이 있으므로 포함하지 않습니다."
+      ],
+      "conditions": [
+        "지명·품종·가공 및 통상적인 짧은 향미어만 독립적으로 서술하고 원문 문장·번역·사진·표·목록 편집·고유한 판매 표현은 복제하지 않습니다.",
+        "출처별 누적 추출이 데이터베이스의 상당 부분이나 반복 추출에 해당하는지 별도 확인합니다. 출처 표시는 이용 허락을 대신하지 않습니다.",
+        "조건부 게시 판단은 과거 수집의 적법성 보증이나 새 자동 수집 허락이 아닙니다.",
+        "딥링크·하이퍼링크 조건은 별도이므로 기존 출처 링크도 자동 허용하지 않습니다."
+      ],
+      "acquisitionRestriction": "별도 자동 접근 허락은 확인하지 못했습니다. 과거 취득 방식과 약관 적용은 확인이 필요하며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 제시된 사실 중심 화면 범위에는 조건부 게시 가능으로 판단하되 실제 모든 문장의 원문 유사성 및 과거 취득 경위를 확인했다는 뜻은 아닙니다.",
+      "evidenceUrls": [
+        "https://www.adrenaline.coffee/conditions-g%C3%A9n%C3%A9rales-de-vente"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "algrano.com",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "keep-held",
+      "reasons": [
+        "수동 수집까지 포함해 체계적 데이터베이스 편집을 명시 제한한다. 산지 DB에 편입하는 현재 목적과 직접 겹친다.",
+        "사용자 행위 조항은 자동 접근·스크래핑 및 수동 포함 체계적 데이터베이스 편집 수집을 금지. 열람 라이선스만 부여"
+      ],
+      "conditions": [
+        "동일 출처의 DB 편입 허가 또는 해당 수집·편입에 적용 가능한 예외를 확보하기 전 보류.",
+        "동일 사실을 다른 출처에서 재확인할 수 있다는 사정은 이 출처의 현재 사용 권한이 되지 않는다.",
+        "이 판단은 위법 확정이 아니며, 과거 자동수집 문제는 문장 재작성으로 해소되지 않는다."
+      ],
+      "acquisitionRestriction": "명시 자동접근·추출 제한 있음. 추가 자동수집 중지 유지. 이미 취득한 자료는 취득 시점·방식·동의·적용 약관을 별도로 확인해야 하며 조건부 게시 판단은 과거 수집을 면책하지 않음.",
+      "existingPublicationAssessment": "현재 게시물이 짧은 사실이어도 확인된 데이터·정보 이용 또는 DB 편입 조건과 겹치거나 인용 문서 적용 조건이 미확정이므로 이 출처 기반 복원은 보류한다.",
+      "evidenceUrls": [
+        "https://algrano.com/terms-conditions"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "andina.pe",
+      "decision": "insufficient-evidence",
+      "reasons": [
+        "확인된 약관은 Andina 앱·서비스용이며 현재 인용한 일반 뉴스 기사에 적용되는지 불명확하다. 기사 속 지명·수상자 사실의 자체 보호 가능성과 별개로 이 자료의 실제 사용 조건을 확정할 근거가 부족하다.",
+        "기록된 원출처 URL 1개; 현행 맥락 URL 1개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "해당 원자산의 라이선스·약관 적용범위·기존 추출 형태를 확인하기 전 사용 승인으로 처리하지 않는다.",
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "일반 자동 접근 금지는 기존 근거에서 확정되지 않았다. 이는 자동 취득 허가를 의미하지 않는다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 이 자료의 기존/예정 사용을 승인할 수 없다. 위법성이 확정됐다는 의미는 아니다.",
+      "evidenceUrls": [
+        "https://andina.pe/agencia/legal/andinatyc.html"
+      ],
+      "currentUse": true,
+      "confidence": "low",
+      "sourceCount": 1,
+      "checkedAt": "2026-09-09T05:32:46.880042+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "archerscoffee.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "확인한 제한은 사이트 표현물 복제·변형에 대한 것입니다. 독립된 지명·품종·가공 사실 전부를 금지한다고 확대할 근거는 부족합니다."
+      ],
+      "conditions": [
+        "지명·품종·가공 및 통상적인 짧은 향미어만 독립적으로 서술하고 원문 문장·번역·사진·표·목록 편집·고유한 판매 표현은 복제하지 않습니다.",
+        "출처별 누적 추출이 데이터베이스의 상당 부분이나 반복 추출에 해당하는지 별도 확인합니다. 출처 표시는 이용 허락을 대신하지 않습니다.",
+        "조건부 게시 판단은 과거 수집의 적법성 보증이나 새 자동 수집 허락이 아닙니다."
+      ],
+      "acquisitionRestriction": "별도 자동 접근 허락은 확인하지 못했습니다. 과거 취득 방식과 약관 적용은 확인이 필요하며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 제시된 사실 중심 화면 범위에는 조건부 게시 가능으로 판단하되 실제 모든 문장의 원문 유사성 및 과거 취득 경위를 확인했다는 뜻은 아닙니다.",
+      "evidenceUrls": [
+        "https://archerscoffee.com/pages/terms-and-conditions"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "atomicroastery.com",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "확인된 제한은 자동접근 또는 서비스·보호 콘텐츠의 복제·상업적 배포에 관한 것이다. 짧은 산지명·품종·가공 사실 전체를 외부에 독립 서술하지 못한다는 근거로 확대하지 않는다.",
+        "제12조는 spider/crawl/scrape를 금지. 제2조는 서비스 일부의 복제·판매·이용에 명시적 서면허가 요구. 사실 자체의 독점권 또는 위법성을 판정하는 조항으로 확대하지 않음."
+      ],
+      "conditions": [
+        "산지·품종·가공 등 짧은 개별 사실만 사용하고 원문 문장·번역·설명 구조·사진·가격표·상품 설명 또는 목록 편집물을 복제하지 않는다.",
+        "향미는 짧은 일반 어휘에 한정하고 해당 로트의 관능 기록으로 표시한다. 독특한 표현이나 노트 묶음·순서를 대량 복제하지 않는다.",
+        "현재 판단은 게시 형태에 관한 실무 판단이다. 이미 이루어진 자동수집의 계약상 적법성·취득 당시 조건·권한은 별도 기록으로 확인하며 재작성으로 정당화되지 않는다.",
+        "새 자동수집은 재개하지 않는다. 게시 조건과 수집 권한은 별도로 관리한다."
+      ],
+      "acquisitionRestriction": "명시 자동접근·추출 제한 있음. 추가 자동수집 중지 유지. 이미 취득한 자료는 취득 시점·방식·동의·적용 약관을 별도로 확인해야 하며 조건부 게시 판단은 과거 수집을 면책하지 않음.",
+      "existingPublicationAssessment": "제공된 현재 사용 형태라면 보호 표현 복제와 구별되는 소량 사실의 독립 서술은 조건부 사용 후보다. 해당 호스트의 전체 자료·목록이나 과거 취득 방식까지 허가되었다는 뜻은 아니다.",
+      "evidenceUrls": [
+        "https://atomicroastery.com/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "atp.gob.pa",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "keep-held",
+      "reasons": [
+        "외부 DB 구축을 위한 수집을 명시 제한하며 현재 출처는 홍보 성격 PDF다. 웹페이지 출처표시 복제 허용을 해당 PDF·DB 편입에 확대할 수 없다.",
+        "출처 표기를 조건으로 웹페이지 복제 허용. 홍보 자료 이용에는 서면 허가 필요.",
+        "콘텐츠 판매·상업화와 외부 데이터베이스 구축을 위한 수집 금지. 로봇 관련 제한도 명시.",
+        "개별 외부 기관 문서는 자체 라이선스를 우선 확인해야 함."
+      ],
+      "conditions": [
+        "인용 PDF의 별도 조건과 DB 편입 권한을 확인하기 전 보류.",
+        "동일 사실을 다른 출처에서 재확인할 수 있다는 사정은 이 출처의 현재 사용 권한이 되지 않는다.",
+        "이 판단은 위법 확정이 아니며, 과거 자동수집 문제는 문장 재작성으로 해소되지 않는다."
+      ],
+      "acquisitionRestriction": "명시 자동접근·추출 제한 있음. 추가 자동수집 중지 유지. 이미 취득한 자료는 취득 시점·방식·동의·적용 약관을 별도로 확인해야 하며 조건부 게시 판단은 과거 수집을 면책하지 않음.",
+      "existingPublicationAssessment": "현재 게시물이 짧은 사실이어도 확인된 데이터·정보 이용 또는 DB 편입 조건과 겹치거나 인용 문서 적용 조건이 미확정이므로 이 출처 기반 복원은 보류한다.",
+      "evidenceUrls": [
+        "https://www.atp.gob.pa/condiciones-de-uso/"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "atricoffee.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "서비스 복제 및 자동 수집 제한을 개별 산지 사실 게시의 전면 금지와 구분합니다."
+      ],
+      "conditions": [
+        "지명·품종·가공 및 통상적인 짧은 향미어만 독립적으로 서술하고 원문 문장·번역·사진·표·목록 편집·고유한 판매 표현은 복제하지 않습니다.",
+        "출처별 누적 추출이 데이터베이스의 상당 부분이나 반복 추출에 해당하는지 별도 확인합니다. 출처 표시는 이용 허락을 대신하지 않습니다.",
+        "조건부 게시 판단은 과거 수집의 적법성 보증이나 새 자동 수집 허락이 아닙니다."
+      ],
+      "acquisitionRestriction": "명시 자동 접근 제한 유지. 과거 자동 수집의 허락·약관 적용·취득 경위는 별도 미해결이며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 제시된 사실 중심 화면 범위에는 조건부 게시 가능으로 판단하되 실제 모든 문장의 원문 유사성 및 과거 취득 경위를 확인했다는 뜻은 아닙니다.",
+      "evidenceUrls": [
+        "https://atricoffee.com/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "aviary.coffee",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "자동 수집 금지 및 서비스 복제 제한을 확인했습니다. 독립된 개별 사실의 공개를 모두 금지하는 데이터 재사용 조항과는 구분합니다."
+      ],
+      "conditions": [
+        "지명·품종·가공 및 통상적인 짧은 향미어만 독립적으로 서술하고 원문 문장·번역·사진·표·목록 편집·고유한 판매 표현은 복제하지 않습니다.",
+        "출처별 누적 추출이 데이터베이스의 상당 부분이나 반복 추출에 해당하는지 별도 확인합니다. 출처 표시는 이용 허락을 대신하지 않습니다.",
+        "조건부 게시 판단은 과거 수집의 적법성 보증이나 새 자동 수집 허락이 아닙니다."
+      ],
+      "acquisitionRestriction": "명시 자동 접근 제한 유지. 과거 자동 수집의 허락·약관 적용·취득 경위는 별도 미해결이며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 제시된 사실 중심 화면 범위에는 조건부 게시 가능으로 판단하되 실제 모든 문장의 원문 유사성 및 과거 취득 경위를 확인했다는 뜻은 아닙니다.",
+      "evidenceUrls": [
+        "https://aviary.coffee/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "beanhoard.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "보류 근거는 통상 이용을 넘는 자동 접근입니다. 독립된 짧은 산지 사실 게시 자체의 금지를 확인한 것은 아닙니다."
+      ],
+      "conditions": [
+        "지명·품종·가공 및 통상적인 짧은 향미어만 독립적으로 서술하고 원문 문장·번역·사진·표·목록 편집·고유한 판매 표현은 복제하지 않습니다.",
+        "출처별 누적 추출이 데이터베이스의 상당 부분이나 반복 추출에 해당하는지 별도 확인합니다. 출처 표시는 이용 허락을 대신하지 않습니다.",
+        "조건부 게시 판단은 과거 수집의 적법성 보증이나 새 자동 수집 허락이 아닙니다."
+      ],
+      "acquisitionRestriction": "명시 자동 접근 제한 유지. 과거 자동 수집의 허락·약관 적용·취득 경위는 별도 미해결이며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "기록상 과거 조사 목록만 있고 현재 공개 사용은 확인되지 않습니다. 제시된 사실 중심 화면 범위에는 조건부 게시 가능으로 판단하되 실제 모든 문장의 원문 유사성 및 과거 취득 경위를 확인했다는 뜻은 아닙니다.",
+      "evidenceUrls": [
+        "https://beanhoard.com/terms"
+      ],
+      "currentUse": false,
+      "confidence": "medium",
+      "referencedInCurrentData": false,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "beannbeancoffee.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "기존 근거는 자동 접근 금지와 서비스 복제·판매·이용 서면허가 조항이다. 산지·품종·가공 등 독립 사실의 짧은 자체 서술을 데이터 재배포 금지로 확대할 근거는 확인되지 않았다.",
+        "기록된 원출처 URL 2개; 현행 맥락 URL 0개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "명시적 자동 접근 제한 있음. 신규 자동 수집을 계속하지 않으며, 기존 자동 취득의 약관 문제는 별도로 남는다.",
+      "existingPublicationAssessment": "현재는 과거 출처 목록만 있고 현행 공개 사용은 확인되지 않으며 지정된 독립 사실 사용만 조건부 허용 판단이다. 기존 자동 취득까지 적법하다는 판단은 아니다.",
+      "evidenceUrls": [
+        "https://beannbeancoffee.com/policies/terms-of-service"
+      ],
+      "currentUse": false,
+      "confidence": "medium",
+      "sourceCount": 2,
+      "checkedAt": "2026-09-09T05:32:46.880010+00:00",
+      "referencedInCurrentData": false,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "blacktucanocoffee.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "기존 근거는 자동 접근 금지와 서비스 복제·판매·이용 서면허가 조항이다. 산지·품종·가공 등 독립 사실의 짧은 자체 서술을 데이터 재배포 금지로 확대할 근거는 확인되지 않았다.",
+        "기록된 원출처 URL 1개; 현행 맥락 URL 1개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "명시적 자동 접근 제한 있음. 신규 자동 수집을 계속하지 않으며, 기존 자동 취득의 약관 문제는 별도로 남는다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 지정된 독립 사실 사용만 조건부 허용 판단이다. 기존 자동 취득까지 적법하다는 판단은 아니다.",
+      "evidenceUrls": [
+        "https://www.blacktucanocoffee.com/pages/termos-de-servicos"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "sourceCount": 1,
+      "checkedAt": "2026-09-09T05:32:46.880045+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "blackwhiteroasters.com",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "확인된 제한은 자동접근 또는 서비스·보호 콘텐츠의 복제·상업적 배포에 관한 것이다. 짧은 산지명·품종·가공 사실 전체를 외부에 독립 서술하지 못한다는 근거로 확대하지 않는다.",
+        "제12조 spider/crawl/scrape 금지, 제2조 서비스 복제·판매·이용에 서면허가 필요."
+      ],
+      "conditions": [
+        "산지·품종·가공 등 짧은 개별 사실만 사용하고 원문 문장·번역·설명 구조·사진·가격표·상품 설명 또는 목록 편집물을 복제하지 않는다.",
+        "향미는 짧은 일반 어휘에 한정하고 해당 로트의 관능 기록으로 표시한다. 독특한 표현이나 노트 묶음·순서를 대량 복제하지 않는다.",
+        "현재 판단은 게시 형태에 관한 실무 판단이다. 이미 이루어진 자동수집의 계약상 적법성·취득 당시 조건·권한은 별도 기록으로 확인하며 재작성으로 정당화되지 않는다.",
+        "새 자동수집은 재개하지 않는다. 게시 조건과 수집 권한은 별도로 관리한다."
+      ],
+      "acquisitionRestriction": "명시 자동접근·추출 제한 있음. 추가 자동수집 중지 유지. 이미 취득한 자료는 취득 시점·방식·동의·적용 약관을 별도로 확인해야 하며 조건부 게시 판단은 과거 수집을 면책하지 않음.",
+      "existingPublicationAssessment": "제공된 현재 사용 형태라면 보호 표현 복제와 구별되는 소량 사실의 독립 서술은 조건부 사용 후보다. 해당 호스트의 전체 자료·목록이나 과거 취득 방식까지 허가되었다는 뜻은 아니다.",
+      "evidenceUrls": [
+        "https://www.blackwhiteroasters.com/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "cafedecolombia.com",
+      "decision": "keep-held",
+      "reasons": [
+        "자동·수동 내용 감시와 복사, 상업·비상업 게시 및 세부 링크까지 허가 조건으로 정해 현재 출처 기반 공개 활용을 일반 허용하기 어렵습니다."
+      ],
+      "conditions": [
+        "해당 출처에 의존한 자료 사용 보류를 유지하고 명시 허가 또는 적용 범위 확인 후 재판단합니다.",
+        "다른 출처에서 독립적으로 확인할 수 있다는 사정은 이 출처 사용 허락을 뜻하지 않습니다.",
+        "딥링크·하이퍼링크 조건은 별도이므로 기존 출처 링크도 자동 허용하지 않습니다."
+      ],
+      "acquisitionRestriction": "명시 자동 접근 제한 유지. 과거 자동 수집의 허락·약관 적용·취득 경위는 별도 미해결이며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 현재 확보한 근거로 이 출처를 일반 사용 가능 상태로 해제하지 않습니다. 위법 확정 판단은 아닙니다.",
+      "evidenceUrls": [
+        "https://federaciondecafeteros.org/terminos-y-condiciones-de-uso-contenido-web/"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "cafen.co.uk",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "확인된 제한은 자동접근 또는 서비스·보호 콘텐츠의 복제·상업적 배포에 관한 것이다. 짧은 산지명·품종·가공 사실 전체를 외부에 독립 서술하지 못한다는 근거로 확대하지 않는다.",
+        "제13조 spider/crawl/scrape 및 서비스 복제·판매·이용 금지. 제6조 개인 비상업용 및 무허가 재게시 제한."
+      ],
+      "conditions": [
+        "산지·품종·가공 등 짧은 개별 사실만 사용하고 원문 문장·번역·설명 구조·사진·가격표·상품 설명 또는 목록 편집물을 복제하지 않는다.",
+        "향미는 짧은 일반 어휘에 한정하고 해당 로트의 관능 기록으로 표시한다. 독특한 표현이나 노트 묶음·순서를 대량 복제하지 않는다.",
+        "현재 판단은 게시 형태에 관한 실무 판단이다. 이미 이루어진 자동수집의 계약상 적법성·취득 당시 조건·권한은 별도 기록으로 확인하며 재작성으로 정당화되지 않는다.",
+        "새 자동수집은 재개하지 않는다. 게시 조건과 수집 권한은 별도로 관리한다."
+      ],
+      "acquisitionRestriction": "명시 자동접근·추출 제한 있음. 추가 자동수집 중지 유지. 이미 취득한 자료는 취득 시점·방식·동의·적용 약관을 별도로 확인해야 하며 조건부 게시 판단은 과거 수집을 면책하지 않음.",
+      "existingPublicationAssessment": "제공된 현재 사용 형태라면 보호 표현 복제와 구별되는 소량 사실의 독립 서술은 조건부 사용 후보다. 해당 호스트의 전체 자료·목록이나 과거 취득 방식까지 허가되었다는 뜻은 아니다.",
+      "evidenceUrls": [
+        "https://cafen.co.uk/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "casetacoffee.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "개인 비상업 이용, 재게시·변형 제한은 원자료 재사용 허락이 없다는 뜻입니다. 짧은 독립 사실의 권리까지 사이트에 귀속된다고 확대하지 않습니다."
+      ],
+      "conditions": [
+        "지명·품종·가공 및 통상적인 짧은 향미어만 독립적으로 서술하고 원문 문장·번역·사진·표·목록 편집·고유한 판매 표현은 복제하지 않습니다.",
+        "출처별 누적 추출이 데이터베이스의 상당 부분이나 반복 추출에 해당하는지 별도 확인합니다. 출처 표시는 이용 허락을 대신하지 않습니다.",
+        "조건부 게시 판단은 과거 수집의 적법성 보증이나 새 자동 수집 허락이 아닙니다."
+      ],
+      "acquisitionRestriction": "명시 자동 접근 제한 유지. 과거 자동 수집의 허락·약관 적용·취득 경위는 별도 미해결이며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 제시된 사실 중심 화면 범위에는 조건부 게시 가능으로 판단하되 실제 모든 문장의 원문 유사성 및 과거 취득 경위를 확인했다는 뜻은 아닙니다.",
+      "evidenceUrls": [
+        "https://casetacoffee.com/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "casinomocca.com",
+      "decision": "keep-held",
+      "reasons": [
+        "기존 약관 근거에 DB 저장·제공의 서면허가 조건이 명시되어 있다. 현행 Koke Shalaye 랏의 구조화된 편입을 포함하므로 객관적 사실이라는 이유만으로 보류 해제하기 어렵다.",
+        "기록된 원출처 URL 2개; 현행 맥락 URL 1개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 출처 기반 자료의 신규 공개·확장 편입은 보류한다. 관련 데이터·취득·재사용 조건의 적용 또는 권리자 허가를 확인한 뒤 개별 해제한다.",
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "일반 자동 접근 금지는 기존 근거에서 확정되지 않았다. 이는 자동 취득 허가를 의미하지 않는다. 데이터/텍스트 취득·추출·DB 편입·정보 이용에 관한 별도 제한의 범위를 해소해야 한다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 이 자료의 기존/예정 사용을 승인할 수 없다. 위법성이 확정됐다는 의미는 아니다.",
+      "evidenceUrls": [
+        "https://casinomocca.com/altalanos-szerzodesi-feltetelek/"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "sourceCount": 2,
+      "checkedAt": "2026-09-09T05:32:46.880015+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "cdn-pro-web-211-225.cdn-nhncommerce.com",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "keep-held",
+      "reasons": [
+        "확인된 출판자 조항은 IP-owned 정보로 한정하지 않고 취득 정보의 영리·제3자 이용을 제한한다. 출처는 이미지이며 출판자·개별 권리 매칭도 미완료다.",
+        "현재 CDN 이미지의 출판자 GSC 약관 제20조는 몰에서 얻은 정보의 무승인 영리 이용·제3자 이용을 제한. 'IP가 귀속된 정보'로 범위를 한정하지 않는 문언.",
+        "CDN 운영자 약관을 이미지 재사용 허가로 대체할 수 없음. 개별 이미지 권리·출판자 매칭 추가 검토 필요."
+      ],
+      "conditions": [
+        "GSC 정보 이용 조항 적용 및 해당 이미지에서 얻은 데이터 이용 권한을 확인하기 전 보류. 이미지를 게시하지 않는 것만으로 정보 이용 제한이 해소되지는 않음.",
+        "동일 사실을 다른 출처에서 재확인할 수 있다는 사정은 이 출처의 현재 사용 권한이 되지 않는다.",
+        "이 판단은 위법 확정이 아니며, 과거 자동수집 문제는 문장 재작성으로 해소되지 않는다."
+      ],
+      "acquisitionRestriction": "자동접근 특정 제한은 기존 근거에서 미확인. 이는 자동수집 허가가 아니며 과거 취득 권한 확인은 별도.",
+      "existingPublicationAssessment": "현재 게시물이 짧은 사실이어도 확인된 데이터·정보 이용 또는 DB 편입 조건과 겹치거나 인용 문서 적용 조건이 미확정이므로 이 출처 기반 복원은 보류한다.",
+      "evidenceUrls": [
+        "https://www.gsc.coffee/service/agreement.php"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "cherrybookcoffee.com",
+      "decision": "keep-held",
+      "reasons": [
+        "자동 접근과 유료 보고서 기반 카탈로그 데이터 일괄 재게시를 별도로 제한한다. 과거 목록 1건의 데이터가 그 카탈로그에 해당하는지 확인되지 않았으므로 신규 편입은 보류한다. 단일 사실 전체의 금지로 판단한 것은 아니다.",
+        "기록된 원출처 URL 1개; 현행 맥락 URL 0개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 출처 기반 자료의 신규 공개·확장 편입은 보류한다. 관련 데이터·취득·재사용 조건의 적용 또는 권리자 허가를 확인한 뒤 개별 해제한다.",
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "명시적 자동 접근 제한 있음. 신규 자동 수집을 계속하지 않으며, 기존 자동 취득의 약관 문제는 별도로 남는다. 데이터/텍스트 취득·추출·DB 편입·정보 이용에 관한 별도 제한의 범위를 해소해야 한다.",
+      "existingPublicationAssessment": "현재는 과거 출처 목록만 있고 현행 공개 사용은 확인되지 않으며 이 자료의 기존/예정 사용을 승인할 수 없다. 위법성이 확정됐다는 의미는 아니다.",
+      "evidenceUrls": [
+        "https://cherrybookcoffee.com/terms"
+      ],
+      "currentUse": false,
+      "confidence": "medium",
+      "sourceCount": 1,
+      "checkedAt": "2026-09-09T05:32:46.880048+00:00",
+      "referencedInCurrentData": false,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "coffeehunter.com",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "확인된 제한은 자동접근 또는 서비스·보호 콘텐츠의 복제·상업적 배포에 관한 것이다. 짧은 산지명·품종·가공 사실 전체를 외부에 독립 서술하지 못한다는 근거로 확대하지 않는다.",
+        "Mercanta는 자동 접근·스크래핑 금지. 콘텐츠는 개인 비상업적 발췌 외 재배포·상업적 활용·다른 웹사이트/검색 시스템 저장에 서면 허가 필요."
+      ],
+      "conditions": [
+        "산지·품종·가공 등 짧은 개별 사실만 사용하고 원문 문장·번역·설명 구조·사진·가격표·상품 설명 또는 목록 편집물을 복제하지 않는다.",
+        "향미는 짧은 일반 어휘에 한정하고 해당 로트의 관능 기록으로 표시한다. 독특한 표현이나 노트 묶음·순서를 대량 복제하지 않는다.",
+        "현재 판단은 게시 형태에 관한 실무 판단이다. 이미 이루어진 자동수집의 계약상 적법성·취득 당시 조건·권한은 별도 기록으로 확인하며 재작성으로 정당화되지 않는다.",
+        "새 자동수집은 재개하지 않는다. 게시 조건과 수집 권한은 별도로 관리한다."
+      ],
+      "acquisitionRestriction": "명시 자동접근·추출 제한 있음. 추가 자동수집 중지 유지. 이미 취득한 자료는 취득 시점·방식·동의·적용 약관을 별도로 확인해야 하며 조건부 게시 판단은 과거 수집을 면책하지 않음.",
+      "existingPublicationAssessment": "제공된 현재 사용 형태라면 보호 표현 복제와 구별되는 소량 사실의 독립 서술은 조건부 사용 후보다. 해당 호스트의 전체 자료·목록이나 과거 취득 방식까지 허가되었다는 뜻은 아니다. 현재 인벤토리는 historical-source-inventory뿐이며 공개에서 사용 중이라고 확인된 자료는 없다.",
+      "evidenceUrls": [
+        "https://coffeehunter.com/terms-of-use/",
+        "https://coffeehunter.com/privacy-policy/"
+      ],
+      "currentUse": false,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": false,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "commonfolkcoffee.com.au",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "서비스 복제 및 자동 수집 제한을 개별 산지 사실 게시의 전면 금지와 구분합니다."
+      ],
+      "conditions": [
+        "지명·품종·가공 및 통상적인 짧은 향미어만 독립적으로 서술하고 원문 문장·번역·사진·표·목록 편집·고유한 판매 표현은 복제하지 않습니다.",
+        "출처별 누적 추출이 데이터베이스의 상당 부분이나 반복 추출에 해당하는지 별도 확인합니다. 출처 표시는 이용 허락을 대신하지 않습니다.",
+        "조건부 게시 판단은 과거 수집의 적법성 보증이나 새 자동 수집 허락이 아닙니다."
+      ],
+      "acquisitionRestriction": "명시 자동 접근 제한 유지. 과거 자동 수집의 허락·약관 적용·취득 경위는 별도 미해결이며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 제시된 사실 중심 화면 범위에는 조건부 게시 가능으로 판단하되 실제 모든 문장의 원문 유사성 및 과거 취득 경위를 확인했다는 뜻은 아닙니다.",
+      "evidenceUrls": [
+        "https://www.commonfolkcoffee.com.au/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "counterculturecoffee.com",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "insufficient-evidence",
+      "reasons": [
+        "근거가 indexed-excerpt로 표시됨. 개인 비상업 접근 및 데이터마이닝 제한과 현재 이미 얻은 사실 재게시의 관계를 판정하기에 원문 범위 미확정.",
+        "제9조는 개인적 비상업적 접근만 허가하고 데이터마이닝·로봇 추출, 콘텐츠 상업사용·배포·변형을 제한. 공개된 사이트와 콘텐츠 범위의 조건."
+      ],
+      "conditions": [
+        "위 미확정 항목과 취득·이용 범위를 확인하기 전 이 출처를 사용 가능으로 확정하거나 자동 복원하지 않는다.",
+        "추가 제품 데이터 수집을 하지 않는다. 필요한 경우 공식 약관 또는 이미 보관된 취득 기록만 확인한다."
+      ],
+      "acquisitionRestriction": "명시 자동접근·추출 제한 있음. 추가 자동수집 중지 유지. 이미 취득한 자료는 취득 시점·방식·동의·적용 약관을 별도로 확인해야 하며 조건부 게시 판단은 과거 수집을 면책하지 않음.",
+      "existingPublicationAssessment": "자료가 불법이라고 결론내릴 근거도, 현재 출처 기반 게시를 허용한다고 확정할 근거도 부족하다.",
+      "evidenceUrls": [
+        "https://counterculturecoffee.com/pages/terms-of-service"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "low",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "covoyacoffee.com",
+      "decision": "keep-held",
+      "reasons": [
+        "데이터·정보를 포함한 Content의 다른 웹사이트 게시를 직접 제한합니다. 자동 수집 금지만 있는 경우와 다릅니다."
+      ],
+      "conditions": [
+        "해당 출처에 의존한 자료 사용 보류를 유지하고 명시 허가 또는 적용 범위 확인 후 재판단합니다.",
+        "다른 출처에서 독립적으로 확인할 수 있다는 사정은 이 출처 사용 허락을 뜻하지 않습니다."
+      ],
+      "acquisitionRestriction": "명시 자동 접근 제한 유지. 과거 자동 수집의 허락·약관 적용·취득 경위는 별도 미해결이며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 현재 확보한 근거로 이 출처를 일반 사용 가능 상태로 해제하지 않습니다. 위법 확정 판단은 아닙니다.",
+      "evidenceUrls": [
+        "https://www.covoyacoffee.com/conditions-of-use"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "creaturecoffee.co",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "과거 목록 1건이며 현재 공개 사용은 없다. 보호 콘텐츠의 개인 비상업 외 복제 제한은 유지하되 독립적인 생산사실을 짧게 서술하는 신규 사용은 조건부 가능하다.",
+        "기록된 원출처 URL 1개; 현행 맥락 URL 0개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다.",
+        "보호 콘텐츠 자체나 서비스의 상업적 활용에 해당하면 별도 허가가 필요하다. 판매 기능이 없다는 사실만으로 모든 상업성 조건이 충족된 것으로 보지 않는다."
+      ],
+      "acquisitionRestriction": "일반 자동 접근 금지는 기존 근거에서 확정되지 않았다. 이는 자동 취득 허가를 의미하지 않는다.",
+      "existingPublicationAssessment": "현재는 과거 출처 목록만 있고 현행 공개 사용은 확인되지 않으며 지정된 독립 사실 사용만 조건부 허용 판단이다. 기존 자동 취득까지 적법하다는 판단은 아니다.",
+      "evidenceUrls": [
+        "https://creaturecoffee.co/pages/terms-and-conditions"
+      ],
+      "currentUse": false,
+      "confidence": "medium",
+      "sourceCount": 1,
+      "checkedAt": "2026-09-09T05:32:46.880052+00:00",
+      "referencedInCurrentData": false,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "cuptural.coffee",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "확인된 제한은 자동접근 또는 서비스·보호 콘텐츠의 복제·상업적 배포에 관한 것이다. 짧은 산지명·품종·가공 사실 전체를 외부에 독립 서술하지 못한다는 근거로 확대하지 않는다.",
+        "서비스 약관 §2는 복제·판매·이용에 서면 허락을 요구하며 §12는 spider/crawl/scrape를 명시적으로 금지합니다."
+      ],
+      "conditions": [
+        "산지·품종·가공 등 짧은 개별 사실만 사용하고 원문 문장·번역·설명 구조·사진·가격표·상품 설명 또는 목록 편집물을 복제하지 않는다.",
+        "향미는 짧은 일반 어휘에 한정하고 해당 로트의 관능 기록으로 표시한다. 독특한 표현이나 노트 묶음·순서를 대량 복제하지 않는다.",
+        "현재 판단은 게시 형태에 관한 실무 판단이다. 이미 이루어진 자동수집의 계약상 적법성·취득 당시 조건·권한은 별도 기록으로 확인하며 재작성으로 정당화되지 않는다.",
+        "새 자동수집은 재개하지 않는다. 게시 조건과 수집 권한은 별도로 관리한다."
+      ],
+      "acquisitionRestriction": "명시 자동접근·추출 제한 있음. 추가 자동수집 중지 유지. 이미 취득한 자료는 취득 시점·방식·동의·적용 약관을 별도로 확인해야 하며 조건부 게시 판단은 과거 수집을 면책하지 않음.",
+      "existingPublicationAssessment": "제공된 현재 사용 형태라면 보호 표현 복제와 구별되는 소량 사실의 독립 서술은 조건부 사용 후보다. 해당 호스트의 전체 자료·목록이나 과거 취득 방식까지 허가되었다는 뜻은 아니다. 현재 인벤토리는 historical-source-inventory뿐이며 공개에서 사용 중이라고 확인된 자료는 없다.",
+      "evidenceUrls": [
+        "https://cuptural.coffee/policies/terms-of-service"
+      ],
+      "currentUse": false,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": false,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "database.coffeeinstitute.org",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "공식 약관 색인에 자료 재게시 제한이 있지만 DB라는 호스트 이름만으로 독립 사실 재사용 금지를 추정하지 않습니다. 개별 사실에 한한 판단이며 CQI 평가서·점수표·표 구조 복제 허용은 아닙니다."
+      ],
+      "conditions": [
+        "지명·품종·가공 및 통상적인 짧은 향미어만 독립적으로 서술하고 원문 문장·번역·사진·표·목록 편집·고유한 판매 표현은 복제하지 않습니다.",
+        "출처별 누적 추출이 데이터베이스의 상당 부분이나 반복 추출에 해당하는지 별도 확인합니다. 출처 표시는 이용 허락을 대신하지 않습니다.",
+        "조건부 게시 판단은 과거 수집의 적법성 보증이나 새 자동 수집 허락이 아닙니다."
+      ],
+      "acquisitionRestriction": "별도 자동 접근 허락은 확인하지 못했습니다. 과거 취득 방식과 약관 적용은 확인이 필요하며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "기록상 과거 조사 목록만 있고 현재 공개 사용은 확인되지 않습니다. 제시된 사실 중심 화면 범위에는 조건부 게시 가능으로 판단하되 실제 모든 문장의 원문 유사성 및 과거 취득 경위를 확인했다는 뜻은 아닙니다.",
+      "evidenceUrls": [
+        "https://database.coffeeinstitute.org/terms"
+      ],
+      "currentUse": false,
+      "confidence": "medium",
+      "referencedInCurrentData": false,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "drinkpassenger.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "기존 근거는 자동 접근 금지와 서비스 복제·판매·이용 서면허가 조항이다. 산지·품종·가공 등 독립 사실의 짧은 자체 서술을 데이터 재배포 금지로 확대할 근거는 확인되지 않았다.",
+        "기록된 원출처 URL 1개; 현행 맥락 URL 0개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "명시적 자동 접근 제한 있음. 신규 자동 수집을 계속하지 않으며, 기존 자동 취득의 약관 문제는 별도로 남는다.",
+      "existingPublicationAssessment": "현재는 과거 출처 목록만 있고 현행 공개 사용은 확인되지 않으며 지정된 독립 사실 사용만 조건부 허용 판단이다. 기존 자동 취득까지 적법하다는 판단은 아니다.",
+      "evidenceUrls": [
+        "https://drinkpassenger.com/policies/terms-of-service"
+      ],
+      "currentUse": false,
+      "confidence": "medium",
+      "sourceCount": 1,
+      "checkedAt": "2026-09-09T05:32:46.880055+00:00",
+      "referencedInCurrentData": false,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "dropcoffee.com",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "확인된 제한은 자동접근 또는 서비스·보호 콘텐츠의 복제·상업적 배포에 관한 것이다. 짧은 산지명·품종·가공 사실 전체를 외부에 독립 서술하지 못한다는 근거로 확대하지 않는다.",
+        "공식 약관 검색 색인에서 제12조 자동 수집 금지와 제2조 복제·상업 활용 서면 허가 조건 확인."
+      ],
+      "conditions": [
+        "산지·품종·가공 등 짧은 개별 사실만 사용하고 원문 문장·번역·설명 구조·사진·가격표·상품 설명 또는 목록 편집물을 복제하지 않는다.",
+        "향미는 짧은 일반 어휘에 한정하고 해당 로트의 관능 기록으로 표시한다. 독특한 표현이나 노트 묶음·순서를 대량 복제하지 않는다.",
+        "현재 판단은 게시 형태에 관한 실무 판단이다. 이미 이루어진 자동수집의 계약상 적법성·취득 당시 조건·권한은 별도 기록으로 확인하며 재작성으로 정당화되지 않는다.",
+        "새 자동수집은 재개하지 않는다. 게시 조건과 수집 권한은 별도로 관리한다.",
+        "evidenceCoverage=official-page와 findings의 검색 색인 표현이 상충하므로 근거 수준을 정정해야 한다. 현재 결론의 확신은 중간 이하이다."
+      ],
+      "acquisitionRestriction": "명시 자동접근·추출 제한 있음. 추가 자동수집 중지 유지. 이미 취득한 자료는 취득 시점·방식·동의·적용 약관을 별도로 확인해야 하며 조건부 게시 판단은 과거 수집을 면책하지 않음.",
+      "existingPublicationAssessment": "제공된 현재 사용 형태라면 보호 표현 복제와 구별되는 소량 사실의 독립 서술은 조건부 사용 후보다. 해당 호스트의 전체 자료·목록이나 과거 취득 방식까지 허가되었다는 뜻은 아니다.",
+      "evidenceUrls": [
+        "https://www.dropcoffee.com/pages/terms-of-service"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "drwakefield.com",
+      "decision": "insufficient-evidence",
+      "reasons": [
+        "공식 약관을 다시 읽어도 상업적 이용 허용 문장과 일체 상업적 접근·사용 금지 문장이 충돌합니다. 사실의 보호성과 별개로 현재 서비스에 적용할 사용 범위를 단정하기 어렵습니다."
+      ],
+      "conditions": [
+        "해당 출처에 의존한 자료 사용 보류를 유지하고 명시 허가 또는 적용 범위 확인 후 재판단합니다.",
+        "다른 출처에서 독립적으로 확인할 수 있다는 사정은 이 출처 사용 허락을 뜻하지 않습니다."
+      ],
+      "acquisitionRestriction": "별도 자동 접근 허락은 확인하지 못했습니다. 과거 취득 방식과 약관 적용은 확인이 필요하며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 현재 확보한 근거로 이 출처를 일반 사용 가능 상태로 해제하지 않습니다. 위법 확정 판단은 아닙니다.",
+      "evidenceUrls": [
+        "https://drwakefield.com/tcs/"
+      ],
+      "currentUse": true,
+      "confidence": "low",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "en-asia.falcon-micro.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "개인 이용 라이선스와 콘텐츠 변형·복제 제한이 있으나 보호 표현물을 사용하지 않는 독립 사실까지 일괄 배제하지 않습니다. 자료 복제와 링크에는 별도 조건이 남습니다."
+      ],
+      "conditions": [
+        "지명·품종·가공 및 통상적인 짧은 향미어만 독립적으로 서술하고 원문 문장·번역·사진·표·목록 편집·고유한 판매 표현은 복제하지 않습니다.",
+        "출처별 누적 추출이 데이터베이스의 상당 부분이나 반복 추출에 해당하는지 별도 확인합니다. 출처 표시는 이용 허락을 대신하지 않습니다.",
+        "조건부 게시 판단은 과거 수집의 적법성 보증이나 새 자동 수집 허락이 아닙니다.",
+        "딥링크·하이퍼링크 조건은 별도이므로 기존 출처 링크도 자동 허용하지 않습니다."
+      ],
+      "acquisitionRestriction": "별도 자동 접근 허락은 확인하지 못했습니다. 과거 취득 방식과 약관 적용은 확인이 필요하며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 제시된 사실 중심 화면 범위에는 조건부 게시 가능으로 판단하되 실제 모든 문장의 원문 유사성 및 과거 취득 경위를 확인했다는 뜻은 아닙니다.",
+      "evidenceUrls": [
+        "https://en-asia.falcon-micro.com/pages/terms-and-privacy"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "en.coffeelibre.kr",
+      "decision": "keep-held",
+      "reasons": [
+        "영문 22조 2항을 다시 읽었으며 몰 이용으로 얻은 information의 게시·배포·제삼자 이용에 사전 동의를 요구합니다. 국문 자사 저작물 한정 문구를 대신 적용할 수 없습니다."
+      ],
+      "conditions": [
+        "해당 출처에 의존한 자료 사용 보류를 유지하고 명시 허가 또는 적용 범위 확인 후 재판단합니다.",
+        "다른 출처에서 독립적으로 확인할 수 있다는 사정은 이 출처 사용 허락을 뜻하지 않습니다."
+      ],
+      "acquisitionRestriction": "별도 자동 접근 허락은 확인하지 못했습니다. 과거 취득 방식과 약관 적용은 확인이 필요하며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 현재 확보한 근거로 이 출처를 일반 사용 가능 상태로 해제하지 않습니다. 위법 확정 판단은 아닙니다.",
+      "evidenceUrls": [
+        "https://en.coffeelibre.kr/member/agreement.html"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "established.coffee",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "기존 근거는 자동 접근 금지와 서비스 복제·판매·이용 서면허가 조항이다. 산지·품종·가공 등 독립 사실의 짧은 자체 서술을 데이터 재배포 금지로 확대할 근거는 확인되지 않았다.",
+        "기록된 원출처 URL 1개; 현행 맥락 URL 1개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "명시적 자동 접근 제한 있음. 신규 자동 수집을 계속하지 않으며, 기존 자동 취득의 약관 문제는 별도로 남는다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 지정된 독립 사실 사용만 조건부 허용 판단이다. 기존 자동 취득까지 적법하다는 판단은 아니다.",
+      "evidenceUrls": [
+        "https://established.coffee/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "sourceCount": 1,
+      "checkedAt": "2026-09-09T05:32:46.880058+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "eu.covoyacoffee.com",
+      "decision": "keep-held",
+      "reasons": [
+        "EU 호스트의 실제 조건은 로봇뿐 아니라 수동 취득·데이터 마이닝도 서면동의 대상으로 규정한다. 현행 2개 자료 추출의 취득 문제를 재서술로 해소할 수 없다.",
+        "기록된 원출처 URL 2개; 현행 맥락 URL 2개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 출처 기반 자료의 신규 공개·확장 편입은 보류한다. 관련 데이터·취득·재사용 조건의 적용 또는 권리자 허가를 확인한 뒤 개별 해제한다.",
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "명시적 자동 접근 제한 있음. 신규 자동 수집을 계속하지 않으며, 기존 자동 취득의 약관 문제는 별도로 남는다. 데이터/텍스트 취득·추출·DB 편입·정보 이용에 관한 별도 제한의 범위를 해소해야 한다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 이 자료의 기존/예정 사용을 승인할 수 없다. 위법성이 확정됐다는 의미는 아니다.",
+      "evidenceUrls": [
+        "https://eu.covoyacoffee.com/conditions-of-use"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "sourceCount": 2,
+      "checkedAt": "2026-09-09T05:32:46.880019+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "evermorethee.nl",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "확인된 제한은 자동접근 또는 서비스·보호 콘텐츠의 복제·상업적 배포에 관한 것이다. 짧은 산지명·품종·가공 사실 전체를 외부에 독립 서술하지 못한다는 근거로 확대하지 않는다.",
+        "12조는 사이트 텍스트·해설·이미지를 사적 이용만 허용하고 사전 허가 없는 게시를 제한함."
+      ],
+      "conditions": [
+        "산지·품종·가공 등 짧은 개별 사실만 사용하고 원문 문장·번역·설명 구조·사진·가격표·상품 설명 또는 목록 편집물을 복제하지 않는다.",
+        "향미는 짧은 일반 어휘에 한정하고 해당 로트의 관능 기록으로 표시한다. 독특한 표현이나 노트 묶음·순서를 대량 복제하지 않는다.",
+        "현재 판단은 게시 형태에 관한 실무 판단이다. 이미 이루어진 자동수집의 계약상 적법성·취득 당시 조건·권한은 별도 기록으로 확인하며 재작성으로 정당화되지 않는다."
+      ],
+      "acquisitionRestriction": "자동접근 특정 제한은 기존 근거에서 미확인. 이는 자동수집 허가가 아니며 과거 취득 권한 확인은 별도.",
+      "existingPublicationAssessment": "제공된 현재 사용 형태라면 보호 표현 복제와 구별되는 소량 사실의 독립 서술은 조건부 사용 후보다. 해당 호스트의 전체 자료·목록이나 과거 취득 방식까지 허가되었다는 뜻은 아니다.",
+      "evidenceUrls": [
+        "https://evermorethee.nl/algemene-voorwaarden/"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "fatmiilk.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "서비스 복제 및 자동 수집 제한을 개별 산지 사실 게시의 전면 금지와 구분합니다."
+      ],
+      "conditions": [
+        "지명·품종·가공 및 통상적인 짧은 향미어만 독립적으로 서술하고 원문 문장·번역·사진·표·목록 편집·고유한 판매 표현은 복제하지 않습니다.",
+        "출처별 누적 추출이 데이터베이스의 상당 부분이나 반복 추출에 해당하는지 별도 확인합니다. 출처 표시는 이용 허락을 대신하지 않습니다.",
+        "조건부 게시 판단은 과거 수집의 적법성 보증이나 새 자동 수집 허락이 아닙니다."
+      ],
+      "acquisitionRestriction": "명시 자동 접근 제한 유지. 과거 자동 수집의 허락·약관 적용·취득 경위는 별도 미해결이며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 제시된 사실 중심 화면 범위에는 조건부 게시 가능으로 판단하되 실제 모든 문장의 원문 유사성 및 과거 취득 경위를 확인했다는 뜻은 아닙니다.",
+      "evidenceUrls": [
+        "https://fatmiilk.com/pages/terms-of-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "favor.coffee",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "기존 근거는 자동 접근 금지와 서비스 복제·판매·이용 서면허가 조항이다. 산지·품종·가공 등 독립 사실의 짧은 자체 서술을 데이터 재배포 금지로 확대할 근거는 확인되지 않았다.",
+        "기록된 원출처 URL 1개; 현행 맥락 URL 0개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "명시적 자동 접근 제한 있음. 신규 자동 수집을 계속하지 않으며, 기존 자동 취득의 약관 문제는 별도로 남는다.",
+      "existingPublicationAssessment": "현재는 과거 출처 목록만 있고 현행 공개 사용은 확인되지 않으며 지정된 독립 사실 사용만 조건부 허용 판단이다. 기존 자동 취득까지 적법하다는 판단은 아니다.",
+      "evidenceUrls": [
+        "https://favor.coffee/policies/terms-of-service"
+      ],
+      "currentUse": false,
+      "confidence": "medium",
+      "sourceCount": 1,
+      "checkedAt": "2026-09-09T05:32:46.880063+00:00",
+      "referencedInCurrentData": false,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "fivesenses.com.au",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "확인된 제한은 자동접근 또는 서비스·보호 콘텐츠의 복제·상업적 배포에 관한 것이다. 짧은 산지명·품종·가공 사실 전체를 외부에 독립 서술하지 못한다는 근거로 확대하지 않는다.",
+        "사이트 자료는 개인 비상업 이용만 허용하며 다른 복제·게시·배포는 사전 서면 허가 필요."
+      ],
+      "conditions": [
+        "산지·품종·가공 등 짧은 개별 사실만 사용하고 원문 문장·번역·설명 구조·사진·가격표·상품 설명 또는 목록 편집물을 복제하지 않는다.",
+        "향미는 짧은 일반 어휘에 한정하고 해당 로트의 관능 기록으로 표시한다. 독특한 표현이나 노트 묶음·순서를 대량 복제하지 않는다.",
+        "현재 판단은 게시 형태에 관한 실무 판단이다. 이미 이루어진 자동수집의 계약상 적법성·취득 당시 조건·권한은 별도 기록으로 확인하며 재작성으로 정당화되지 않는다."
+      ],
+      "acquisitionRestriction": "자동접근 특정 제한은 기존 근거에서 미확인. 이는 자동수집 허가가 아니며 과거 취득 권한 확인은 별도.",
+      "existingPublicationAssessment": "제공된 현재 사용 형태라면 보호 표현 복제와 구별되는 소량 사실의 독립 서술은 조건부 사용 후보다. 해당 호스트의 전체 자료·목록이나 과거 취득 방식까지 허가되었다는 뜻은 아니다.",
+      "evidenceUrls": [
+        "https://fivesenses.com.au/pages/disclaimer"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "gabrielcoffee.com.au",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "서비스 복제 및 자동 수집 제한을 개별 산지 사실 게시의 전면 금지와 구분합니다."
+      ],
+      "conditions": [
+        "지명·품종·가공 및 통상적인 짧은 향미어만 독립적으로 서술하고 원문 문장·번역·사진·표·목록 편집·고유한 판매 표현은 복제하지 않습니다.",
+        "출처별 누적 추출이 데이터베이스의 상당 부분이나 반복 추출에 해당하는지 별도 확인합니다. 출처 표시는 이용 허락을 대신하지 않습니다.",
+        "조건부 게시 판단은 과거 수집의 적법성 보증이나 새 자동 수집 허락이 아닙니다."
+      ],
+      "acquisitionRestriction": "명시 자동 접근 제한 유지. 과거 자동 수집의 허락·약관 적용·취득 경위는 별도 미해결이며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 제시된 사실 중심 화면 범위에는 조건부 게시 가능으로 판단하되 실제 모든 문장의 원문 유사성 및 과거 취득 경위를 확인했다는 뜻은 아닙니다.",
+      "evidenceUrls": [
+        "https://gabrielcoffee.com.au/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "georgehowellcoffee.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "Kanzu 랏 1건의 짧은 생산사실은 보호 자료의 복제와 구분 가능하다. 다만 링크 사전승인 조항은 사실 게시와 별도이므로 현재 상세 출처 링크를 그대로 허용한다고 판단하지 않는다.",
+        "기록된 원출처 URL 1개; 현행 맥락 URL 1개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다.",
+        "상세 링크 제한은 사실 사용과 별도로 해결한다. 링크를 바꾸는 것만으로 기존 취득·사용을 정당화하지 않는다.",
+        "보호 콘텐츠 자체나 서비스의 상업적 활용에 해당하면 별도 허가가 필요하다. 판매 기능이 없다는 사실만으로 모든 상업성 조건이 충족된 것으로 보지 않는다."
+      ],
+      "acquisitionRestriction": "일반 자동 접근 금지는 기존 근거에서 확정되지 않았다. 이는 자동 취득 허가를 의미하지 않는다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 지정된 독립 사실 사용만 조건부 허용 판단이다. 기존 자동 취득까지 적법하다는 판단은 아니다.",
+      "evidenceUrls": [
+        "https://georgehowellcoffee.com/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "sourceCount": 1,
+      "checkedAt": "2026-09-09T05:32:46.880067+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "gesharycoffee.com",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "insufficient-evidence",
+      "reasons": [
+        "검색 색인에서 제한 일부만 확인했고 원문 접근 실패. 다운로드 데이터가 어디까지 포함되는지 미확정이며 현재 사용 맥락은 과거 인벤토리뿐.",
+        "공식 약관 검색 색인에서 이미지·영상·텍스트·다운로드 데이터의 무허가 복제·전용 제한 확인. 직접 요청은 실패."
+      ],
+      "conditions": [
+        "위 미확정 항목과 취득·이용 범위를 확인하기 전 이 출처를 사용 가능으로 확정하거나 자동 복원하지 않는다.",
+        "추가 제품 데이터 수집을 하지 않는다. 필요한 경우 공식 약관 또는 이미 보관된 취득 기록만 확인한다."
+      ],
+      "acquisitionRestriction": "자동접근 특정 제한은 기존 근거에서 미확인. 이는 자동수집 허가가 아니며 과거 취득 권한 확인은 별도.",
+      "existingPublicationAssessment": "자료가 불법이라고 결론내릴 근거도, 현재 출처 기반 게시를 허용한다고 확정할 근거도 부족하다. 현재 인벤토리는 historical-source-inventory뿐이며 공개에서 사용 중이라고 확인된 자료는 없다.",
+      "evidenceUrls": [
+        "https://gesharycoffee.com/en/disclaimer/"
+      ],
+      "currentUse": false,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "low",
+      "referencedInCurrentData": false,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "goodhustlecoffee.com.au",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "insufficient-evidence",
+      "reasons": [
+        "자동수집·서비스 복제 제한은 색인에 있으나 직접 약관 읽기 실패. 과거 취득·현재 사용 허가의 평가 근거가 부분적임.",
+        "공식 약관 검색 색인에서 spider/crawl/scrape 금지 및 서비스 복제·판매·이용은 서면 허가 필요를 확인. 직접 약관 페이지 읽기는 실패."
+      ],
+      "conditions": [
+        "위 미확정 항목과 취득·이용 범위를 확인하기 전 이 출처를 사용 가능으로 확정하거나 자동 복원하지 않는다.",
+        "추가 제품 데이터 수집을 하지 않는다. 필요한 경우 공식 약관 또는 이미 보관된 취득 기록만 확인한다."
+      ],
+      "acquisitionRestriction": "명시 자동접근·추출 제한 있음. 추가 자동수집 중지 유지. 이미 취득한 자료는 취득 시점·방식·동의·적용 약관을 별도로 확인해야 하며 조건부 게시 판단은 과거 수집을 면책하지 않음.",
+      "existingPublicationAssessment": "자료가 불법이라고 결론내릴 근거도, 현재 출처 기반 게시를 허용한다고 확정할 근거도 부족하다.",
+      "evidenceUrls": [
+        "https://goodhustlecoffee.com.au/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "low",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "greencoffeecollective.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "5개 중 현행 3개 URL이다. 자동 수집과 서비스 복제 제한만으로 이미 확인한 독립 지명·품종·가공 사실의 짧은 공개를 전부 금지할 근거는 부족하다.",
+        "기록된 원출처 URL 5개; 현행 맥락 URL 3개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "명시적 자동 접근 제한 있음. 신규 자동 수집을 계속하지 않으며, 기존 자동 취득의 약관 문제는 별도로 남는다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 지정된 독립 사실 사용만 조건부 허용 판단이다. 기존 자동 취득까지 적법하다는 판단은 아니다.",
+      "evidenceUrls": [
+        "https://greencoffeecollective.com/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "sourceCount": 5,
+      "checkedAt": "2026-09-09T05:32:46.879989+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "gshotcoffeeroastery.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "서비스 복제 및 자동 수집 제한을 개별 산지 사실 게시의 전면 금지와 구분합니다."
+      ],
+      "conditions": [
+        "지명·품종·가공 및 통상적인 짧은 향미어만 독립적으로 서술하고 원문 문장·번역·사진·표·목록 편집·고유한 판매 표현은 복제하지 않습니다.",
+        "출처별 누적 추출이 데이터베이스의 상당 부분이나 반복 추출에 해당하는지 별도 확인합니다. 출처 표시는 이용 허락을 대신하지 않습니다.",
+        "조건부 게시 판단은 과거 수집의 적법성 보증이나 새 자동 수집 허락이 아닙니다."
+      ],
+      "acquisitionRestriction": "명시 자동 접근 제한 유지. 과거 자동 수집의 허락·약관 적용·취득 경위는 별도 미해결이며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 제시된 사실 중심 화면 범위에는 조건부 게시 가능으로 판단하되 실제 모든 문장의 원문 유사성 및 과거 취득 경위를 확인했다는 뜻은 아닙니다.",
+      "evidenceUrls": [
+        "https://gshotcoffeeroastery.com/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "hola.coffee",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "기존 근거는 자동 접근 금지와 서비스 복제·판매·이용 서면허가 조항이다. 산지·품종·가공 등 독립 사실의 짧은 자체 서술을 데이터 재배포 금지로 확대할 근거는 확인되지 않았다.",
+        "기록된 원출처 URL 1개; 현행 맥락 URL 1개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "명시적 자동 접근 제한 있음. 신규 자동 수집을 계속하지 않으며, 기존 자동 취득의 약관 문제는 별도로 남는다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 지정된 독립 사실 사용만 조건부 허용 판단이다. 기존 자동 취득까지 적법하다는 판단은 아니다.",
+      "evidenceUrls": [
+        "https://hola.coffee/en/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "sourceCount": 1,
+      "checkedAt": "2026-09-09T05:32:46.880072+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "home.lamarzoccousa.com",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "확인된 제한은 자동접근 또는 서비스·보호 콘텐츠의 복제·상업적 배포에 관한 것이다. 짧은 산지명·품종·가공 사실 전체를 외부에 독립 서술하지 못한다는 근거로 확대하지 않는다.",
+        "§1 전세계계열웹 적용. §2 텍스트·기타자료 재게시·번역·상업배포 서면허가요구; 다운로드용 제품정보도 개인비상업만.",
+        "개별사실 권리성·독립서술·법적예외는 별도검토."
+      ],
+      "conditions": [
+        "산지·품종·가공 등 짧은 개별 사실만 사용하고 원문 문장·번역·설명 구조·사진·가격표·상품 설명 또는 목록 편집물을 복제하지 않는다.",
+        "향미는 짧은 일반 어휘에 한정하고 해당 로트의 관능 기록으로 표시한다. 독특한 표현이나 노트 묶음·순서를 대량 복제하지 않는다.",
+        "현재 판단은 게시 형태에 관한 실무 판단이다. 이미 이루어진 자동수집의 계약상 적법성·취득 당시 조건·권한은 별도 기록으로 확인하며 재작성으로 정당화되지 않는다."
+      ],
+      "acquisitionRestriction": "자동접근 특정 제한은 기존 근거에서 미확인. 이는 자동수집 허가가 아니며 과거 취득 권한 확인은 별도.",
+      "existingPublicationAssessment": "제공된 현재 사용 형태라면 보호 표현 복제와 구별되는 소량 사실의 독립 서술은 조건부 사용 후보다. 해당 호스트의 전체 자료·목록이나 과거 취득 방식까지 허가되었다는 뜻은 아니다.",
+      "evidenceUrls": [
+        "https://home.lamarzoccousa.com/terms-conditions/"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "honest.coffee",
+      "decision": "keep-held",
+      "reasons": [
+        "수집물·DB·디렉터리 구축 자체에 서면 허가를 요구합니다. 산지 목록 편입을 일반적인 콘텐츠 재작성으로 처리할 수 없습니다."
+      ],
+      "conditions": [
+        "해당 출처에 의존한 자료 사용 보류를 유지하고 명시 허가 또는 적용 범위 확인 후 재판단합니다.",
+        "다른 출처에서 독립적으로 확인할 수 있다는 사정은 이 출처 사용 허락을 뜻하지 않습니다."
+      ],
+      "acquisitionRestriction": "명시 자동 접근 제한 유지. 과거 자동 수집의 허락·약관 적용·취득 경위는 별도 미해결이며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 현재 확보한 근거로 이 출처를 일반 사용 가능 상태로 해제하지 않습니다. 위법 확정 판단은 아닙니다.",
+      "evidenceUrls": [
+        "https://www.honest.coffee/footer-terms-and-conditions"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "honestmocha.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "기존 근거는 자동 접근 금지와 서비스 복제·판매·이용 서면허가 조항이다. 산지·품종·가공 등 독립 사실의 짧은 자체 서술을 데이터 재배포 금지로 확대할 근거는 확인되지 않았다.",
+        "기록된 원출처 URL 1개; 현행 맥락 URL 1개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "명시적 자동 접근 제한 있음. 신규 자동 수집을 계속하지 않으며, 기존 자동 취득의 약관 문제는 별도로 남는다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 지정된 독립 사실 사용만 조건부 허용 판단이다. 기존 자동 취득까지 적법하다는 판단은 아니다.",
+      "evidenceUrls": [
+        "https://www.honestmocha.com/terms-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "sourceCount": 1,
+      "checkedAt": "2026-09-09T05:32:46.880074+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "hscoffeeroasters.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "확인한 핵심 제한은 자동 스크래핑입니다. 그 사실만으로 기존의 독립 사실 게시까지 금지된다고 판단하지 않습니다."
+      ],
+      "conditions": [
+        "지명·품종·가공 및 통상적인 짧은 향미어만 독립적으로 서술하고 원문 문장·번역·사진·표·목록 편집·고유한 판매 표현은 복제하지 않습니다.",
+        "출처별 누적 추출이 데이터베이스의 상당 부분이나 반복 추출에 해당하는지 별도 확인합니다. 출처 표시는 이용 허락을 대신하지 않습니다.",
+        "조건부 게시 판단은 과거 수집의 적법성 보증이나 새 자동 수집 허락이 아닙니다."
+      ],
+      "acquisitionRestriction": "명시 자동 접근 제한 유지. 과거 자동 수집의 허락·약관 적용·취득 경위는 별도 미해결이며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 제시된 사실 중심 화면 범위에는 조건부 게시 가능으로 판단하되 실제 모든 문장의 원문 유사성 및 과거 취득 경위를 확인했다는 뜻은 아닙니다.",
+      "evidenceUrls": [
+        "https://hscoffeeroasters.com/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "idlehandsroasting.com",
+      "decision": "keep-held",
+      "reasons": [
+        "데이터·기타 정보 수집 자체를 금지하는 조항이 확인되어 있다. Ecuador El Dorado·Halo Beriti의 현행 2개 랏 정보 편입은 보호 표현을 복사하지 않았다는 사유만으로 승인하기 어렵다.",
+        "기록된 원출처 URL 2개; 현행 맥락 URL 2개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 출처 기반 자료의 신규 공개·확장 편입은 보류한다. 관련 데이터·취득·재사용 조건의 적용 또는 권리자 허가를 확인한 뒤 개별 해제한다.",
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "명시적 자동 접근 제한 있음. 신규 자동 수집을 계속하지 않으며, 기존 자동 취득의 약관 문제는 별도로 남는다. 데이터/텍스트 취득·추출·DB 편입·정보 이용에 관한 별도 제한의 범위를 해소해야 한다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 이 자료의 기존/예정 사용을 승인할 수 없다. 위법성이 확정됐다는 의미는 아니다.",
+      "evidenceUrls": [
+        "https://idlehandsroasting.com/terms-of-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "sourceCount": 2,
+      "checkedAt": "2026-09-09T05:32:46.880022+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "ineffablecoffee.com",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "insufficient-evidence",
+      "reasons": [
+        "목록에는 단일 상품 출처이나 전체·상당 부분 및 반복 추출인지 실제 누적 취득 범위를 확인하지 못함. 상세 페이지 링크 허가 조건도 미해결.",
+        "4.2조 법적 예외·허락 없는 보호 콘텐츠 복제·재배포 제한. 전체 또는 상당 부분의 콘텐츠·DB 추출 및 재사용 금지.",
+        "4.4조 홈페이지 연결만 허용한다고 명시하여 상세 출처 링크도 조건 검토 필요.",
+        "전수·반복 추출은 수집량 검토 전 보류. 상당 부분 추출 제한을 단일 객관적 사실의 일괄 금지로 확대하지 않음."
+      ],
+      "conditions": [
+        "위 미확정 항목과 취득·이용 범위를 확인하기 전 이 출처를 사용 가능으로 확정하거나 자동 복원하지 않는다.",
+        "추가 제품 데이터 수집을 하지 않는다. 필요한 경우 공식 약관 또는 이미 보관된 취득 기록만 확인한다."
+      ],
+      "acquisitionRestriction": "자동화 여부와 별개로 DB 편입·체계적 또는 상당 부분 추출 조건 적용을 검토해야 함.",
+      "existingPublicationAssessment": "자료가 불법이라고 결론내릴 근거도, 현재 출처 기반 게시를 허용한다고 확정할 근거도 부족하다.",
+      "evidenceUrls": [
+        "https://ineffablecoffee.com/en/pages/aviso-legal"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "low",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "interamericancoffee.de",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "콘텐츠·PDF의 복제와 전달 제한을 확인했지만 개별 산지 사실의 독립 서술과 문서 복제는 구분할 수 있습니다. PDF 표·설명·편집 자체의 재사용까지 허용하는 판단은 아닙니다."
+      ],
+      "conditions": [
+        "지명·품종·가공 및 통상적인 짧은 향미어만 독립적으로 서술하고 원문 문장·번역·사진·표·목록 편집·고유한 판매 표현은 복제하지 않습니다.",
+        "출처별 누적 추출이 데이터베이스의 상당 부분이나 반복 추출에 해당하는지 별도 확인합니다. 출처 표시는 이용 허락을 대신하지 않습니다.",
+        "조건부 게시 판단은 과거 수집의 적법성 보증이나 새 자동 수집 허락이 아닙니다."
+      ],
+      "acquisitionRestriction": "별도 자동 접근 허락은 확인하지 못했습니다. 과거 취득 방식과 약관 적용은 확인이 필요하며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 제시된 사실 중심 화면 범위에는 조건부 게시 가능으로 판단하되 실제 모든 문장의 원문 유사성 및 과거 취득 경위를 확인했다는 뜻은 아닙니다.",
+      "evidenceUrls": [
+        "https://interamericancoffee.de/imprint/",
+        "https://interamericancoffee.de/wp-content/uploads/2025/04/iac_offerlist_17-11-2025.pdf"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "justincoffee.com.tw",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "insufficient-evidence",
+      "reasons": [
+        "검색 색인 부분 문구만으로 웹 자료·콘텐츠 제한의 독립 사실 적용 범위를 확인할 수 없음.",
+        "공식 사용조건 색인: 웹 자료·콘텐츠의 무단 전파·복제·수정·게시·전송 제한. 직접 요청 실패."
+      ],
+      "conditions": [
+        "위 미확정 항목과 취득·이용 범위를 확인하기 전 이 출처를 사용 가능으로 확정하거나 자동 복원하지 않는다.",
+        "추가 제품 데이터 수집을 하지 않는다. 필요한 경우 공식 약관 또는 이미 보관된 취득 기록만 확인한다."
+      ],
+      "acquisitionRestriction": "자동접근 특정 제한은 기존 근거에서 미확인. 이는 자동수집 허가가 아니며 과거 취득 권한 확인은 별도.",
+      "existingPublicationAssessment": "자료가 불법이라고 결론내릴 근거도, 현재 출처 기반 게시를 허용한다고 확정할 근거도 부족하다.",
+      "evidenceUrls": [
+        "https://www.justincoffee.com.tw/zh-TW/pages/terms"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "low",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "lacaffinerie.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "콘텐츠 복제·변경·재사용 제한과 보호되지 않는 독립 사실 서술을 구분합니다. 명시적으로 허용한 단순 링크와 콘텐츠 재사용 허락도 서로 다릅니다."
+      ],
+      "conditions": [
+        "지명·품종·가공 및 통상적인 짧은 향미어만 독립적으로 서술하고 원문 문장·번역·사진·표·목록 편집·고유한 판매 표현은 복제하지 않습니다.",
+        "출처별 누적 추출이 데이터베이스의 상당 부분이나 반복 추출에 해당하는지 별도 확인합니다. 출처 표시는 이용 허락을 대신하지 않습니다.",
+        "조건부 게시 판단은 과거 수집의 적법성 보증이나 새 자동 수집 허락이 아닙니다."
+      ],
+      "acquisitionRestriction": "별도 자동 접근 허락은 확인하지 못했습니다. 과거 취득 방식과 약관 적용은 확인이 필요하며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "기록상 과거 조사 목록만 있고 현재 공개 사용은 확인되지 않습니다. 제시된 사실 중심 화면 범위에는 조건부 게시 가능으로 판단하되 실제 모든 문장의 원문 유사성 및 과거 취득 경위를 확인했다는 뜻은 아닙니다.",
+      "evidenceUrls": [
+        "https://www.lacaffinerie.com/mentions-legales/"
+      ],
+      "currentUse": false,
+      "confidence": "medium",
+      "referencedInCurrentData": false,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "link.springer.com",
+      "decision": "insufficient-evidence",
+      "reasons": [
+        "현재 근거는 Chiroso 관련 특정 논문 10.1007/s10722-021-01139-y다. Springer의 일반 자동 검색·다운로드 조건과 별개로 이 논문의 OA·라이선스 및 실제 발췌 범위가 확인되지 않았다. 일반 약관만으로 사실 이용 전부 금지 또는 전부 허용을 확정하지 않는다.",
+        "기록된 원출처 URL 1개; 현행 맥락 URL 1개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "해당 원자산의 라이선스·약관 적용범위·기존 추출 형태를 확인하기 전 사용 승인으로 처리하지 않는다.",
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "명시적 자동 접근 제한 있음. 신규 자동 수집을 계속하지 않으며, 기존 자동 취득의 약관 문제는 별도로 남는다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 이 자료의 기존/예정 사용을 승인할 수 없다. 위법성이 확정됐다는 의미는 아니다.",
+      "evidenceUrls": [
+        "https://rd.springer.com/termsandconditions"
+      ],
+      "currentUse": true,
+      "confidence": "low",
+      "sourceCount": 1,
+      "checkedAt": "2026-09-09T05:32:46.880096+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "linkedin.com",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "keep-held",
+      "reasons": [
+        "8.2조가 단순 자동접근뿐 아니라 서비스·검색도구에서 얻은 정보의 복제·사용·배포에 동의를 요구한다.",
+        "8.2조 서비스·프로필·데이터 스크래핑 금지. 서비스에서 직접 또는 검색도구 등을 통해 얻은 정보 복제·사용·배포에 소유자 동의 요구. 회원 및 방문자 대상."
+      ],
+      "conditions": [
+        "해당 게시물 소유자의 사용 동의와 플랫폼 적용 조건을 확인하기 전 보류. 다른 곳에서 같은 사실을 확인하는 것은 이 출처의 이용 허가가 아님.",
+        "동일 사실을 다른 출처에서 재확인할 수 있다는 사정은 이 출처의 현재 사용 권한이 되지 않는다.",
+        "이 판단은 위법 확정이 아니며, 과거 자동수집 문제는 문장 재작성으로 해소되지 않는다."
+      ],
+      "acquisitionRestriction": "명시 자동접근·추출 제한 있음. 추가 자동수집 중지 유지. 이미 취득한 자료는 취득 시점·방식·동의·적용 약관을 별도로 확인해야 하며 조건부 게시 판단은 과거 수집을 면책하지 않음.",
+      "existingPublicationAssessment": "현재 게시물이 짧은 사실이어도 확인된 데이터·정보 이용 또는 DB 편입 조건과 겹치거나 인용 문서 적용 조건이 미확정이므로 이 출처 기반 복원은 보류한다.",
+      "evidenceUrls": [
+        "https://www.linkedin.com/legal/user-agreement"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "lomi.cafe",
+      "decision": "keep-held",
+      "reasons": [
+        "자동뿐 아니라 수동 정보 수집·저장·색인을 명시적으로 제한합니다. 현 목록화 작업과 직접 관련된 수집·편입 조건이 해소되지 않았습니다."
+      ],
+      "conditions": [
+        "해당 출처에 의존한 자료 사용 보류를 유지하고 명시 허가 또는 적용 범위 확인 후 재판단합니다.",
+        "다른 출처에서 독립적으로 확인할 수 있다는 사정은 이 출처 사용 허락을 뜻하지 않습니다.",
+        "딥링크·하이퍼링크 조건은 별도이므로 기존 출처 링크도 자동 허용하지 않습니다."
+      ],
+      "acquisitionRestriction": "명시 자동 접근 제한 유지. 과거 자동 수집의 허락·약관 적용·취득 경위는 별도 미해결이며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "기록상 과거 조사 목록만 있고 현재 공개 사용은 확인되지 않습니다. 현재 확보한 근거로 이 출처를 일반 사용 가능 상태로 해제하지 않습니다. 위법 확정 판단은 아닙니다.",
+      "evidenceUrls": [
+        "https://lomi.cafe/cgu"
+      ],
+      "currentUse": false,
+      "confidence": "medium",
+      "referencedInCurrentData": false,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "m.en.coffeelibre.kr",
+      "decision": "keep-held",
+      "reasons": [
+        "공식 영문 제22조를 다시 확인했으며 IP 귀속 정보로 한정하지 않고 몰에서 얻은 정보의 복사·전송·공개·제3자 이용을 제한한다. 과거 목록 1건을 현행에 편입하기 전 넓은 정보 조항의 적용을 확인해야 한다.",
+        "기록된 원출처 URL 1개; 현행 맥락 URL 0개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 출처 기반 자료의 신규 공개·확장 편입은 보류한다. 관련 데이터·취득·재사용 조건의 적용 또는 권리자 허가를 확인한 뒤 개별 해제한다.",
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "일반 자동 접근 금지는 기존 근거에서 확정되지 않았다. 이는 자동 취득 허가를 의미하지 않는다. 데이터/텍스트 취득·추출·DB 편입·정보 이용에 관한 별도 제한의 범위를 해소해야 한다.",
+      "existingPublicationAssessment": "현재는 과거 출처 목록만 있고 현행 공개 사용은 확인되지 않으며 이 자료의 기존/예정 사용을 승인할 수 없다. 위법성이 확정됐다는 의미는 아니다.",
+      "evidenceUrls": [
+        "https://m.en.coffeelibre.kr/member/agreement.html"
+      ],
+      "currentUse": false,
+      "confidence": "medium",
+      "sourceCount": 1,
+      "checkedAt": "2026-09-09T05:32:46.880099+00:00",
+      "referencedInCurrentData": false,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "mastefi.com",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "확인된 제한은 자동접근 또는 서비스·보호 콘텐츠의 복제·상업적 배포에 관한 것이다. 짧은 산지명·품종·가공 사실 전체를 외부에 독립 서술하지 못한다는 근거로 확대하지 않는다.",
+        "제2조 자동 시스템 데이터 추출 금지. 제3조 콘텐츠 복제·배포·이용 서면허가 요구"
+      ],
+      "conditions": [
+        "산지·품종·가공 등 짧은 개별 사실만 사용하고 원문 문장·번역·설명 구조·사진·가격표·상품 설명 또는 목록 편집물을 복제하지 않는다.",
+        "향미는 짧은 일반 어휘에 한정하고 해당 로트의 관능 기록으로 표시한다. 독특한 표현이나 노트 묶음·순서를 대량 복제하지 않는다.",
+        "현재 판단은 게시 형태에 관한 실무 판단이다. 이미 이루어진 자동수집의 계약상 적법성·취득 당시 조건·권한은 별도 기록으로 확인하며 재작성으로 정당화되지 않는다.",
+        "새 자동수집은 재개하지 않는다. 게시 조건과 수집 권한은 별도로 관리한다."
+      ],
+      "acquisitionRestriction": "명시 자동접근·추출 제한 있음. 추가 자동수집 중지 유지. 이미 취득한 자료는 취득 시점·방식·동의·적용 약관을 별도로 확인해야 하며 조건부 게시 판단은 과거 수집을 면책하지 않음.",
+      "existingPublicationAssessment": "제공된 현재 사용 형태라면 보호 표현 복제와 구별되는 소량 사실의 독립 서술은 조건부 사용 후보다. 해당 호스트의 전체 자료·목록이나 과거 취득 방식까지 허가되었다는 뜻은 아니다.",
+      "evidenceUrls": [
+        "https://mastefi.com/user-agreement"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "medium.com",
+      "decision": "keep-held",
+      "reasons": [
+        "데이터·콘텐츠의 자동 및 수동 복사까지 제한한 근거가 있어 현재 수집물을 그대로 재사용 가능하다고 판단하지 않습니다. 글쓴이의 권리와 플랫폼 조건도 별개입니다."
+      ],
+      "conditions": [
+        "해당 출처에 의존한 자료 사용 보류를 유지하고 명시 허가 또는 적용 범위 확인 후 재판단합니다.",
+        "다른 출처에서 독립적으로 확인할 수 있다는 사정은 이 출처 사용 허락을 뜻하지 않습니다."
+      ],
+      "acquisitionRestriction": "명시 자동 접근 제한 유지. 과거 자동 수집의 허락·약관 적용·취득 경위는 별도 미해결이며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 현재 확보한 근거로 이 출처를 일반 사용 가능 상태로 해제하지 않습니다. 위법 확정 판단은 아닙니다.",
+      "evidenceUrls": [
+        "https://policy.medium.com/medium-rules-30e5502c4eb4"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "melbournecoffeemerchants.com.au",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "확인된 제한은 자동접근 또는 서비스·보호 콘텐츠의 복제·상업적 배포에 관한 것이다. 짧은 산지명·품종·가공 사실 전체를 외부에 독립 서술하지 못한다는 근거로 확대하지 않는다.",
+        "이전 직접 검토에서 개인·비상업적 이용 외 콘텐츠 출판·배포·변경·판매에 서면허가 요구 확인. 이번 재열람은 내부 오류. 자동수집 문구 미확인."
+      ],
+      "conditions": [
+        "산지·품종·가공 등 짧은 개별 사실만 사용하고 원문 문장·번역·설명 구조·사진·가격표·상품 설명 또는 목록 편집물을 복제하지 않는다.",
+        "향미는 짧은 일반 어휘에 한정하고 해당 로트의 관능 기록으로 표시한다. 독특한 표현이나 노트 묶음·순서를 대량 복제하지 않는다.",
+        "현재 판단은 게시 형태에 관한 실무 판단이다. 이미 이루어진 자동수집의 계약상 적법성·취득 당시 조건·권한은 별도 기록으로 확인하며 재작성으로 정당화되지 않는다.",
+        "등록된 24개 출처 및 두 개 웹 목록 PDF가 카탈로그의 상당 부분·반복 추출에 해당하는지 별도 확인하고, 웹 목록·표 배열은 복원하지 않는다."
+      ],
+      "acquisitionRestriction": "자동접근 특정 제한은 기존 근거에서 미확인. 이는 자동수집 허가가 아니며 과거 취득 권한 확인은 별도.",
+      "existingPublicationAssessment": "제공된 현재 사용 형태라면 보호 표현 복제와 구별되는 소량 사실의 독립 서술은 조건부 사용 후보다. 해당 호스트의 전체 자료·목록이나 과거 취득 방식까지 허가되었다는 뜻은 아니다.",
+      "evidenceUrls": [
+        "https://melbournecoffeemerchants.com.au/terms-of-use/"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "memlicoffee.com",
+      "decision": "keep-held",
+      "reasons": [
+        "사이트 또는 콘텐츠의 extract·re-utilize를 직접 제한하며 미국법상 예외는 남겨 둔다. 과거 목록 1건을 이미 수집한 자료 그대로 신규 편입하는 허락은 확인되지 않아 추출 범위·법적 예외 검토까지 유지한다.",
+        "기록된 원출처 URL 1개; 현행 맥락 URL 0개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 출처 기반 자료의 신규 공개·확장 편입은 보류한다. 관련 데이터·취득·재사용 조건의 적용 또는 권리자 허가를 확인한 뒤 개별 해제한다.",
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "일반 자동 접근 금지는 기존 근거에서 확정되지 않았다. 이는 자동 취득 허가를 의미하지 않는다. 데이터/텍스트 취득·추출·DB 편입·정보 이용에 관한 별도 제한의 범위를 해소해야 한다.",
+      "existingPublicationAssessment": "현재는 과거 출처 목록만 있고 현행 공개 사용은 확인되지 않으며 이 자료의 기존/예정 사용을 승인할 수 없다. 위법성이 확정됐다는 의미는 아니다.",
+      "evidenceUrls": [
+        "https://www.memlicoffee.com/termsandconditions"
+      ],
+      "currentUse": false,
+      "confidence": "medium",
+      "sourceCount": 1,
+      "checkedAt": "2026-09-09T05:32:46.880101+00:00",
+      "referencedInCurrentData": false,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "methodicalcoffee.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "자동 수집 및 서비스 복제 제한을 개별 사실의 독립 서술과 구분합니다."
+      ],
+      "conditions": [
+        "지명·품종·가공 및 통상적인 짧은 향미어만 독립적으로 서술하고 원문 문장·번역·사진·표·목록 편집·고유한 판매 표현은 복제하지 않습니다.",
+        "출처별 누적 추출이 데이터베이스의 상당 부분이나 반복 추출에 해당하는지 별도 확인합니다. 출처 표시는 이용 허락을 대신하지 않습니다.",
+        "조건부 게시 판단은 과거 수집의 적법성 보증이나 새 자동 수집 허락이 아닙니다."
+      ],
+      "acquisitionRestriction": "명시 자동 접근 제한 유지. 과거 자동 수집의 허락·약관 적용·취득 경위는 별도 미해결이며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 제시된 사실 중심 화면 범위에는 조건부 게시 가능으로 판단하되 실제 모든 문장의 원문 유사성 및 과거 취득 경위를 확인했다는 뜻은 아닙니다.",
+      "evidenceUrls": [
+        "https://methodicalcoffee.com/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "mewa.gov.sa",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "insufficient-evidence",
+      "reasons": [
+        "공개정보 사용의 개인·비영리 조건은 확인했지만 현재 프로젝트에 그 조건이 충족되는지 불명확. 현재 자료는 과거 인벤토리로만 등록됨.",
+        "포털 콘텐츠·공개정보 활용은 개인·비영리 사용자 및 출처표시 조건. 일반 상업이용 허가 없음. 자동접근 특정조항 미확인."
+      ],
+      "conditions": [
+        "위 미확정 항목과 취득·이용 범위를 확인하기 전 이 출처를 사용 가능으로 확정하거나 자동 복원하지 않는다.",
+        "추가 제품 데이터 수집을 하지 않는다. 필요한 경우 공식 약관 또는 이미 보관된 취득 기록만 확인한다."
+      ],
+      "acquisitionRestriction": "자동접근 특정 제한은 기존 근거에서 미확인. 이는 자동수집 허가가 아니며 과거 취득 권한 확인은 별도.",
+      "existingPublicationAssessment": "자료가 불법이라고 결론내릴 근거도, 현재 출처 기반 게시를 허용한다고 확정할 근거도 부족하다. 현재 인벤토리는 historical-source-inventory뿐이며 공개에서 사용 중이라고 확인된 자료는 없다.",
+      "evidenceUrls": [
+        "https://www.mewa.gov.sa/en/aboutPortal/Pages/ClientCharter.aspx"
+      ],
+      "currentUse": false,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "low",
+      "referencedInCurrentData": false,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "mokcoffee.be",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "서비스 복제 및 자동 수집 제한을 개별 산지 사실 게시의 전면 금지와 구분합니다."
+      ],
+      "conditions": [
+        "지명·품종·가공 및 통상적인 짧은 향미어만 독립적으로 서술하고 원문 문장·번역·사진·표·목록 편집·고유한 판매 표현은 복제하지 않습니다.",
+        "출처별 누적 추출이 데이터베이스의 상당 부분이나 반복 추출에 해당하는지 별도 확인합니다. 출처 표시는 이용 허락을 대신하지 않습니다.",
+        "조건부 게시 판단은 과거 수집의 적법성 보증이나 새 자동 수집 허락이 아닙니다."
+      ],
+      "acquisitionRestriction": "명시 자동 접근 제한 유지. 과거 자동 수집의 허락·약관 적용·취득 경위는 별도 미해결이며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 제시된 사실 중심 화면 범위에는 조건부 게시 가능으로 판단하되 실제 모든 문장의 원문 유사성 및 과거 취득 경위를 확인했다는 뜻은 아닙니다.",
+      "evidenceUrls": [
+        "https://mokcoffee.be/pages/terms-conditions"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "momoscoffee.net",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "기존 근거는 자동 접근 금지와 서비스 복제·판매·이용 서면허가 조항이다. 산지·품종·가공 등 독립 사실의 짧은 자체 서술을 데이터 재배포 금지로 확대할 근거는 확인되지 않았다.",
+        "기록된 원출처 URL 1개; 현행 맥락 URL 1개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "명시적 자동 접근 제한 있음. 신규 자동 수집을 계속하지 않으며, 기존 자동 취득의 약관 문제는 별도로 남는다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 지정된 독립 사실 사용만 조건부 허용 판단이다. 기존 자동 취득까지 적법하다는 판단은 아니다.",
+      "evidenceUrls": [
+        "https://momoscoffee.net/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "sourceCount": 1,
+      "checkedAt": "2026-09-09T05:32:46.880104+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "morrowcoffee.com",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "확인된 제한은 자동접근 또는 서비스·보호 콘텐츠의 복제·상업적 배포에 관한 것이다. 짧은 산지명·품종·가공 사실 전체를 외부에 독립 서술하지 못한다는 근거로 확대하지 않는다.",
+        "제12조 spider/crawl/scrape 명시 금지. 제2조 서비스 복제·판매·이용에 서면 허가 요구."
+      ],
+      "conditions": [
+        "산지·품종·가공 등 짧은 개별 사실만 사용하고 원문 문장·번역·설명 구조·사진·가격표·상품 설명 또는 목록 편집물을 복제하지 않는다.",
+        "향미는 짧은 일반 어휘에 한정하고 해당 로트의 관능 기록으로 표시한다. 독특한 표현이나 노트 묶음·순서를 대량 복제하지 않는다.",
+        "현재 판단은 게시 형태에 관한 실무 판단이다. 이미 이루어진 자동수집의 계약상 적법성·취득 당시 조건·권한은 별도 기록으로 확인하며 재작성으로 정당화되지 않는다.",
+        "새 자동수집은 재개하지 않는다. 게시 조건과 수집 권한은 별도로 관리한다."
+      ],
+      "acquisitionRestriction": "명시 자동접근·추출 제한 있음. 추가 자동수집 중지 유지. 이미 취득한 자료는 취득 시점·방식·동의·적용 약관을 별도로 확인해야 하며 조건부 게시 판단은 과거 수집을 면책하지 않음.",
+      "existingPublicationAssessment": "제공된 현재 사용 형태라면 보호 표현 복제와 구별되는 소량 사실의 독립 서술은 조건부 사용 후보다. 해당 호스트의 전체 자료·목록이나 과거 취득 방식까지 허가되었다는 뜻은 아니다.",
+      "evidenceUrls": [
+        "https://morrowcoffee.com/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "nemesis.coffee",
+      "decision": "keep-held",
+      "reasons": [
+        "정보·data text를 포함한 자료의 내부 DB 편입 및 재게시 금지를 명시해 산지 데이터베이스 용도와 직접 충돌합니다."
+      ],
+      "conditions": [
+        "해당 출처에 의존한 자료 사용 보류를 유지하고 명시 허가 또는 적용 범위 확인 후 재판단합니다.",
+        "다른 출처에서 독립적으로 확인할 수 있다는 사정은 이 출처 사용 허락을 뜻하지 않습니다."
+      ],
+      "acquisitionRestriction": "별도 자동 접근 허락은 확인하지 못했습니다. 과거 취득 방식과 약관 적용은 확인이 필요하며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "기록상 과거 조사 목록만 있고 현재 공개 사용은 확인되지 않습니다. 현재 확보한 근거로 이 출처를 일반 사용 가능 상태로 해제하지 않습니다. 위법 확정 판단은 아닙니다.",
+      "evidenceUrls": [
+        "https://cdn.shopify.com/s/files/1/0570/9499/6149/files/Website_Terms.pdf?v=1636587126"
+      ],
+      "currentUse": false,
+      "confidence": "medium",
+      "referencedInCurrentData": false,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "nkgquality.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "현재 사용은 Atitlan La Voz PDF 1건의 산지 사실이다. 데이터 편집물의 제3자 이전·변형 제한이 자료 전체나 편집물을 대상으로 한다는 점과 개별 사실을 구분한다. 표·필드 묶음·도안의 재현은 허용 판단에서 제외한다.",
+        "기록된 원출처 URL 1개; 현행 맥락 URL 1개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다.",
+        "보호 콘텐츠 자체나 서비스의 상업적 활용에 해당하면 별도 허가가 필요하다. 판매 기능이 없다는 사실만으로 모든 상업성 조건이 충족된 것으로 보지 않는다."
+      ],
+      "acquisitionRestriction": "일반 자동 접근 금지는 기존 근거에서 확정되지 않았다. 이는 자동 취득 허가를 의미하지 않는다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 지정된 독립 사실 사용만 조건부 허용 판단이다. 기존 자동 취득까지 적법하다는 판단은 아니다.",
+      "evidenceUrls": [
+        "https://www.nkgquality.com/en/imprint/"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "sourceCount": 1,
+      "checkedAt": "2026-09-09T05:32:46.880107+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "nomadcoffee.es",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "현행 2개 제품의 독립 생산사실만 자체 표현으로 사용하는 범위다. 사적 이용 외 보호 콘텐츠 복제 제한을 지명·품종 자체의 독점으로 확대하지 않는다.",
+        "기록된 원출처 URL 2개; 현행 맥락 URL 2개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다.",
+        "보호 콘텐츠 자체나 서비스의 상업적 활용에 해당하면 별도 허가가 필요하다. 판매 기능이 없다는 사실만으로 모든 상업성 조건이 충족된 것으로 보지 않는다."
+      ],
+      "acquisitionRestriction": "일반 자동 접근 금지는 기존 근거에서 확정되지 않았다. 이는 자동 취득 허가를 의미하지 않는다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 지정된 독립 사실 사용만 조건부 허용 판단이다. 기존 자동 취득까지 적법하다는 판단은 아니다.",
+      "evidenceUrls": [
+        "https://nomadcoffee.es/policies/legal-notice"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "sourceCount": 2,
+      "checkedAt": "2026-09-09T05:32:46.880026+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "onyxcoffeelab.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "8개 URL 중 현행 6개다. 자동 수집 금지와 서비스 복제 조항은 확인되지만 독립 생산사실의 게시나 DB 편입을 별도로 금지한 근거는 없다. 누적된 상품 설명·노트의 선택·배열을 재현하지 않는 제한된 사실 사용으로 판단한다.",
+        "기록된 원출처 URL 8개; 현행 맥락 URL 6개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "명시적 자동 접근 제한 있음. 신규 자동 수집을 계속하지 않으며, 기존 자동 취득의 약관 문제는 별도로 남는다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 지정된 독립 사실 사용만 조건부 허용 판단이다. 기존 자동 취득까지 적법하다는 판단은 아니다.",
+      "evidenceUrls": [
+        "https://onyxcoffeelab.com/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "sourceCount": 8,
+      "checkedAt": "2026-09-09T05:32:46.879978+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "origin-gi.com",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "keep-held",
+      "reasons": [
+        "정보·데이터 재사용 제한이 명시되고 실제 출처는 제3자 Coffee Board PDF다. 호스트의 일반 조건과 문서 자체 허가 범위가 구분되지 않았다.",
+        "4.1은 웹 정보·데이터·자료 복제·배포·수익화에 서면 허가 요구. 법률상 인용권 등 예외, 뉴스레터 전달 허용은 별도."
+      ],
+      "conditions": [
+        "해당 PDF 권리자와 현재 정보 재사용에 적용되는 허가·법률상 예외를 특정하기 전 보류.",
+        "동일 사실을 다른 출처에서 재확인할 수 있다는 사정은 이 출처의 현재 사용 권한이 되지 않는다.",
+        "이 판단은 위법 확정이 아니며, 과거 자동수집 문제는 문장 재작성으로 해소되지 않는다."
+      ],
+      "acquisitionRestriction": "자동접근 특정 제한은 기존 근거에서 미확인. 이는 자동수집 허가가 아니며 과거 취득 권한 확인은 별도.",
+      "existingPublicationAssessment": "현재 게시물이 짧은 사실이어도 확인된 데이터·정보 이용 또는 DB 편입 조건과 겹치거나 인용 문서 적용 조건이 미확정이므로 이 출처 기반 복원은 보류한다.",
+      "evidenceUrls": [
+        "https://www.origin-gi.com/terms-conditions/"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "panamavarietals.coffee",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "확인된 제한은 자동접근 또는 서비스·보호 콘텐츠의 복제·상업적 배포에 관한 것이다. 짧은 산지명·품종·가공 사실 전체를 외부에 독립 서술하지 못한다는 근거로 확대하지 않는다.",
+        "그래픽·텍스트를 다른 전자/인쇄 출판물에 복제하려면 명시 동의 필요."
+      ],
+      "conditions": [
+        "산지·품종·가공 등 짧은 개별 사실만 사용하고 원문 문장·번역·설명 구조·사진·가격표·상품 설명 또는 목록 편집물을 복제하지 않는다.",
+        "향미는 짧은 일반 어휘에 한정하고 해당 로트의 관능 기록으로 표시한다. 독특한 표현이나 노트 묶음·순서를 대량 복제하지 않는다.",
+        "현재 판단은 게시 형태에 관한 실무 판단이다. 이미 이루어진 자동수집의 계약상 적법성·취득 당시 조건·권한은 별도 기록으로 확인하며 재작성으로 정당화되지 않는다."
+      ],
+      "acquisitionRestriction": "자동접근 특정 제한은 기존 근거에서 미확인. 이는 자동수집 허가가 아니며 과거 취득 권한 확인은 별도.",
+      "existingPublicationAssessment": "제공된 현재 사용 형태라면 보호 표현 복제와 구별되는 소량 사실의 독립 서술은 조건부 사용 후보다. 해당 호스트의 전체 자료·목록이나 과거 취득 방식까지 허가되었다는 뜻은 아니다.",
+      "evidenceUrls": [
+        "https://www.panamavarietals.coffee/copy-of-fincas"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "paperplanecoffee.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "서비스 복제 및 자동 수집 제한을 개별 산지 사실 게시의 전면 금지와 구분합니다."
+      ],
+      "conditions": [
+        "지명·품종·가공 및 통상적인 짧은 향미어만 독립적으로 서술하고 원문 문장·번역·사진·표·목록 편집·고유한 판매 표현은 복제하지 않습니다.",
+        "출처별 누적 추출이 데이터베이스의 상당 부분이나 반복 추출에 해당하는지 별도 확인합니다. 출처 표시는 이용 허락을 대신하지 않습니다.",
+        "조건부 게시 판단은 과거 수집의 적법성 보증이나 새 자동 수집 허락이 아닙니다."
+      ],
+      "acquisitionRestriction": "명시 자동 접근 제한 유지. 과거 자동 수집의 허락·약관 적용·취득 경위는 별도 미해결이며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 제시된 사실 중심 화면 범위에는 조건부 게시 가능으로 판단하되 실제 모든 문장의 원문 유사성 및 과거 취득 경위를 확인했다는 뜻은 아닙니다.",
+      "evidenceUrls": [
+        "https://www.paperplanecoffee.com/pages/privacy-policy"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "partnerscoffee.com",
+      "decision": "keep-held",
+      "reasons": [
+        "제10조는 자동 도구에 한정하지 않고 데이터 scrape·harvest·collect에 서면 허가를 요구한다. 현행 3개 페이지 데이터의 축적은 단순 저작물 표현 복제와 구분되는 제한이다.",
+        "기록된 원출처 URL 3개; 현행 맥락 URL 3개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 출처 기반 자료의 신규 공개·확장 편입은 보류한다. 관련 데이터·취득·재사용 조건의 적용 또는 권리자 허가를 확인한 뒤 개별 해제한다.",
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "명시적 자동 접근 제한 있음. 신규 자동 수집을 계속하지 않으며, 기존 자동 취득의 약관 문제는 별도로 남는다. 데이터/텍스트 취득·추출·DB 편입·정보 이용에 관한 별도 제한의 범위를 해소해야 한다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 이 자료의 기존/예정 사용을 승인할 수 없다. 위법성이 확정됐다는 의미는 아니다.",
+      "evidenceUrls": [
+        "https://www.partnerscoffee.com/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "sourceCount": 3,
+      "checkedAt": "2026-09-09T05:32:46.880002+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "passportcoffee.com.au",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "기존 근거는 자동 접근 금지와 서비스 복제·판매·이용 서면허가 조항이다. 산지·품종·가공 등 독립 사실의 짧은 자체 서술을 데이터 재배포 금지로 확대할 근거는 확인되지 않았다.",
+        "기록된 원출처 URL 1개; 현행 맥락 URL 1개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "명시적 자동 접근 제한 있음. 신규 자동 수집을 계속하지 않으며, 기존 자동 취득의 약관 문제는 별도로 남는다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 지정된 독립 사실 사용만 조건부 허용 판단이다. 기존 자동 취득까지 적법하다는 판단은 아니다.",
+      "evidenceUrls": [
+        "https://passportcoffee.com.au/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "sourceCount": 1,
+      "checkedAt": "2026-09-09T05:32:46.880110+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "pinupcoffeeco.com",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "확인된 제한은 자동접근 또는 서비스·보호 콘텐츠의 복제·상업적 배포에 관한 것이다. 짧은 산지명·품종·가공 사실 전체를 외부에 독립 서술하지 못한다는 근거로 확대하지 않는다.",
+        "제2조 서비스 복제·판매·이용 서면허가 및 금지행위의 spider/crawl/scrape 확인"
+      ],
+      "conditions": [
+        "산지·품종·가공 등 짧은 개별 사실만 사용하고 원문 문장·번역·설명 구조·사진·가격표·상품 설명 또는 목록 편집물을 복제하지 않는다.",
+        "향미는 짧은 일반 어휘에 한정하고 해당 로트의 관능 기록으로 표시한다. 독특한 표현이나 노트 묶음·순서를 대량 복제하지 않는다.",
+        "현재 판단은 게시 형태에 관한 실무 판단이다. 이미 이루어진 자동수집의 계약상 적법성·취득 당시 조건·권한은 별도 기록으로 확인하며 재작성으로 정당화되지 않는다.",
+        "새 자동수집은 재개하지 않는다. 게시 조건과 수집 권한은 별도로 관리한다."
+      ],
+      "acquisitionRestriction": "명시 자동접근·추출 제한 있음. 추가 자동수집 중지 유지. 이미 취득한 자료는 취득 시점·방식·동의·적용 약관을 별도로 확인해야 하며 조건부 게시 판단은 과거 수집을 면책하지 않음.",
+      "existingPublicationAssessment": "제공된 현재 사용 형태라면 보호 표현 복제와 구별되는 소량 사실의 독립 서술은 조건부 사용 후보다. 해당 호스트의 전체 자료·목록이나 과거 취득 방식까지 허가되었다는 뜻은 아니다.",
+      "evidenceUrls": [
+        "https://www.pinupcoffeeco.com/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "pmc.ncbi.nlm.nih.gov",
+      "decision": "insufficient-evidence",
+      "reasons": [
+        "확인 근거는 PMC의 체계적·대량 수집 경로 제한뿐입니다. 대상 논문 개별 라이선스 및 현 품종 설명의 표현 차용 여부를 확인하지 않아 논문 자료 전체를 사용 가능으로 판정하지 않습니다. 연구 사실 자체를 독립 서술하는 것은 별도입니다."
+      ],
+      "conditions": [
+        "해당 출처에 의존한 자료 사용 보류를 유지하고 명시 허가 또는 적용 범위 확인 후 재판단합니다.",
+        "다른 출처에서 독립적으로 확인할 수 있다는 사정은 이 출처 사용 허락을 뜻하지 않습니다."
+      ],
+      "acquisitionRestriction": "지정 경로 외 체계적·대량 자동 수집 제한입니다. 단건 열람 전체 금지로 확대하지 않으며 과거 취득 경로 적합성은 별도 미확인입니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 현재 확보한 근거로 이 출처를 일반 사용 가능 상태로 해제하지 않습니다. 위법 확정 판단은 아닙니다.",
+      "evidenceUrls": [
+        "https://pmc.ncbi.nlm.nih.gov/tools/developers/"
+      ],
+      "currentUse": true,
+      "confidence": "low",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "presscoffee.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "자동 수집 및 서비스 복제 제한만으로 산지·품종 사실의 독립 게시 전체가 금지되었다고 볼 근거는 부족합니다."
+      ],
+      "conditions": [
+        "지명·품종·가공 및 통상적인 짧은 향미어만 독립적으로 서술하고 원문 문장·번역·사진·표·목록 편집·고유한 판매 표현은 복제하지 않습니다.",
+        "출처별 누적 추출이 데이터베이스의 상당 부분이나 반복 추출에 해당하는지 별도 확인합니다. 출처 표시는 이용 허락을 대신하지 않습니다.",
+        "조건부 게시 판단은 과거 수집의 적법성 보증이나 새 자동 수집 허락이 아닙니다."
+      ],
+      "acquisitionRestriction": "명시 자동 접근 제한 유지. 과거 자동 수집의 허락·약관 적용·취득 경위는 별도 미해결이며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 제시된 사실 중심 화면 범위에는 조건부 게시 가능으로 판단하되 실제 모든 문장의 원문 유사성 및 과거 취득 경위를 확인했다는 뜻은 아닙니다.",
+      "evidenceUrls": [
+        "https://presscoffee.com/pages/terms-of-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "proudmarycoffee.com.au",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "기존 근거는 자동 접근 금지와 서비스 복제·판매·이용 서면허가 조항이다. 산지·품종·가공 등 독립 사실의 짧은 자체 서술을 데이터 재배포 금지로 확대할 근거는 확인되지 않았다.",
+        "기록된 원출처 URL 2개; 현행 맥락 URL 2개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "명시적 자동 접근 제한 있음. 신규 자동 수집을 계속하지 않으며, 기존 자동 취득의 약관 문제는 별도로 남는다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 지정된 독립 사실 사용만 조건부 허용 판단이다. 기존 자동 취득까지 적법하다는 판단은 아니다.",
+      "evidenceUrls": [
+        "https://www.proudmarycoffee.com.au/pages/terms-and-conditions"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "sourceCount": 2,
+      "checkedAt": "2026-09-09T05:32:46.880029+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "redroostercoffee.com",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "확인된 제한은 자동접근 또는 서비스·보호 콘텐츠의 복제·상업적 배포에 관한 것이다. 짧은 산지명·품종·가공 사실 전체를 외부에 독립 서술하지 못한다는 근거로 확대하지 않는다.",
+        "Permitted and Prohibited Uses: 모든 목적 robot/spider 자동접근 금지.",
+        "이용제한의 개별 사실 적용과 법적 예외는 미확정. hold는 위법판정이 아님."
+      ],
+      "conditions": [
+        "산지·품종·가공 등 짧은 개별 사실만 사용하고 원문 문장·번역·설명 구조·사진·가격표·상품 설명 또는 목록 편집물을 복제하지 않는다.",
+        "향미는 짧은 일반 어휘에 한정하고 해당 로트의 관능 기록으로 표시한다. 독특한 표현이나 노트 묶음·순서를 대량 복제하지 않는다.",
+        "현재 판단은 게시 형태에 관한 실무 판단이다. 이미 이루어진 자동수집의 계약상 적법성·취득 당시 조건·권한은 별도 기록으로 확인하며 재작성으로 정당화되지 않는다.",
+        "새 자동수집은 재개하지 않는다. 게시 조건과 수집 권한은 별도로 관리한다."
+      ],
+      "acquisitionRestriction": "명시 자동접근·추출 제한 있음. 추가 자동수집 중지 유지. 이미 취득한 자료는 취득 시점·방식·동의·적용 약관을 별도로 확인해야 하며 조건부 게시 판단은 과거 수집을 면책하지 않음.",
+      "existingPublicationAssessment": "제공된 현재 사용 형태라면 보호 표현 복제와 구별되는 소량 사실의 독립 서술은 조건부 사용 후보다. 해당 호스트의 전체 자료·목록이나 과거 취득 방식까지 허가되었다는 뜻은 아니다.",
+      "evidenceUrls": [
+        "https://www.redroostercoffee.com/terms"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "republic.coffee",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "모든 자동 접근 및 웹 정보의 개인 비상업 이용 조건은 넓다. Bourbon Dalat 1건의 지명·품종 등 짧은 사실 공개만 조건부 평가하며 사이트 콘텐츠 자체의 재게시나 과거 취득은 승인하지 않는다.",
+        "기록된 원출처 URL 1개; 현행 맥락 URL 1개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다.",
+        "보호 콘텐츠 자체나 서비스의 상업적 활용에 해당하면 별도 허가가 필요하다. 판매 기능이 없다는 사실만으로 모든 상업성 조건이 충족된 것으로 보지 않는다."
+      ],
+      "acquisitionRestriction": "명시적 자동 접근 제한 있음. 신규 자동 수집을 계속하지 않으며, 기존 자동 취득의 약관 문제는 별도로 남는다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 지정된 독립 사실 사용만 조건부 허용 판단이다. 기존 자동 취득까지 적법하다는 판단은 아니다.",
+      "evidenceUrls": [
+        "https://republic.coffee/tcs/"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "sourceCount": 1,
+      "checkedAt": "2026-09-09T05:32:46.880112+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "ritualcoffee.com",
+      "decision": "keep-held",
+      "reasons": [
+        "제품 설명·텍스트의 수집과 다운로드 자체가 사이트 이용허락에서 명시적으로 제외된다. 4개 상품에서 산지·랏 필드를 추출한 사용이므로 글을 새로 써도 수집 문제는 남는다.",
+        "기록된 원출처 URL 4개; 현행 맥락 URL 4개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 출처 기반 자료의 신규 공개·확장 편입은 보류한다. 관련 데이터·취득·재사용 조건의 적용 또는 권리자 허가를 확인한 뒤 개별 해제한다.",
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "일반 자동 접근 금지는 기존 근거에서 확정되지 않았다. 이는 자동 취득 허가를 의미하지 않는다. 데이터/텍스트 취득·추출·DB 편입·정보 이용에 관한 별도 제한의 범위를 해소해야 한다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 이 자료의 기존/예정 사용을 승인할 수 없다. 위법성이 확정됐다는 의미는 아니다.",
+      "evidenceUrls": [
+        "https://ritualcoffee.com/shop/terms-conditions/"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "sourceCount": 4,
+      "checkedAt": "2026-09-09T05:32:46.879994+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "roastdb.com",
+      "decision": "keep-held",
+      "reasons": [
+        "데이터 복제·재배포와 외부 데이터베이스 재게시를 명시적으로 금지합니다. 산지 데이터베이스 편입이라는 현 사용과 직접 맞닿습니다."
+      ],
+      "conditions": [
+        "해당 출처에 의존한 자료 사용 보류를 유지하고 명시 허가 또는 적용 범위 확인 후 재판단합니다.",
+        "다른 출처에서 독립적으로 확인할 수 있다는 사정은 이 출처 사용 허락을 뜻하지 않습니다."
+      ],
+      "acquisitionRestriction": "명시 자동 접근 제한 유지. 과거 자동 수집의 허락·약관 적용·취득 경위는 별도 미해결이며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "기록상 과거 조사 목록만 있고 현재 공개 사용은 확인되지 않습니다. 현재 확보한 근거로 이 출처를 일반 사용 가능 상태로 해제하지 않습니다. 위법 확정 판단은 아닙니다.",
+      "evidenceUrls": [
+        "https://roastdb.com/terms"
+      ],
+      "currentUse": false,
+      "confidence": "medium",
+      "referencedInCurrentData": false,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "roguewavecoffee.ca",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "확인된 제한은 자동접근 또는 서비스·보호 콘텐츠의 복제·상업적 배포에 관한 것이다. 짧은 산지명·품종·가공 사실 전체를 외부에 독립 서술하지 못한다는 근거로 확대하지 않는다.",
+        "§12 spider/crawl/scrape 금지, §2 서비스 일부 복제·판매·이용은 서면허가 요구. 열람자를 포함한 사이트 사용자 대상."
+      ],
+      "conditions": [
+        "산지·품종·가공 등 짧은 개별 사실만 사용하고 원문 문장·번역·설명 구조·사진·가격표·상품 설명 또는 목록 편집물을 복제하지 않는다.",
+        "향미는 짧은 일반 어휘에 한정하고 해당 로트의 관능 기록으로 표시한다. 독특한 표현이나 노트 묶음·순서를 대량 복제하지 않는다.",
+        "현재 판단은 게시 형태에 관한 실무 판단이다. 이미 이루어진 자동수집의 계약상 적법성·취득 당시 조건·권한은 별도 기록으로 확인하며 재작성으로 정당화되지 않는다.",
+        "새 자동수집은 재개하지 않는다. 게시 조건과 수집 권한은 별도로 관리한다."
+      ],
+      "acquisitionRestriction": "명시 자동접근·추출 제한 있음. 추가 자동수집 중지 유지. 이미 취득한 자료는 취득 시점·방식·동의·적용 약관을 별도로 확인해야 하며 조건부 게시 판단은 과거 수집을 면책하지 않음.",
+      "existingPublicationAssessment": "제공된 현재 사용 형태라면 보호 표현 복제와 구별되는 소량 사실의 독립 서술은 조건부 사용 후보다. 해당 호스트의 전체 자료·목록이나 과거 취득 방식까지 허가되었다는 뜻은 아니다.",
+      "evidenceUrls": [
+        "https://roguewavecoffee.ca/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "samplecoffee.com.au",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "확인된 제한은 자동접근 또는 서비스·보호 콘텐츠의 복제·상업적 배포에 관한 것이다. 짧은 산지명·품종·가공 사실 전체를 외부에 독립 서술하지 못한다는 근거로 확대하지 않는다.",
+        "§15 spider/crawl/scrape 금지, §12 콘텐츠·온라인 스토어 복제와 판매 등은 서면허가 요구."
+      ],
+      "conditions": [
+        "산지·품종·가공 등 짧은 개별 사실만 사용하고 원문 문장·번역·설명 구조·사진·가격표·상품 설명 또는 목록 편집물을 복제하지 않는다.",
+        "향미는 짧은 일반 어휘에 한정하고 해당 로트의 관능 기록으로 표시한다. 독특한 표현이나 노트 묶음·순서를 대량 복제하지 않는다.",
+        "현재 판단은 게시 형태에 관한 실무 판단이다. 이미 이루어진 자동수집의 계약상 적법성·취득 당시 조건·권한은 별도 기록으로 확인하며 재작성으로 정당화되지 않는다.",
+        "새 자동수집은 재개하지 않는다. 게시 조건과 수집 권한은 별도로 관리한다."
+      ],
+      "acquisitionRestriction": "명시 자동접근·추출 제한 있음. 추가 자동수집 중지 유지. 이미 취득한 자료는 취득 시점·방식·동의·적용 약관을 별도로 확인해야 하며 조건부 게시 판단은 과거 수집을 면책하지 않음.",
+      "existingPublicationAssessment": "제공된 현재 사용 형태라면 보호 표현 복제와 구별되는 소량 사실의 독립 서술은 조건부 사용 후보다. 해당 호스트의 전체 자료·목록이나 과거 취득 방식까지 허가되었다는 뜻은 아니다.",
+      "evidenceUrls": [
+        "https://samplecoffee.com.au/pages/policies"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "scenery.coffee",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "현행 7개 URL의 반복 취득 규모를 고려해 카탈로그·상품 설명의 집합적 재현을 제외한다. 제12조 취득 제한은 유지하되 제2조 서비스 복제를 독립 사실 전체의 금지로 확대하지 않는다.",
+        "기록된 원출처 URL 7개; 현행 맥락 URL 7개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "명시적 자동 접근 제한 있음. 신규 자동 수집을 계속하지 않으며, 기존 자동 취득의 약관 문제는 별도로 남는다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 지정된 독립 사실 사용만 조건부 허용 판단이다. 기존 자동 취득까지 적법하다는 판단은 아니다.",
+      "evidenceUrls": [
+        "https://scenery.coffee/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "sourceCount": 7,
+      "checkedAt": "2026-09-09T05:32:46.879984+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "servantcoffee.com",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "확인된 제한은 자동접근 또는 서비스·보호 콘텐츠의 복제·상업적 배포에 관한 것이다. 짧은 산지명·품종·가공 사실 전체를 외부에 독립 서술하지 못한다는 근거로 확대하지 않는다.",
+        "콘텐츠 및 편집물의 게시·전송·판매·2차 저작·이용을 제한하고 보호 콘텐츠는 개인 이용만 허용, 다른 이용은 서면 허가 필요. 자동 수집 일반 금지는 미확인."
+      ],
+      "conditions": [
+        "산지·품종·가공 등 짧은 개별 사실만 사용하고 원문 문장·번역·설명 구조·사진·가격표·상품 설명 또는 목록 편집물을 복제하지 않는다.",
+        "향미는 짧은 일반 어휘에 한정하고 해당 로트의 관능 기록으로 표시한다. 독특한 표현이나 노트 묶음·순서를 대량 복제하지 않는다.",
+        "현재 판단은 게시 형태에 관한 실무 판단이다. 이미 이루어진 자동수집의 계약상 적법성·취득 당시 조건·권한은 별도 기록으로 확인하며 재작성으로 정당화되지 않는다."
+      ],
+      "acquisitionRestriction": "자동접근 특정 제한은 기존 근거에서 미확인. 이는 자동수집 허가가 아니며 과거 취득 권한 확인은 별도.",
+      "existingPublicationAssessment": "제공된 현재 사용 형태라면 보호 표현 복제와 구별되는 소량 사실의 독립 서술은 조건부 사용 후보다. 해당 호스트의 전체 자료·목록이나 과거 취득 방식까지 허가되었다는 뜻은 아니다. 현재 인벤토리는 historical-source-inventory뿐이며 공개에서 사용 중이라고 확인된 자료는 없다.",
+      "evidenceUrls": [
+        "https://servantcoffee.com/terms-of-service/"
+      ],
+      "currentUse": false,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": false,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "shop.app",
+      "decision": "keep-held",
+      "reasons": [
+        "agentic AI와 자동·수동 추출까지 사전 허가 대상으로 명시해 이 플랫폼에서 확보한 자료의 목록 편입을 일반 허용하기 어렵습니다."
+      ],
+      "conditions": [
+        "해당 출처에 의존한 자료 사용 보류를 유지하고 명시 허가 또는 적용 범위 확인 후 재판단합니다.",
+        "다른 출처에서 독립적으로 확인할 수 있다는 사정은 이 출처 사용 허락을 뜻하지 않습니다."
+      ],
+      "acquisitionRestriction": "명시 자동 접근 제한 유지. 과거 자동 수집의 허락·약관 적용·취득 경위는 별도 미해결이며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "기록상 과거 조사 목록만 있고 현재 공개 사용은 확인되지 않습니다. 현재 확보한 근거로 이 출처를 일반 사용 가능 상태로 해제하지 않습니다. 위법 확정 판단은 아닙니다.",
+      "evidenceUrls": [
+        "https://shop.app/terms-of-service?locale=en-US"
+      ],
+      "currentUse": false,
+      "confidence": "medium",
+      "referencedInCurrentData": false,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "sigmacoffee.co.uk",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "기존 근거는 자동 접근 금지와 서비스 복제·판매·이용 서면허가 조항이다. 산지·품종·가공 등 독립 사실의 짧은 자체 서술을 데이터 재배포 금지로 확대할 근거는 확인되지 않았다.",
+        "기록된 원출처 URL 2개; 현행 맥락 URL 1개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "명시적 자동 접근 제한 있음. 신규 자동 수집을 계속하지 않으며, 기존 자동 취득의 약관 문제는 별도로 남는다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 지정된 독립 사실 사용만 조건부 허용 판단이다. 기존 자동 취득까지 적법하다는 판단은 아니다.",
+      "evidenceUrls": [
+        "https://sigmacoffee.co.uk/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "sourceCount": 2,
+      "checkedAt": "2026-09-09T05:32:46.880033+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "stellarkl.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "My Liberica 1건의 지명·품종·가공 같은 독립 사실만 자체 서술하는 경우다. 제5조 상품 설명 등 보호 콘텐츠의 복제·이용 허가 요구는 그대로 적용한다.",
+        "기록된 원출처 URL 1개; 현행 맥락 URL 1개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "일반 자동 접근 금지는 기존 근거에서 확정되지 않았다. 이는 자동 취득 허가를 의미하지 않는다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 지정된 독립 사실 사용만 조건부 허용 판단이다. 기존 자동 취득까지 적법하다는 판단은 아니다.",
+      "evidenceUrls": [
+        "https://stellarkl.com/pages/terms-of-service-payment-policy"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "sourceCount": 1,
+      "checkedAt": "2026-09-09T05:32:46.880115+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "stitch.coffee",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "확인된 제한은 자동접근 또는 서비스·보호 콘텐츠의 복제·상업적 배포에 관한 것이다. 짧은 산지명·품종·가공 사실 전체를 외부에 독립 서술하지 못한다는 근거로 확대하지 않는다.",
+        "서비스·정보 이용에 약관 적용. 서면 허가 없는 서비스 복제·판매 제한, Prohibited Uses에서 spider/crawl/scrape 금지."
+      ],
+      "conditions": [
+        "산지·품종·가공 등 짧은 개별 사실만 사용하고 원문 문장·번역·설명 구조·사진·가격표·상품 설명 또는 목록 편집물을 복제하지 않는다.",
+        "향미는 짧은 일반 어휘에 한정하고 해당 로트의 관능 기록으로 표시한다. 독특한 표현이나 노트 묶음·순서를 대량 복제하지 않는다.",
+        "현재 판단은 게시 형태에 관한 실무 판단이다. 이미 이루어진 자동수집의 계약상 적법성·취득 당시 조건·권한은 별도 기록으로 확인하며 재작성으로 정당화되지 않는다.",
+        "새 자동수집은 재개하지 않는다. 게시 조건과 수집 권한은 별도로 관리한다."
+      ],
+      "acquisitionRestriction": "명시 자동접근·추출 제한 있음. 추가 자동수집 중지 유지. 이미 취득한 자료는 취득 시점·방식·동의·적용 약관을 별도로 확인해야 하며 조건부 게시 판단은 과거 수집을 면책하지 않음.",
+      "existingPublicationAssessment": "제공된 현재 사용 형태라면 보호 표현 복제와 구별되는 소량 사실의 독립 서술은 조건부 사용 후보다. 해당 호스트의 전체 자료·목록이나 과거 취득 방식까지 허가되었다는 뜻은 아니다.",
+      "evidenceUrls": [
+        "https://stitch.coffee/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "stumptowncoffee.com",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "insufficient-evidence",
+      "reasons": [
+        "데이터 수집 금지가 명시되어 있으나 기존 요약만으로 단순 접근 제한인지 데이터 재사용·축적도 포함하는지 분리 불가. 이미 수집한 정보의 취득 경로도 미확인.",
+        "개인적 비상업 사용만 허가하며 복제·배포·변형은 서면허가 필요. 데이터 수집 금지 및 사전승인 없는 자동 접근·취득·다운로드 금지 명시."
+      ],
+      "conditions": [
+        "위 미확정 항목과 취득·이용 범위를 확인하기 전 이 출처를 사용 가능으로 확정하거나 자동 복원하지 않는다.",
+        "추가 제품 데이터 수집을 하지 않는다. 필요한 경우 공식 약관 또는 이미 보관된 취득 기록만 확인한다."
+      ],
+      "acquisitionRestriction": "명시 자동접근·추출 제한 있음. 추가 자동수집 중지 유지. 이미 취득한 자료는 취득 시점·방식·동의·적용 약관을 별도로 확인해야 하며 조건부 게시 판단은 과거 수집을 면책하지 않음.",
+      "existingPublicationAssessment": "자료가 불법이라고 결론내릴 근거도, 현재 출처 기반 게시를 허용한다고 확정할 근거도 부족하다.",
+      "evidenceUrls": [
+        "https://www.stumptowncoffee.com/pages/terms-and-conditions"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "low",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "sucafina.com",
+      "decision": "keep-held",
+      "reasons": [
+        "80개 URL 중 77개가 현행 산지·랏·품종 근거다. 개인 비상업적 발췌 외 타 사이트·검색 시스템 저장 제한과 대규모 반복 취득이 결합되어 단일 사실 몇 건의 문제로 축소할 수 없다. NA 약관 외 APAC·EMEA 취득도 포함하므로 전량 사용 가능 승인은 보류한다.",
+        "기록된 원출처 URL 80개; 현행 맥락 URL 77개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 출처 기반 자료의 신규 공개·확장 편입은 보류한다. 관련 데이터·취득·재사용 조건의 적용 또는 권리자 허가를 확인한 뒤 개별 해제한다.",
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "명시적 자동 접근 제한 있음. 신규 자동 수집을 계속하지 않으며, 기존 자동 취득의 약관 문제는 별도로 남는다. 77개 현행 URL의 누적 편입과 검색 시스템 저장 조건을 함께 검토해야 한다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 이 자료의 기존/예정 사용을 승인할 수 없다. 위법성이 확정됐다는 의미는 아니다.",
+      "evidenceUrls": [
+        "https://sucafina.com/na/terms-of-use"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "sourceCount": 80,
+      "checkedAt": "2026-09-09T05:32:46.879902+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "suedhang.org",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "웹사이트 요소의 복제·배포·저장 제한을 확인했습니다. 원문이나 편집물을 복제하지 않는 개별 사실 서술 전부까지 금지로 확대하지 않습니다."
+      ],
+      "conditions": [
+        "지명·품종·가공 및 통상적인 짧은 향미어만 독립적으로 서술하고 원문 문장·번역·사진·표·목록 편집·고유한 판매 표현은 복제하지 않습니다.",
+        "출처별 누적 추출이 데이터베이스의 상당 부분이나 반복 추출에 해당하는지 별도 확인합니다. 출처 표시는 이용 허락을 대신하지 않습니다.",
+        "조건부 게시 판단은 과거 수집의 적법성 보증이나 새 자동 수집 허락이 아닙니다."
+      ],
+      "acquisitionRestriction": "별도 자동 접근 허락은 확인하지 못했습니다. 과거 취득 방식과 약관 적용은 확인이 필요하며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 제시된 사실 중심 화면 범위에는 조건부 게시 가능으로 판단하되 실제 모든 문장의 원문 유사성 및 과거 취득 경위를 확인했다는 뜻은 아닙니다.",
+      "evidenceUrls": [
+        "https://www.suedhang.org/impressum/",
+        "https://www.suedhang.org/agb/"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "sweetmarias.com",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "확인된 제한은 자동접근 또는 서비스·보호 콘텐츠의 복제·상업적 배포에 관한 것이다. 짧은 산지명·품종·가공 사실 전체를 외부에 독립 서술하지 못한다는 근거로 확대하지 않는다.",
+        "제6조 개인 비상업 이용 외 복제·재게시 서면허가 요구. 제13조 스크래핑·추출·AI 도구 접근 제한. 제14조 별도 에이전트 식별 요건도 존재하여 무조건 허가로 해석하지 않음"
+      ],
+      "conditions": [
+        "산지·품종·가공 등 짧은 개별 사실만 사용하고 원문 문장·번역·설명 구조·사진·가격표·상품 설명 또는 목록 편집물을 복제하지 않는다.",
+        "향미는 짧은 일반 어휘에 한정하고 해당 로트의 관능 기록으로 표시한다. 독특한 표현이나 노트 묶음·순서를 대량 복제하지 않는다.",
+        "현재 판단은 게시 형태에 관한 실무 판단이다. 이미 이루어진 자동수집의 계약상 적법성·취득 당시 조건·권한은 별도 기록으로 확인하며 재작성으로 정당화되지 않는다.",
+        "새 자동수집은 재개하지 않는다. 게시 조건과 수집 권한은 별도로 관리한다."
+      ],
+      "acquisitionRestriction": "명시 자동접근·추출 제한 있음. 추가 자동수집 중지 유지. 이미 취득한 자료는 취득 시점·방식·동의·적용 약관을 별도로 확인해야 하며 조건부 게시 판단은 과거 수집을 면책하지 않음.",
+      "existingPublicationAssessment": "제공된 현재 사용 형태라면 보호 표현 복제와 구별되는 소량 사실의 독립 서술은 조건부 사용 후보다. 해당 호스트의 전체 자료·목록이나 과거 취득 방식까지 허가되었다는 뜻은 아니다.",
+      "evidenceUrls": [
+        "https://www.sweetmarias.com/pages/terms-of-service",
+        "https://www.sweetmarias.com/"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "talitha.com",
+      "decision": "keep-held",
+      "reasons": [
+        "서면허가 없는 체계적 데이터 취득·편집물·DB 구축을 명시적으로 제한한다. 과거 목록 1건은 아직 현행 사용이 아니며 기존 작업의 반복 수집에 포함됐는지 미확인이므로 현재 자료의 신규 편입을 보류한다.",
+        "기록된 원출처 URL 1개; 현행 맥락 URL 0개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 출처 기반 자료의 신규 공개·확장 편입은 보류한다. 관련 데이터·취득·재사용 조건의 적용 또는 권리자 허가를 확인한 뒤 개별 해제한다.",
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "명시적 자동 접근 제한 있음. 신규 자동 수집을 계속하지 않으며, 기존 자동 취득의 약관 문제는 별도로 남는다. 데이터/텍스트 취득·추출·DB 편입·정보 이용에 관한 별도 제한의 범위를 해소해야 한다.",
+      "existingPublicationAssessment": "현재는 과거 출처 목록만 있고 현행 공개 사용은 확인되지 않으며 이 자료의 기존/예정 사용을 승인할 수 없다. 위법성이 확정됐다는 의미는 아니다.",
+      "evidenceUrls": [
+        "https://talitha.com/policies/terms-of-service"
+      ],
+      "currentUse": false,
+      "confidence": "medium",
+      "sourceCount": 1,
+      "checkedAt": "2026-09-09T05:32:46.880117+00:00",
+      "referencedInCurrentData": false,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "tastinggrounds.com",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "keep-held",
+      "reasons": [
+        "모음·DB·디렉터리 구축을 위한 체계적 데이터 수집을 명시 제한한다.",
+        "서면 허가 없는 체계적 데이터 수집으로 모음·데이터베이스·디렉터리 작성 금지. 사적 비상업 이용만 허용하며 콘텐츠 상업 이용 제한."
+      ],
+      "conditions": [
+        "산지 DB 편입 용도의 허가를 확인하기 전 신규 사용 보류. 현재 맥락은 과거 인벤토리뿐이므로 공개 복원 대상으로 삼지 않음.",
+        "동일 사실을 다른 출처에서 재확인할 수 있다는 사정은 이 출처의 현재 사용 권한이 되지 않는다.",
+        "이 판단은 위법 확정이 아니며, 과거 자동수집 문제는 문장 재작성으로 해소되지 않는다."
+      ],
+      "acquisitionRestriction": "명시 자동접근·추출 제한 있음. 추가 자동수집 중지 유지. 이미 취득한 자료는 취득 시점·방식·동의·적용 약관을 별도로 확인해야 하며 조건부 게시 판단은 과거 수집을 면책하지 않음.",
+      "existingPublicationAssessment": "현재 게시물이 짧은 사실이어도 확인된 데이터·정보 이용 또는 DB 편입 조건과 겹치거나 인용 문서 적용 조건이 미확정이므로 이 출처 기반 복원은 보류한다. 현재 인벤토리는 historical-source-inventory뿐이며 공개에서 사용 중이라고 확인된 자료는 없다.",
+      "evidenceUrls": [
+        "https://tastinggrounds.com/terms"
+      ],
+      "currentUse": false,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": false,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "theangryroaster.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "서비스 복제 및 자동 수집 제한을 개별 산지 사실 게시의 전면 금지와 구분합니다."
+      ],
+      "conditions": [
+        "지명·품종·가공 및 통상적인 짧은 향미어만 독립적으로 서술하고 원문 문장·번역·사진·표·목록 편집·고유한 판매 표현은 복제하지 않습니다.",
+        "출처별 누적 추출이 데이터베이스의 상당 부분이나 반복 추출에 해당하는지 별도 확인합니다. 출처 표시는 이용 허락을 대신하지 않습니다.",
+        "조건부 게시 판단은 과거 수집의 적법성 보증이나 새 자동 수집 허락이 아닙니다."
+      ],
+      "acquisitionRestriction": "명시 자동 접근 제한 유지. 과거 자동 수집의 허락·약관 적용·취득 경위는 별도 미해결이며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 제시된 사실 중심 화면 범위에는 조건부 게시 가능으로 판단하되 실제 모든 문장의 원문 유사성 및 과거 취득 경위를 확인했다는 뜻은 아닙니다.",
+      "evidenceUrls": [
+        "https://theangryroaster.com/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "thebarn.de",
+      "decision": "keep-held",
+      "reasons": [
+        "제한 대상에 offers·directories·databases를 구체적으로 포함합니다. 이 출처의 목록을 산지 데이터로 재편성하는 사용을 단순 문장 재작성만으로 허용할 수 없습니다."
+      ],
+      "conditions": [
+        "해당 출처에 의존한 자료 사용 보류를 유지하고 명시 허가 또는 적용 범위 확인 후 재판단합니다.",
+        "다른 출처에서 독립적으로 확인할 수 있다는 사정은 이 출처 사용 허락을 뜻하지 않습니다."
+      ],
+      "acquisitionRestriction": "명시 자동 접근 제한 유지. 과거 자동 수집의 허락·약관 적용·취득 경위는 별도 미해결이며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 현재 확보한 근거로 이 출처를 일반 사용 가능 상태로 해제하지 않습니다. 위법 확정 판단은 아닙니다.",
+      "evidenceUrls": [
+        "https://thebarn.de/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "thebeangeek.com",
+      "decision": "keep-held",
+      "reasons": [
+        "데이터 복사·추출·재배포를 목적 불문 금지하는 제3조가 직접 적용될 가능성이 높다. 현재는 과거 목록 2건뿐이므로 신규 공개 편입을 계속 보류한다.",
+        "기록된 원출처 URL 2개; 현행 맥락 URL 0개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 출처 기반 자료의 신규 공개·확장 편입은 보류한다. 관련 데이터·취득·재사용 조건의 적용 또는 권리자 허가를 확인한 뒤 개별 해제한다.",
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "명시적 자동 접근 제한 있음. 신규 자동 수집을 계속하지 않으며, 기존 자동 취득의 약관 문제는 별도로 남는다. 데이터/텍스트 취득·추출·DB 편입·정보 이용에 관한 별도 제한의 범위를 해소해야 한다.",
+      "existingPublicationAssessment": "현재는 과거 출처 목록만 있고 현행 공개 사용은 확인되지 않으며 이 자료의 기존/예정 사용을 승인할 수 없다. 위법성이 확정됐다는 의미는 아니다.",
+      "evidenceUrls": [
+        "https://www.thebeangeek.com/terms-and-conditions"
+      ],
+      "currentUse": false,
+      "confidence": "medium",
+      "sourceCount": 2,
+      "checkedAt": "2026-09-09T05:32:46.880036+00:00",
+      "referencedInCurrentData": false,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "thecoffeevine.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "베트남 산지 관련 기사 1건에서 객관적 생산사실만 서술하는 범위는 보호 표현 복사와 구분된다. 홈페이지 외 상세 링크 금지 문구는 별도 제한이므로 상세 출처 링크 조건을 해소해야 한다.",
+        "기록된 원출처 URL 1개; 현행 맥락 URL 1개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다.",
+        "상세 링크 제한은 사실 사용과 별도로 해결한다. 링크를 바꾸는 것만으로 기존 취득·사용을 정당화하지 않는다.",
+        "보호 콘텐츠 자체나 서비스의 상업적 활용에 해당하면 별도 허가가 필요하다. 판매 기능이 없다는 사실만으로 모든 상업성 조건이 충족된 것으로 보지 않는다."
+      ],
+      "acquisitionRestriction": "일반 자동 접근 금지는 기존 근거에서 확정되지 않았다. 이는 자동 취득 허가를 의미하지 않는다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 지정된 독립 사실 사용만 조건부 허용 판단이다. 기존 자동 취득까지 적법하다는 판단은 아니다.",
+      "evidenceUrls": [
+        "https://thecoffeevine.com/disclaimer-2/"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "sourceCount": 1,
+      "checkedAt": "2026-09-09T05:32:46.880120+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "thecrackpots.com",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "확인된 제한은 자동접근 또는 서비스·보호 콘텐츠의 복제·상업적 배포에 관한 것이다. 짧은 산지명·품종·가공 사실 전체를 외부에 독립 서술하지 못한다는 근거로 확대하지 않는다.",
+        "제12조 스크래핑·크롤링 금지. 제2조 서비스 복제·판매·활용은 명시적 서면 허가 필요."
+      ],
+      "conditions": [
+        "산지·품종·가공 등 짧은 개별 사실만 사용하고 원문 문장·번역·설명 구조·사진·가격표·상품 설명 또는 목록 편집물을 복제하지 않는다.",
+        "향미는 짧은 일반 어휘에 한정하고 해당 로트의 관능 기록으로 표시한다. 독특한 표현이나 노트 묶음·순서를 대량 복제하지 않는다.",
+        "현재 판단은 게시 형태에 관한 실무 판단이다. 이미 이루어진 자동수집의 계약상 적법성·취득 당시 조건·권한은 별도 기록으로 확인하며 재작성으로 정당화되지 않는다.",
+        "새 자동수집은 재개하지 않는다. 게시 조건과 수집 권한은 별도로 관리한다."
+      ],
+      "acquisitionRestriction": "명시 자동접근·추출 제한 있음. 추가 자동수집 중지 유지. 이미 취득한 자료는 취득 시점·방식·동의·적용 약관을 별도로 확인해야 하며 조건부 게시 판단은 과거 수집을 면책하지 않음.",
+      "existingPublicationAssessment": "제공된 현재 사용 형태라면 보호 표현 복제와 구별되는 소량 사실의 독립 서술은 조건부 사용 후보다. 해당 호스트의 전체 자료·목록이나 과거 취득 방식까지 허가되었다는 뜻은 아니다.",
+      "evidenceUrls": [
+        "https://thecrackpots.com/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "thehuboug.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "서비스 복제 제한은 있으나 자동 수집 특정 금지는 확인하지 못했습니다. 짧은 독립 사실과 서비스 복제를 구분해 조건부 사용으로 판단합니다."
+      ],
+      "conditions": [
+        "지명·품종·가공 및 통상적인 짧은 향미어만 독립적으로 서술하고 원문 문장·번역·사진·표·목록 편집·고유한 판매 표현은 복제하지 않습니다.",
+        "출처별 누적 추출이 데이터베이스의 상당 부분이나 반복 추출에 해당하는지 별도 확인합니다. 출처 표시는 이용 허락을 대신하지 않습니다.",
+        "조건부 게시 판단은 과거 수집의 적법성 보증이나 새 자동 수집 허락이 아닙니다."
+      ],
+      "acquisitionRestriction": "별도 자동 접근 허락은 확인하지 못했습니다. 과거 취득 방식과 약관 적용은 확인이 필요하며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 제시된 사실 중심 화면 범위에는 조건부 게시 가능으로 판단하되 실제 모든 문장의 원문 유사성 및 과거 취득 경위를 확인했다는 뜻은 아닙니다.",
+      "evidenceUrls": [
+        "https://www.thehuboug.com/terms-of-service/"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "torque.coffee",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "기존 근거는 자동 접근 금지와 서비스 복제·판매·이용 서면허가 조항이다. 산지·품종·가공 등 독립 사실의 짧은 자체 서술을 데이터 재배포 금지로 확대할 근거는 확인되지 않았다.",
+        "기록된 원출처 URL 1개; 현행 맥락 URL 1개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "명시적 자동 접근 제한 있음. 신규 자동 수집을 계속하지 않으며, 기존 자동 취득의 약관 문제는 별도로 남는다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 지정된 독립 사실 사용만 조건부 허용 판단이다. 기존 자동 취득까지 적법하다는 판단은 아니다.",
+      "evidenceUrls": [
+        "https://torque.coffee/policies/terms-of-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "sourceCount": 1,
+      "checkedAt": "2026-09-09T05:32:46.880123+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "uk.covoyacoffee.com",
+      "decision": "keep-held",
+      "reasons": [
+        "영국 사이트 원문에서도 data·information을 포함한 Content를 다른 사이트에 게시하는 행위를 제한합니다. 단순 자동 수집 금지로만 해석할 수 없습니다."
+      ],
+      "conditions": [
+        "해당 출처에 의존한 자료 사용 보류를 유지하고 명시 허가 또는 적용 범위 확인 후 재판단합니다.",
+        "다른 출처에서 독립적으로 확인할 수 있다는 사정은 이 출처 사용 허락을 뜻하지 않습니다."
+      ],
+      "acquisitionRestriction": "명시 자동 접근 제한 유지. 과거 자동 수집의 허락·약관 적용·취득 경위는 별도 미해결이며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 현재 확보한 근거로 이 출처를 일반 사용 가능 상태로 해제하지 않습니다. 위법 확정 판단은 아닙니다.",
+      "evidenceUrls": [
+        "https://uk.covoyacoffee.com/conditions-of-use"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "valle.federaciondecafeteros.org",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "keep-held",
+      "reasons": [
+        "수작업 복사까지 허가를 요구하고 상업·비상업 복제·배포 및 상세 링크를 별도로 제한한다. 현재 정보 게시와 출처 상세 링크에 걸치는 조건이다.",
+        "Valle 공식 푸터가 연결한 FNC 정책. robots/spiders/자동장치 또는 수작업으로 내용 감시·복사는 사전 서면 허가 필요. 상업·비상업 복제·배포 금지, 세부 페이지 링크도 허가 요청 요구."
+      ],
+      "conditions": [
+        "해당 사실 정보의 외부 사용과 상세 링크 조건을 확인하기 전 보류. 자동접근만 중지하는 것으로 해결되지 않음.",
+        "동일 사실을 다른 출처에서 재확인할 수 있다는 사정은 이 출처의 현재 사용 권한이 되지 않는다.",
+        "이 판단은 위법 확정이 아니며, 과거 자동수집 문제는 문장 재작성으로 해소되지 않는다."
+      ],
+      "acquisitionRestriction": "명시 자동접근·추출 제한 있음. 추가 자동수집 중지 유지. 이미 취득한 자료는 취득 시점·방식·동의·적용 약관을 별도로 확인해야 하며 조건부 게시 판단은 과거 수집을 면책하지 않음.",
+      "existingPublicationAssessment": "현재 게시물이 짧은 사실이어도 확인된 데이터·정보 이용 또는 DB 편입 조건과 겹치거나 인용 문서 적용 조건이 미확정이므로 이 출처 기반 복원은 보류한다.",
+      "evidenceUrls": [
+        "https://federaciondecafeteros.org/terminos-y-condiciones-de-uso-contenido-web/"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "valor.coffee",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "서비스 복제 및 자동 수집 제한을 개별 산지 사실 게시의 전면 금지와 구분합니다."
+      ],
+      "conditions": [
+        "지명·품종·가공 및 통상적인 짧은 향미어만 독립적으로 서술하고 원문 문장·번역·사진·표·목록 편집·고유한 판매 표현은 복제하지 않습니다.",
+        "출처별 누적 추출이 데이터베이스의 상당 부분이나 반복 추출에 해당하는지 별도 확인합니다. 출처 표시는 이용 허락을 대신하지 않습니다.",
+        "조건부 게시 판단은 과거 수집의 적법성 보증이나 새 자동 수집 허락이 아닙니다."
+      ],
+      "acquisitionRestriction": "명시 자동 접근 제한 유지. 과거 자동 수집의 허락·약관 적용·취득 경위는 별도 미해결이며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "현 사용 맥락은 산지·품종·랏 정보입니다. 제시된 사실 중심 화면 범위에는 조건부 게시 가능으로 판단하되 실제 모든 문장의 원문 유사성 및 과거 취득 경위를 확인했다는 뜻은 아닙니다.",
+      "evidenceUrls": [
+        "https://valor.coffee/terms-of-service"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "vervecoffee.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "개인 비상업적 사이트 이용·콘텐츠 재게시 조건은 넓지만 현행 3개 자료의 객관적 사실과 보호 콘텐츠 자체를 구분할 수 있다. 사실 공개 조건부 판단은 자동 접근의 정당성이나 원문 재게시 허가를 의미하지 않는다.",
+        "기록된 원출처 URL 4개; 현행 맥락 URL 3개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다.",
+        "보호 콘텐츠 자체나 서비스의 상업적 활용에 해당하면 별도 허가가 필요하다. 판매 기능이 없다는 사실만으로 모든 상업성 조건이 충족된 것으로 보지 않는다."
+      ],
+      "acquisitionRestriction": "명시적 자동 접근 제한 있음. 신규 자동 수집을 계속하지 않으며, 기존 자동 취득의 약관 문제는 별도로 남는다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 지정된 독립 사실 사용만 조건부 허용 판단이다. 기존 자동 취득까지 적법하다는 판단은 아니다.",
+      "evidenceUrls": [
+        "https://www.vervecoffee.com/pages/terms-of-use"
+      ],
+      "currentUse": true,
+      "confidence": "medium",
+      "sourceCount": 4,
+      "checkedAt": "2026-09-09T05:32:46.879998+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "vimeo.com",
+      "decision": "insufficient-evidence",
+      "reasons": [
+        "영상 862582585의 개별 라이선스, 기존 정보가 영상·자막·설명 중 어디서 추출됐는지와 취득 방식이 미확인이다. 짧은 산지 사실 자체와 영상 재사용은 다르지만 플랫폼 약관만으로 현재 추출물의 사용 가능성을 확정할 수 없다.",
+        "기록된 원출처 URL 1개; 현행 맥락 URL 1개. URL 개수는 실제 추출량이나 DB의 실질적 비율을 입증하지 않는다."
+      ],
+      "conditions": [
+        "해당 원자산의 라이선스·약관 적용범위·기존 추출 형태를 확인하기 전 사용 승인으로 처리하지 않는다.",
+        "현재 판단은 지명·생산자·품종·가공 같은 독립 사실과 짧은 통상적 향미어를 자체 서술하는 사용에 한정한다.",
+        "사진·가격·판매 설명·표·고유한 문장과 노트 전체의 선택·배열을 복제하지 않고, 개별 랏의 향미를 지역 전체의 보편적 특성으로 바꾸지 않는다.",
+        "이 판정은 원출처의 명시적 이용 허가나 과거 취득의 적법성 보증이 아니다. 출처 표기·문장 재작성·다른 출처로 링크 교체는 과거 자동 수집 문제를 해소하지 않는다."
+      ],
+      "acquisitionRestriction": "명시적 자동 접근 제한 있음. 신규 자동 수집을 계속하지 않으며, 기존 자동 취득의 약관 문제는 별도로 남는다.",
+      "existingPublicationAssessment": "현행 공개 근거가 있으며 이 자료의 기존/예정 사용을 승인할 수 없다. 위법성이 확정됐다는 의미는 아니다.",
+      "evidenceUrls": [
+        "https://vimeo.com/legal/"
+      ],
+      "currentUse": true,
+      "confidence": "low",
+      "sourceCount": 1,
+      "checkedAt": "2026-09-09T05:32:46.880125+00:00",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "watchhouse.com",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "확인된 제한은 자동접근 또는 서비스·보호 콘텐츠의 복제·상업적 배포에 관한 것이다. 짧은 산지명·품종·가공 사실 전체를 외부에 독립 서술하지 못한다는 근거로 확대하지 않는다.",
+        "Intellectual property: 웹콘텐츠 일부/전체 복제·다른웹/검색시스템 저장에 명시허가 요구.",
+        "이용제한의 개별 사실 적용과 법적 예외는 미확정. hold는 위법판정이 아님."
+      ],
+      "conditions": [
+        "산지·품종·가공 등 짧은 개별 사실만 사용하고 원문 문장·번역·설명 구조·사진·가격표·상품 설명 또는 목록 편집물을 복제하지 않는다.",
+        "향미는 짧은 일반 어휘에 한정하고 해당 로트의 관능 기록으로 표시한다. 독특한 표현이나 노트 묶음·순서를 대량 복제하지 않는다.",
+        "현재 판단은 게시 형태에 관한 실무 판단이다. 이미 이루어진 자동수집의 계약상 적법성·취득 당시 조건·권한은 별도 기록으로 확인하며 재작성으로 정당화되지 않는다.",
+        "다른 웹사이트·검색시스템 저장 제한은 보호 콘텐츠에 적용되는 기록이므로 원문 발췌·본문 저장을 함께 복원하지 않는다."
+      ],
+      "acquisitionRestriction": "자동접근 특정 제한은 기존 근거에서 미확인. 이는 자동수집 허가가 아니며 과거 취득 권한 확인은 별도.",
+      "existingPublicationAssessment": "제공된 현재 사용 형태라면 보호 표현 복제와 구별되는 소량 사실의 독립 서술은 조건부 사용 후보다. 해당 호스트의 전체 자료·목록이나 과거 취득 방식까지 허가되었다는 뜻은 아니다.",
+      "evidenceUrls": [
+        "https://watchhouse.com/pages/terms-of-service"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "xliiicoffee.com",
+      "checkedAt": "2026-09-09T05:32:08.670773+00:00",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "확인된 제한은 자동접근 또는 서비스·보호 콘텐츠의 복제·상업적 배포에 관한 것이다. 짧은 산지명·품종·가공 사실 전체를 외부에 독립 서술하지 못한다는 근거로 확대하지 않는다.",
+        "13조 spider/crawl/scrape 금지. 2조 서비스 무허가 복제·판매·이용 금지, 9조 콘텐츠와 편집물 사용에 서면 허가 요구."
+      ],
+      "conditions": [
+        "산지·품종·가공 등 짧은 개별 사실만 사용하고 원문 문장·번역·설명 구조·사진·가격표·상품 설명 또는 목록 편집물을 복제하지 않는다.",
+        "향미는 짧은 일반 어휘에 한정하고 해당 로트의 관능 기록으로 표시한다. 독특한 표현이나 노트 묶음·순서를 대량 복제하지 않는다.",
+        "현재 판단은 게시 형태에 관한 실무 판단이다. 이미 이루어진 자동수집의 계약상 적법성·취득 당시 조건·권한은 별도 기록으로 확인하며 재작성으로 정당화되지 않는다.",
+        "새 자동수집은 재개하지 않는다. 게시 조건과 수집 권한은 별도로 관리한다."
+      ],
+      "acquisitionRestriction": "명시 자동접근·추출 제한 있음. 추가 자동수집 중지 유지. 이미 취득한 자료는 취득 시점·방식·동의·적용 약관을 별도로 확인해야 하며 조건부 게시 판단은 과거 수집을 면책하지 않음.",
+      "existingPublicationAssessment": "제공된 현재 사용 형태라면 보호 표현 복제와 구별되는 소량 사실의 독립 서술은 조건부 사용 후보다. 해당 호스트의 전체 자료·목록이나 과거 취득 방식까지 허가되었다는 뜻은 아니다.",
+      "evidenceUrls": [
+        "https://xliiicoffee.com/en/terms-conditions/"
+      ],
+      "currentUse": true,
+      "currentUseMeaning": "현재 산지·로트·품종 자료의 참조 맥락 여부. 보류 상태에서 실제 화면에 공개 중이라는 의미는 아님.",
+      "confidence": "medium",
+      "referencedInCurrentData": true,
+      "automaticPublicationApproval": false
+    },
+    {
+      "host": "zeriscoffee.com",
+      "decision": "usable-facts-with-conditions",
+      "reasons": [
+        "보호 콘텐츠 복제·배포 제한과 독립된 산지 사실의 서술을 구분합니다. 별도 구매 약관을 데이터 금지 근거로 삼지 않습니다."
+      ],
+      "conditions": [
+        "지명·품종·가공 및 통상적인 짧은 향미어만 독립적으로 서술하고 원문 문장·번역·사진·표·목록 편집·고유한 판매 표현은 복제하지 않습니다.",
+        "출처별 누적 추출이 데이터베이스의 상당 부분이나 반복 추출에 해당하는지 별도 확인합니다. 출처 표시는 이용 허락을 대신하지 않습니다.",
+        "조건부 게시 판단은 과거 수집의 적법성 보증이나 새 자동 수집 허락이 아닙니다."
+      ],
+      "acquisitionRestriction": "별도 자동 접근 허락은 확인하지 못했습니다. 과거 취득 방식과 약관 적용은 확인이 필요하며 재서술로 소급 정당화되지 않습니다.",
+      "existingPublicationAssessment": "기록상 과거 조사 목록만 있고 현재 공개 사용은 확인되지 않습니다. 제시된 사실 중심 화면 범위에는 조건부 게시 가능으로 판단하되 실제 모든 문장의 원문 유사성 및 과거 취득 경위를 확인했다는 뜻은 아닙니다.",
+      "evidenceUrls": [
+        "https://zeriscoffee.com/aviso-legal/",
+        "https://zeriscoffee.com/terminos-condiciones/"
+      ],
+      "currentUse": false,
+      "confidence": "medium",
+      "referencedInCurrentData": false,
+      "automaticPublicationApproval": false
+    }
+  ]
+}

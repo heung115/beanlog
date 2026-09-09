@@ -1,0 +1,21 @@
+{
+  "reviewedAt": "2026-09-09",
+  "scope": "Current structured origin, raw lot and variety textual fields; source metadata and verification notes excluded.",
+  "counts": {
+    "origins": 389,
+    "lotAssignments": 708,
+    "varieties": 92,
+    "textFields": 20748
+  },
+  "matches": {
+    "contactEmail": [],
+    "embeddedMarkup": [],
+    "priceOrPurchase": []
+  },
+  "limits": [
+    "Pattern screening is not a privacy or copyright clearance.",
+    "A lack of exact copies or embedded markup does not rule out protected paraphrase, translation, database extraction or third-party rights.",
+    "Public producer names may identify natural persons; their presence is not itself proof of unlawful personal-data processing.",
+    "Terms application and rights ownership require separate evidence."
+  ]
+}

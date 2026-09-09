@@ -1,0 +1,300 @@
+{
+  "guides": [
+    {
+      "id": "ethiopia-west-arsi",
+      "country": "Ethiopia",
+      "name": "West Arsi",
+      "nameKo": "웨스트 아르시",
+      "kind": "region",
+      "aliases": [
+        "West-Arsi",
+        "Western Arsi",
+        "웨스트아르시"
+      ],
+      "summary": {
+        "ko": "오로미아의 고지대 산지. 넨세보의 레피사와 리리파에서 꽃향과 과일 향미의 커피를 생산합니다.",
+        "en": "A highland coffee origin in Oromia, including the floral and fruit-forward coffees of Refisa and Riripa in Nensebo."
+      },
+      "environment": {
+        "ko": "넨세보의 소농들이 수확한 체리를 레피사·리리파 워싱스테이션으로 운반합니다. 리리파에서는 선별한 체리를 워시드 또는 내추럴로 가공하고 건조대에서 말립니다.",
+        "en": "Smallholders in Nensebo deliver cherries to the Refisa and Riripa washing stations. At Riripa, selected cherries are processed as washed or natural lots and dried on raised beds."
+      },
+      "flavorNotes": {
+        "ko": [
+          "꽃",
+          "복숭아",
+          "오렌지",
+          "홍차"
+        ],
+        "en": [
+          "Floral",
+          "Peach",
+          "Orange",
+          "Black tea"
+        ]
+      },
+      "varieties": [
+        "Ethiopian landrace",
+        "Kurume",
+        "Welisho",
+        "Local JARC varieties"
+      ],
+      "processes": {
+        "ko": [
+          "워시드",
+          "내추럴"
+        ],
+        "en": [
+          "Washed",
+          "Natural"
+        ]
+      },
+      "specialty": {
+        "ko": "레피사의 꽃향·레몬버베나와 리리파의 복숭아·파파야가 대표적인 로트 사례입니다. 리리파에서는 워시드와 내추럴을 모두 생산합니다.",
+        "en": "Documented lots include floral and lemon-verbena notes from Refisa, and peach and papaya from Riripa. Riripa produces both washed and natural coffees."
+      },
+      "sources": [
+        {
+          "title": "Refisa — SEY Washed 2021",
+          "url": "https://www.seycoffee.com/products/refisa",
+          "publisher": "SEY Coffee",
+          "accessedAt": "2026-09-09"
+        },
+        {
+          "title": "Riripa Organic — 2022/23",
+          "url": "https://fuglencoffee.jp/en/blogs/coffee-beans/riripa-organic",
+          "publisher": "Fuglen Coffee Roasters Tokyo",
+          "accessedAt": "2026-09-09"
+        },
+        {
+          "title": "Riripa Mewa — Washed Organic G2",
+          "url": "https://www.littlefish.coffee/shop/p/riripaorganic",
+          "publisher": "Little Fish Coffee Roasters",
+          "accessedAt": "2026-09-09"
+        },
+        {
+          "title": "West Arsi Riripa Natural",
+          "url": "https://www.allycoffee.com/coffees/west-arsi-riripa-natural/",
+          "publisher": "Ally Coffee",
+          "accessedAt": "2026-09-09"
+        }
+      ],
+      "verification": {
+        "reviewedAt": "2026-09-09",
+        "flavorBasis": "lot",
+        "flavorContext": {
+          "ko": "SEY Refisa 2021 및 Fuglen Riripa 2022/23 개별 원두 노트. 구역 전체의 고정 향미로 일반화하지 않음.",
+          "en": "Individual SEY Refisa 2021 and Fuglen Riripa 2022/23 tasting notes, not a fixed zone-wide profile."
+        },
+        "flavorSourceUrls": [
+          "https://www.seycoffee.com/products/refisa",
+          "https://fuglencoffee.jp/en/blogs/coffee-beans/riripa-organic"
+        ]
+      }
+    }
+  ],
+  "profiles": [
+    {
+      "regionId": "ethiopia-west-arsi",
+      "priority": "standard",
+      "rationale": "웨스트 아르시 내 넨세보의 4개 원두 상품을 확인했다. 넨세보 하위 탐색과 같은 로트를 공유한다.",
+      "sources": [
+        {
+          "title": "Refisa — SEY Washed 2021",
+          "url": "https://www.seycoffee.com/products/refisa",
+          "publisher": "SEY Coffee",
+          "accessedAt": "2026-09-09"
+        },
+        {
+          "title": "Riripa Organic — 2022/23",
+          "url": "https://fuglencoffee.jp/en/blogs/coffee-beans/riripa-organic",
+          "publisher": "Fuglen Coffee Roasters Tokyo",
+          "accessedAt": "2026-09-09"
+        },
+        {
+          "title": "Riripa Mewa — Washed Organic G2",
+          "url": "https://www.littlefish.coffee/shop/p/riripaorganic",
+          "publisher": "Little Fish Coffee Roasters",
+          "accessedAt": "2026-09-09"
+        },
+        {
+          "title": "West Arsi Riripa Natural",
+          "url": "https://www.allycoffee.com/coffees/west-arsi-riripa-natural/",
+          "publisher": "Ally Coffee",
+          "accessedAt": "2026-09-09"
+        }
+      ],
+      "lots": [
+        {
+          "name": "Refisa — SEY Washed 2021",
+          "producer": "Refisa Washing Station — supplying smallholders",
+          "location": "Nensebo, West Arsi, Ethiopia",
+          "varieties": [
+            "Ethiopian landrace"
+          ],
+          "process": {
+            "ko": "워시드",
+            "en": "Washed"
+          },
+          "flavorNotes": {
+            "ko": [
+              "열대과일",
+              "꽃",
+              "레몬버베나"
+            ],
+            "en": [
+              "Tropical fruit",
+              "Floral",
+              "Lemon verbena"
+            ]
+          },
+          "sources": [
+            {
+              "title": "Refisa — SEY Washed 2021",
+              "url": "https://www.seycoffee.com/products/refisa",
+              "publisher": "SEY Coffee",
+              "accessedAt": "2026-09-09"
+            }
+          ],
+          "harvest": "January 2021"
+        },
+        {
+          "name": "Riripa Organic — Fuglen Washed 2022/23",
+          "producer": "Riripa Washing Station — 742 smallholders",
+          "location": "Riripa, Nensebo, West Arsi, Ethiopia",
+          "varieties": [
+            "Welisho",
+            "Kurume"
+          ],
+          "process": {
+            "ko": "워시드",
+            "en": "Washed"
+          },
+          "flavorNotes": {
+            "ko": [
+              "파파야",
+              "오렌지",
+              "복숭아",
+              "홍차"
+            ],
+            "en": [
+              "Papaya",
+              "Orange",
+              "Peach",
+              "Black tea"
+            ]
+          },
+          "sources": [
+            {
+              "title": "Riripa Organic — 2022/23",
+              "url": "https://fuglencoffee.jp/en/blogs/coffee-beans/riripa-organic",
+              "publisher": "Fuglen Coffee Roasters Tokyo",
+              "accessedAt": "2026-09-09"
+            }
+          ],
+          "harvest": "2022–2023"
+        },
+        {
+          "name": "Riripa Mewa — Little Fish Washed G2",
+          "producer": "Riripa village smallholders",
+          "location": "Riripa, West Arsi, Ethiopia",
+          "varieties": [
+            "Ethiopian landrace"
+          ],
+          "process": {
+            "ko": "워시드",
+            "en": "Washed"
+          },
+          "flavorNotes": {
+            "ko": [
+              "자몽",
+              "백도",
+              "라벤더"
+            ],
+            "en": [
+              "Grapefruit",
+              "White peach",
+              "Lavender"
+            ]
+          },
+          "sources": [
+            {
+              "title": "Riripa Mewa — Washed Organic G2",
+              "url": "https://www.littlefish.coffee/shop/p/riripaorganic",
+              "publisher": "Little Fish Coffee Roasters",
+              "accessedAt": "2026-09-09"
+            }
+          ]
+        },
+        {
+          "name": "Riripa — Ally Natural",
+          "producer": "Riripa Washing Station — SNAP / Negusse Debela and 822 producers",
+          "location": "Riripa, Nensebo, West Arsi, Ethiopia",
+          "varieties": [
+            "Local JARC varieties",
+            "Local landraces"
+          ],
+          "process": {
+            "ko": "내추럴",
+            "en": "Natural"
+          },
+          "flavorNotes": {
+            "ko": [
+              "열대과일",
+              "꿀",
+              "레몬그라스"
+            ],
+            "en": [
+              "Tropical fruit",
+              "Honey",
+              "Lemongrass"
+            ]
+          },
+          "sources": [
+            {
+              "title": "West Arsi Riripa Natural",
+              "url": "https://www.allycoffee.com/coffees/west-arsi-riripa-natural/",
+              "publisher": "Ally Coffee",
+              "accessedAt": "2026-09-09"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "audit": {
+    "decision": "West Arsi 1개 region 추천; Nensebo는 이 지역 내 확인된 생산 범위 및 검색 별칭으로 보존. 현재 사례가 모두 Nensebo에 집중되어 있으므로 West Arsi 부모 + Nensebo 자식에 똑같은 로트를 복제하는 2개 카드는 만들지 않음. Nensebo 이외 산지를 확보하면 후속 분리 가능.",
+    "queries": [
+      "\"Nensebo\" \"roaster\" \"Refisa\" coffee",
+      "\"West Arsi\" \"Riripa\" coffee roaster",
+      "\"West Arsi\" \"Nensebo\" site:seycoffee.com/products"
+    ],
+    "directlyOpened": [
+      "https://www.seycoffee.com/products/refisa",
+      "https://fuglencoffee.jp/en/blogs/coffee-beans/riripa-organic",
+      "https://www.littlefish.coffee/shop/p/riripaorganic",
+      "https://www.allycoffee.com/coffees/west-arsi-riripa-natural/"
+    ],
+    "sourceCaveats": [
+      "Fuglen 2023 기사 중 Duromina/Dumerso/Nanochara를 이 지역과 연결한 일반문장은 다른 산지와 충돌하므로 제외. Locality 구조와 Riripa 상품정보만 채택.",
+      "Welisho는 원문 유지. 현재 coffee-varieties 프로필 aliases와 일치 여부는 root가 검사; 확인 없이 Wolisho로 변환하지 않음.",
+      "Little Fish는 현재 판매페이지이나 harvest가 없어 미상. 발행/크롤 날짜를 작황으로 간주하지 않음.",
+      "Ally Natural November–January는 계절만 있고 연도 없음.",
+      "구역전체 재배고도 범위는 제시하지 않음. Refisa/Fuglen 개별원두 고도를 zone전체로 일반화하지 않기 위해 altitude 생략.",
+      "Fuglen 상품 link39는 Cache miss였으나 공식 원두 아카이브 본문은 직접 성공. SEY와 Little Fish 제품 페이지도 직접 성공."
+    ],
+    "africaFileStable": true,
+    "africaStats": {
+      "regions": 27,
+      "lotsBefore": 65,
+      "lotsAfter": 88,
+      "added": 23,
+      "existingLotNotesEnriched": 1
+    },
+    "validation": [
+      "Node origin-specialty + origin-varieties: 11 passed",
+      "ESLint africa.ts passed"
+    ],
+    "integrationDecision": "사용자의 큰 지역→세부 지역 탐색을 위해 West Arsi→Nensebo로 분리. Nensebo/Riripa/Refisa를 West Arsi의 동의어로 저장하지 않는다. 4개 동일 원두를 두 탐색 위치에서 공유하며 고유 원두 수에는 한 번만 계산."
+  }
+}

@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
-import { originPresets, originSlug } from "@/data/origin-presets";
+import { originSlug } from "@/data/origin-presets";
+import { originGuideCountries, originRegionGuides, regionGuidePath } from "@/data/origin-guides";
 import {
   localizedUrl,
   type SeoLocale,
@@ -11,9 +12,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const paths = [
     "",
     "/origins",
-    ...originPresets.map(
+    ...originGuideCountries.map(
       (preset) => `/origins/${originSlug(preset.country)}`
     ),
+    ...originRegionGuides.map(regionGuidePath),
   ];
 
   return paths.flatMap((path) => {

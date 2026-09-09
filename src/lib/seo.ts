@@ -12,7 +12,7 @@ export const SEO_COPY = {
     landing: {
       title: "beanmap | 커피 원두 기록과 산지 가이드",
       description:
-        "마신 커피의 원두, 로스터리, 산지, 가공 방식, 테이스팅 노트와 점수를 기록하고 20개 커피 생산국 가이드를 살펴보세요.",
+        "마신 커피의 원두, 로스터리, 산지, 가공 방식, 테이스팅 노트와 점수를 기록하고 세계 커피 산지 가이드를 살펴보세요.",
       keywords: [
         "커피 기록",
         "원두 기록",
@@ -22,9 +22,9 @@ export const SEO_COPY = {
       ],
     },
     origins: {
-      title: "세계 커피 산지 가이드 20개국 | beanmap",
+      title: "세계 커피 산지·세부 지역 가이드 | beanmap",
       description:
-        "에티오피아, 콜롬비아, 케냐 등 20개 커피 생산국의 대표 향미, 재배 고도, 주요 품종과 생산 지역을 한눈에 살펴보세요.",
+        "세계 커피 산지와 세부 지역을 찾아보세요. 지역별 향미 경향, 재배 환경, 가공 방식과 스페셜티 커피의 특징을 출처와 함께 살펴볼 수 있습니다.",
       keywords: [
         "커피 산지",
         "커피 생산국",
@@ -39,7 +39,7 @@ export const SEO_COPY = {
     landing: {
       title: "beanmap | Coffee Journal & Origin Guide",
       description:
-        "Track coffee beans, roasters, origins, processing methods, tasting notes, and ratings, then explore guides to 20 coffee-producing countries.",
+        "Track coffee beans, roasters, origins, processing methods, tasting notes, and ratings, then explore guides to coffee regions and microregions.",
       keywords: [
         "coffee journal",
         "coffee bean tracker",
@@ -49,9 +49,9 @@ export const SEO_COPY = {
       ],
     },
     origins: {
-      title: "Coffee Origin Guide: 20 Producing Countries | beanmap",
+      title: "Coffee Origins: Regions & Microregions | beanmap",
       description:
-        "Explore flavor profiles, growing elevations, varieties, and key regions across 20 coffee-producing countries, including Ethiopia, Colombia, and Kenya.",
+        "Explore regions and microregions across coffee-producing countries, with sourced flavor tendencies, growing conditions, processing methods, and specialty coffee context.",
       keywords: [
         "coffee origin guide",
         "coffee producing countries",
@@ -168,7 +168,7 @@ type PageMetadataInput = {
   keywords: readonly string[];
 };
 
-function buildPublicPageMetadata({
+export function buildPublicPageMetadata({
   locale,
   path = "",
   title,
@@ -250,13 +250,11 @@ export function buildOriginIndexMetadata(localeInput: string): Metadata {
  */
 export function buildOriginDetailMetadata(
   localeInput: string,
-  preset: OriginPresetData,
+  preset: Pick<OriginPresetData, "country" | "countryKo"> & { regions: { name: string; nameKo: string }[] },
   slug: string
 ): Metadata {
   const locale = toSeoLocale(localeInput);
   const country = locale === "ko" ? preset.countryKo : preset.country;
-  const signature =
-    locale === "ko" ? preset.signatureKo : preset.signature;
   const regions = preset.regions
     .slice(0, 3)
     .map((region) => (locale === "ko" ? region.nameKo : region.name))
@@ -267,8 +265,8 @@ export function buildOriginDetailMetadata(
       : `${country} Coffee Origin Guide | ${SITE_NAME}`;
   const description =
     locale === "ko"
-      ? `${country} 커피의 대표 향미(${signature}), 재배 고도 ${preset.altitudeRange}, 주요 품종과 ${regions} 등 생산 지역을 살펴보세요.`
-      : `${country} coffee: ${signature}. See ${preset.altitudeRange} elevations and regions: ${regions}.`;
+      ? `${country}의 ${regions} 등 커피 산지와 세부 지역을 살펴보세요. 지역마다 다른 향미 경향, 재배 환경, 가공 방식과 스페셜티 커피의 특징을 출처와 함께 소개합니다.`
+      : `Explore ${country} coffee regions including ${regions}, with sourced regional flavor tendencies, growing conditions, processing methods, and specialty microregions.`;
   const keywords =
     locale === "ko"
       ? [

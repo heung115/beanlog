@@ -1,0 +1,360 @@
+{
+  "reviewedAt": "2026-09-09",
+  "scope": [
+    "uganda-rwenzori",
+    "uganda-mount-elgon",
+    "china-puer",
+    "timor-leste-ermera",
+    "timor-leste-aileu",
+    "indonesia-kintamani"
+  ],
+  "recommendations": [
+    {
+      "regionId": "uganda-rwenzori",
+      "action": "add",
+      "lot": {
+        "name": "Kalingwe Natural — October 2025",
+        "producer": "Kalingwe farmer groups — Agri Evolve",
+        "location": "Kalingwe, Rwenzori Mountains",
+        "varieties": [
+          "SL14",
+          "SL28",
+          "Older regional landraces"
+        ],
+        "process": {
+          "ko": "내추럴 · 건조대 건조",
+          "en": "Natural · sun-dried on raised beds"
+        },
+        "flavorNotes": {
+          "ko": [
+            "스타프루트",
+            "딸기",
+            "다크초콜릿"
+          ],
+          "en": [
+            "Star fruit",
+            "Strawberry",
+            "Dark chocolate"
+          ]
+        },
+        "harvest": "2025-10",
+        "sources": [
+          {
+            "title": "Kalingwe Natural",
+            "url": "https://agrievolve.com/kalingwe-natural-2/",
+            "publisher": "Agri Evolve",
+            "accessedAt": "2026-09-09"
+          }
+        ]
+      },
+      "evidence": "동일 제품 본문의 Harvest가 October 2025이며 아래 컵 설명도 October 2025 crop을 직접 지칭한다. 가공·품종·Kalingwe 생산자 그룹과 Rwenzori 위치를 같은 페이지에서 확인했다.",
+      "limitations": [
+        "지역 토착종은 세부 이름이 공개되지 않았다. SL14/SL28 이외의 특정 품종으로 치환하지 않았다."
+      ]
+    },
+    {
+      "regionId": "uganda-mount-elgon",
+      "action": "add",
+      "lot": {
+        "name": "Mountain Harvest Washed — Counter Culture selection",
+        "producer": "Mountain Harvest farmer network",
+        "location": "Mount Elgon, Uganda",
+        "varieties": [
+          "SL28",
+          "SL14",
+          "Nyasaland"
+        ],
+        "process": {
+          "ko": "워시드",
+          "en": "Washed"
+        },
+        "flavorNotes": {
+          "ko": [
+            "시트러스",
+            "생강",
+            "당밀"
+          ],
+          "en": [
+            "Citrus",
+            "Ginger",
+            "Molasses"
+          ]
+        },
+        "harvest": "2025-09–2026-01",
+        "sources": [
+          {
+            "title": "Mountain Harvest",
+            "url": "https://counterculturecoffee.com/products/mountain-harvest",
+            "publisher": "Counter Culture Coffee",
+            "accessedAt": "2026-09-09"
+          }
+        ]
+      },
+      "evidence": "상품 Harvest 섹션이 Sep 2025–Jan 2026을 명시한다. 품종·워시드·Mount Elgon의 Mountain Harvest 농가 네트워크와 당해 상품의 세 노트가 한 페이지에 연결된다.",
+      "limitations": [
+        "하나의 농장 단독 로트가 아니라 해당 생산자 네트워크의 농장 커피를 합친 상품이다. 개별 농장명은 공개되지 않았다."
+      ]
+    },
+    {
+      "regionId": "indonesia-kintamani",
+      "action": "add",
+      "lot": {
+        "name": "MI/006/1 — HQ25M-CMPN-0001",
+        "producer": "Kanggo — HEQA",
+        "location": "Belancan Village, Kintamani, Bali",
+        "varieties": [
+          "Cobra"
+        ],
+        "process": {
+          "ko": "카보닉 매서레이션 펄프드 내추럴",
+          "en": "Carbonic maceration pulped natural"
+        },
+        "flavorNotes": {
+          "ko": [
+            "핵과",
+            "꿀",
+            "흑설탕"
+          ],
+          "en": [
+            "Stone fruit",
+            "Honey",
+            "Brown sugar"
+          ]
+        },
+        "harvest": "2025-07",
+        "sources": [
+          {
+            "title": "MI/006/1 - CM Pulped Natural",
+            "url": "https://www.heqa.coffee/products/mi-006-1-cm-pulped-natural",
+            "publisher": "HEQA",
+            "accessedAt": "2026-09-09"
+          }
+        ]
+      },
+      "evidence": "직접 가공업체 HEQA의 단일 로트 명세에 lot number, Kanggo 농장, Belancan/Kintamani 재배지, Cobra, 가공, 세 노트, Harvest Year July 2025가 함께 있다.",
+      "limitations": [
+        "가공소는 Buleleng이다. Kintamani는 재배지로 확인했으며 가공소를 산지로 바꾸지 않았다. 농장의 Yellow Caturra 구획은 이 Cobra 로트의 품종에 포함하지 않았다."
+      ]
+    },
+    {
+      "regionId": "china-puer",
+      "action": "add",
+      "lot": {
+        "name": "Tianhao No.33 Yellow Bourbon Honey",
+        "producer": "Tianhao Wash Station",
+        "location": "Lancang, Pu’er, Yunnan",
+        "varieties": [
+          "Yellow Bourbon"
+        ],
+        "process": {
+          "ko": "허니",
+          "en": "Honey"
+        },
+        "flavorNotes": {
+          "ko": [
+            "베르가모트",
+            "꿀",
+            "건포도",
+            "홍차"
+          ],
+          "en": [
+            "Bergamot",
+            "Honey",
+            "Raisin",
+            "Black tea"
+          ]
+        },
+        "harvest": "2025–2026",
+        "sources": [
+          {
+            "title": "Green bean catalog — No.33",
+            "url": "https://shufromyunnan.com/pages/roasters-green-bean-is-here",
+            "publisher": "Shu from Yunnan",
+            "accessedAt": "2026-09-09"
+          }
+        ]
+      },
+      "evidence": "수입·유통업체 원본 카탈로그의 No.33 항목이 Tianhao/Lancang, Yellow Bourbon, Honey, 네 노트와 Harvest Season 2025-2026을 하나의 항목으로 명시한다. 기존 Tianhao Catimor Natural과 다른 품종·가공 로트다.",
+      "limitations": [
+        "개별 생산자 성명은 이 항목에 없어 Tianhao Wash Station으로만 표기했다. 월은 공개되지 않았다. Lancang의 Pu’er 귀속은 기존 가이드에서 검증된 행정관계를 재사용한다.",
+        "아래 alternative의 Banka와 둘 다 추가하면 지역별 3개 로트 제한을 초과할 수 있으므로 하나를 선택하거나 기존 로트를 교체할 것."
+      ]
+    },
+    {
+      "regionId": "timor-leste-ermera",
+      "action": "add",
+      "lot": {
+        "name": "Rotutu Washed — Dear Green selection",
+        "producer": "Rotutu Coop — Karst Organics",
+        "location": "Rotutu, Letefoho, Ermera",
+        "varieties": [
+          "Typica",
+          "Timor Hybrid"
+        ],
+        "process": {
+          "ko": "워시드",
+          "en": "Washed"
+        },
+        "flavorNotes": {
+          "ko": [
+            "루이보스",
+            "시트러스",
+            "살구"
+          ],
+          "en": [
+            "Rooibos",
+            "Citrus",
+            "Apricot"
+          ]
+        },
+        "harvest": "2025",
+        "sources": [
+          {
+            "title": "Timor-Leste - Rotutu - Washed",
+            "url": "https://www.deargreencoffee.com/products/specialty-coffee-timor-leste-washed",
+            "publisher": "Dear Green Coffee Roasters",
+            "accessedAt": "2026-09-09"
+          }
+        ]
+      },
+      "evidence": "직접 로스터의 실제 상품 명세에서 harvest:2025, manager:Rotutu Coop, Karst, 위치·품종·가공·세 노트를 함께 확인했다. 검색의 .live 미러가 아닌 공식 .com 원문을 읽었다.",
+      "limitations": [
+        "본문의 140가구 이상은 전체 Karst 공급망 설명과 섞여 있으므로 생산자 수에 사용하지 않았다. 상품 상세의 Rotutu Coop 16 farmers와도 구별한다."
+      ]
+    }
+  ],
+  "alternatives": [
+    {
+      "regionId": "china-puer",
+      "action": "alternative_add",
+      "alternativeTo": "Tianhao No.33 Yellow Bourbon Honey",
+      "lot": {
+        "name": "Banka Natural — Kiss the Hippo selection",
+        "producer": "Yunnan Coffee Traders — Banka",
+        "location": "Banka Yi and Banka Er, Menglian, Pu’er, Yunnan",
+        "varieties": [
+          "Catimor P3",
+          "Catimor P4"
+        ],
+        "process": {
+          "ko": "내추럴",
+          "en": "Natural"
+        },
+        "flavorNotes": {
+          "ko": [
+            "적포도",
+            "빨간 사과",
+            "딸기 웨이퍼"
+          ],
+          "en": [
+            "Red grape",
+            "Red apple",
+            "Strawberry wafer"
+          ]
+        },
+        "harvest": "2025-04",
+        "sources": [
+          {
+            "title": "China, Banka",
+            "url": "https://kissthehippo.com/products/china-banka",
+            "publisher": "Kiss the Hippo Coffee",
+            "accessedAt": "2026-09-09"
+          }
+        ]
+      },
+      "evidence": "상품 고유 표에 producer, Catimor P3/P4, Natural, Banka Yi/Er, Harvest April 2025가 함께 있고 상품 머리말에 정확한 세 노트가 있다. 본문에서 Menglian 소재를 확인했다.",
+      "limitations": [
+        "본문의 Banka 전체 실험품종 Pacamara/Yellow Bourbon과 다른 가공법을 이 상품에 섞지 않았다."
+      ]
+    }
+  ],
+  "existingHarvestUpdates": [],
+  "coverage": [
+    {
+      "regionId": "uganda-rwenzori",
+      "status": "recommended",
+      "checkedUrls": [
+        "https://www.genuineorigin.com/uganda-rwenzori-kasese-natural-2026",
+        "https://agrievolve.com/kalingwe-natural-2/",
+        "https://www.croptocup.com/uganda-2025-26-harvest-update/"
+      ],
+      "finding": "기존 Kasese 상품의 2026 표기와 cupping Jan 2026은 수확연도 근거가 아니며 Harvest Time에는 월만 있다. Kalingwe 원본에서 실제 2025 수확을 확보했다. Crop to Cup의 2025 Kwezi 활동은 개별 로트의 완전한 품종·노트 명세가 아니므로 채택하지 않았다."
+    },
+    {
+      "regionId": "uganda-mount-elgon",
+      "status": "recommended",
+      "checkedUrls": [
+        "https://counterculturecoffee.com/products/mountain-harvest",
+        "https://2beardscoffee.com.na/selection/",
+        "https://www.covoyacoffee.com/origins/africa-middle-east/p614847-1-uganda-washed-sironko.html",
+        "https://www.algrano.com/en/products/6942-uganda-mount-elgon-arabica-sironko-station-pure-natural-microlot-a-organic-us-organic-arabica-natural-sun-dried-jan-mar-2025"
+      ],
+      "finding": "Counter Culture의 완전한 2025–2026 수확 명세를 우선 채택. Two Beards도 Sipi Falls의 2025/26 수확과 품종·컵을 공개하지만 생산자를 various smallholders로만 밝혀 추가 채택하지 않았다. Covoya/Algrano는 검색에 상세가 보였으나 open cache miss여서 본문 검증 완료 자료로 집계하지 않았다."
+    },
+    {
+      "regionId": "indonesia-kintamani",
+      "status": "recommended",
+      "checkedUrls": [
+        "https://www.heqa.coffee/products/mi-006-1-cm-pulped-natural",
+        "https://www.cafeimports.com/europe/offerings?new=yes",
+        "https://www.cafeimports.com/europe/offerings?view=beanology.view.karana-kintamani-natural-24826",
+        "https://www.socialhourcoffee.com/products/golden-hour-bali-kintamani",
+        "https://www.genuineorigin.com/bali-kintamani-g1-tp-semi-washed-2025"
+      ],
+      "finding": "HEQA의 July2025 단일 Cobra 로트로 보강 가능. Cafe Imports 24826은 offering row에 2025 Harvest가 명시됐지만 Beanology 링크에서 고유 품종 명세를 확보하지 못해 보류 유지. Social Hour 제목 Bali Kintamani2025와 달리 실제 Harvest는 MAY24–OCT24여서 최근작황 후보 제외. GO는 상품2025/수확월만 공개하여 제외."
+    },
+    {
+      "regionId": "china-puer",
+      "status": "recommended",
+      "checkedUrls": [
+        "https://indochinacoffee.com/coffee/china-fuyan-2024/",
+        "https://www.lbfgroupitalia.com/cina-cina-fuyan-natural.c507",
+        "https://obadiahcoffee.com/products/fuyan",
+        "https://kissthehippo.com/products/china-banka",
+        "https://shufromyunnan.com/pages/roasters-green-bean-is-here"
+      ],
+      "finding": "Fuyan 기존 원문은 수확월만 있으며 URL2024를 수확연도로 사용하지 않았다. 다른 판매자의 Fuyan는 2024/25 또는 March2024로 신규2025/26 대안보다 오래됐다. Tianhao No.33의 명시2025–2026과 별도 Banka April2025 로트를 확보했다."
+    },
+    {
+      "regionId": "timor-leste-ermera",
+      "status": "recommended",
+      "checkedUrls": [
+        "https://www.northstarroast.com/blogs/all-blogs/timor-leste-samoro-returning-to-a-relationship-we-believe-in",
+        "https://www.deargreencoffee.com/products/specialty-coffee-timor-leste-washed",
+        "https://newmathcoffee.com/shop",
+        "https://www.trianoncoffee.com/products/timor-leste-organic-eratoi-ermera"
+      ],
+      "finding": "기존 Samoro의 새 글은 2025 Letefoho 풍작과 해당 재구매를 설명하나 고유 수확 필드가 없어 보수적으로 기존 harvest 업데이트는 하지 않았다. Dear Green Rotutu의 명시2025 완전명세로 보강. Trianon은 Spring2025 재입고를 표시해도 상세 Harvest는2019이므로 제외. New Math의 제목에는 2025/2026 Harvest가 있으나 개별 상품 본문 검증 전 채택하지 않았다."
+    },
+    {
+      "regionId": "timor-leste-aileu",
+      "status": "unresolved",
+      "checkedUrls": [
+        "https://projectorigin.coffee/wp-content/uploads/2022/07/TIM_Aileu_2023.pdf",
+        "https://blackboardcoffee.com.au/blogs/the-coffee-board/our-natural-timor-leste",
+        "https://sucafina.com/apac/offerings/laklo-natural",
+        "https://dccoffee.com.au/products/espresso-single-origin",
+        "https://slidecoffee.com.au/blogs/news/timor-leste-aileu-washed",
+        "https://orijemtimor.coffee/",
+        "https://industrybeans.com/blogs/news/now-roasting-our-winter-seasonal-espresso-filter-blends",
+        "https://rawmaterial.coffee/timor-leste-roaster%27s-portal",
+        "https://volcanocoffeeworks.com/blogs/journal/laclo-junes-roasters-choice-subscription-coffee"
+      ],
+      "finding": "Aileu 소싱 로트는 실재하지만 이번 조사에서 2025/26 수확을 명시한 완전한 로트는 못 찾았다. Project Origin AL1/5D는 수확월만 있고 파일명2023은 작황 확정이 아니다. Sucafina Laklo는 Aileu 재배·품종·가공을 명시하되 Harvest Months만 있다. DC/Industry Beans의 2026은 Centru Kafe 태양광 전환 시점이며 판매 로트 수확연도가 아니다. Blackboard2025와 Slide2025는 게시일. Raw Material/Volcano의 Laclo는 Atsabe/Ermera 공급망이라 Aileu의 동명마을과 혼합할 수 없다.",
+      "accessLimits": [
+        "Slide open은 cache miss여서 검색 결과의 게시일·상품표만 확인했다. 나머지 미검증 검색후보를 본문 검증 완료로 집계하지 않았다."
+      ],
+      "nextEvidenceNeeded": "Orijem Timor/Centru Kafe 또는 Sucafina의 특정 2025/26 로트 명세서에 수확연도와 해당 로트 노트·품종이 함께 있어야 한다."
+    }
+  ],
+  "summary": {
+    "reviewedRegions": 6,
+    "regionsWithCompleteRecentLot": 5,
+    "recommendedLots": 5,
+    "alternativeLots": 1,
+    "unresolvedRegions": [
+      "timor-leste-aileu"
+    ]
+  },
+  "method": "생산자·수입사·직접 로스터의 실제 로트 원문에서 명시 수확연도와 지역·품종·가공·노트를 연결했다. 한 상품의 누락정보를 다른 상품에서 가져오지 않았으며 저장소 데이터는 수정하지 않았다."
+}

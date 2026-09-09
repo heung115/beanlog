@@ -1,0 +1,195 @@
+[
+  {
+    "regionId": "indonesia-sumatra",
+    "query": "Gayo roaster varieties natural; Nusa Sumatra Gayo",
+    "urls": [
+      "https://nusacoffeecompany.com/products/sumatra-gayo"
+    ],
+    "decision": "[Nusa Arinagata](https://nusacoffeecompany.com/products/sumatra-gayo): Central Aceh, Gayo 1, semi washed, 백포도·바닐라·꽃·향신료   별도 협동조합 원두 추가. Gayo 1의 괄호 Timtim을 별도 품종으로 늘리지 않음"
+  },
+  {
+    "regionId": "indonesia-java",
+    "query": "West Java coffee roaster Sigarar",
+    "urls": [
+      "https://www.horshamcoffeeroaster.co.uk/products/west-java-frinsa-collective-fermented-washed"
+    ],
+    "decision": "[Horsham Frinsa Collective](https://www.horshamcoffeeroaster.co.uk/products/west-java-frinsa-collective-fermented-washed): 주변 소농 체리, Borbor/Lini S/Ateng Super/Timor/Sigarar Utang/P88, 유산균 워시드   기존 농장 단일 품종 Frinsa Sarapan과 구분해 추가"
+  },
+  {
+    "regionId": "indonesia-sulawesi",
+    "query": "Toraja Sapan coffee roaster notes variety",
+    "urls": [
+      "https://www.tanameracoffee.com.sg/products/sulawesi-toraja-sapan-250g",
+      "https://nusacoffeecompany.com/products/sulawesi-toraja"
+    ],
+    "decision": "[Tanamera Sapan](https://www.tanameracoffee.com.sg/products/sulawesi-toraja-sapan-250g), [Nusa Sulotco](https://nusacoffeecompany.com/products/sulawesi-toraja) 직접 확인   Tanamera는 라임·생강·블랙커런트 있으나 가공·품종 미공개. Nusa는 Sulotco 워시드 있으나 개별 로트 연결 불명. 기존 Sulotco 원두에 임의 병합하지 않음"
+  },
+  {
+    "regionId": "indonesia-flores",
+    "query": "Flores Bajawa roaster coffee variety honey",
+    "urls": [
+      "https://nusacoffeecompany.com/products/flores-bajawa",
+      "https://www.sanagustin.com/en/product/bajawa/"
+    ],
+    "decision": "[Nusa Beiposo](https://nusacoffeecompany.com/products/flores-bajawa), [San Agustín UPH Wongawali](https://www.sanagustin.com/en/product/bajawa/)   S795 워시드와 Typica/Catimor/S795 웻헐드 2개 추가"
+  },
+  {
+    "regionId": "indonesia-gayo",
+    "query": "Gayo roaster varieties natural; Nusa Sumatra Gayo",
+    "urls": [
+      "https://nusacoffeecompany.com/products/sumatra-gayo"
+    ],
+    "decision": "[Nusa Arinagata](https://nusacoffeecompany.com/products/sumatra-gayo) 직접 확인   Sumatra와 같은 실제 원두 연결"
+  },
+  {
+    "regionId": "indonesia-lintong",
+    "query": "Lintong coffee roasters variety tasting notes",
+    "urls": [
+      "https://coffeetgc.com/2021/03/25/lintong/"
+    ],
+    "decision": "[TGC Jejak Toba](https://coffeetgc.com/2021/03/25/lintong/): Line S, full washed, 견과류·흑설탕·꽃·캐러멜   기존 웻헐드·숙성 비교에 풀 워시드 추가. Line S를 S795로 좁히지 않음. 페이지 아래 품절 과거 원두의 허브 프로필과 혼합하지 않음"
+  },
+  {
+    "regionId": "indonesia-west-java",
+    "query": "West Java coffee roaster Sigarar",
+    "urls": [
+      "https://www.horshamcoffeeroaster.co.uk/products/west-java-frinsa-collective-fermented-washed"
+    ],
+    "decision": "[Horsham Frinsa Collective](https://www.horshamcoffeeroaster.co.uk/products/west-java-frinsa-collective-fermented-washed) 직접 확인   자바와 동일 원두 연결"
+  },
+  {
+    "regionId": "indonesia-toraja",
+    "query": "Toraja Sapan coffee roaster notes variety; Toraja S795 roasted coffee",
+    "urls": [
+      "https://www.tanameracoffee.com.sg/products/sulawesi-toraja-sapan-250g",
+      "https://nusacoffeecompany.com/products/sulawesi-toraja"
+    ],
+    "decision": "[Tanamera](https://www.tanameracoffee.com.sg/products/sulawesi-toraja-sapan-250g), [Nusa](https://nusacoffeecompany.com/products/sulawesi-toraja)   새 검색 대조 완료. 노트와 기존 수입사 lot ID 동일성 부족으로 추가 병합 보류. 블렌드 Eyckman 32도 배제"
+  },
+  {
+    "regionId": "indonesia-bajawa",
+    "query": "Flores Bajawa roaster coffee variety honey",
+    "urls": [
+      "https://nusacoffeecompany.com/products/flores-bajawa",
+      "https://www.sanagustin.com/en/product/bajawa/"
+    ],
+    "decision": "[Nusa](https://nusacoffeecompany.com/products/flores-bajawa), [San Agustín](https://www.sanagustin.com/en/product/bajawa/)   플로레스와 동일한 2개 원두 연결. Nusa의 'East Flores' 문구는 행정 East Flores Regency로 해석하지 않고 Beiposo/Bajawa까지만 사용"
+  },
+  {
+    "regionId": "papua-new-guinea-eastern-highlands",
+    "query": "Eastern Highlands roaster Variety; site:gabrielcoffee.com.au Baroida Geisha",
+    "urls": [
+      "https://gabrielcoffee.com.au/products/baroida-estate-papua-new-guinea-espresso-500g"
+    ],
+    "decision": "[Gabriel Baroida](https://gabrielcoffee.com.au/products/baroida-estate-papua-new-guinea-espresso-500g)   Colbran family Geisha 워시드 추가. 만다린·핵과류·홍차·재스민. 특정 Panama T2722 계통 추정 안 함"
+  },
+  {
+    "regionId": "papua-new-guinea-western-highlands",
+    "query": "Mong Papua coffee roaster washed",
+    "urls": [
+      "https://enjoycoffeeroasters.com/products/mong"
+    ],
+    "decision": "[Enjoy Mong](https://enjoycoffeeroasters.com/products/mong)   Rexson Raguni, Blue Mountain/Mundo Novo/Caturra, slow-dried washed, 배·콜라·레몬그라스. 별도 로스터 표현으로 추가. 생산관계 2025 설명을 harvest로 전환 안 함"
+  },
+  {
+    "regionId": "india-karnataka",
+    "query": "Kerehaklu coffee roaster notes",
+    "urls": [
+      "https://korerocoffee.com/products/kerehaklu-mosto-culture-washed",
+      "https://aviary.coffee/products/016-kerehaklu"
+    ],
+    "decision": "[Korero SLN10](https://korerocoffee.com/products/kerehaklu-mosto-culture-washed), [Aviary 016](https://aviary.coffee/products/016-kerehaklu)   SLN10 모스토 워시드, Selection 9 Lot E 37h 워시드 추가. Aviary 실제 체리수확 2024-12-02 확인"
+  },
+  {
+    "regionId": "india-kerala",
+    "query": "Wayanad specialty robusta roasted coffee variety; Luna Black Baza coffee",
+    "urls": [
+      "https://www.blackbazacoffee.com/products/luna",
+      "https://www.westmountcaffe.com/products/specialty/424770000009581034"
+    ],
+    "decision": "[Black Baza Luna](https://www.blackbazacoffee.com/products/luna), [Westmount](https://www.westmountcaffe.com/products/specialty/424770000009581034)   Luna의 Thomas/내추럴/다크초콜릿·담배·향신료 재확인. Kent 표기는 Robusta 본문과 충돌하여 배제. Westmount는 구체 cultivar/producer 없음, 기존보다 정보가 얕아 보류"
+  },
+  {
+    "regionId": "india-chikmagalur",
+    "query": "Kerehaklu coffee roaster notes",
+    "urls": [
+      "https://korerocoffee.com/products/kerehaklu-mosto-culture-washed",
+      "https://aviary.coffee/products/016-kerehaklu"
+    ],
+    "decision": "[Korero](https://korerocoffee.com/products/kerehaklu-mosto-culture-washed), [Aviary](https://aviary.coffee/products/016-kerehaklu)   Karnataka와 동일 2개 원두 연결. SLN10와 Selection 9 구분"
+  },
+  {
+    "regionId": "india-bababudangiri",
+    "query": "Ratnagiri Bababudangiri notes coffee",
+    "urls": [
+      "https://cafeirreverentes.com/en/product/elsinverguenza/",
+      "https://naivo.in/product/ratnagiri-estate-double-washed-classic/"
+    ],
+    "decision": "[IRREVERENTES El Sinvergüenza](https://cafeirreverentes.com/en/product/elsinverguenza/), [Naivo Double Washed](https://naivo.in/product/ratnagiri-estate-double-washed-classic/)   Cauvery 허니 추가. IRREVERENTES 직접 open cache miss이나 공식 페이지 검색 본문에 생산자·지역·가공·품종·4개 노트 일치. Naivo 미상 품종은 다른 Ratnagiri 제품에서 가져오지 않음"
+  },
+  {
+    "regionId": "india-coorg",
+    "query": "Coorg Harangal coffee roaster varieties",
+    "urls": [
+      "https://www.pinupcoffeeco.com/products/india"
+    ],
+    "decision": "[Pinup Harangal](https://www.pinupcoffeeco.com/products/india)   Petu Kariappa Chandragiri 내추럴, 천도복숭아·자두·건포도·캐러멜 추가. 직접 open cache miss이나 공식 검색 본문 대조. 기존 Harangal 워시드 2025와 별도 원두"
+  },
+  {
+    "regionId": "india-wayanad",
+    "query": "Wayanad specialty robusta roasted coffee variety; Luna Black Baza",
+    "urls": [
+      "https://www.blackbazacoffee.com/products/luna"
+    ],
+    "decision": "[Black Baza Luna](https://www.blackbazacoffee.com/products/luna) 직접 확인   Kerala와 동일 로스터 대조. 가격지급 2026은 harvest 아님; Kent 종 충돌은 남겨 두지 않고 채택 안 함"
+  },
+  {
+    "regionId": "vietnam-da-lat",
+    "query": "Cau Dat Catimor roasters; Cau Dat washed notes coffee",
+    "urls": [
+      "https://www.themarriedbeans.com/en/products/viet-nam-arabica-coffee",
+      "https://www.themarriedbeans.com/en/collections/all",
+      "https://bosgauruscoffee.com/blogs/Stewpen",
+      "https://www.themarriedbeans.com/en/products/ca-phe-nhan-xanh-honey",
+      "https://www.themarriedbeans.com/en/pages/green-coffee-export"
+    ],
+    "decision": "[The Married Beans roasted Cầu Đất](https://www.themarriedbeans.com/en/products/viet-nam-arabica-coffee), [roaster catalogue](https://www.themarriedbeans.com/en/collections/all), [Bosgaurus Stewpen](https://bosgauruscoffee.com/blogs/Stewpen) 직접 확인   기존 Cầu Đất Catimor green lot와 원두 동일성 미확정으로 노트 병합 안 함. Stewpen은 Trạm Hành로 명시하므로 Cầu Đất에 좁혀 연결하지 않음; 추가 대조로 Catimor Honey Red 별도 원두 채택(향신료/당밀/다크초콜릿/핵과류)."
+  },
+  {
+    "regionId": "vietnam-buon-ma-thuot",
+    "query": "Buon Ma Thuot TR4 coffee roasted; site:soulcoffee.vn Nồng Robusta",
+    "urls": [
+      "https://soulcoffee.vn/products/soulful2025-nong-espresso-fine-ro-top7-vietnam-coffee-producer"
+    ],
+    "decision": "[Soul Nồng](https://soulcoffee.vn/products/soulful2025-nong-espresso-fine-ro-top7-vietnam-coffee-producer) 직접 확인   미상 varieties에 원문 'Robusta TR' 보충. TR4 clone으로 추정하지 않음. 2026 Collection도 수확연도로 전환 안 함"
+  },
+  {
+    "regionId": "vietnam-cau-dat",
+    "query": "Cau Dat Catimor roasters; Cau Dat washed notes coffee",
+    "urls": [
+      "https://www.themarriedbeans.com/en/products/viet-nam-arabica-coffee",
+      "https://airworkscoffee.com/products/grandmum-cafe-washed-catimor-cau-dat-vietnam-100g",
+      "https://www.themarriedbeans.com/en/products/ca-phe-nhan-xanh-honey",
+      "https://www.themarriedbeans.com/en/pages/green-coffee-export"
+    ],
+    "decision": "[The Married Beans](https://www.themarriedbeans.com/en/products/viet-nam-arabica-coffee), [Airworks Grandmum](https://airworkscoffee.com/products/grandmum-cafe-washed-catimor-cau-dat-vietnam-100g)   로스터 원두 판매 자료 대조. Airworks는 공식 유통사의 Grandmum washed Catimor지만 생산자 미공개, 기존보다 구체성 낮아 보류. Red Bourbon은 실제 Lạc Dương라 Cầu Đất에 넣지 않음; 추가 대조로 Catimor Honey Red 별도 원두 채택(향신료/당밀/다크초콜릿/핵과류)."
+  },
+  {
+    "regionId": "yemen-haraaz",
+    "query": "Haraz roaster variety",
+    "urls": [
+      "https://www.caffefusari.it/en/product/yemen-da-tradurre-en"
+    ],
+    "decision": "[Caffè Fusari](https://www.caffefusari.it/en/product/yemen-da-tradurre-en) 직접 확인   Jadi/Jufni 내추럴, 자몽·자두·포도·정향 추가. Jufni를 다른 표기 품종과 유전적으로 동치 취급하지 않음"
+  },
+  {
+    "regionId": "yemen-mattari",
+    "query": "Mattari coffee natural roasted; Bani Matar coffee roaster tasting",
+    "urls": [
+      "https://lccroastery.com/2020/05/15/yemen-mocha-matari/",
+      "https://coffeetree.ca/products/yemen-matari",
+      "https://www.dalalcoffee.com/yemen-matari"
+    ],
+    "decision": "[LCC Muslot](https://lccroastery.com/2020/05/15/yemen-mocha-matari/), [Coffee Tree](https://coffeetree.ca/products/yemen-matari), [Dalal](https://www.dalalcoffee.com/yemen-matari)   LCC 역사 원두 추가. Fatoum Muslot는 농장주라고 단정 안 함. 게시일 2020은 harvest로 안 씀. 본문의 Matari/Sanani를 품종이라 하는 역사 설명은 재사용 안 함"
+  }
+]

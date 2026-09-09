@@ -1,0 +1,1584 @@
+{
+  "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+  "scope": "로컬 results-1..6.json 완료행만. 새 웹 조사 없음. 원본 파일 수정 없음. 법률 판정이 아닌 판정 품질 점검.",
+  "snapshotFiles": [
+    ".staging/full-rights/results-1.json",
+    ".staging/full-rights/results-2.json",
+    ".staging/full-rights/results-3.json",
+    ".staging/full-rights/results-4.json",
+    ".staging/full-rights/results-5.json",
+    ".staging/full-rights/results-6.json"
+  ],
+  "snapshotCompletedRows": 397,
+  "snapshotStatusCounts": {
+    "reviewed": 160,
+    "inaccessible": 138,
+    "terms-not-found": 99
+  },
+  "checks": {
+    "shopAppTermsTransferredToOtherHostEvidence": [],
+    "explicitAutomationRestrictedWithoutHold": []
+  },
+  "candidates": [
+    {
+      "host": "beanbrothers.co.kr",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-5.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "hold",
+      "issue": "IP-owned 정보만 제한하는 한국 쇼핑몰 조항인데 hold. 동일 유형 Unspecialty·Micoffee·H Coffee·CoffeeLibre는 fact-only-review.",
+      "suggestedDecision": "fact-only-review로 통일 후보. restricted flags는 IP-owned content에 한정하여 유지; 독립 사실에 확대하지 않음.",
+      "evidence": [
+        {
+          "url": "https://www.beanbrothers.co.kr/service/agreement",
+          "summary": "제23조: 몰에 지식재산권이 귀속된 정보의 무단 영리 이용 및 제3자 이용 제한. 단순 사실 전체의 금지는 아님."
+        }
+      ]
+    },
+    {
+      "host": "varieties.worldcoffeeresearch.org",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-4.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "hold",
+      "issue": "PDF CC BY-NC-ND를 개별 HTML 호스트 restricted/hold로 표시했지만 기록 자체가 HTML 적용 미확정이라고 명시.",
+      "suggestedDecision": "HTML은 fact-only-review, license 적용 범위 미확정으로 표시 후보. PDF는 별도 문서 수준 조건 유지. ND를 독립 사실 재작성 금지로 해석하지 않음.",
+      "evidence": [
+        {
+          "url": "https://cdn2.assets-servd.host/worldcoffee-research/production/pdf/catalogEnglish/Combined/complete-1769602232.pdf?dm=1769602232",
+          "summary": "PDF 카탈로그 CC BY-NC-ND 4.0 확인. 비영리·출처표시·변경금지 조건이며 개별 HTML 사실 작성에 대한 직접 적용은 미확정."
+        }
+      ]
+    },
+    {
+      "host": "ineffablecoffee.com",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-2.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "fact-only-review",
+      "issue": "DB 전체·상당 부분 추출·재사용 명시 금지 및 상세 링크 제한 기록이 있으나 fact-only-review. 타 호스트의 DB 수집 제한은 hold.",
+      "suggestedDecision": "현재 수집량이 전체·상당 부분에 해당하는지 검토할 때까지 추출 작업 hold 후보. 소량 사실에 자동 확대하지 말고 상세 링크 조건도 별도 검토.",
+      "evidence": [
+        {
+          "url": "https://ineffablecoffee.com/en/pages/aviso-legal",
+          "summary": "4.2조 법적 예외·허락 없는 보호 콘텐츠 복제·재배포 제한. 전체 또는 상당 부분의 콘텐츠·DB 추출 및 재사용 금지. 4.4조 홈페이지 연결만 허용한다고 명시하여 상세 출처 링크도 조건 검토 필요."
+        }
+      ]
+    },
+    {
+      "host": "memlicoffee.com",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-2.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "fact-only-review",
+      "issue": "콘텐츠 추출·재사용·재배포 명시 제한인데 fact-only-review. 다른 개인 비상업·명시 추출 제한 호스트는 hold.",
+      "suggestedDecision": "법률상 예외·추출 제한의 데이터 범위를 확인해 hold 또는 fact-only-review 기준 통일. 기존 기록만으로 전체 사실 금지 확정 금지.",
+      "evidence": [
+        {
+          "url": "https://www.memlicoffee.com/termsandconditions",
+          "summary": "Ownership of content 조항에서 사이트와 콘텐츠의 추출·재사용·재배포를 명시 허가 또는 미국법상 예외 외 금지. 개인 비상업적 이용 한정."
+        }
+      ]
+    },
+    {
+      "host": "detourcoffee.com",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-1.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "hold",
+      "issue": "현재 근거는 서비스 복제·판매 일반 조항뿐이고 자동수집·DB·독립 사실 제한 근거 없음. 이를 공개 사실 전반의 hold로 확장했을 가능성.",
+      "suggestedDecision": "fact-only-review 후보 또는 hold 범위를 서비스/보호 콘텐츠 복제에 한정. 명시 자동수집 금지가 기록된 Shopify 상점과 구별.",
+      "evidence": [
+        {
+          "url": "https://detourcoffee.com/policies/terms-of-service",
+          "summary": "§2 서면허가 없는 서비스 복제·판매·이용 제한."
+        }
+      ]
+    },
+    {
+      "host": "dayglow.coffee",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-1.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "hold",
+      "issue": "현재 근거는 서비스 복제·판매 일반 조항뿐이고 자동수집·DB·독립 사실 제한 근거 없음. 이를 공개 사실 전반의 hold로 확장했을 가능성.",
+      "suggestedDecision": "fact-only-review 후보 또는 hold 범위를 서비스/보호 콘텐츠 복제에 한정. 명시 자동수집 금지가 기록된 Shopify 상점과 구별.",
+      "evidence": [
+        {
+          "url": "https://dayglow.coffee/pages/legal",
+          "summary": "§2 서비스복제·상업이용 서면허가요구. scrape표현없음."
+        }
+      ]
+    },
+    {
+      "host": "jacoffee.com",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-1.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "hold",
+      "issue": "현재 근거는 서비스 복제·판매 일반 조항뿐이고 자동수집·DB·독립 사실 제한 근거 없음. 이를 공개 사실 전반의 hold로 확장했을 가능성.",
+      "suggestedDecision": "fact-only-review 후보 또는 hold 범위를 서비스/보호 콘텐츠 복제에 한정. 명시 자동수집 금지가 기록된 Shopify 상점과 구별.",
+      "evidence": [
+        {
+          "url": "https://www.jacoffee.com/policies/terms-of-service",
+          "summary": "§2 서비스 복제·판매·이용 서면허가요구."
+        }
+      ]
+    },
+    {
+      "host": "changeoftone.coffee",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-3.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "hold",
+      "issue": "보호 콘텐츠 복제 제한 근거의 hold가 touton-specialty-coffee·list-beisler·ptscoffee의 유사 조항 fact-only-review와 일관되지 않을 수 있음.",
+      "suggestedDecision": "추출·DB 또는 독립 정보 이용을 별도로 제한하는 근거가 없으면 fact-only-review 후보. 보호 표현 복제 제한은 그대로 기록.",
+      "evidence": [
+        {
+          "url": "https://www.changeoftone.coffee/terms-and-conditions",
+          "summary": "지식재산 조항은 콘텐츠 복제·배포·파생물에 허가 요구. 별도 자동수집 금지는 미확인"
+        }
+      ]
+    },
+    {
+      "host": "coavacoffee.com",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-3.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "hold",
+      "issue": "보호 콘텐츠 복제 제한 근거의 hold가 touton-specialty-coffee·list-beisler·ptscoffee의 유사 조항 fact-only-review와 일관되지 않을 수 있음.",
+      "suggestedDecision": "추출·DB 또는 독립 정보 이용을 별도로 제한하는 근거가 없으면 fact-only-review 후보. 보호 표현 복제 제한은 그대로 기록.",
+      "evidence": [
+        {
+          "url": "https://coavacoffee.com/terms-conditions",
+          "summary": "보호 콘텐츠는 개인 이용만. 게시·전송·파생물·재판매 등은 서면허가 요구. 공개되지 않은 경로로 정보 취득 금지는 일반 공개 접근 금지와 다름"
+        }
+      ]
+    },
+    {
+      "host": "cumpa.de",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-5.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "hold",
+      "issue": "보호 콘텐츠 복제 제한 근거의 hold가 touton-specialty-coffee·list-beisler·ptscoffee의 유사 조항 fact-only-review와 일관되지 않을 수 있음.",
+      "suggestedDecision": "추출·DB 또는 독립 정보 이용을 별도로 제한하는 근거가 없으면 fact-only-review 후보. 보호 표현 복제 제한은 그대로 기록.",
+      "evidence": [
+        {
+          "url": "https://www.cumpa.de/impressum/",
+          "summary": "저작권법 한계를 넘는 복제·가공·배포는 서면 동의 필요. 다운로드·복사는 개인 비상업용으로 한정."
+        }
+      ]
+    },
+    {
+      "host": "bluetokaicoffee.com",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-1.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "hold",
+      "issue": "보호 콘텐츠 복제 제한 근거의 hold가 touton-specialty-coffee·list-beisler·ptscoffee의 유사 조항 fact-only-review와 일관되지 않을 수 있음.",
+      "suggestedDecision": "추출·DB 또는 독립 정보 이용을 별도로 제한하는 근거가 없으면 fact-only-review 후보. 보호 표현 복제 제한은 그대로 기록.",
+      "evidence": [
+        {
+          "url": "https://bluetokaicoffee.com/pages/terms-and-conditions",
+          "summary": "Copyright §7 콘텐츠 재게시·변형·판매 제한."
+        }
+      ]
+    },
+    {
+      "host": "friedhats.com",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-1.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "hold",
+      "issue": "보호 콘텐츠 복제 제한 근거의 hold가 touton-specialty-coffee·list-beisler·ptscoffee의 유사 조항 fact-only-review와 일관되지 않을 수 있음.",
+      "suggestedDecision": "추출·DB 또는 독립 정보 이용을 별도로 제한하는 근거가 없으면 fact-only-review 후보. 보호 표현 복제 제한은 그대로 기록.",
+      "evidence": [
+        {
+          "url": "https://friedhats.com/terms-and-conditions",
+          "summary": "제11조는 이미지·텍스트·디지털자료 등의 사용에 명시허가 요구."
+        }
+      ]
+    },
+    {
+      "host": "shikishima.coffee",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-1.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "hold",
+      "issue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "suggestedDecision": "status를 inaccessible로 바꾸거나 evidenceLevel=index-only를 별도 명시하는 일관된 기준 적용 후보. 색인에서 실제 확인한 제한은 삭제하지 않으며 추가 콘텐츠 수집 허가로 해석하지 않음.",
+      "evidence": [
+        {
+          "url": "https://shikishima.coffee/policies/terms-of-service",
+          "summary": "검색인덱스에서 서비스로 얻은 정보의 상업이용금지 확인. 본문직접열기 실패; 등록사용자 문구의 비회원적용 미확정."
+        }
+      ]
+    },
+    {
+      "host": "frontiersin.org",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-1.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "licensed-use",
+      "issue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "suggestedDecision": "status를 inaccessible로 바꾸거나 evidenceLevel=index-only를 별도 명시하는 일관된 기준 적용 후보. 색인에서 실제 확인한 제한은 삭제하지 않으며 추가 콘텐츠 수집 허가로 해석하지 않음.",
+      "evidence": [
+        {
+          "url": "https://www.frontiersin.org/legal/copyright-statement",
+          "summary": "공식검색 결과 연구논문 CC BY상업/비상업 재사용 허용 및 저자·원출처표시. 본문추출빈응답; 개별논문/제3자자료 예외확인필요."
+        }
+      ]
+    },
+    {
+      "host": "farmdirectory.cupofexcellence.org",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-2.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "fact-only-review",
+      "issue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "suggestedDecision": "status를 inaccessible로 바꾸거나 evidenceLevel=index-only를 별도 명시하는 일관된 기준 적용 후보. 색인에서 실제 확인한 제한은 삭제하지 않으며 추가 콘텐츠 수집 허가로 해석하지 않음.",
+      "evidence": [
+        {
+          "url": "https://farmdirectory.cupofexcellence.org/terms/",
+          "summary": "공식 약관 검색 색인으로 개인 비상업 임시 1부 열람 허가 확인. 직접 열기는 캐시 실패. 공개 재게시 허가 아님."
+        }
+      ]
+    },
+    {
+      "host": "molke.nl",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-2.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "fact-only-review",
+      "issue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "suggestedDecision": "status를 inaccessible로 바꾸거나 evidenceLevel=index-only를 별도 명시하는 일관된 기준 적용 후보. 색인에서 실제 확인한 제한은 삭제하지 않으며 추가 콘텐츠 수집 허가로 해석하지 않음.",
+      "evidence": [
+        {
+          "url": "https://www.molke.nl/disclaimer",
+          "summary": "공식 면책 페이지 검색 색인에서 개인·내부 사용 외 복제·배포에는 서면 동의가 필요함을 확인. 직접 열람은 로봇 확인으로 중단. 숙박업체 사이트이며 커피 출처로 등록된 과거 도메인이 맞는지 재검토 필요."
+        }
+      ]
+    },
+    {
+      "host": "dropcoffee.com",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-2.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "hold",
+      "issue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "suggestedDecision": "status를 inaccessible로 바꾸거나 evidenceLevel=index-only를 별도 명시하는 일관된 기준 적용 후보. 색인에서 실제 확인한 제한은 삭제하지 않으며 추가 콘텐츠 수집 허가로 해석하지 않음.",
+      "evidence": [
+        {
+          "url": "https://www.dropcoffee.com/pages/terms-of-service",
+          "summary": "공식 약관 검색 색인에서 제12조 자동 수집 금지와 제2조 복제·상업 활용 서면 허가 조건 확인."
+        }
+      ]
+    },
+    {
+      "host": "lacoladera.com.mx",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-2.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "fact-only-review",
+      "issue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "suggestedDecision": "status를 inaccessible로 바꾸거나 evidenceLevel=index-only를 별도 명시하는 일관된 기준 적용 후보. 색인에서 실제 확인한 제한은 삭제하지 않으며 추가 콘텐츠 수집 허가로 해석하지 않음.",
+      "evidence": [
+        {
+          "url": "https://lacoladera.com.mx/terminos-y-condiciones/",
+          "summary": "공식 약관 검색 색인에서 글·사진·로고 등 자체 보호 콘텐츠의 무허가 상업적 활용 금지 확인. 직접 열람은 시간 초과. 객관적 사실 추출이나 일반 자동 수집을 명시적으로 금지하는 조항은 확인하지 못함."
+        }
+      ]
+    },
+    {
+      "host": "lf.coffee",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-2.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "fact-only-review",
+      "issue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "suggestedDecision": "status를 inaccessible로 바꾸거나 evidenceLevel=index-only를 별도 명시하는 일관된 기준 적용 후보. 색인에서 실제 확인한 제한은 삭제하지 않으며 추가 콘텐츠 수집 허가로 해석하지 않음.",
+      "evidence": [
+        {
+          "url": "https://www.lf.coffee/en/pages/agb",
+          "summary": "공식 판매 약관 검색 색인에서 거래·결제·배송 조건 확인. 콘텐츠 재사용·자동 수집 조건은 확인되지 않음. 직접 열람 캐시 오류."
+        }
+      ]
+    },
+    {
+      "host": "mantaraycoffee.com.au",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-2.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "fact-only-review",
+      "issue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "suggestedDecision": "status를 inaccessible로 바꾸거나 evidenceLevel=index-only를 별도 명시하는 일관된 기준 적용 후보. 색인에서 실제 확인한 제한은 삭제하지 않으며 추가 콘텐츠 수집 허가로 해석하지 않음.",
+      "evidence": [
+        {
+          "url": "https://mantaraycoffee.com.au/pages/terms-shipping-and-returns",
+          "summary": "공식 약관 검색 색인에서 콘텐츠 다운로드는 개인용으로 한정하며 판매·활용 목적 복제·재배포 금지 확인."
+        }
+      ]
+    },
+    {
+      "host": "pilgrimroasters.com",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-2.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "fact-only-review",
+      "issue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "suggestedDecision": "status를 inaccessible로 바꾸거나 evidenceLevel=index-only를 별도 명시하는 일관된 기준 적용 후보. 색인에서 실제 확인한 제한은 삭제하지 않으며 추가 콘텐츠 수집 허가로 해석하지 않음.",
+      "evidence": [
+        {
+          "url": "https://pilgrimroasters.com/policies/terms-of-service",
+          "summary": "공식 약관 검색 색인 제6조 개인 비상업적 이용 외 콘텐츠 복제·저장·재게시에는 서면 동의 요구. 일반 자동 수집 금지는 확인되지 않음. 직접 열람은 캐시 오류."
+        }
+      ]
+    },
+    {
+      "host": "beannbeancoffee.com",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-3.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "hold",
+      "issue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "suggestedDecision": "status를 inaccessible로 바꾸거나 evidenceLevel=index-only를 별도 명시하는 일관된 기준 적용 후보. 색인에서 실제 확인한 제한은 삭제하지 않으며 추가 콘텐츠 수집 허가로 해석하지 않음.",
+      "evidence": [
+        {
+          "url": "https://beannbeancoffee.com/policies/terms-of-service",
+          "summary": "약관 검색 색인 본문에서 제2조 서비스 복제·이용 서면허가 및 제12조 크롤링·스크래핑 금지 확인. 직접 열기는 실패"
+        }
+      ]
+    },
+    {
+      "host": "woodberrycoffee.com",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-3.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "fact-only-review",
+      "issue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "suggestedDecision": "status를 inaccessible로 바꾸거나 evidenceLevel=index-only를 별도 명시하는 일관된 기준 적용 후보. 색인에서 실제 확인한 제한은 삭제하지 않으며 추가 콘텐츠 수집 허가로 해석하지 않음.",
+      "evidence": [
+        {
+          "url": "https://www.woodberrycoffee.com/ja-gb/pages/terms-of-use",
+          "summary": "공식 약관 검색 색인에 지식재산권 귀속 및 권리침해 금지. 자동접근·독립 사실 재사용에 대한 명시 금지는 확인되지 않음"
+        }
+      ]
+    },
+    {
+      "host": "royalcoffee.com",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-4.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "fact-only-review",
+      "issue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "suggestedDecision": "status를 inaccessible로 바꾸거나 evidenceLevel=index-only를 별도 명시하는 일관된 기준 적용 후보. 색인에서 실제 확인한 제한은 삭제하지 않으며 추가 콘텐츠 수집 허가로 해석하지 않음.",
+      "evidence": [
+        {
+          "url": "https://royalcoffee.com/terms-conditions/",
+          "summary": "공식 약관은 검색 색인에서 coming soon과 권리 유보만 확인. 본문 열기는 실패. 별도 책의 복제 금지를 상품 사실 전체에 확대하지 않음."
+        }
+      ]
+    },
+    {
+      "host": "baristashopen.se",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-4.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "fact-only-review",
+      "issue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "suggestedDecision": "status를 inaccessible로 바꾸거나 evidenceLevel=index-only를 별도 명시하는 일관된 기준 적용 후보. 색인에서 실제 확인한 제한은 삭제하지 않으며 추가 콘텐츠 수집 허가로 해석하지 않음.",
+      "evidence": [
+        {
+          "url": "https://www.baristashopen.se/farskrostat/kopvillkor.php",
+          "summary": "공식 구매약관 색인은 배송·환불·보증·개인정보 중심. 본문 열기 실패. 웹 사실 수집 제한으로 확대하지 않음."
+        }
+      ]
+    },
+    {
+      "host": "cafe18.com.co",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-4.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "fact-only-review",
+      "issue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "suggestedDecision": "status를 inaccessible로 바꾸거나 evidenceLevel=index-only를 별도 명시하는 일관된 기준 적용 후보. 색인에서 실제 확인한 제한은 삭제하지 않으며 추가 콘텐츠 수집 허가로 해석하지 않음.",
+      "evidence": [
+        {
+          "url": "https://www.cafe18.com.co/politicas/consumidor",
+          "summary": "공식 소비자 정책 색인은 구매·환불·교육정보 권리 중심. 웹 데이터 재사용·수집 조건 미확인. 페이지 열기는 실패."
+        }
+      ]
+    },
+    {
+      "host": "coffeelibre.cafe24.com",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-4.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "fact-only-review",
+      "issue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "suggestedDecision": "status를 inaccessible로 바꾸거나 evidenceLevel=index-only를 별도 명시하는 일관된 기준 적용 후보. 색인에서 실제 확인한 제한은 삭제하지 않으며 추가 콘텐츠 수집 허가로 해석하지 않음.",
+      "evidence": [
+        {
+          "url": "https://coffeelibre.cafe24.com/member/agreement.html",
+          "summary": "동일 호스트 공식 약관 색인 제22조 확인. 몰에 권리가 귀속된 정보의 영리 복제·배포·제3자 이용 사전승낙 요구. 개별 사실 전체에 확대하지 않음."
+        }
+      ]
+    },
+    {
+      "host": "sangoamsterdam.com",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-5.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "fact-only-review",
+      "issue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "suggestedDecision": "status를 inaccessible로 바꾸거나 evidenceLevel=index-only를 별도 명시하는 일관된 기준 적용 후보. 색인에서 실제 확인한 제한은 삭제하지 않으며 추가 콘텐츠 수집 허가로 해석하지 않음.",
+      "evidence": [
+        {
+          "url": "https://www.sangoamsterdam.com/policies/terms-of-service",
+          "summary": "소비자 원격판매 약관을 공식 검색 색인으로 확인. 사이트 자동수집/독립적 사실 재사용의 명시 제한은 확인되지 않음."
+        }
+      ]
+    },
+    {
+      "host": "gesharycoffee.com",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-5.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "hold",
+      "issue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "suggestedDecision": "status를 inaccessible로 바꾸거나 evidenceLevel=index-only를 별도 명시하는 일관된 기준 적용 후보. 색인에서 실제 확인한 제한은 삭제하지 않으며 추가 콘텐츠 수집 허가로 해석하지 않음.",
+      "evidence": [
+        {
+          "url": "https://gesharycoffee.com/en/disclaimer/",
+          "summary": "공식 약관 검색 색인에서 이미지·영상·텍스트·다운로드 데이터의 무허가 복제·전용 제한 확인. 직접 요청은 실패."
+        }
+      ]
+    },
+    {
+      "host": "justincoffee.com.tw",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-5.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "hold",
+      "issue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "suggestedDecision": "status를 inaccessible로 바꾸거나 evidenceLevel=index-only를 별도 명시하는 일관된 기준 적용 후보. 색인에서 실제 확인한 제한은 삭제하지 않으며 추가 콘텐츠 수집 허가로 해석하지 않음.",
+      "evidence": [
+        {
+          "url": "https://www.justincoffee.com.tw/zh-TW/pages/terms",
+          "summary": "공식 사용조건 색인: 웹 자료·콘텐츠의 무단 전파·복제·수정·게시·전송 제한. 직접 요청 실패."
+        }
+      ]
+    },
+    {
+      "host": "fao.org",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-1.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "licensed-use",
+      "issue": "licensed-use/allowed는 출판물의 비상업 조건 근거이나 호스트는 웹·통계 DB도 포함 가능. 전체 호스트 허가로 소비될 위험.",
+      "suggestedDecision": "현재 인용 URL이 해당 출판물 조건에 속하는지 매칭 전에는 fact-only-review 또는 conditional-license로 한정. 문서별 라이선스 확인값 없이 일괄 허용 금지.",
+      "evidence": [
+        {
+          "url": "https://www.fao.org/publications/about-fao-publishing/permissions/",
+          "summary": "출판물 개인연구교육·비상업제품 사용에 출처표시 조건, 재사용허가요청 경로제공. 개별출판물 라이선스 우선; 웹전체/통계DB에 일괄확장금지."
+        }
+      ]
+    },
+    {
+      "host": "dof.gob.mx",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-3.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "licensed-use",
+      "issue": "licensed-use지만 commercialReuse=restricted이며 허가는 비영리 한정. 상업성 여부 없는 downstream 소비 시 무조건 허용으로 오인 가능.",
+      "suggestedDecision": "licensed-use는 noncommercial 조건 충족 시에만 적용하도록 scope 구조화. 현재 사이트 용도 매칭 미확정이면 fact-only-review 또는 unresolved 후보.",
+      "evidence": [
+        {
+          "url": "https://dof.gob.mx/aviso_legal.html",
+          "summary": "비영리 정보·문서 복제는 지정 출처표시 조건으로 허용. 영리 복제·배포는 사전 서면동의 필요. 문서 본문 변조 금지"
+        }
+      ]
+    },
+    {
+      "host": "gov.br",
+      "reviewedAt": "2026-09-09T05:10:57.336386+00:00",
+      "sourceFile": ".staging/full-rights/results-1.json",
+      "currentStatus": "reviewed",
+      "currentRecommendation": "licensed-use",
+      "issue": "포털 CC BY-ND를 호스트 전체 allowed로 읽을 수 있음. 자체 기록도 하위 첨부 조건 별도라고 명시.",
+      "suggestedDecision": "현재 인용 문서와 포털 라이선스 적용 매칭을 남길 것. 제3자 첨부와 독립 사실은 구별하며 HTML 전체 일괄 허가로 확대하지 않음.",
+      "evidence": [
+        {
+          "url": "https://www.gov.br/pt-br/termos-de-uso",
+          "summary": "공식 포털 CC BY-ND3.0 footer 및 이용약관 확인. 원형공유상업가능·변경금지조건; 하위첨부별조건 및 독립사실예외 별도."
+        }
+      ]
+    }
+  ],
+  "finalComparisons": [
+    {
+      "host": "beanbrothers.co.kr",
+      "originalIssue": "IP-owned 정보만 제한하는 한국 쇼핑몰 조항인데 hold. 동일 유형 Unspecialty·Micoffee·H Coffee·CoffeeLibre는 fact-only-review.",
+      "currentReview": {
+        "host": "beanbrothers.co.kr",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09",
+        "checkedUrls": [
+          "https://www.beanbrothers.co.kr/service/agreement"
+        ],
+        "termsUrls": [
+          "https://www.beanbrothers.co.kr/service/agreement"
+        ],
+        "automation": "unknown",
+        "republication": "restricted",
+        "commercialReuse": "restricted",
+        "license": null,
+        "scope": "공식 사이트 이용조건; 개별 사실 보호성은 별도",
+        "findings": [
+          "제23조: 몰에 지식재산권이 귀속된 정보의 무단 영리 이용 및 제3자 이용 제한. 단순 사실 전체의 금지는 아님."
+        ],
+        "evidence": [
+          {
+            "url": "https://www.beanbrothers.co.kr/service/agreement",
+            "summary": "제23조: 몰에 지식재산권이 귀속된 정보의 무단 영리 이용 및 제3자 이용 제한. 단순 사실 전체의 금지는 아님."
+          }
+        ],
+        "recommendation": "fact-only-review"
+      }
+    },
+    {
+      "host": "varieties.worldcoffeeresearch.org",
+      "originalIssue": "PDF CC BY-NC-ND를 개별 HTML 호스트 restricted/hold로 표시했지만 기록 자체가 HTML 적용 미확정이라고 명시.",
+      "currentReview": {
+        "host": "varieties.worldcoffeeresearch.org",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09",
+        "checkedUrls": [
+          "https://varieties.worldcoffeeresearch.org/",
+          "https://cdn2.assets-servd.host/worldcoffee-research/production/pdf/catalogEnglish/Combined/complete-1769602232.pdf?dm=1769602232"
+        ],
+        "termsUrls": [
+          "https://cdn2.assets-servd.host/worldcoffee-research/production/pdf/catalogEnglish/Combined/complete-1769602232.pdf?dm=1769602232"
+        ],
+        "automation": "unknown",
+        "republication": "unknown",
+        "commercialReuse": "unknown",
+        "license": "CC BY-NC-ND 4.0 (PDF 카탈로그)",
+        "scope": "variety; HTML 직접 조건 미확정. license는 연결된 PDF 문서에 한정.",
+        "findings": [
+          "PDF 카탈로그 CC BY-NC-ND 4.0 확인. 비영리·출처표시·변경금지 조건이며 개별 HTML 사실 작성에 대한 직접 적용은 미확정."
+        ],
+        "evidence": [
+          {
+            "url": "https://cdn2.assets-servd.host/worldcoffee-research/production/pdf/catalogEnglish/Combined/complete-1769602232.pdf?dm=1769602232",
+            "summary": "PDF 카탈로그 CC BY-NC-ND 4.0 확인. 비영리·출처표시·변경금지 조건이며 개별 HTML 사실 작성에 대한 직접 적용은 미확정."
+          }
+        ],
+        "recommendation": "fact-only-review"
+      }
+    },
+    {
+      "host": "ineffablecoffee.com",
+      "originalIssue": "DB 전체·상당 부분 추출·재사용 명시 금지 및 상세 링크 제한 기록이 있으나 fact-only-review. 타 호스트의 DB 수집 제한은 hold.",
+      "currentReview": {
+        "host": "ineffablecoffee.com",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09T05:13:49.969Z",
+        "checkedUrls": [
+          "https://ineffablecoffee.com/en/pages/aviso-legal"
+        ],
+        "termsUrls": [
+          "https://ineffablecoffee.com/en/pages/aviso-legal"
+        ],
+        "automation": "unknown",
+        "republication": "restricted",
+        "commercialReuse": "restricted",
+        "license": null,
+        "scope": "lots,origin; substantial portal/database extraction, protected content and deep-link terms",
+        "findings": [
+          "4.2조 법적 예외·허락 없는 보호 콘텐츠 복제·재배포 제한. 전체 또는 상당 부분의 콘텐츠·DB 추출 및 재사용 금지.",
+          "4.4조 홈페이지 연결만 허용한다고 명시하여 상세 출처 링크도 조건 검토 필요.",
+          "전수·반복 추출은 수집량 검토 전 보류. 상당 부분 추출 제한을 단일 객관적 사실의 일괄 금지로 확대하지 않음."
+        ],
+        "evidence": [
+          {
+            "url": "https://ineffablecoffee.com/en/pages/aviso-legal",
+            "summary": "4.2조 법적 예외·허락 없는 보호 콘텐츠 복제·재배포 제한. 전체 또는 상당 부분의 콘텐츠·DB 추출 및 재사용 금지. 4.4조 홈페이지 연결만 허용한다고 명시하여 상세 출처 링크도 조건 검토 필요."
+          }
+        ],
+        "recommendation": "hold",
+        "evidenceCoverage": "official-page",
+        "collectionHold": true,
+        "publicationRecommendation": "fact-only-review"
+      }
+    },
+    {
+      "host": "memlicoffee.com",
+      "originalIssue": "콘텐츠 추출·재사용·재배포 명시 제한인데 fact-only-review. 다른 개인 비상업·명시 추출 제한 호스트는 hold.",
+      "currentReview": {
+        "host": "memlicoffee.com",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09T05:13:49.969Z",
+        "checkedUrls": [
+          "https://www.memlicoffee.com/termsandconditions"
+        ],
+        "termsUrls": [
+          "https://www.memlicoffee.com/termsandconditions"
+        ],
+        "automation": "unknown",
+        "republication": "restricted",
+        "commercialReuse": "restricted",
+        "license": null,
+        "scope": "historical-source-inventory; website/content extraction; statutory US-law exceptions preserved",
+        "findings": [
+          "Ownership of content 조항에서 사이트와 콘텐츠의 추출·재사용·재배포를 명시 허가 또는 미국법상 예외 외 금지. 개인 비상업적 이용 한정.",
+          "추출 작업은 범위 확인 전 보류하되 독립 사실 게시 자체의 위법성을 확정하지 않음."
+        ],
+        "evidence": [
+          {
+            "url": "https://www.memlicoffee.com/termsandconditions",
+            "summary": "Ownership of content 조항에서 사이트와 콘텐츠의 추출·재사용·재배포를 명시 허가 또는 미국법상 예외 외 금지. 개인 비상업적 이용 한정."
+          }
+        ],
+        "recommendation": "hold",
+        "evidenceCoverage": "official-page",
+        "collectionHold": true,
+        "publicationRecommendation": "fact-only-review"
+      }
+    },
+    {
+      "host": "detourcoffee.com",
+      "originalIssue": "현재 근거는 서비스 복제·판매 일반 조항뿐이고 자동수집·DB·독립 사실 제한 근거 없음. 이를 공개 사실 전반의 hold로 확장했을 가능성.",
+      "currentReview": {
+        "host": "detourcoffee.com",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09",
+        "checkedUrls": [
+          "https://detourcoffee.com/policies/terms-of-service"
+        ],
+        "termsUrls": [
+          "https://detourcoffee.com/policies/terms-of-service"
+        ],
+        "automation": "unknown",
+        "republication": "restricted",
+        "commercialReuse": "restricted",
+        "license": null,
+        "scope": "historical-source-inventory; lots:honduras-intibuca; origin:honduras-intibuca; 제한 확인 범위: 서비스 일부의 복제·판매·재이용 일반 조항. 독립 생산사실 또는 데이터 추출을 특정한 제한은 현재 근거에서 미확인.",
+        "findings": [
+          "§2 서면허가 없는 서비스 복제·판매·이용 제한.",
+          "독립적인 사실서술의 적법 여부를 확정하지 않음.",
+          "서비스 복제 일반 조항만으로 짧은 독립 사실의 이용 전체를 hold하지 않음. 재사용 허락을 얻었다는 뜻은 아니며 기존 restricted는 서비스 복제 범위에 한정."
+        ],
+        "evidence": [
+          {
+            "url": "https://detourcoffee.com/policies/terms-of-service",
+            "summary": "§2 서면허가 없는 서비스 복제·판매·이용 제한."
+          }
+        ],
+        "recommendation": "fact-only-review"
+      }
+    },
+    {
+      "host": "dayglow.coffee",
+      "originalIssue": "현재 근거는 서비스 복제·판매 일반 조항뿐이고 자동수집·DB·독립 사실 제한 근거 없음. 이를 공개 사실 전반의 hold로 확장했을 가능성.",
+      "currentReview": {
+        "host": "dayglow.coffee",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09",
+        "checkedUrls": [
+          "https://dayglow.coffee/pages/legal"
+        ],
+        "termsUrls": [
+          "https://dayglow.coffee/pages/legal"
+        ],
+        "automation": "unknown",
+        "republication": "restricted",
+        "commercialReuse": "restricted",
+        "license": null,
+        "scope": "historical-source-inventory; 제한 확인 범위: 서비스 일부의 복제·판매·재이용 일반 조항. 독립 생산사실 또는 데이터 추출을 특정한 제한은 현재 근거에서 미확인.",
+        "findings": [
+          "§2 서비스복제·상업이용 서면허가요구. scrape표현없음.",
+          "개별사실 권리성·독립서술·법적예외는 별도검토.",
+          "서비스 복제 일반 조항만으로 짧은 독립 사실의 이용 전체를 hold하지 않음. 재사용 허락을 얻었다는 뜻은 아니며 기존 restricted는 서비스 복제 범위에 한정."
+        ],
+        "evidence": [
+          {
+            "url": "https://dayglow.coffee/pages/legal",
+            "summary": "§2 서비스복제·상업이용 서면허가요구. scrape표현없음."
+          }
+        ],
+        "recommendation": "fact-only-review"
+      }
+    },
+    {
+      "host": "jacoffee.com",
+      "originalIssue": "현재 근거는 서비스 복제·판매 일반 조항뿐이고 자동수집·DB·독립 사실 제한 근거 없음. 이를 공개 사실 전반의 hold로 확장했을 가능성.",
+      "currentReview": {
+        "host": "jacoffee.com",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09",
+        "checkedUrls": [
+          "https://www.jacoffee.com/policies/terms-of-service"
+        ],
+        "termsUrls": [
+          "https://www.jacoffee.com/policies/terms-of-service"
+        ],
+        "automation": "unknown",
+        "republication": "restricted",
+        "commercialReuse": "restricted",
+        "license": null,
+        "scope": "origin:colombia-risaralda; 제한 확인 범위: 서비스 일부의 복제·판매·재이용 일반 조항. 독립 생산사실 또는 데이터 추출을 특정한 제한은 현재 근거에서 미확인.",
+        "findings": [
+          "§2 서비스 복제·판매·이용 서면허가요구.",
+          "독립사실 권리성 및 법적예외는 별도.",
+          "서비스 복제 일반 조항만으로 짧은 독립 사실의 이용 전체를 hold하지 않음. 재사용 허락을 얻었다는 뜻은 아니며 기존 restricted는 서비스 복제 범위에 한정."
+        ],
+        "evidence": [
+          {
+            "url": "https://www.jacoffee.com/policies/terms-of-service",
+            "summary": "§2 서비스 복제·판매·이용 서면허가요구."
+          }
+        ],
+        "recommendation": "fact-only-review"
+      }
+    },
+    {
+      "host": "changeoftone.coffee",
+      "originalIssue": "보호 콘텐츠 복제 제한 근거의 hold가 touton-specialty-coffee·list-beisler·ptscoffee의 유사 조항 fact-only-review와 일관되지 않을 수 있음.",
+      "currentReview": {
+        "host": "changeoftone.coffee",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09",
+        "checkedUrls": [
+          "https://www.changeoftone.coffee/terms-and-conditions"
+        ],
+        "termsUrls": [
+          "https://www.changeoftone.coffee/terms-and-conditions"
+        ],
+        "automation": "unknown",
+        "republication": "restricted",
+        "commercialReuse": "unknown",
+        "license": null,
+        "scope": "사이트 콘텐츠·서비스; 구매 조건과 별도",
+        "findings": [
+          "지식재산 조항은 콘텐츠 복제·배포·파생물에 허가 요구. 별도 자동수집 금지는 미확인",
+          "보호 표현·콘텐츠 복제 제한은 유지하되 독립 사실의 추출·DB 구축을 별도로 금지하는 근거로 확대하지 않음. 사실 항목만 개별 검토"
+        ],
+        "evidence": [
+          {
+            "url": "https://www.changeoftone.coffee/terms-and-conditions",
+            "summary": "지식재산 조항은 콘텐츠 복제·배포·파생물에 허가 요구. 별도 자동수집 금지는 미확인"
+          }
+        ],
+        "recommendation": "fact-only-review"
+      }
+    },
+    {
+      "host": "coavacoffee.com",
+      "originalIssue": "보호 콘텐츠 복제 제한 근거의 hold가 touton-specialty-coffee·list-beisler·ptscoffee의 유사 조항 fact-only-review와 일관되지 않을 수 있음.",
+      "currentReview": {
+        "host": "coavacoffee.com",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09",
+        "checkedUrls": [
+          "https://coavacoffee.com/terms-conditions"
+        ],
+        "termsUrls": [
+          "https://coavacoffee.com/terms-conditions"
+        ],
+        "automation": "unknown",
+        "republication": "restricted",
+        "commercialReuse": "restricted",
+        "license": null,
+        "scope": "사이트 콘텐츠·서비스; 구매 조건과 별도",
+        "findings": [
+          "보호 콘텐츠는 개인 이용만. 게시·전송·파생물·재판매 등은 서면허가 요구. 공개되지 않은 경로로 정보 취득 금지는 일반 공개 접근 금지와 다름",
+          "보호 표현·콘텐츠 복제 제한은 유지하되 독립 사실의 추출·DB 구축을 별도로 금지하는 근거로 확대하지 않음. 사실 항목만 개별 검토"
+        ],
+        "evidence": [
+          {
+            "url": "https://coavacoffee.com/terms-conditions",
+            "summary": "보호 콘텐츠는 개인 이용만. 게시·전송·파생물·재판매 등은 서면허가 요구. 공개되지 않은 경로로 정보 취득 금지는 일반 공개 접근 금지와 다름"
+          }
+        ],
+        "recommendation": "fact-only-review"
+      }
+    },
+    {
+      "host": "cumpa.de",
+      "originalIssue": "보호 콘텐츠 복제 제한 근거의 hold가 touton-specialty-coffee·list-beisler·ptscoffee의 유사 조항 fact-only-review와 일관되지 않을 수 있음.",
+      "currentReview": {
+        "host": "cumpa.de",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09",
+        "checkedUrls": [
+          "https://www.cumpa.de/impressum/"
+        ],
+        "termsUrls": [
+          "https://www.cumpa.de/impressum/"
+        ],
+        "automation": "unknown",
+        "republication": "restricted",
+        "commercialReuse": "restricted",
+        "license": null,
+        "scope": "공식 사이트 이용조건; 개별 사실 보호성은 별도",
+        "findings": [
+          "저작권법 한계를 넘는 복제·가공·배포는 서면 동의 필요. 다운로드·복사는 개인 비상업용으로 한정.",
+          "보호 표현의 복제 제한이며 독립 사실 추출/DB 자체를 별도 금지하는 근거는 미확인."
+        ],
+        "evidence": [
+          {
+            "url": "https://www.cumpa.de/impressum/",
+            "summary": "저작권법 한계를 넘는 복제·가공·배포는 서면 동의 필요. 다운로드·복사는 개인 비상업용으로 한정."
+          }
+        ],
+        "recommendation": "fact-only-review"
+      }
+    },
+    {
+      "host": "bluetokaicoffee.com",
+      "originalIssue": "보호 콘텐츠 복제 제한 근거의 hold가 touton-specialty-coffee·list-beisler·ptscoffee의 유사 조항 fact-only-review와 일관되지 않을 수 있음.",
+      "currentReview": {
+        "host": "bluetokaicoffee.com",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09",
+        "checkedUrls": [
+          "https://bluetokaicoffee.com/pages/terms-and-conditions"
+        ],
+        "termsUrls": [
+          "https://bluetokaicoffee.com/pages/terms-and-conditions"
+        ],
+        "automation": "unknown",
+        "republication": "restricted",
+        "commercialReuse": "restricted",
+        "license": null,
+        "scope": "lots:india-chikmagalur; lots:india-karnataka; origin:india-chikmagalur; origin:india-karnataka; 제한 확인 범위: 저작권 등 보호 콘텐츠의 복제·게시·변형. 독립 사실·자동접근·DB 축적에 대한 별도 제한 근거는 미확인.",
+        "findings": [
+          "Copyright §7 콘텐츠 재게시·변형·판매 제한.",
+          "독립적인 사실서술의 적법 여부를 확정하지 않음.",
+          "보호 콘텐츠 이용 제한과 독립 사실 서술을 구별하여 fact-only-review로 조정. 명시 자동추출·DB 제한을 확인한 사이트와 다름."
+        ],
+        "evidence": [
+          {
+            "url": "https://bluetokaicoffee.com/pages/terms-and-conditions",
+            "summary": "Copyright §7 콘텐츠 재게시·변형·판매 제한."
+          }
+        ],
+        "recommendation": "fact-only-review"
+      }
+    },
+    {
+      "host": "friedhats.com",
+      "originalIssue": "보호 콘텐츠 복제 제한 근거의 hold가 touton-specialty-coffee·list-beisler·ptscoffee의 유사 조항 fact-only-review와 일관되지 않을 수 있음.",
+      "currentReview": {
+        "host": "friedhats.com",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09",
+        "checkedUrls": [
+          "https://friedhats.com/terms-and-conditions"
+        ],
+        "termsUrls": [
+          "https://friedhats.com/terms-and-conditions"
+        ],
+        "automation": "unknown",
+        "republication": "restricted",
+        "commercialReuse": "restricted",
+        "license": null,
+        "scope": "historical-source-inventory; lots:colombia-ortega; lots:peru-puno; origin:colombia-ortega; origin:colombia-tolima; origin:peru-puno; 제한 확인 범위: 저작권 등 보호 콘텐츠의 복제·게시·변형. 독립 사실·자동접근·DB 축적에 대한 별도 제한 근거는 미확인.",
+        "findings": [
+          "제11조는 이미지·텍스트·디지털자료 등의 사용에 명시허가 요구.",
+          "사실의 독립 서술·권리성 및 법적 예외 적용은 별도 판단.",
+          "보호 콘텐츠 이용 제한과 독립 사실 서술을 구별하여 fact-only-review로 조정. 명시 자동추출·DB 제한을 확인한 사이트와 다름."
+        ],
+        "evidence": [
+          {
+            "url": "https://friedhats.com/terms-and-conditions",
+            "summary": "제11조는 이미지·텍스트·디지털자료 등의 사용에 명시허가 요구."
+          }
+        ],
+        "recommendation": "fact-only-review"
+      }
+    },
+    {
+      "host": "shikishima.coffee",
+      "originalIssue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "currentReview": {
+        "host": "shikishima.coffee",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09",
+        "checkedUrls": [
+          "https://shikishima.coffee/policies/terms-of-service"
+        ],
+        "termsUrls": [
+          "https://shikishima.coffee/policies/terms-of-service"
+        ],
+        "automation": "unknown",
+        "republication": "unknown",
+        "commercialReuse": "restricted",
+        "license": null,
+        "scope": "lots:el-salvador-chalatenango; origin:bolivia-santa-fe-loayza; origin:el-salvador-chalatenango",
+        "findings": [
+          "검색인덱스에서 서비스로 얻은 정보의 상업이용금지 확인. 본문직접열기 실패; 등록사용자 문구의 비회원적용 미확정.",
+          "이용제한의 개별 사실 적용과 법적 예외는 미확정. hold는 위법판정이 아님.",
+          "상업 이용 금지의 검색 발췌는 유지하나 등록회원 조항의 비회원 적용 범위가 불명확하여 전체 호스트 hold 대신 unresolved. 약관 적용 확인 전 추가 수집 승인으로 해석하지 않음."
+        ],
+        "evidence": [
+          {
+            "url": "https://shikishima.coffee/policies/terms-of-service",
+            "summary": "검색인덱스에서 서비스로 얻은 정보의 상업이용금지 확인. 본문직접열기 실패; 등록사용자 문구의 비회원적용 미확정."
+          }
+        ],
+        "recommendation": "unresolved",
+        "evidenceCoverage": "indexed-excerpt",
+        "reviewLimitations": "공식 검색 색인의 부분 발췌가 근거이며 직접 약관 본문을 읽지 못함. reviewed인 경우도 약관 전체 직접 검토 완료를 의미하지 않음. 확인되지 않은 조항은 unknown."
+      }
+    },
+    {
+      "host": "frontiersin.org",
+      "originalIssue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "currentReview": {
+        "host": "frontiersin.org",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09",
+        "checkedUrls": [
+          "https://www.frontiersin.org/legal/copyright-statement"
+        ],
+        "termsUrls": [
+          "https://www.frontiersin.org/legal/copyright-statement"
+        ],
+        "automation": "unknown",
+        "republication": "allowed",
+        "commercialReuse": "allowed",
+        "license": "CC BY for articles; exceptions and site software separate",
+        "scope": "variety:sidra; 라이선스 조건은 해당 출판물/연구논문/포털 자체 자료에 한정. 현재 개별 인용 자료와 적용 조건 매칭 전에는 전체 호스트 licensed-use로 처리하지 않음.",
+        "findings": [
+          "공식검색 결과 연구논문 CC BY상업/비상업 재사용 허용 및 저자·원출처표시. 본문추출빈응답; 개별논문/제3자자료 예외확인필요.",
+          "개별사실 권리성·독립서술·법적예외는 별도검토.",
+          "기존 허용 근거는 유지하되 개별 인용 자료의 적용 확인 전에는 fact-only-review로 조정. 독립 사실 재작성과 원문·번역물 배포의 라이선스 판단은 별도."
+        ],
+        "evidence": [
+          {
+            "url": "https://www.frontiersin.org/legal/copyright-statement",
+            "summary": "공식검색 결과 연구논문 CC BY상업/비상업 재사용 허용 및 저자·원출처표시. 본문추출빈응답; 개별논문/제3자자료 예외확인필요."
+          }
+        ],
+        "recommendation": "fact-only-review",
+        "licenseApplicability": "현재 인용 자료별 적용 및 제3자 예외 매칭 미완료. allowed 표시는 기록된 라이선스 적용 자료에 한정하며 호스트 전체 허락이 아님.",
+        "evidenceCoverage": "indexed-excerpt",
+        "reviewLimitations": "공식 검색 색인의 부분 발췌가 근거이며 직접 약관 본문을 읽지 못함. reviewed인 경우도 약관 전체 직접 검토 완료를 의미하지 않음. 확인되지 않은 조항은 unknown."
+      }
+    },
+    {
+      "host": "farmdirectory.cupofexcellence.org",
+      "originalIssue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "currentReview": {
+        "host": "farmdirectory.cupofexcellence.org",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09T05:13:49.969Z",
+        "checkedUrls": [
+          "https://farmdirectory.cupofexcellence.org/terms/"
+        ],
+        "termsUrls": [
+          "https://farmdirectory.cupofexcellence.org/terms/"
+        ],
+        "automation": "unknown",
+        "republication": "restricted",
+        "commercialReuse": "restricted",
+        "license": null,
+        "scope": "lots,origin",
+        "findings": [
+          "공식 약관 검색 색인으로 개인 비상업 임시 1부 열람 허가 확인. 직접 열기는 캐시 실패. 공개 재게시 허가 아님."
+        ],
+        "evidence": [
+          {
+            "url": "https://farmdirectory.cupofexcellence.org/terms/",
+            "summary": "공식 약관 검색 색인으로 개인 비상업 임시 1부 열람 허가 확인. 직접 열기는 캐시 실패. 공개 재게시 허가 아님."
+          }
+        ],
+        "recommendation": "fact-only-review",
+        "evidenceCoverage": "indexed-excerpt",
+        "collectionHold": false,
+        "publicationRecommendation": "fact-only-review"
+      }
+    },
+    {
+      "host": "molke.nl",
+      "originalIssue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "currentReview": {
+        "host": "molke.nl",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09T05:13:49.969Z",
+        "checkedUrls": [
+          "https://www.molke.nl/disclaimer"
+        ],
+        "termsUrls": [
+          "https://www.molke.nl/disclaimer"
+        ],
+        "automation": "unknown",
+        "republication": "restricted",
+        "commercialReuse": "restricted",
+        "license": null,
+        "scope": "historical-source-inventory",
+        "findings": [
+          "공식 면책 페이지 검색 색인에서 개인·내부 사용 외 복제·배포에는 서면 동의가 필요함을 확인. 직접 열람은 로봇 확인으로 중단.",
+          "숙박업체 사이트이며 커피 출처로 등록된 과거 도메인이 맞는지 재검토 필요."
+        ],
+        "evidence": [
+          {
+            "url": "https://www.molke.nl/disclaimer",
+            "summary": "공식 면책 페이지 검색 색인에서 개인·내부 사용 외 복제·배포에는 서면 동의가 필요함을 확인. 직접 열람은 로봇 확인으로 중단. 숙박업체 사이트이며 커피 출처로 등록된 과거 도메인이 맞는지 재검토 필요."
+          }
+        ],
+        "recommendation": "fact-only-review",
+        "evidenceCoverage": "indexed-excerpt",
+        "collectionHold": false,
+        "publicationRecommendation": "fact-only-review"
+      }
+    },
+    {
+      "host": "dropcoffee.com",
+      "originalIssue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "currentReview": {
+        "host": "dropcoffee.com",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09T05:13:49.969Z",
+        "checkedUrls": [
+          "https://www.dropcoffee.com/pages/terms-of-service"
+        ],
+        "termsUrls": [
+          "https://www.dropcoffee.com/pages/terms-of-service"
+        ],
+        "automation": "restricted",
+        "republication": "restricted",
+        "commercialReuse": "restricted",
+        "license": null,
+        "scope": "lots,origin",
+        "findings": [
+          "공식 약관 검색 색인에서 제12조 자동 수집 금지와 제2조 복제·상업 활용 서면 허가 조건 확인."
+        ],
+        "evidence": [
+          {
+            "url": "https://www.dropcoffee.com/pages/terms-of-service",
+            "summary": "공식 약관 검색 색인에서 제12조 자동 수집 금지와 제2조 복제·상업 활용 서면 허가 조건 확인."
+          }
+        ],
+        "recommendation": "hold",
+        "evidenceCoverage": "official-page",
+        "collectionHold": true,
+        "publicationRecommendation": "fact-only-review"
+      }
+    },
+    {
+      "host": "lacoladera.com.mx",
+      "originalIssue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "currentReview": {
+        "host": "lacoladera.com.mx",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09T05:13:49.969Z",
+        "checkedUrls": [
+          "https://lacoladera.com.mx/terminos-y-condiciones/"
+        ],
+        "termsUrls": [
+          "https://lacoladera.com.mx/terminos-y-condiciones/"
+        ],
+        "automation": "unknown",
+        "republication": "unknown",
+        "commercialReuse": "restricted",
+        "license": null,
+        "scope": "lots,origin",
+        "findings": [
+          "공식 약관 검색 색인에서 글·사진·로고 등 자체 보호 콘텐츠의 무허가 상업적 활용 금지 확인. 직접 열람은 시간 초과.",
+          "객관적 사실 추출이나 일반 자동 수집을 명시적으로 금지하는 조항은 확인하지 못함."
+        ],
+        "evidence": [
+          {
+            "url": "https://lacoladera.com.mx/terminos-y-condiciones/",
+            "summary": "공식 약관 검색 색인에서 글·사진·로고 등 자체 보호 콘텐츠의 무허가 상업적 활용 금지 확인. 직접 열람은 시간 초과. 객관적 사실 추출이나 일반 자동 수집을 명시적으로 금지하는 조항은 확인하지 못함."
+          }
+        ],
+        "recommendation": "fact-only-review",
+        "evidenceCoverage": "indexed-excerpt",
+        "collectionHold": false,
+        "publicationRecommendation": "fact-only-review"
+      }
+    },
+    {
+      "host": "lf.coffee",
+      "originalIssue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "currentReview": {
+        "host": "lf.coffee",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09T05:13:49.969Z",
+        "checkedUrls": [
+          "https://www.lf.coffee/en/pages/agb"
+        ],
+        "termsUrls": [
+          "https://www.lf.coffee/en/pages/agb"
+        ],
+        "automation": "unknown",
+        "republication": "unknown",
+        "commercialReuse": "unknown",
+        "license": null,
+        "scope": "lots,origin",
+        "findings": [
+          "공식 판매 약관 검색 색인에서 거래·결제·배송 조건 확인. 콘텐츠 재사용·자동 수집 조건은 확인되지 않음. 직접 열람 캐시 오류."
+        ],
+        "evidence": [
+          {
+            "url": "https://www.lf.coffee/en/pages/agb",
+            "summary": "공식 판매 약관 검색 색인에서 거래·결제·배송 조건 확인. 콘텐츠 재사용·자동 수집 조건은 확인되지 않음. 직접 열람 캐시 오류."
+          }
+        ],
+        "recommendation": "fact-only-review",
+        "evidenceCoverage": "indexed-excerpt",
+        "collectionHold": false,
+        "publicationRecommendation": "fact-only-review"
+      }
+    },
+    {
+      "host": "mantaraycoffee.com.au",
+      "originalIssue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "currentReview": {
+        "host": "mantaraycoffee.com.au",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09T05:13:49.969Z",
+        "checkedUrls": [
+          "https://mantaraycoffee.com.au/pages/terms-shipping-and-returns"
+        ],
+        "termsUrls": [
+          "https://mantaraycoffee.com.au/pages/terms-shipping-and-returns"
+        ],
+        "automation": "unknown",
+        "republication": "restricted",
+        "commercialReuse": "restricted",
+        "license": null,
+        "scope": "lots,origin",
+        "findings": [
+          "공식 약관 검색 색인에서 콘텐츠 다운로드는 개인용으로 한정하며 판매·활용 목적 복제·재배포 금지 확인."
+        ],
+        "evidence": [
+          {
+            "url": "https://mantaraycoffee.com.au/pages/terms-shipping-and-returns",
+            "summary": "공식 약관 검색 색인에서 콘텐츠 다운로드는 개인용으로 한정하며 판매·활용 목적 복제·재배포 금지 확인."
+          }
+        ],
+        "recommendation": "fact-only-review",
+        "evidenceCoverage": "official-page",
+        "collectionHold": false,
+        "publicationRecommendation": "fact-only-review"
+      }
+    },
+    {
+      "host": "pilgrimroasters.com",
+      "originalIssue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "currentReview": {
+        "host": "pilgrimroasters.com",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09T05:13:49.969Z",
+        "checkedUrls": [
+          "https://pilgrimroasters.com/policies/terms-of-service"
+        ],
+        "termsUrls": [
+          "https://pilgrimroasters.com/policies/terms-of-service"
+        ],
+        "automation": "unknown",
+        "republication": "restricted",
+        "commercialReuse": "restricted",
+        "license": null,
+        "scope": "lots,origin",
+        "findings": [
+          "공식 약관 검색 색인 제6조 개인 비상업적 이용 외 콘텐츠 복제·저장·재게시에는 서면 동의 요구. 일반 자동 수집 금지는 확인되지 않음.",
+          "직접 열람은 캐시 오류."
+        ],
+        "evidence": [
+          {
+            "url": "https://pilgrimroasters.com/policies/terms-of-service",
+            "summary": "공식 약관 검색 색인 제6조 개인 비상업적 이용 외 콘텐츠 복제·저장·재게시에는 서면 동의 요구. 일반 자동 수집 금지는 확인되지 않음. 직접 열람은 캐시 오류."
+          }
+        ],
+        "recommendation": "fact-only-review",
+        "evidenceCoverage": "indexed-excerpt",
+        "collectionHold": false,
+        "publicationRecommendation": "fact-only-review"
+      }
+    },
+    {
+      "host": "beannbeancoffee.com",
+      "originalIssue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "currentReview": {
+        "host": "beannbeancoffee.com",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09",
+        "checkedUrls": [
+          "https://beannbeancoffee.com/policies/terms-of-service"
+        ],
+        "termsUrls": [
+          "https://beannbeancoffee.com/policies/terms-of-service"
+        ],
+        "automation": "restricted",
+        "republication": "restricted",
+        "commercialReuse": "restricted",
+        "license": null,
+        "scope": "해당 공식 웹사이트의 정보·콘텐츠; 단순 사실의 법적 보호 여부와 구별",
+        "findings": [
+          "약관 검색 색인 본문에서 제2조 서비스 복제·이용 서면허가 및 제12조 크롤링·스크래핑 금지 확인. 직접 열기는 실패"
+        ],
+        "evidence": [
+          {
+            "url": "https://beannbeancoffee.com/policies/terms-of-service",
+            "summary": "약관 검색 색인 본문에서 제2조 서비스 복제·이용 서면허가 및 제12조 크롤링·스크래핑 금지 확인. 직접 열기는 실패"
+          }
+        ],
+        "recommendation": "hold",
+        "evidenceCoverage": "indexed-excerpt"
+      }
+    },
+    {
+      "host": "woodberrycoffee.com",
+      "originalIssue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "currentReview": {
+        "host": "woodberrycoffee.com",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09",
+        "checkedUrls": [
+          "https://www.woodberrycoffee.com/ja-gb/pages/terms-of-use"
+        ],
+        "termsUrls": [
+          "https://www.woodberrycoffee.com/ja-gb/pages/terms-of-use"
+        ],
+        "automation": "unknown",
+        "republication": "unknown",
+        "commercialReuse": "unknown",
+        "license": null,
+        "scope": "해당 사이트 자료·서비스. 구매·인증 규정과 구분",
+        "findings": [
+          "공식 약관 검색 색인에 지식재산권 귀속 및 권리침해 금지. 자동접근·독립 사실 재사용에 대한 명시 금지는 확인되지 않음"
+        ],
+        "evidence": [
+          {
+            "url": "https://www.woodberrycoffee.com/ja-gb/pages/terms-of-use",
+            "summary": "공식 약관 검색 색인에 지식재산권 귀속 및 권리침해 금지. 자동접근·독립 사실 재사용에 대한 명시 금지는 확인되지 않음"
+          }
+        ],
+        "recommendation": "fact-only-review",
+        "evidenceCoverage": "indexed-excerpt"
+      }
+    },
+    {
+      "host": "royalcoffee.com",
+      "originalIssue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "currentReview": {
+        "host": "royalcoffee.com",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09",
+        "checkedUrls": [
+          "https://royalcoffee.com/terms-conditions/"
+        ],
+        "termsUrls": [
+          "https://royalcoffee.com/terms-conditions/"
+        ],
+        "automation": "unknown",
+        "republication": "unknown",
+        "commercialReuse": "unknown",
+        "license": null,
+        "scope": "lots; origin",
+        "findings": [
+          "공식 약관은 검색 색인에서 coming soon과 권리 유보만 확인. 본문 열기는 실패. 별도 책의 복제 금지를 상품 사실 전체에 확대하지 않음."
+        ],
+        "evidence": [
+          {
+            "url": "https://royalcoffee.com/terms-conditions/",
+            "summary": "공식 약관은 검색 색인에서 coming soon과 권리 유보만 확인. 본문 열기는 실패. 별도 책의 복제 금지를 상품 사실 전체에 확대하지 않음."
+          }
+        ],
+        "recommendation": "fact-only-review",
+        "evidenceCoverage": "indexed-excerpt"
+      }
+    },
+    {
+      "host": "baristashopen.se",
+      "originalIssue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "currentReview": {
+        "host": "baristashopen.se",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09",
+        "checkedUrls": [
+          "https://www.baristashopen.se/farskrostat/kopvillkor.php"
+        ],
+        "termsUrls": [
+          "https://www.baristashopen.se/farskrostat/kopvillkor.php"
+        ],
+        "automation": "unknown",
+        "republication": "unknown",
+        "commercialReuse": "unknown",
+        "license": null,
+        "scope": "lots; origin",
+        "findings": [
+          "공식 구매약관 색인은 배송·환불·보증·개인정보 중심. 본문 열기 실패. 웹 사실 수집 제한으로 확대하지 않음."
+        ],
+        "evidence": [
+          {
+            "url": "https://www.baristashopen.se/farskrostat/kopvillkor.php",
+            "summary": "공식 구매약관 색인은 배송·환불·보증·개인정보 중심. 본문 열기 실패. 웹 사실 수집 제한으로 확대하지 않음."
+          }
+        ],
+        "recommendation": "fact-only-review",
+        "evidenceCoverage": "indexed-excerpt"
+      }
+    },
+    {
+      "host": "cafe18.com.co",
+      "originalIssue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "currentReview": {
+        "host": "cafe18.com.co",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09",
+        "checkedUrls": [
+          "https://www.cafe18.com.co/politicas/consumidor"
+        ],
+        "termsUrls": [
+          "https://www.cafe18.com.co/politicas/consumidor"
+        ],
+        "automation": "unknown",
+        "republication": "unknown",
+        "commercialReuse": "unknown",
+        "license": null,
+        "scope": "historical-source-inventory",
+        "findings": [
+          "공식 소비자 정책 색인은 구매·환불·교육정보 권리 중심. 웹 데이터 재사용·수집 조건 미확인. 페이지 열기는 실패."
+        ],
+        "evidence": [
+          {
+            "url": "https://www.cafe18.com.co/politicas/consumidor",
+            "summary": "공식 소비자 정책 색인은 구매·환불·교육정보 권리 중심. 웹 데이터 재사용·수집 조건 미확인. 페이지 열기는 실패."
+          }
+        ],
+        "recommendation": "fact-only-review",
+        "evidenceCoverage": "indexed-excerpt"
+      }
+    },
+    {
+      "host": "coffeelibre.cafe24.com",
+      "originalIssue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "currentReview": {
+        "host": "coffeelibre.cafe24.com",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09",
+        "checkedUrls": [
+          "https://coffeelibre.cafe24.com/member/agreement.html"
+        ],
+        "termsUrls": [
+          "https://coffeelibre.cafe24.com/member/agreement.html"
+        ],
+        "automation": "unknown",
+        "republication": "restricted",
+        "commercialReuse": "restricted",
+        "license": null,
+        "scope": "lots; origin",
+        "findings": [
+          "동일 호스트 공식 약관 색인 제22조 확인. 몰에 권리가 귀속된 정보의 영리 복제·배포·제3자 이용 사전승낙 요구. 개별 사실 전체에 확대하지 않음."
+        ],
+        "evidence": [
+          {
+            "url": "https://coffeelibre.cafe24.com/member/agreement.html",
+            "summary": "동일 호스트 공식 약관 색인 제22조 확인. 몰에 권리가 귀속된 정보의 영리 복제·배포·제3자 이용 사전승낙 요구. 개별 사실 전체에 확대하지 않음."
+          }
+        ],
+        "recommendation": "fact-only-review",
+        "evidenceCoverage": "indexed-excerpt"
+      }
+    },
+    {
+      "host": "sangoamsterdam.com",
+      "originalIssue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "currentReview": {
+        "host": "sangoamsterdam.com",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09",
+        "checkedUrls": [
+          "https://www.sangoamsterdam.com/policies/terms-of-service"
+        ],
+        "termsUrls": [
+          "https://www.sangoamsterdam.com/policies/terms-of-service"
+        ],
+        "automation": "unknown",
+        "republication": "unknown",
+        "commercialReuse": "unknown",
+        "license": null,
+        "scope": "공식 사이트 이용조건; 개별 사실 보호성은 별도",
+        "findings": [
+          "소비자 원격판매 약관을 공식 검색 색인으로 확인. 사이트 자동수집/독립적 사실 재사용의 명시 제한은 확인되지 않음."
+        ],
+        "evidence": [
+          {
+            "url": "https://www.sangoamsterdam.com/policies/terms-of-service",
+            "summary": "소비자 원격판매 약관을 공식 검색 색인으로 확인. 사이트 자동수집/독립적 사실 재사용의 명시 제한은 확인되지 않음."
+          }
+        ],
+        "recommendation": "fact-only-review",
+        "evidenceCoverage": "indexed-excerpt"
+      }
+    },
+    {
+      "host": "gesharycoffee.com",
+      "originalIssue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "currentReview": {
+        "host": "gesharycoffee.com",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09",
+        "checkedUrls": [
+          "https://gesharycoffee.com/en/disclaimer/"
+        ],
+        "termsUrls": [
+          "https://gesharycoffee.com/en/disclaimer/"
+        ],
+        "automation": "unknown",
+        "republication": "restricted",
+        "commercialReuse": "unknown",
+        "license": null,
+        "scope": "사이트 콘텐츠; 거래 약관과 사실을 구분",
+        "findings": [
+          "공식 약관 검색 색인에서 이미지·영상·텍스트·다운로드 데이터의 무허가 복제·전용 제한 확인. 직접 요청은 실패."
+        ],
+        "evidence": [
+          {
+            "url": "https://gesharycoffee.com/en/disclaimer/",
+            "summary": "공식 약관 검색 색인에서 이미지·영상·텍스트·다운로드 데이터의 무허가 복제·전용 제한 확인. 직접 요청은 실패."
+          }
+        ],
+        "recommendation": "hold",
+        "evidenceCoverage": "indexed-excerpt"
+      }
+    },
+    {
+      "host": "justincoffee.com.tw",
+      "originalIssue": "reviewed이나 기록은 검색 색인 또는 빈 본문 응답에 근거함. 직접 본문 확인 완료와 구별 필요.",
+      "currentReview": {
+        "host": "justincoffee.com.tw",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09",
+        "checkedUrls": [
+          "https://www.justincoffee.com.tw/zh-TW/pages/terms"
+        ],
+        "termsUrls": [
+          "https://www.justincoffee.com.tw/zh-TW/pages/terms"
+        ],
+        "automation": "unknown",
+        "republication": "restricted",
+        "commercialReuse": "unknown",
+        "license": null,
+        "scope": "사이트 콘텐츠; 거래 약관과 사실을 구분",
+        "findings": [
+          "공식 사용조건 색인: 웹 자료·콘텐츠의 무단 전파·복제·수정·게시·전송 제한. 직접 요청 실패."
+        ],
+        "evidence": [
+          {
+            "url": "https://www.justincoffee.com.tw/zh-TW/pages/terms",
+            "summary": "공식 사용조건 색인: 웹 자료·콘텐츠의 무단 전파·복제·수정·게시·전송 제한. 직접 요청 실패."
+          }
+        ],
+        "recommendation": "hold",
+        "evidenceCoverage": "indexed-excerpt"
+      }
+    },
+    {
+      "host": "fao.org",
+      "originalIssue": "licensed-use/allowed는 출판물의 비상업 조건 근거이나 호스트는 웹·통계 DB도 포함 가능. 전체 호스트 허가로 소비될 위험.",
+      "currentReview": {
+        "host": "fao.org",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09",
+        "checkedUrls": [
+          "https://www.fao.org/publications/about-fao-publishing/permissions/"
+        ],
+        "termsUrls": [
+          "https://www.fao.org/publications/about-fao-publishing/permissions/"
+        ],
+        "automation": "unknown",
+        "republication": "allowed",
+        "commercialReuse": "unknown",
+        "license": "Publication-specific; default noncommercial with attribution",
+        "scope": "origin:china-baoshan; 라이선스 조건은 해당 출판물/연구논문/포털 자체 자료에 한정. 현재 개별 인용 자료와 적용 조건 매칭 전에는 전체 호스트 licensed-use로 처리하지 않음.",
+        "findings": [
+          "출판물 개인연구교육·비상업제품 사용에 출처표시 조건, 재사용허가요청 경로제공. 개별출판물 라이선스 우선; 웹전체/통계DB에 일괄확장금지.",
+          "개별사실 권리성·독립서술·법적예외는 별도검토.",
+          "기존 허용 근거는 유지하되 개별 인용 자료의 적용 확인 전에는 fact-only-review로 조정. 독립 사실 재작성과 원문·번역물 배포의 라이선스 판단은 별도."
+        ],
+        "evidence": [
+          {
+            "url": "https://www.fao.org/publications/about-fao-publishing/permissions/",
+            "summary": "출판물 개인연구교육·비상업제품 사용에 출처표시 조건, 재사용허가요청 경로제공. 개별출판물 라이선스 우선; 웹전체/통계DB에 일괄확장금지."
+          }
+        ],
+        "recommendation": "fact-only-review",
+        "licenseApplicability": "현재 인용 자료별 적용 및 제3자 예외 매칭 미완료. allowed 표시는 기록된 라이선스 적용 자료에 한정하며 호스트 전체 허락이 아님."
+      }
+    },
+    {
+      "host": "dof.gob.mx",
+      "originalIssue": "licensed-use지만 commercialReuse=restricted이며 허가는 비영리 한정. 상업성 여부 없는 downstream 소비 시 무조건 허용으로 오인 가능.",
+      "currentReview": {
+        "host": "dof.gob.mx",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09",
+        "checkedUrls": [
+          "https://dof.gob.mx/aviso_legal.html"
+        ],
+        "termsUrls": [
+          "https://dof.gob.mx/aviso_legal.html"
+        ],
+        "automation": "unknown",
+        "republication": "allowed",
+        "commercialReuse": "restricted",
+        "license": "비영리 복제 허용; 문서 제목·발행기관·장소·DOF 발행일·인용일·형식·URL 출처표시 및 원문 무변조 조건",
+        "scope": "DOF가 게시한 정보·문서의 비영리 복제에만 조건부 허가. 지정 출처표시 및 원문 무변경 조건. 현재 사이트의 비영리 조건 충족은 미확정이며 다른 출처·자료나 상업 이용으로 확대하지 않음",
+        "findings": [
+          "비영리 정보·문서 복제는 지정 출처표시 조건으로 허용. 영리 복제·배포는 사전 서면동의 필요. 문서 본문 변조 금지",
+          "현재 사용의 비영리 조건 충족이 확인되지 않아 무조건 licensed-use로 판정하지 않음"
+        ],
+        "evidence": [
+          {
+            "url": "https://dof.gob.mx/aviso_legal.html",
+            "summary": "비영리 정보·문서 복제는 지정 출처표시 조건으로 허용. 영리 복제·배포는 사전 서면동의 필요. 문서 본문 변조 금지"
+          }
+        ],
+        "recommendation": "fact-only-review"
+      }
+    },
+    {
+      "host": "gov.br",
+      "originalIssue": "포털 CC BY-ND를 호스트 전체 allowed로 읽을 수 있음. 자체 기록도 하위 첨부 조건 별도라고 명시.",
+      "currentReview": {
+        "host": "gov.br",
+        "status": "reviewed",
+        "checkedAt": "2026-09-09",
+        "checkedUrls": [
+          "https://www.gov.br/pt-br/termos-de-uso"
+        ],
+        "termsUrls": [
+          "https://www.gov.br/pt-br/termos-de-uso"
+        ],
+        "automation": "unknown",
+        "republication": "allowed",
+        "commercialReuse": "allowed",
+        "license": "CC BY-ND 3.0 Unported; content-specific exceptions",
+        "scope": "origin:brazil-alta-mogiana; origin:brazil-bahia; origin:brazil-cerrado; origin:brazil-mogiana; 라이선스 조건은 해당 출판물/연구논문/포털 자체 자료에 한정. 현재 개별 인용 자료와 적용 조건 매칭 전에는 전체 호스트 licensed-use로 처리하지 않음.",
+        "findings": [
+          "공식 포털 CC BY-ND3.0 footer 및 이용약관 확인. 원형공유상업가능·변경금지조건; 하위첨부별조건 및 독립사실예외 별도.",
+          "개별사실 권리성·독립서술·법적예외는 별도검토.",
+          "기존 허용 근거는 유지하되 개별 인용 자료의 적용 확인 전에는 fact-only-review로 조정. 독립 사실 재작성과 원문·번역물 배포의 라이선스 판단은 별도."
+        ],
+        "evidence": [
+          {
+            "url": "https://www.gov.br/pt-br/termos-de-uso",
+            "summary": "공식 포털 CC BY-ND3.0 footer 및 이용약관 확인. 원형공유상업가능·변경금지조건; 하위첨부별조건 및 독립사실예외 별도."
+          }
+        ],
+        "recommendation": "fact-only-review",
+        "licenseApplicability": "현재 인용 자료별 적용 및 제3자 예외 매칭 미완료. allowed 표시는 기록된 라이선스 적용 자료에 한정하며 호스트 전체 허락이 아님."
+      }
+    }
+  ],
+  "scopeNote": "Candidate discovery snapshot plus final investigator records; unresolved legal conditions are not converted to clearance."
+}
