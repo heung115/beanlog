@@ -4,6 +4,7 @@ import importlib.util
 import io
 from pathlib import Path
 import tempfile
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -47,6 +48,19 @@ class DownloadTests(unittest.TestCase):
         handler=download.SameHostRedirect()
         for url in ('https://example.invalid/a','http://storage.googleapis.com/a','https://user:pass@storage.googleapis.com/a','https://storage.googleapis.com:444/a'):
             with self.subTest(url=url),self.assertRaises(ValueError):handler.redirect_request(None,None,302,'',{},url)
+
+    def test_download_uses_writer_token_and_refuses_auditor_or_wrong_target(self):
+        cloud=SimpleNamespace(role='writer',settings={'bucket':'fixture-backup'},token='fixture-writer-token')
+        with patch.object(download.urllib.request,'build_opener') as factory:
+            download.open_range(cloud,'fixture-backup','beanmap/baseline/fixture/file.age','123',0,4)
+            request=factory.return_value.open.call_args.args[0]
+            self.assertEqual(request.get_header('Authorization'),'Bearer fixture-writer-token')
+            self.assertIn('generation=123',request.full_url)
+        for role,bucket,name in [('auditor','fixture-backup','beanmap/a'),('writer','other','beanmap/a'),('writer','fixture-backup','other/a')]:
+            cloud.role=role
+            with self.subTest(role=role,bucket=bucket,name=name),patch.object(download.urllib.request,'build_opener') as factory:
+                with self.assertRaises(ValueError):download.open_range(cloud,bucket,name,'123',0,4)
+                factory.assert_not_called()
 
 
 if __name__=='__main__':unittest.main()

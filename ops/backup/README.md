@@ -120,11 +120,16 @@ PostgreSQL 역할 백업/복구 동작은 [공식 pg_dumpall 문서](https://www
 ## GCP 무료 범위의 운영 구성
 
 대상은 `gcp-free-deploy` 프로젝트의 미국 서부 `us-west1` Standard 전용 버킷이다.
-사용 중인 gcloud 인증을 Mac에서 이용하며 운영 서버에 서비스 계정 키나 GCP
-자격 증명을 두지 않는다. 키를 새로 발급하는 자동화도 없다. 일상 uploader의
-필요 권한은 대상 객체의 create/get/list 및 버킷 정책 읽기이며 삭제/overwrite는
-업로드에 필요하지 않다. 현재 설치는 사용자가 이미 가진 인증 범위로 실행되므로
-새로운 최소권한 계정이 구성됐다고 주장하지 않는다.
+Mac에서 서로 다른 두 전용 서비스 계정과 각 계정의 비공개 gcloud 구성을
+사용한다. `identities.writer`는 대상 버킷·정책·목록 조회와 `beanmap/` 객체
+생성·읽기를 담당하고, `identities.auditor`는 전체 결제 범위의 프로젝트·버킷·객체
+목록을 읽어 4GB 용량 제한을 검사한다. 두 identity의 이메일과 절대 구성 경로가
+모두 필수이며 개인 기본 인증으로 대체하지 않는다. 운영 서버에 GCP 자격 증명을
+두지 않고, 이 도구가 계정·키 발급이나 IAM 변경을 자동으로 수행하지도 않는다.
+writer는 기존 객체 수정·삭제·덮어쓰기나 버킷 설정 변경 권한을 필요로 하지 않는다.
+
+용량 조회에 사용하는 프로젝트에는 Cloud Billing API 활성화가 필요하며,
+[공식 가격 문서](https://cloud.google.com/billing/v1/pricing)에 따르면 이 API 사용은 무료다.
 
 - Uniform bucket-level access와 public access prevention을 강제한다.
 - soft delete, versioning, Autoclass, retention lock을 사용하지 않는다.
@@ -178,3 +183,49 @@ python3 ops/backup/gcs_download.py --config /PRIVATE/PATH/gcs.json \
 drop-in도 포함한다. 복원 시 새 호스트의 Caddy UID와 Tailscale 주소로 helper를
 다시 실행하고 unit을 enable해야 한다. 과거 방화벽 규칙 전체나 `/run` 소켓을
 복사하지 않는다. Serve 선언을 검토해 기존 다른 경로를 보존하며 Funnel은 켜지 않는다.
+
+### 백업 전용 인증과 용량 조회 계정
+
+개인 gcloud 세션은 백업·복구 경로에서 사용하지 않는다. `gcs-config.example.json`의
+`identities.writer`와 `identities.auditor`에 서로 다른 서비스 계정 이메일과
+각 계정 전용 `gcloud_config` 절대 경로를 지정한다. 디렉터리는 실행 사용자 소유의
+0700이어야 하고 심볼릭 링크나 개인 기본 `~/.config/gcloud` 경로는 거부한다.
+각 전용 디렉터리의 `default` 구성에는 지정한 서비스 계정 하나만 등록한다.
+실제 키 발급·IAM 설정은 별도 관리자 작업이며, 이 도구는 계정·키·버킷을 만들지 않는다.
+
+- writer: 대상 버킷의 `storage.buckets.get`, `storage.buckets.getIamPolicy`,
+  `storage.objects.list`와 `beanmap/` 객체의 `storage.objects.create/get`만 필요하다.
+  업로드는 generation=0으로 새 객체만 만들고 복합 업로드를 끈다. 기존 객체 수정·삭제,
+  버킷 설정·IAM 변경 권한을 요구하지 않는다.
+- auditor: 연결된 전체 결제 범위의 프로젝트 목록과 각 프로젝트 버킷 목록을 읽고,
+  대상 버킷 메타데이터·IAM·객체 목록을 조회한다. 객체 본문 읽기·생성·수정·삭제
+  권한은 주지 않는다. 연결 프로젝트 조회에 필요한 billing/resource-manager 권한은
+  실제 API가 요구하는 최소 읽기 권한으로 별도 검토한다.
+
+전송·상태·다운로드는 writer 인증을 쓰고, 기존 전체 결제 범위의 용량 합산은
+매번 auditor 인증으로 실행한다. 다른 버킷·알 수 없는 프로젝트·조회 실패·불완전한
+목록은 계속 실패 처리하므로, 대상 버킷만 조회하는 방식으로 무료 4GB 보호를
+축소하지 않는다. auditor가 접근할 수 없는 새 프로젝트가 연결되어도 백업을 중단한다.
+관리자 로그인이나 주기적인 수동 인증 갱신에 의존하는 검토 스냅샷은 사용하지 않는다.
+
+각 실행은 양쪽 계정의 읽기 권한과 금지 권한을 `testIamPermissions`로 확인한다.
+`objects.update/delete`, `buckets.setIamPolicy/update/delete` 등이 확인되면 전송 전에
+실패한다. auditor의 객체 get/create 권한도 실패 사유다. 이 조회는 버킷 리소스에
+대한 검사라 객체 prefix 조건부 권한을 모두 증명하지 못할 수 있다. 배포 시 사용자 지정
+IAM 역할 정의와 조건을 별도로 검토하고, 조건부 수정·삭제 권한을 주지 않는다.
+검사 통과를 모든 상속·조건부 권한의 완전한 부재 증명으로 표현하지 않는다.
+필수 설정인 uniform bucket-level access에서는 객체 ACL 자체가 비활성화되며,
+GCS가 `objects.getIamPolicy/setIamPolicy` 검사 요청을 400으로 거부한다. 이 두 객체
+ACL 권한은 API 검사에 넣지 않고 역할 정의 검토로 확인한다. 버킷의
+`buckets.setIamPolicy` 금지 검사는 그대로 유지한다.
+
+모든 gcloud 호출에 같은 전용 환경·고정 account·`default` 구성을 명시한다. 외부
+`CLOUDSDK_*`, ADC, impersonation, access-token, proxy/CA 환경 덮어쓰기는 거부한다.
+저장된 구성의 자격 증명 대체·impersonation·토큰 파일·인증 생략·별도 API endpoint도
+거부한다. 파일 업로드, API 조회, 다운로드가 서로 다른 계정으로 실행되는 경로는 없다.
+API 리디렉션에서 다른 호스트로 인증 헤더를 전달하지 않는다. 실패 출력에는 토큰·키나
+gcloud 원문 오류를 포함하지 않는다.
+
+인증 우선순위는 [gcloud 인증 문서](https://docs.cloud.google.com/sdk/docs/authenticate),
+버킷 권한 검사는 [testIamPermissions 문서](https://docs.cloud.google.com/storage/docs/json_api/v1/buckets/testIamPermissions),
+객체 prefix·목록 권한의 차이는 [Cloud Storage IAM 조건](https://docs.cloud.google.com/storage/docs/access-control/iam)에 따른다.

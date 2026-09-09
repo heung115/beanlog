@@ -17,15 +17,11 @@ gcs = importlib.util.module_from_spec(spec); spec.loader.exec_module(gcs)
 RANGE_BYTES = 32 * 1024**2
 
 
-class SameHostRedirect(urllib.request.HTTPRedirectHandler):
-    def redirect_request(self, request, fp, code, msg, headers, newurl):
-        parsed = urllib.parse.urlsplit(newurl)
-        if parsed.scheme != 'https' or parsed.hostname != 'storage.googleapis.com' or parsed.port not in (None, 443) or parsed.username or parsed.password:
-            raise ValueError('Refusing cross-host credential redirect')
-        return super().redirect_request(request, fp, code, msg, headers, newurl)
-
+SameHostRedirect = gcs.SameHostRedirect
 
 def open_range(cloud, bucket, name, generation, start, end):
+    if cloud.role != 'writer' or bucket != cloud.settings['bucket'] or not name.startswith('beanmap/'):
+        raise ValueError('Download requires the pinned writer and approved bucket prefix')
     url = 'https://storage.googleapis.com/download/storage/v1/b/' + urllib.parse.quote(bucket, safe='') + '/o/' + urllib.parse.quote(name, safe='')
     url += '?' + urllib.parse.urlencode({'alt': 'media', 'generation': generation})
     request = urllib.request.Request(url, headers={'Authorization': 'Bearer ' + cloud.token, 'Range': f'bytes={start}-{end}', 'Accept-Encoding': 'identity'})
@@ -87,7 +83,7 @@ def main():
         if not args.remote_prefix.startswith('beanmap/baseline/') or not gcs.backup.NAME.fullmatch(args.remote_prefix.rsplit('/', 1)[-1]):
             raise ValueError('Only a known completed baseline prefix is accepted')
         manifest = json.loads((directory / 'manifest.json').read_text())
-        cloud = gcs.Cloud(settings['gcloud'])
+        cloud = gcs.Cloud(settings)
         total, bucket, objects = cloud.inventory(settings['project'], settings['bucket'])
         gcs.verify_lifecycle(bucket, settings['bucket_metageneration'])
         if total > settings.get('maximum_pool_bytes', gcs.HARD_BYTES): raise ValueError('Pool exceeds reviewed bound')
