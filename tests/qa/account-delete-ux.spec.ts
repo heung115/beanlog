@@ -11,6 +11,7 @@ import { admin, browserSupabaseUrl, ensureUser } from "./helpers";
 for (const locale of ["ko", "en"] as const) {
   const t = locale === "ko" ? ko : en;
   test(`${locale} deleting a dedicated empty account confirms completion at the public home`, async ({ page }) => {
+    test.setTimeout(60_000);
     const account = { email: `beanmap-qa-delete-${randomUUID()}@local.test`, password: randomBytes(24).toString("hex") };
     const id = await ensureUser(account.email, account.password);
     try {

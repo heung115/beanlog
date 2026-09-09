@@ -35,9 +35,14 @@ if (mode === "exhaust-user") {
   const send = (path, headers={}) => status(`http://fixture-caddy:8081/auth/v1/${path}`, {method:"POST", headers:{apikey:"fixture-only-api-key",...headers}});
   result={forgedPassword:await send("token?grant_type=password", {"X-Beanmap-Auth-Client-IP":otherIp,"X-Forwarded-For":otherIp})};
   for (const path of ["signup","recover","otp"]) {
-    const count={}; for(let i=0;i<11;i++) {const code=await send(path);count[code]=(count[code]??0)+1;} result[path]=count;
+    const count={}; for(let i=0;i<11;i++) {const code=path==="signup" ? await status("http://fixture-caddy:8080/auth-signup",{method:"POST"}) : await send(path);count[code]=(count[code]??0)+1;} result[path]=count;
   }
   for (const [key,path] of [["verify","verify"],["refresh","token?grant_type=refresh_token"],["logout","logout"]]) result[key]=await send(path);
+  result.signupSpellingsBlocked=true;
+  for(const path of ["signup","signup/","%73ignup","signup%2f","%2573ignup","./signup","other/../signup","//signup"]) {
+    if(await send(path,{"X-Beanmap-Auth-Client-IP":otherIp,"X-Forwarded-For":otherIp})!==404) result.signupSpellingsBlocked=false;
+  }
+  result.untrustedDirectSignup=await status("http://beanmap-auth-gateway:8000/auth/v1/signup",{method:"POST",headers:{apikey:"fixture-only-api-key","X-Beanmap-Auth-Client-IP":otherIp}});
   result.adminDenied=await send("admin/users");
   result.internalAdminDenied=await status("http://beanmap-auth-gateway:8000/auth/v1/admin/users",{headers:{apikey:"fixture-only-api-key"}});
   result.admin=await status("http://beanmap-auth-gateway:8000/auth/v1/admin/users",{headers:{apikey:"fixture-only-admin-key"}});

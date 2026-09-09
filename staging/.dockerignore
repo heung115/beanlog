@@ -1,0 +1,4 @@
+*
+!Caddyfile
+!ingress.Dockerfile
+!ingress-entrypoint.sh

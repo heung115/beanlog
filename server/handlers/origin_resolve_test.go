@@ -41,6 +41,9 @@ func TestBeanMutationsEnforceOriginCatalogHierarchy(t *testing.T) {
 					"origin_region_id": scenario.region, "origin_region": "Untrusted region label",
 					"origin_entity_id": scenario.entity, "farm_producer": "Untrusted producer label",
 				}
+				if scenario.region == 0 {
+					delete(data, "origin_region_id")
+				}
 				if method == http.MethodPut {
 					data["expected_updated_at"] = "2026-09-09T00:00:00.123456Z"
 				}

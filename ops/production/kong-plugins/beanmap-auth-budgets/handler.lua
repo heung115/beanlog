@@ -1,6 +1,6 @@
 -- Authentication budgets run after key-auth and ACL. No credentials, query
 -- strings, or client addresses are written to the application log.
-local Handler = { PRIORITY = 900, VERSION = "1.0.0" }
+local Handler = { PRIORITY = 900, VERSION = "1.1.0" }
 local limits = {
   user_read = 600, user_write = 30, password = 60, refresh = 120,
   signup = 10, recover = 10, otp = 10, verify = 30, logout = 30,
@@ -26,6 +26,12 @@ function Handler:access(conf)
   local dict = ngx.shared.beanmap_auth_budgets
   if not dict then return kong.response.exit(503, { message = "Authentication temporarily unavailable" }) end
   local operation = category()
+  -- The signup gate uses the socket peer, never the forwarded client identity.
+  -- A DB HMAC assertion additionally binds the exact email and consent event.
+  if operation == "signup" and (kong.client.get_ip() ~= conf.signup_source_ip
+      or not kong.request.get_header("X-Beanmap-Auth-Client-IP")) then
+    return kong.response.exit(404, { message = "Not found" })
+  end
   if operation == "admin" then
     local consumer = kong.client.get_consumer()
     if not consumer or consumer.username ~= "service_role" then

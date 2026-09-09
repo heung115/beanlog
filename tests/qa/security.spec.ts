@@ -601,7 +601,7 @@ test("revoked sessions lose Auth, PostgREST and Go API access immediately", asyn
   try {
     const { session } = await signIn(user.email, user.password);
     const headers = { apikey: stagingAnonKey, Authorization: `Bearer ${session.access_token}` };
-    const payload = { name: "[QA] session canary", roastery: "QA", bean_type: "single_origin", origin_country: "Kenya", process_method: "washed", roast_level: "light", consumed_at: "2026-09-08", place_type: "home", overall_score: 8, tags: [], blend_components: [] };
+    const payload = { name: "[QA] session canary", note: "Temporary session boundary fixture", roastery: "QA", bean_type: "single_origin", origin_country: "Kenya", process_method: "washed", roast_level: "light", consumed_at: "2026-09-08", place_type: "home", overall_score: 8, tags: [], blend_components: [] };
     const created = await request.post(`${qaApiURL}/api/beans`, { headers, data: payload });
     expect(created.status()).toBe(201);
     const beanId = (await created.json()).id;
@@ -665,5 +665,30 @@ test("origin contacts cannot be fetched directly while curated entity names rema
   for (const entity of entities) {
     expect(Object.keys(entity).sort()).toEqual(["entity_type", "id", "name", "name_ko"]);
     expect(entity.name).not.toMatch(/@|\b(?:phone|telephone|mobile|email|fax)\b|[0-9](?:[0-9\s().+\-]*[0-9]){6}/i);
+  }
+});
+
+
+test("real local Auth retains long ASCII and Unicode passwords through a password change", async () => {
+  test.skip(!["localhost", "127.0.0.1", "[::1]"].includes(new URL(stagingSupabaseUrl).hostname), "Password storage checks require isolated local Auth");
+  const email = `beanmap-qa-password-${Date.now()}-${randomBytes(6).toString("hex")}@local.test`;
+  const initialPassword = randomBytes(32).toString("hex");
+  const changedPassword = `원두향기${randomBytes(20).toString("hex")}`;
+  expect(initialPassword.length).toBe(64);
+  expect(Array.from(changedPassword).length).toBeGreaterThanOrEqual(15);
+  expect(Buffer.byteLength(changedPassword, "utf8")).toBeLessThanOrEqual(72);
+  const id = await ensureUser(email, initialPassword);
+  try {
+    const { client, session } = await signIn(email, initialPassword);
+    expect(session.user.id).toBe(id);
+    const changed = await client.auth.updateUser({ password: changedPassword });
+    expect(changed.error).toBeNull();
+    const { session: fresh } = await signIn(email, changedPassword);
+    expect(fresh.user.id).toBe(id);
+    const oldPassword = await client.auth.signInWithPassword({ email, password: initialPassword });
+    expect(oldPassword.error).not.toBeNull();
+  } finally {
+    const { error } = await admin.auth.admin.deleteUser(id);
+    if (error) throw error;
   }
 });

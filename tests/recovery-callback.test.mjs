@@ -21,7 +21,7 @@ function load(path, dependencies) {
   return exports;
 }
 
-async function fixture(t, method = "recovery", verified = true) {
+async function fixture(t, method = "recovery", verified = true, consentComplete = true) {
   const directory = await mkdtemp(join(tmpdir(), "beanmap-callback-test-"));
   t.after(() => rm(directory, { recursive: true, force: true }));
   const jar = new Map();
@@ -42,7 +42,18 @@ async function fixture(t, method = "recovery", verified = true) {
     verifyOtp: async (options) => { exchanges.push(["otp", options]); return { data: { session }, error: null }; },
   };
   const supabase = { auth };
+  const oauthCalls = [];
   const callback = load("../src/app/api/auth/callback/route.ts", {
+    "@/lib/security/oauth-consent": {
+      takeOAuthPreconsent: async () => { oauthCalls.push("take"); return null; },
+      completeOAuthCallbackConsent: async (client, token, proof) => {
+        assert.equal(client, supabase);
+        assert.equal(token, accessToken);
+        assert.equal(proof, null);
+        oauthCalls.push("complete");
+        return consentComplete;
+      },
+    },
     "@/lib/security/password-recovery": helpers,
     "@/lib/supabase/server": { createClient: async () => supabase, setSessionPersistencePreference: async () => {} },
     "@/lib/security/redirect": redirects,
@@ -50,14 +61,15 @@ async function fixture(t, method = "recovery", verified = true) {
     "next/headers": cookieAdapter,
     "@/lib/admin/private-access": { getRequestAppOrigin: async () => "https://beanmap.example" },
   });
-  return { callback, helpers, jar, exchanges, supabase };
+  return { callback, helpers, jar, exchanges, supabase, oauthCalls };
 }
 
 for (const query of ["code=code-fixture&mode=recovery", "token_hash=hash-fixture&type=recovery"]) {
   test(`${query.split("=")[0]} recovery callback issues a bound, one-use HttpOnly proof`, async (t) => {
-    const { callback, helpers, jar, supabase } = await fixture(t, query.startsWith("token_hash") ? "otp" : "recovery");
+    const { callback, helpers, jar, supabase, oauthCalls } = await fixture(t, query.startsWith("token_hash") ? "otp" : "recovery");
     const response = await callback.GET(new Request(`https://beanmap.example/api/auth/callback?${query}&locale=en&next=%2Fen%2Fstats`));
     assert.equal(new URL(response.headers.get("location")).pathname, "/en/reset-password");
+    assert.deepEqual(oauthCalls, []);
     const proof = jar.get("beanmap-recovery-proof");
     assert.ok(proof);
     assert.equal(proof.options.httpOnly, true);
@@ -72,16 +84,30 @@ for (const query of ["code=code-fixture&mode=recovery", "token_hash=hash-fixture
 
 for (const [method, verified] of [["password", true], ["oauth", true], ["recovery", false]]) {
   test(`mode and SDK redirectType cannot upgrade ${method}/${verified} into recovery`, async (t) => {
-    const { callback, jar } = await fixture(t, method, verified);
+    const { callback, jar, oauthCalls } = await fixture(t, method, verified);
     const response = await callback.GET(new Request("https://beanmap.example/api/auth/callback?code=code-fixture&mode=recovery&locale=ko"));
     assert.equal(new URL(response.headers.get("location")).pathname, "/ko/forgot-password");
+    assert.deepEqual(oauthCalls, []);
     assert.equal(jar.has("beanmap-recovery-proof"), false);
   });
 }
 
 test("a normal OAuth callback keeps its destination without issuing a reset proof", async (t) => {
-  const { callback, jar } = await fixture(t, "oauth");
+  const { callback, jar, oauthCalls } = await fixture(t, "oauth");
   const response = await callback.GET(new Request("https://beanmap.example/api/auth/callback?code=code-fixture&next=%2Fko%2Fstats"));
   assert.equal(new URL(response.headers.get("location")).pathname, "/ko/stats");
+  assert.deepEqual(oauthCalls, ["take", "complete"]);
+  assert.equal(jar.has("beanmap-recovery-proof"), false);
+});
+
+
+test("a pending OAuth account without completed consent is routed to consent on the safe origin", async (t) => {
+  const { callback, jar, oauthCalls } = await fixture(t, "oauth", true, false);
+  const response = await callback.GET(new Request("https://beanmap.example/api/auth/callback?code=code-fixture&locale=en&next=%2Fen%2Fstats"));
+  const destination = new URL(response.headers.get("location"));
+  assert.equal(destination.origin, "https://beanmap.example");
+  assert.equal(destination.pathname, "/en/consent");
+  assert.equal(destination.searchParams.get("next"), "/en/stats");
+  assert.deepEqual(oauthCalls, ["take", "complete"]);
   assert.equal(jar.has("beanmap-recovery-proof"), false);
 });

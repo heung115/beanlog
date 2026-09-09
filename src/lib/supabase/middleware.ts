@@ -63,7 +63,7 @@ export function isProtectedPath(pathname: string): boolean {
 
   return (
     route.length > 0 &&
-    ["explore", "beans", "stats", "settings", "admin"].includes(route[0])
+    ["explore", "beans", "stats", "settings", "admin", "consent"].includes(route[0])
   );
 }
 
@@ -191,6 +191,15 @@ export async function updateSession(request: NextRequest, preferredLocale?: "ko"
     url.pathname = `/${locale}/login`;
     url.search = "";
     url.searchParams.set("next", returnPath);
+    return preserveAuthResponse(supabaseResponse, NextResponse.redirect(url));
+  }
+
+  if (user?.app_metadata?.beanmap_pending_consent === true && (isProtectedPath(pathname) || isAuthPage)
+    && !/^\/(?:ko|en)\/consent\/?$/.test(pathname)) {
+    const url = request.nextUrl.clone();
+    url.pathname = `/${locale}/consent`;
+    url.search = "";
+    if (isProtectedPath(pathname)) url.searchParams.set("next", returnPath);
     return preserveAuthResponse(supabaseResponse, NextResponse.redirect(url));
   }
 

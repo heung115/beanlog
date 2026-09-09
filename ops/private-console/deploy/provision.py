@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Prepare private-console credentials on the server without printing values.
 
-This command only writes its own runtime directory and the Studio directories.
+This command only writes its runtime files, private socket directory and Studio directories.
 It never edits the existing Supabase .env, restarts services, runs SQL, changes
 Tailscale, or rotates existing credentials. Run as root on the deployment host.
 """
@@ -12,6 +12,7 @@ import argparse
 import ipaddress
 import json
 import os
+import pwd
 from pathlib import Path
 import re
 import secrets
@@ -167,6 +168,9 @@ def prepare() -> None:
     rest = container_env("supabase-rest")
     auth = container_env("supabase-auth")
     owner, dns = tailscale_owner(command_json(["tailscale", "status", "--json"]))
+    caddy_identity = pwd.getpwnam("caddy")
+    if caddy_identity.pw_uid == 0:
+        raise ProvisionError("Private Unix sockets require the dedicated non-root Caddy account")
     schemas = required(rest, "PGRST_DB_SCHEMAS")
     if "beanmap_private" in {name.strip() for name in schemas.split(",")}:
         raise ProvisionError("beanmap_private must not be exposed through PostgREST")
@@ -192,6 +196,9 @@ def prepare() -> None:
     # Validate optional values before writing anything, too.
     raw_env(studio)
     ensure_directory(RUNTIME, 0o700)
+    # Caddy recreates this private directory at startup; root tailscaled can
+    # traverse it, while ordinary local users cannot reach its socket files.
+    ensure_directory(Path("/run/caddy/private"), 0o700, caddy_identity.pw_gid, caddy_identity.pw_uid)
     ingress_secret = persisted_token(RUNTIME / "admin_ingress_secret")
     crypto_key = persisted_token(RUNTIME / "meta_crypto_key")
     studio["PG_META_CRYPTO_KEY"] = crypto_key

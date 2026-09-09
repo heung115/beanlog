@@ -6,6 +6,7 @@ import ts from "typescript";
 import { z } from "zod";
 import * as redirectHelpers from "../src/lib/security/redirect.ts";
 import * as validation from "../src/lib/validation/auth.ts";
+import * as passwordPolicy from "../src/lib/security/password-policy.ts";
 import * as authRecovery from "../src/lib/supabase/auth-recovery.ts";
 
 const source = readFileSync(new URL("../src/lib/actions/auth.ts", import.meta.url), "utf8");
@@ -26,6 +27,7 @@ function form(values = {}) {
 function authModule(overrides = {}, recoveryProof = true) {
   const calls = [];
   const auth = {
+    signInWithPassword: async (...args) => { calls.push(["signInWithPassword", ...args]); return { error: null }; },
     resetPasswordForEmail: async (...args) => { calls.push(["requestReset", ...args]); return { error: null }; },
     getUser: async () => { calls.push(["getUser"]); return { data: { user: { id: "fixture-user" } }, error: null }; },
     updateUser: async (...args) => { calls.push(["updateUser", ...args]); return { error: null }; },
@@ -36,6 +38,10 @@ function authModule(overrides = {}, recoveryProof = true) {
   vm.runInNewContext(compiled, {
     exports, URL, URLSearchParams, FormData,
     require(name) {
+      if (name === "@/lib/security/oauth-consent") return { storeOAuthPreconsent: async () => { throw new Error("OAuth preconsent must not run during password reset or email signup"); } };
+      if (name === "next/headers") return { headers: async () => new Headers() };
+      if (name === "@/lib/security/signup-consent") return { controlledSignup: async () => { throw new Error("Unexpected signup during reset"); } };
+      if (name === "@/lib/security/password-policy") return passwordPolicy;
       if (name === "@/lib/security/password-recovery") return {
         checkPasswordRecoveryProof: async (_client, userId, consume) => {
           calls.push(["recoveryProof", userId, consume]);
@@ -123,8 +129,10 @@ for (const locale of ["ko", "en"]) {
   });
 }
 
-test("short, overlong, and mismatched reset passwords cannot reach identity or update calls", async () => {
+test("short, compromised, overlong, and mismatched reset passwords cannot reach identity or update calls", async () => {
   for (const [values, expected] of [
+    [{ password: "passwordpassword", passwordConfirm: "passwordpassword" }, { error: "password_compromised", field: "password" }],
+    [{ password: "123456", passwordConfirm: "123456" }, { error: "password_length", field: "password" }],
     [{ password: "12345", passwordConfirm: "12345" }, { error: "password_length", field: "password" }],
     [{ password: "x".repeat(129), passwordConfirm: "x".repeat(129) }, { error: "password_length", field: "password" }],
     [{ passwordConfirm: "different-password" }, { error: "password_mismatch", field: "passwordConfirm" }],
@@ -186,4 +194,20 @@ test("an ordinary valid session without recovery proof cannot change a password"
   assert.deepEqual(plain(await actions.updatePasswordAction({}, form())), { error: "expired" });
   assert.equal(calls.some(([name]) => name === "updateUser"), false);
   assert.deepEqual(calls.find(([name]) => name === "recoveryProof"), ["recoveryProof", "fixture-user", true]);
+});
+
+
+test("direct signup cannot bypass the shared policy before the controlled boundary", async () => {
+  for (const password of ["123456", "passwordpassword", "a".repeat(73)]) {
+    const { actions, calls } = authModule();
+    const result = await actions.signUp("policy-fixture@local.test", password, "Fixture", true);
+    assert.ok(result.error);
+    assert.deepEqual(calls, []);
+  }
+});
+
+test("legacy short-password login remains available without the new-credential policy", async () => {
+  const { actions, calls } = authModule();
+  await assert.rejects(actions.signInAction({}, form({ password: "123456" })), (error) => error.destination === "/explore");
+  assert.equal(calls.filter(([name]) => name === "signInWithPassword").length, 1);
 });

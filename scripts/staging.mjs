@@ -16,6 +16,7 @@ import { ensureQaCredentials } from "./staging-credentials.mjs";
 import { prepareOcrAssets } from "./prepare-ocr-assets.mjs";
 import { waitForHttpStatus } from "./http-readiness.mjs";
 import { reserveLoopbackPort } from "./port-reservation.mjs";
+import { startQaIngress } from "./qa-ingress.mjs";
 import {
   signalSpawnedProcess,
   spawnOwnedProcess,
@@ -38,6 +39,8 @@ const runtimeSupabase = path.join(runtimeRoot, "supabase");
 const envFile = path.join(runtimeRoot, "docker.env");
 const databaseSecretFile = path.join(runtimeRoot, "api-database-url.secret");
 const authRateSecretFile = path.join(runtimeRoot, "auth-rate-id.secret");
+const signupConsentSecretFile = path.join(runtimeRoot, "signup-consent.secret");
+const authClientIpSecretFile = path.join(runtimeRoot, "auth-client-ip.secret");
 const composeFile = path.join(root, "docker-compose.staging.yml");
 const command = process.argv[2] ?? "help";
 if (["up", "qa", "qa:production"].includes(command)) prepareOcrAssets();
@@ -84,6 +87,8 @@ function compose(args, options = {}) {
 }
 
 function copyRuntimeConfig() {
+  fs.mkdirSync(runtimeRoot, { recursive: true, mode: 0o700 });
+  fs.chmodSync(runtimeRoot, 0o700);
   fs.mkdirSync(runtimeSupabase, { recursive: true });
   const template = fs.readFileSync(
     path.join(root, "staging", "supabase", "config.toml"),
@@ -358,14 +363,23 @@ function writeEnvironment(status, databaseUrl) {
     STAGING_SUPABASE_SERVICE_ROLE_KEY: status.SERVICE_ROLE_KEY,
     STAGING_DATABASE_URL_FILE: databaseSecretFile,
     STAGING_AUTH_RATE_ID_SECRET_FILE: authRateSecretFile,
+    STAGING_SIGNUP_CONSENT_SECRET_FILE: signupConsentSecretFile,
+    STAGING_AUTH_CLIENT_IP_SECRET_FILE: authClientIpSecretFile,
     STAGING_JWKS_URL: "http://kong:8000/auth/v1/.well-known/jwks.json",
     STAGING_JWT_ISSUER: `${status.API_URL}/auth/v1`,
   };
   fs.mkdirSync(runtimeRoot, { recursive: true });
+  fs.chmodSync(runtimeRoot, 0o700);
   if (!fs.existsSync(authRateSecretFile)) fs.writeFileSync(authRateSecretFile, randomBytes(32).toString("hex"), { mode: 0o600 });
-  fs.chmodSync(authRateSecretFile, 0o600);
+  // Docker Desktop bind secrets retain numeric ownership. A non-root container
+  // needs read-only file access; the enclosing host directory stays owner-only.
+  fs.chmodSync(authRateSecretFile, 0o444);
+  if (!fs.existsSync(signupConsentSecretFile)) fs.writeFileSync(signupConsentSecretFile, randomBytes(32).toString("hex"), { mode: 0o600 });
+  fs.chmodSync(signupConsentSecretFile, 0o444);
+  if (!fs.existsSync(authClientIpSecretFile)) fs.writeFileSync(authClientIpSecretFile, randomBytes(32).toString("hex"), { mode: 0o600 });
+  fs.chmodSync(authClientIpSecretFile, 0o444);
   fs.writeFileSync(databaseSecretFile, `${databaseUrl}\n`, { mode: 0o600 });
-  fs.chmodSync(databaseSecretFile, 0o600);
+  fs.chmodSync(databaseSecretFile, 0o444);
   fs.writeFileSync(
     envFile,
     `${Object.entries(values)
@@ -375,6 +389,24 @@ function writeEnvironment(status, databaseUrl) {
   );
   fs.chmodSync(envFile, 0o600);
   ensureQaCredentials(runtimeRoot);
+}
+
+function provisionSignupSigningKey() {
+  const secret = fs.readFileSync(signupConsentSecretFile, "utf8").trim();
+  if (!/^[0-9a-f]{64}$/.test(secret)) throw new Error("Invalid local signup signing key");
+  const sql = `BEGIN;
+DO $key$ BEGIN
+  IF EXISTS(SELECT 1 FROM beanmap_signup.signing_key WHERE id AND secret <> decode('${secret}','hex')) THEN
+    RAISE EXCEPTION 'Local signup signing key differs; explicit rotation required';
+  END IF;
+  INSERT INTO beanmap_signup.signing_key(id,secret) VALUES(true,decode('${secret}','hex'))
+    ON CONFLICT(id) DO NOTHING;
+END; $key$;
+COMMIT;`;
+  const result = spawnSync("docker", ["exec", "-i", `supabase_db_${runtime.supabaseProject}`, "psql", "-X", "-q", "-v", "ON_ERROR_STOP=1", "-U", "supabase_admin", "-d", "postgres"], {
+    cwd: root, input: sql, encoding: "utf8", stdio: ["pipe", "ignore", "pipe"],
+  });
+  if (result.status !== 0) throw new Error("Local signup signing-key provisioning failed; diagnostics suppressed");
 }
 
 function readStoredDatabaseUrl() {
@@ -426,6 +458,7 @@ function qaEnvironment(env, qaCredentials, baseURL) {
     QA_ISOLATION_PASSWORD: qaCredentials.isolation.password,
     QA_EMPTY_EMAIL: qaCredentials.empty.email,
     QA_EMPTY_PASSWORD: qaCredentials.empty.password,
+    QA_SIGNUP_CONSENT_SECRET_FILE: signupConsentSecretFile,
   };
 }
 
@@ -485,6 +518,7 @@ async function up() {
   const databaseUrl = storedDatabaseUrl ?? provisionApiDatabaseRole();
   grantApiRuntimeRole();
   writeEnvironment(status, databaseUrl);
+  provisionSignupSigningKey();
   await hardenSupabaseBindings();
   if (storedDatabaseUrl) {
     // Source files are mounted into the Next.js development container, so an
@@ -494,7 +528,7 @@ async function up() {
     // A newly provisioned database password must be read by a fresh API
     // process. Recreate only the API; never replace the web container for an
     // API secret rotation.
-    compose(["up", "-d", "--build", "--remove-orphans", "web"]);
+    compose(["up", "-d", "--build", "--remove-orphans", "web", "ingress"]);
     compose(["up", "-d", "--build", "--force-recreate", "api"]);
   }
   await waitFor(
@@ -560,6 +594,8 @@ async function qaProduction() {
   const interruption = new AbortController();
   let qaLock;
   let appPortReservation;
+  let upstreamPortReservation;
+  let qaIngress;
   let buildProcess;
   let productionServer;
   let qaProcess;
@@ -592,6 +628,7 @@ async function qaProduction() {
       runtime.productionQaWeb,
       "Production QA app"
     );
+    upstreamPortReservation = await reserveLoopbackPort(0, "Production QA upstream");
     await waitFor(
       `http://localhost:${env.STAGING_API_PORT}/health`,
       "beanmap staging API",
@@ -627,14 +664,17 @@ async function qaProduction() {
     buildProcess = undefined;
 
     const { serverEntry, standaloneRoot } = prepareStandaloneRuntime();
-    await appPortReservation.release();
-    appPortReservation = undefined;
+    const upstreamPort = upstreamPortReservation.port;
+    await upstreamPortReservation.release();
+    upstreamPortReservation = undefined;
     productionServer = spawnOwnedProcess(
       process.execPath,
       [serverEntry],
       {
         cwd: standaloneRoot,
-        env: production.processEnv,
+        env: { ...production.processEnv, PORT: String(upstreamPort),
+          SIGNUP_CONSENT_SECRET_FILE: signupConsentSecretFile,
+          AUTH_CLIENT_IP_SECRET_FILE: authClientIpSecretFile },
         stdio: ["ignore", "inherit", "inherit"],
       }
     );
@@ -643,6 +683,10 @@ async function qaProduction() {
         `Production QA server exited before the test run completed (${signal ?? code ?? "unknown"}).`
       );
     });
+    await appPortReservation.release();
+    appPortReservation = undefined;
+    qaIngress = await startQaIngress({ port: runtime.productionQaWeb, upstreamPort,
+      proof: fs.readFileSync(authClientIpSecretFile, "utf8").trim() });
     await Promise.race([
       waitFor(
         `${production.appUrl}/api/health`,
@@ -675,9 +719,11 @@ async function qaProduction() {
     try {
       await runCleanupSteps([
         () => stopSpawnedProcess(qaProcess),
+        () => qaIngress?.close(),
         () => stopSpawnedProcess(productionServer),
         () => stopSpawnedProcess(buildProcess),
         () => appPortReservation?.release(),
+        () => upstreamPortReservation?.release(),
         () => qaLock?.release(),
       ]);
     } finally {

@@ -1,0 +1,9 @@
+{
+  "gcloud": "/PATH/TO/gcloud",
+  "project": "gcp-free-deploy",
+  "bucket": "beanmap-security-backups-gcp-free-deploy-20260909",
+  "prefix": "beanmap",
+  "retention_days": 30,
+  "maximum_pool_bytes": 4000000000,
+  "bucket_metageneration": "2"
+}

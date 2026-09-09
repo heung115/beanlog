@@ -19,7 +19,7 @@
 
 ## Caddy 연결 시 필수 경계
 
-- 콘솔 HTTP 리스너는 `127.0.0.1`에만 bind하고 Tailscale 개인 전용 접근 게이트를 통해 노출한다.
+- 콘솔은 `0700` 디렉터리의 `0600` Unix 소켓에만 bind하고 root Tailscale Serve를 통해 노출한다. 호스트 관리망·자신의 Serve 주소 우회도 [전송 경계](deploy/README.md)에 따라 차단한다. 공유 loopback TCP를 인증 경계로 사용하지 않는다.
 - `/`, `/index.html`, `/app.js`, `/style.css`, `/config.json`만 public 디렉터리에서 제공한다.
 - `/status.json`만 `/var/lib/beanmap-console/status.json`에 명시적으로 연결한다.
 - 나머지 경로, 디렉터리 탐색, `cpu-state.json`, 수집기와 테스트 파일은 404 처리한다.

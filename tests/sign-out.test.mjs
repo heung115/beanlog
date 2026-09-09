@@ -18,6 +18,10 @@ function signOutWith(response) {
   vm.runInNewContext(outputText, {
     exports,
     require(name) {
+      if (name === "@/lib/security/oauth-consent") return { storeOAuthPreconsent: async () => { throw new Error("OAuth preconsent must not run during sign-out"); } };
+      if (name === "next/headers") return { headers: async () => { throw new Error("Unexpected signup headers during sign-out"); } };
+      if (name === "@/lib/security/signup-consent") return { controlledSignup: async () => { throw new Error("Unexpected signup during sign-out"); } };
+      if (name === "@/lib/security/password-policy") return { newPasswordIssue: async () => { throw new Error("New-password policy must not run during sign-out"); } };
       if (name === "@/lib/security/password-recovery") return {};
       if (name === "@/lib/validation/auth") return authValidation;
       if (name === "@/lib/supabase/auth-recovery") return authRecovery;

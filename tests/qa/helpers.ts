@@ -1,5 +1,8 @@
+import { randomUUID } from "node:crypto";
 import { execFileSync } from "node:child_process";
 import path from "node:path";
+import { readFileSync } from "node:fs";
+import { signupConsentAssertion } from "../../src/lib/security/signup-consent";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { ensureQaCredentials } from "../../scripts/staging-credentials.mjs";
 import { deriveStagingRuntime } from "../../scripts/staging-runtime.mjs";
@@ -90,11 +93,17 @@ export async function ensureUser(email: string, password: string) {
   // test suite cannot log out another browser session.
   if (existing) return existing.id;
 
+  if (!["localhost", "127.0.0.1", "[::1]"].includes(new URL(stagingSupabaseUrl).hostname)
+    || !/^beanmap-qa-[a-z0-9-]+@local\.test$/.test(email)) {
+    throw new Error("Signed QA provisioning requires a local disposable fixture");
+  }
+  const secretFile = process.env.QA_SIGNUP_CONSENT_SECRET_FILE ?? path.join(runtime.runtimeRoot, "signup-consent.secret");
+  const consent = signupConsentAssertion(email, readFileSync(secretFile, "utf8").trim());
   const { data, error } = await admin.auth.admin.createUser({
     email,
     password,
     email_confirm: true,
-    user_metadata: { display_name: "beanmap QA" },
+    user_metadata: { display_name: "beanmap QA", beanmap_signup_consent: consent },
   });
   if (error || !data.user) throw error ?? new Error("QA user creation failed");
   return data.user.id;
@@ -114,7 +123,8 @@ export async function signIn(email: string, password: string) {
 export async function localFixtureRpc(
   client: SupabaseClient,
   name: "create_bean_record" | "update_bean_record" | "delete_bean_record",
-  parameters: Record<string, unknown>
+  parameters: Record<string, unknown>,
+  legacyColumns?: { roastery: string }
 ): Promise<{ data: string | boolean | null; error: { code: string } | null }> {
   if (!["localhost", "127.0.0.1", "[::1]"].includes(new URL(stagingSupabaseUrl).hostname)) {
     throw new Error("Raw legacy fixtures require isolated loopback staging");
@@ -136,7 +146,20 @@ export async function localFixtureRpc(
     : name === "update_bean_record"
       ? `public.update_bean_record((${literal(parameters.p_id)} #>> '{}')::uuid, ${args})`
       : `public.create_bean_record(${args})`;
-  const sql = `BEGIN; SET LOCAL ROLE beanmap_api_runtime; SET LOCAL request.jwt.claims = '${JSON.stringify(claims).replaceAll("'", "''")}'; SELECT to_json(${invocation}); COMMIT;`;
+  if (legacyColumns && (name !== "create_bean_record" || Object.keys(legacyColumns).some(key => key !== "roastery")
+    || typeof legacyColumns.roastery !== "string" || legacyColumns.roastery.length > 200)) {
+    throw new Error("Legacy storage fixture fields rejected");
+  }
+  // Reproduce historic whitespace only after a valid current-session creation.
+  // The private repair targets that returned row and its exact disposable owner.
+  const operation = legacyColumns
+    ? `DO $fixture$ BEGIN PERFORM set_config('beanmap.qa_fixture_id', (${invocation})::text, true); END $fixture$;
+       RESET ROLE;
+       UPDATE public.beans SET roastery=(${literal(legacyColumns.roastery)} #>> '{}')
+         WHERE id=current_setting('beanmap.qa_fixture_id')::uuid AND user_id=(${literal(session.user.id)} #>> '{}')::uuid;
+       SELECT to_json(current_setting('beanmap.qa_fixture_id'));`
+    : `SELECT to_json(${invocation});`;
+  const sql = `BEGIN; SET LOCAL ROLE beanmap_api_runtime; SET LOCAL request.jwt.claims = '${JSON.stringify(claims).replaceAll("'", "''")}'; ${operation} COMMIT;`;
   try {
     const output = execFileSync("docker", ["exec", "-i", container, "psql", "-U", "supabase_admin", "-d", "postgres", "-X", "-qAt", "-v", "ON_ERROR_STOP=1", "-v", "VERBOSITY=verbose"], {
       input: sql, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"], timeout: 30000,
@@ -173,4 +196,36 @@ export async function qaAuthenticatedApi(client: SupabaseClient, path: string, m
 
 export async function qaBeanApi(client: SupabaseClient, path: string, method: string, body?: Record<string, unknown>) {
   return qaAuthenticatedApi(client, `/api/beans${path}`, method, body);
+}
+
+
+/** Synthetic pending-provider state; no external OAuth exchange or consent event. */
+export function localPendingOAuthUser(email: string, password: string, provider: "google" | "kakao"): string {
+  if (!["localhost", "127.0.0.1", "[::1]"].includes(new URL(stagingSupabaseUrl).hostname)
+    || !/^beanmap-qa-oauth-[a-f0-9-]+@local\.test$/.test(email)
+    || !/^[a-f0-9]{48}$/.test(password) || !["google", "kakao"].includes(provider)) {
+    throw new Error("Synthetic OAuth fixture guard rejected");
+  }
+  const container = process.env.QA_DB_CONTAINER ?? (hasExternalQaEnvironment ? "" : `supabase_db_${runtime.supabaseProject}`);
+  if (!/^[a-zA-Z0-9][a-zA-Z0-9_.-]+$/.test(container)) throw new Error("Explicit local QA_DB_CONTAINER is required");
+  const id = randomUUID();
+  const payload = JSON.stringify({ id, email, password, provider }).replaceAll("'", "''");
+  const sql = `BEGIN;
+    DO $fixture$ DECLARE v jsonb := '${payload}'::jsonb; BEGIN
+      INSERT INTO auth.users(id,instance_id,aud,role,email,encrypted_password,email_confirmed_at,confirmation_token,recovery_token,email_change_token_new,email_change,raw_app_meta_data,raw_user_meta_data,created_at,updated_at)
+      VALUES((v->>'id')::uuid,'00000000-0000-0000-0000-000000000000','authenticated','authenticated',v->>'email',extensions.crypt(v->>'password',extensions.gen_salt('bf')),now(),'','','','',jsonb_build_object('provider',v->>'provider','providers',jsonb_build_array(v->>'provider')),'{"display_name":"Synthetic local OAuth QA"}',now(),now());
+      INSERT INTO auth.identities(provider_id,user_id,identity_data,provider,created_at,updated_at)
+      VALUES(v->>'id',(v->>'id')::uuid,jsonb_build_object('sub',v->>'id','email',v->>'email','email_verified',true),'email',now(),now());
+      INSERT INTO beanmap_signup.pending_oauth_consent(user_id,provider) VALUES((v->>'id')::uuid,v->>'provider');
+      UPDATE auth.users SET raw_app_meta_data=raw_app_meta_data||'{"beanmap_pending_consent":true}'::jsonb WHERE id=(v->>'id')::uuid;
+      IF EXISTS(SELECT 1 FROM beanmap_signup.consent_events WHERE user_id=(v->>'id')::uuid) THEN RAISE EXCEPTION 'Unexpected synthetic consent event'; END IF;
+    END $fixture$;
+    COMMIT;`;
+  try {
+    execFileSync("docker", ["exec", "-i", container, "psql", "-U", "supabase_admin", "-d", "postgres", "-X", "-qAt", "-v", "ON_ERROR_STOP=1"],
+      { input: sql, encoding: "utf8", stdio: ["pipe", "pipe", "pipe"], timeout: 30000 });
+  } catch {
+    throw new Error("Local pending-provider fixture creation failed");
+  }
+  return id;
 }

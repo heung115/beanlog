@@ -223,40 +223,64 @@ for (const [name, requestHeaders, expectedOrigin] of [
   test(`${name} uses the configured safe origin throughout OAuth`, async () => {
     const access = privateAccess(requestHeaders);
     const calls = [];
+    const oauthLifecycle = [];
     const actions = loadModule("../src/lib/actions/auth.ts", {
+      "next/headers": { headers: async () => requestHeaders },
+      "@/lib/security/oauth-consent": { storeOAuthPreconsent: async (provider) => { oauthLifecycle.push(["preconsent", provider]); } },
+      "@/lib/security/signup-consent": { controlledSignup: async () => { throw new Error("Email signup must not run during OAuth"); } },
+      "@/lib/security/password-policy": { newPasswordIssue: async () => { throw new Error("Password checks must not run during OAuth"); } },
       "zod": { z },
       "@/lib/validation/auth": authValidation,
       "@/lib/supabase/auth-recovery": authRecovery,
       "@/lib/admin/private-access": access,
       "@/lib/security/redirect": redirects,
       "@/lib/security/password-recovery": {},
-      "next/navigation": { redirect: () => {} },
+      "next/navigation": { redirect: (url) => { oauthLifecycle.push(["redirect", url]); } },
       "@/lib/supabase/server": {
         createPublicClient: async () => ({ auth: { signInWithOAuth: async (options) => {
           calls.push(options.options.redirectTo);
-          return { data: { url: null }, error: null };
+          oauthLifecycle.push(["authorize", options.provider]);
+          return { data: { url: "https://identity.example/authorize" }, error: null };
         } } }),
         setSessionPersistencePreference: async () => {},
       },
     });
     await actions.signInWithOAuth("google", true, "/ko/admin");
+    assert.deepEqual(oauthLifecycle, [["authorize", "google"], ["preconsent", "google"], ["redirect", "https://identity.example/authorize"]]);
+    const callbackConsentCalls = [];
+    const callbackToken = "callback-fixture-token";
+    const callbackClient = { auth: {
+      exchangeCodeForSession: async (code) => {
+        assert.equal(code, "fixture-code");
+        return { data: { session: { access_token: callbackToken } }, error: null };
+      },
+    } };
     const authorizeCallback = new URL(calls[0]);
     assert.equal(authorizeCallback.origin, expectedOrigin);
     assert.equal(authorizeCallback.pathname, "/api/auth/callback");
     assert.equal(authorizeCallback.searchParams.get("next"), "/ko/admin");
     const callback = loadModule("../src/app/api/auth/callback/route.ts", {
+      "@/lib/security/oauth-consent": {
+        takeOAuthPreconsent: async () => { callbackConsentCalls.push("take"); return null; },
+        completeOAuthCallbackConsent: async (client, token, proof) => {
+          assert.equal(client, callbackClient);
+          assert.equal(token, callbackToken);
+          assert.equal(proof, null);
+          callbackConsentCalls.push("complete");
+          return true;
+        },
+      },
       "@/lib/admin/private-access": access,
       "@/lib/security/redirect": redirects,
       "@/lib/security/password-recovery": {},
       "next/server": { NextResponse },
       "next/headers": { cookies: async () => ({ get: () => undefined }) },
-      "@/lib/supabase/server": { createClient: async () => ({ auth: {
-        exchangeCodeForSession: async () => ({ error: null }),
-      } }) },
+      "@/lib/supabase/server": { createClient: async () => callbackClient },
     });
     const request = new Request(`${privateOrigin}/api/auth/callback?code=fixture-code&next=%2Fko%2Fadmin`, { headers: requestHeaders });
     const response = await callback.GET(request);
     assert.equal(response.headers.get("location"), `${expectedOrigin}/ko/admin`);
+    assert.deepEqual(callbackConsentCalls, ["take", "complete"]);
     assert.equal(JSON.stringify([...response.headers]).includes(fixtureSecret), false);
   });
 }

@@ -6,7 +6,7 @@ import { splitStagingMigrations, privilegedStagingMigration } from "../scripts/s
 test("CLI bootstrap excludes only reviewed privileged migrations", () => {
   const plan = splitStagingMigrations(fs.readdirSync(new URL("../supabase/migrations/", import.meta.url)));
   assert.ok(plan.bootstrap.includes("00027_bean_edit_concurrency.sql"));
-  assert.equal(plan.privileged.length, 6);
+  assert.equal(plan.privileged.length, 10);
   assert.ok(plan.privileged.every(name => !plan.bootstrap.includes(name)));
   assert.throws(() => splitStagingMigrations(["00099_unreviewed.sql"]), /Review new migrations/);
 });

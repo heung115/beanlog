@@ -41,20 +41,29 @@ export default function SignupPage() {
   }, [state.field, loading]);
   const message = state.error === "display_name_required" ? "displayNameRequired"
     : state.error === "password_length" ? "passwordRequirements"
+    : state.error === "password_compromised" ? "passwordCompromised"
     : state.error === "password_mismatch" ? "passwordMismatch"
     : state.error === "agreement_required" ? "agreementRequired" : "signupError";
   function fieldError(name: string) {
     return { "aria-invalid": state.field === name || undefined, "aria-describedby": state.field === name ? "signup-form-error" : undefined };
   }
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (submitting.current || serverPending) return;
-    const values = new FormData(e.currentTarget);
-    const issue = validateRegistrationFields(values);
+    submitting.current = true;
+    const form = e.currentTarget;
+    const values = new FormData(form);
+    let issue;
+    try { issue = await validateRegistrationFields(values); } catch {
+      submitting.current = false;
+      setClientState({ error: "temporarily_unavailable" });
+      return;
+    }
     if (issue) {
       setClientState(issue);
-      e.currentTarget.querySelector<HTMLElement>(`[name="${issue.field}"]`)?.focus();
+      form.querySelector<HTMLElement>(`[name="${issue.field}"]`)?.focus();
+      submitting.current = false;
       return;
     }
     submitting.current = true;
@@ -109,8 +118,8 @@ export default function SignupPage() {
             aria-describedby={`password-requirements${state.field === "password" ? " signup-form-error" : ""}`}
             placeholder="••••••••"
             required
-            minLength={6}
-            maxLength={128}
+            minLength={15}
+            maxLength={72}
             autoComplete="new-password"
           />
           <p id="password-requirements" className="-mt-2 text-xs leading-5 text-brown-light">{t("passwordRequirements")}</p>
@@ -122,8 +131,8 @@ export default function SignupPage() {
             {...fieldError("passwordConfirm")}
             placeholder="••••••••"
             required
-            minLength={6}
-            maxLength={128}
+            minLength={15}
+            maxLength={72}
             autoComplete="new-password"
           />
 

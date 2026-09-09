@@ -1,0 +1,10 @@
+{
+  "source_alias": "oracle",
+  "destination": "/ABSOLUTE/APPROVED/BACKUP/DIRECTORY",
+  "recipient": "REPLACE_WITH_DEDICATED_AGE_PUBLIC_RECIPIENT",
+  "retention_days": 30,
+  "rpo_hours": 24,
+  "max_archive_gib": 20,
+  "include_recovery_config": true,
+  "include_images": false
+}

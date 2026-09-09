@@ -11,7 +11,7 @@ PLUGIN = '''      - name: beanmap-auth-budgets
 '''
 
 
-def kong_policy(source):
+def kong_policy(source, web_ip=None):
     if 'name: beanmap-auth-budgets' in source:
         raise ValueError('Budget plugin already installed; review existing configuration')
     parts = re.split(r'(?m)(?=^  - name: )', source)
@@ -23,7 +23,8 @@ def kong_policy(source):
             raise ValueError('Auth service has no plugin list')
         # Remove the former shared gateway-source bucket only from Auth services.
         part = re.sub(r'(?m)^      - name: rate-limiting\n(?:(?:        |          ).*\n)*', '', part)
-        parts[index] = part.replace('    plugins:\n', '    plugins:\n' + PLUGIN, 1)
+        plugin = PLUGIN + (f'          signup_source_ip: \"{web_ip}\"\n' if web_ip else '')
+        parts[index] = part.replace('    plugins:\n', '    plugins:\n' + plugin, 1)
         count += 1
     if count < 2:
         raise ValueError('Expected at least generic and GET-user Auth services')
@@ -59,6 +60,7 @@ def overlay(source, web_ip, host_ip):
     kong.setdefault('volumes', []).append('/etc/beanmap-auth-budgets/plugin:/usr/local/share/lua/5.1/kong/plugins/beanmap-auth-budgets:ro')
     result['services']['auth'] = {'environment': {
         'GOTRUE_JWT_EXP': '300',
+        'GOTRUE_PASSWORD_MIN_LENGTH': '15',
         'GOTRUE_RATE_LIMIT_HEADER': 'X-Beanmap-Auth-Rate-Identity',
         'GOTRUE_MAILER_TEMPLATES_MAGIC_LINK': 'https://beanmap.site/auth-templates/magic-link.html',
     }}

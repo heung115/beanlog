@@ -1,6 +1,7 @@
 import { createClient, setSessionPersistencePreference } from "@/lib/supabase/server";
 import { getOAuthFailureKind, resolveAuthFailurePath, resolvePasswordRecoveryPath, resolveTrustedAppRedirect } from "@/lib/security/redirect";
 import { issuePasswordRecoveryProof } from "@/lib/security/password-recovery";
+import { takeOAuthPreconsent, completeOAuthCallbackConsent } from "@/lib/security/oauth-consent";
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { getRequestAppOrigin } from "@/lib/admin/private-access";
@@ -19,6 +20,7 @@ export async function GET(request: Request) {
   const tokenHash = searchParams.get("type") === "recovery" ? searchParams.get("token_hash") : null;
   if ((code || tokenHash) && !searchParams.has("error")) {
     try {
+      const preconsent = recovery ? null : await takeOAuthPreconsent();
       const supabase = await createClient(recovery ? { persistSession: false } : undefined);
       const { data, error } = tokenHash
         ? await supabase.auth.verifyOtp({ token_hash: tokenHash, type: "recovery" })
@@ -29,9 +31,15 @@ export async function GET(request: Request) {
         ? await issuePasswordRecoveryProof(supabase, data.session.access_token, tokenHash ? "recovery-otp" : "pkce") : false;
       if (!error && (!recovery || recoveryVerified)) {
         if (recovery) await setSessionPersistencePreference(false);
+        let destination = next;
+        if (!recovery && data.session?.access_token && !await completeOAuthCallbackConsent(supabase, data.session.access_token, preconsent)) {
+          const consent = new URL(`/${preferredLocale === "en" ? "en" : "ko"}/consent`, configuredAppUrl);
+          consent.searchParams.set("next", new URL(next).pathname + new URL(next).search);
+          destination = consent;
+        }
         const response = NextResponse.redirect(recovery
           ? resolveTrustedAppRedirect(resolvePasswordRecoveryPath(searchParams.get("next"), preferredLocale), configuredAppUrl)
-          : next);
+          : destination);
         response.headers.set("Cache-Control", "no-store");
         response.headers.set("Referrer-Policy", "no-referrer");
         return response;

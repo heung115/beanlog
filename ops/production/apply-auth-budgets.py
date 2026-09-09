@@ -11,6 +11,7 @@ import subprocess
 import time
 
 HERE = Path(__file__).resolve().parent
+CONTROL_FILES = ['apply-auth-budgets.py', 'prepare-auth-budgets.py', 'caddy-version-boundary.py']
 BASE = Path('/srv/beanlog/supabase/docker')
 FILES = {
     'kong': BASE / 'volumes/api/kong.yml',
@@ -60,6 +61,15 @@ def atomic_install(source, target, mode=None):
 
 
 def validate_caddy(path):
+    spec = importlib.util.spec_from_file_location('caddy_version_boundary', HERE / 'caddy-version-boundary.py')
+    boundary = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(boundary)
+    sources = [path.read_text()]
+    # Read loaded configuration families only, never environment/credential files.
+    for candidate in Path('/etc/caddy').rglob('*'):
+        if candidate.is_file() and (candidate.name == 'Caddyfile' or candidate.suffix in ('.Caddyfile', '.conf')):
+            sources.append(candidate.read_text())
+    boundary.assert_safe(run(['/usr/bin/caddy', 'version']).decode(), sources)
     run(['systemd-run', '--wait', '--pipe', '--collect',
          '--property=EnvironmentFile=/etc/beanmap-private-console/caddy.env',
          '--property=EnvironmentFile=/etc/beanmap-auth-client-ip/caddy.env',
@@ -109,12 +119,13 @@ def prepare(state):
         shutil.copy2(live, state / (kind + '.before'))
         source = live.read_text()
         value = generator.overlay(source, web_ip, host_ip) if kind == 'overlay' else {
-            'kong': generator.kong_policy, 'caddy': generator.caddy_policy, 'expiry': generator.expiry,
+            'kong': lambda source: generator.kong_policy(source, web_ip), 'caddy': generator.caddy_policy, 'expiry': generator.expiry,
         }[kind](source)
         candidate = state / (kind + '.candidate')
         candidate.write_text(value)
         candidate.chmod(0o600)
         records[kind] = {'before': digest(live), 'candidate': digest(candidate)}
+    records['tools'] = {name: digest(HERE / name) for name in CONTROL_FILES}
     records['plugin'] = {name: digest(HERE / 'kong-plugins/beanmap-auth-budgets' / name) for name in ['handler.lua', 'schema.lua']}
     records['monitor'] = {name: digest(HERE / name) for name in MONITOR_FILES}
     if any(path.exists() for path in MONITOR_FILES.values()):
@@ -129,6 +140,8 @@ def prepare(state):
 
 def apply(state):
     records = json.loads((state / 'manifest.json').read_text())
+    if records.get('tools') != {name: digest(HERE / name) for name in CONTROL_FILES}:
+        raise ValueError('Rollout or Caddy safety gate changed after preparation')
     if (state / 'applied').exists():
         raise ValueError('This rollout already completed')
     for kind, live in FILES.items():

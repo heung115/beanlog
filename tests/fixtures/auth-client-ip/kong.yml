@@ -25,6 +25,8 @@ services:
         config:
           allow: [anon]
       - name: beanmap-auth-budgets
+        config:
+          signup_source_ip: "$FIXTURE_WEB_IP"
   - name: auth-v1
     url: http://fixture-web:9999
     routes:
@@ -37,3 +39,5 @@ services:
         config:
           allow: [anon]
       - name: beanmap-auth-budgets
+        config:
+          signup_source_ip: "$FIXTURE_WEB_IP"

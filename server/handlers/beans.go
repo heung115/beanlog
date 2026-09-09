@@ -1,13 +1,16 @@
 package handlers
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"math"
+	"io"
+	"math/big"
 	"net/http"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -15,6 +18,7 @@ import (
 	"beanmap-server/models"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 )
@@ -498,19 +502,27 @@ func buildBeanRecordPayload(req *models.CreateBeanRequest, sel *originSelection,
 		SortOrder        int      `json:"sort_order"`
 	}
 	components := make([]componentPayload, 0, len(req.BlendComponents))
+	var totalHundredths int64
 	for i, comp := range req.BlendComponents {
-		// numeric(5,2) would silently round extra decimal places. Allow only
-		// float representation noise around exact hundredths before the RPC.
-		scaledPercentage := comp.Percentage * 100
-		if math.Abs(scaledPercentage-math.Round(scaledPercentage)) > 1e-8 {
+		// Count exact hundredths so the total matches numeric(5,2) storage.
+		scaledPercentage, ok := new(big.Rat).SetString(strconv.FormatFloat(comp.Percentage, 'g', -1, 64))
+		if !ok {
+			return "", "", "", errors.New("invalid percentage")
+		}
+		scaledPercentage.Mul(scaledPercentage, big.NewRat(100, 1))
+		if !scaledPercentage.IsInt() {
 			return "", "", "", errors.New("blend percentages must have at most two decimal places")
 		}
+		totalHundredths += scaledPercentage.Num().Int64()
 		components = append(components, componentPayload{
 			OriginCountry: comp.OriginCountry, OriginRegion: comp.OriginRegion,
 			OriginSubregions: comp.OriginSubregions, FarmProducer: comp.FarmProducer,
 			Varietal: canonicalText(comp.Varietal), ProcessMethod: comp.ProcessMethod,
 			ProcessDetail: comp.ProcessDetail, Percentage: comp.Percentage, SortOrder: i,
 		})
+	}
+	if (req.BeanType == "blend" && (len(components) == 0 || totalHundredths != 10000)) || (req.BeanType == "single_origin" && len(components) != 0) {
+		return "", "", "", errors.New("invalid blend total")
 	}
 	componentsJSON, err := json.Marshal(components)
 	if err != nil {
@@ -520,13 +532,102 @@ func buildBeanRecordPayload(req *models.CreateBeanRequest, sel *originSelection,
 	return string(beanJSON), string(tagsJSON), string(componentsJSON), nil
 }
 
+// Reject unknown fields at each JSON object, including nested collections.
+func bindBeanMutation(c *gin.Context, target any) error {
+	decoder := json.NewDecoder(c.Request.Body)
+	var payload json.RawMessage
+	if err := decoder.Decode(&payload); err != nil {
+		return err
+	}
+	var object map[string]json.RawMessage
+	if err := json.Unmarshal(payload, &object); err != nil || object == nil {
+		return errors.New("invalid bean object")
+	}
+	for _, key := range []string{"tags", "blend_components"} {
+		if value, exists := object[key]; exists && bytes.Equal(bytes.TrimSpace(value), []byte("null")) {
+			return errors.New("invalid collection")
+		}
+	}
+	var components []map[string]json.RawMessage
+	if value, exists := object["blend_components"]; exists {
+		if err := json.Unmarshal(value, &components); err != nil {
+			return err
+		}
+		for _, component := range components {
+			// Inspect the original decimal before float64 can round off extra
+			// precision (for example 0.0100000000000000001).
+			rawPercentage, exists := component["percentage"]
+			if !exists || len(rawPercentage) > 64 {
+				return errors.New("invalid percentage")
+			}
+			bounded, parseErr := strconv.ParseFloat(string(rawPercentage), 64)
+			if parseErr != nil || bounded <= 0 || bounded > 100 {
+				return errors.New("invalid percentage")
+			}
+			percentage, ok := new(big.Rat).SetString(string(rawPercentage))
+			if !ok || percentage.Sign() <= 0 || percentage.Cmp(big.NewRat(100, 1)) > 0 {
+				return errors.New("invalid percentage")
+			}
+			percentage.Mul(percentage, big.NewRat(100, 1))
+			if !percentage.IsInt() {
+				return errors.New("invalid percentage precision")
+			}
+			if value, exists := component["sort_order"]; exists && bytes.Equal(bytes.TrimSpace(value), []byte("null")) {
+				return errors.New("invalid sort order")
+			}
+		}
+	}
+	typedDecoder := json.NewDecoder(bytes.NewReader(payload))
+	typedDecoder.DisallowUnknownFields()
+	if err := typedDecoder.Decode(target); err != nil {
+		return err
+	}
+	var extra any
+	if err := decoder.Decode(&extra); err != io.EOF {
+		return errors.New("invalid trailing JSON")
+	}
+	if err := binding.Validator.ValidateStruct(target); err != nil {
+		return err
+	}
+	var req *models.CreateBeanRequest
+	switch value := target.(type) {
+	case *models.CreateBeanRequest:
+		req = value
+	case *models.UpdateBeanRequest:
+		req = &value.CreateBeanRequest
+	}
+	whitespace := "\t\n\v\f\r \u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000\ufeff"
+	validSubregions := func(values []string) bool {
+		for _, value := range values {
+			if strings.Trim(value, whitespace) == "" {
+				return false
+			}
+		}
+		return true
+	}
+	if !validSubregions(req.OriginSubregions) {
+		return errors.New("invalid subregions")
+	}
+	for _, component := range req.BlendComponents {
+		if !validSubregions(component.OriginSubregions) || strings.Trim(component.OriginCountry, whitespace) == "" {
+			return errors.New("invalid component origin")
+		}
+	}
+	for _, tag := range req.Tags {
+		if strings.Trim(tag.Tag, whitespace) == "" {
+			return errors.New("invalid tag")
+		}
+	}
+	return nil
+}
+
 // Create persists a bean and its dependent rows through the atomic
 // create_bean_record function, so blend totals, RLS, and rollback all live
 // in one database-side unit rather than being re-implemented here.
 func (h *BeanHandler) Create(c *gin.Context) {
 	db := middleware.RequestDB(c)
 	var req models.CreateBeanRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := bindBeanMutation(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid bean data"})
 		return
 	}
@@ -562,7 +663,7 @@ func (h *BeanHandler) Update(c *gin.Context) {
 	db := middleware.RequestDB(c)
 	beanID := c.Param("id")
 	var req models.UpdateBeanRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
+	if err := bindBeanMutation(c, &req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid bean data"})
 		return
 	}

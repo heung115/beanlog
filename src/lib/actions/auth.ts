@@ -8,6 +8,10 @@ import {
 } from "@/lib/supabase/server";
 import { redirect, RedirectType } from "next/navigation";
 import { z } from "zod";
+import { headers } from "next/headers";
+import { controlledSignup } from "@/lib/security/signup-consent";
+import { storeOAuthPreconsent } from "@/lib/security/oauth-consent";
+import { newPasswordIssue } from "@/lib/security/password-policy";
 import { resolvePostAuthPath } from "@/lib/security/redirect";
 import { getRequestAppOrigin } from "@/lib/admin/private-access";
 import { validateRegistrationFields, validateNewPassword, type RegistrationField } from "@/lib/validation/auth";
@@ -19,12 +23,12 @@ export type SignInState = {
 };
 
 export type SignUpState = {
-  error?: "display_name_required" | "password_length" | "password_mismatch" | "agreement_required" | "signup_failed" | "temporarily_unavailable";
+  error?: "display_name_required" | "password_length" | "password_compromised" | "password_mismatch" | "agreement_required" | "signup_failed" | "temporarily_unavailable";
   field?: RegistrationField;
 };
 
 export type PasswordResetState = {
-  error?: "invalid_email" | "temporarily_unavailable" | "password_length" | "password_mismatch" | "expired" | "same_password";
+  error?: "invalid_email" | "temporarily_unavailable" | "password_length" | "password_compromised" | "password_mismatch" | "expired" | "same_password";
   field?: "email" | "password" | "passwordConfirm";
   sent?: boolean;
   requiresNewLink?: boolean;
@@ -62,7 +66,7 @@ const signInSchema = z.object({
 
 const signUpSchema = z.object({
   email: z.string().trim().email().max(320),
-  password: z.string().min(6).max(128),
+  password: z.string().min(1).max(1024),
   displayName: z.string().trim().min(1).max(50),
   acceptedTerms: z.literal(true),
 });
@@ -76,27 +80,12 @@ export async function signUp(
   const parsed = signUpSchema.safeParse({ email, password, displayName, acceptedTerms });
   if (!parsed.success) return { error: "Invalid signup data" };
 
-  const supabase = await createClient();
-
-  const { error } = await supabase.auth.signUp({
-    email: parsed.data.email,
-    password: parsed.data.password,
-    options: {
-      data: { display_name: parsed.data.displayName },
-    },
-  });
-
-  if (error) {
-    return { error: "Unable to create account" };
-  }
-
-  // The profiles row is created by the handle_new_user database trigger from
-  // raw_user_meta_data.display_name; no separate data write is needed here.
-  return { success: true };
+  if (await newPasswordIssue(parsed.data.password)) return { error: "Invalid signup data" };
+  return controlledSignup(parsed.data, await headers());
 }
 
 export async function signUpAction(_previousState: SignUpState, formData: FormData): Promise<SignUpState> {
-  const issue = validateRegistrationFields(formData);
+  const issue = await validateRegistrationFields(formData);
   if (issue) return issue;
   let result;
   try {
@@ -104,7 +93,7 @@ export async function signUpAction(_previousState: SignUpState, formData: FormDa
   } catch {
     return { error: "temporarily_unavailable" };
   }
-  if (result.error) return { error: "signup_failed" };
+  if ("error" in result) return { error: "signup_failed" };
   const { locale, query } = authFormDestination(formData);
   if (formData.get("draft") === "1") {
     query.delete("next");
@@ -136,7 +125,7 @@ export async function requestPasswordResetAction(_previousState: PasswordResetSt
 }
 
 export async function updatePasswordAction(_previousState: PasswordResetState, formData: FormData): Promise<PasswordResetState> {
-  const issue = validateNewPassword(formData);
+  const issue = await validateNewPassword(formData);
   if (issue) return issue;
   const { locale, query } = authFormDestination(formData);
   let proofConsumed = false;
@@ -222,6 +211,7 @@ export async function signInWithOAuth(
 
   await setSessionPersistencePreference(true);
   if (data.url) {
+    await storeOAuthPreconsent(provider);
     redirect(data.url);
   }
 }

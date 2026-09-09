@@ -26,22 +26,31 @@ class RolloutTests(unittest.TestCase):
     def test_single_atomic_transaction_and_ledger(self):
         with tempfile.TemporaryDirectory() as directory:
             source = self.source(directory)
-            sql = rollout.transaction_sql(source, {})
+            sql = rollout.transaction_sql(source, {}, "a" * 64)
             self.assertEqual(sql.splitlines().count('begin;'), 1)
             self.assertEqual(sql.splitlines().count('commit;'), 1)
             self.assertEqual(sql.count('insert into beanmap_security.release_migrations'), len(rollout.MIGRATIONS))
             self.assertLess(sql.index('select 2;'), sql.index('commit;'))
 
+    def test_signup_key_is_private_formatted_and_never_implicitly_rotated(self):
+        for key in ('', 'a' * 63, 'A' * 64, 'a' * 65, "'; select 1; --"):
+            with self.subTest(key_length=len(key)), self.assertRaises(ValueError):
+                rollout.signup_key_sql(key)
+        sql = rollout.signup_key_sql('a' * 64)
+        self.assertIn('explicit rotation required', sql)
+        self.assertIn('on conflict (id) do nothing', sql)
+        self.assertNotIn('do update', sql.lower())
+
     def test_resume_requires_complete_matching_checksums(self):
         with tempfile.TemporaryDirectory() as directory:
             source = self.source(directory)
             applied = {name: checksum for name, checksum, _ in rollout.migration_sources(source)}
-            sql = rollout.transaction_sql(source, applied)
+            sql = rollout.transaction_sql(source, applied, "a" * 64)
             self.assertNotIn('select 1;', sql)
             self.assertIn('select 2;', sql)
             applied.pop(next(iter(applied)))
             with self.assertRaises(ValueError):
-                rollout.transaction_sql(source, applied)
+                rollout.transaction_sql(source, applied, "a" * 64)
 
     def test_modified_migration_is_rejected(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -50,7 +59,7 @@ class RolloutTests(unittest.TestCase):
             name = next(iter(applied))
             (source / 'supabase/migrations' / name).write_text('begin;\nselect 3;\ncommit;\n')
             with self.assertRaises(ValueError):
-                rollout.transaction_sql(source, applied)
+                rollout.transaction_sql(source, applied, "a" * 64)
 
     def test_multiple_or_external_transactions_are_rejected(self):
         for sql in ('begin;\ncommit;\nbegin;\ncommit;', 'select 4;\nbegin;\ncommit;', 'begin;\ncommit;\nselect 4;'):
@@ -66,6 +75,9 @@ class RolloutTests(unittest.TestCase):
         after['services']['api']['environment'].update(AUTH_URL='http://supabase-auth:9999', AUTH_RATE_ID_SECRET_FILE='/run/secrets/auth_rate_id')
         after['services']['api']['secrets'].append({'source': 'auth_rate_id', 'target': '/run/secrets/auth_rate_id'})
         after['secrets']['auth_rate_id'] = {'name': 'beanlogapp_auth_rate_id', 'file': str(rollout.SECRET)}
+        after['services']['web']['environment'] = {'SIGNUP_CONSENT_SECRET_FILE': '/run/secrets/signup_consent'}
+        after['services']['web']['secrets'] = [{'source': 'signup_consent', 'target': '/run/secrets/signup_consent'}]
+        after['secrets']['signup_consent'] = {'name': 'beanlogapp_signup_consent', 'file': str(rollout.SIGNUP_SECRET)}
         return before, after
 
     def test_only_expected_config_additions_and_resume_pass(self):

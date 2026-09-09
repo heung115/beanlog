@@ -4,9 +4,9 @@
 
 | 화면 | Tailscale HTTPS | 서버 내부 전달 |
 | --- | --- | --- |
-| 운영 현황 | `https://oracle-free.tail6e4bc0.ts.net` | Serve 443 → `127.0.0.1:9310` |
-| 데이터베이스 Studio | `https://oracle-free.tail6e4bc0.ts.net:8443` | Serve 8443 → `127.0.0.1:9311` → Studio 관리망 고정 IPv4의 `3000` 포트 |
-| beanmap 관리자 | `https://oracle-free.tail6e4bc0.ts.net:9443/ko/admin` | Serve 9443 → `127.0.0.1:9312` → 기존 Next `127.0.0.1:3100` |
+| 운영 현황 | `https://oracle-free.tail6e4bc0.ts.net` | Serve 443 → `/run/caddy/private/status.sock` |
+| 데이터베이스 Studio | `https://oracle-free.tail6e4bc0.ts.net:8443` | Serve 8443 → `/run/caddy/private/studio.sock` → Studio 관리망 고정 IPv4의 `3000` 포트 |
+| beanmap 관리자 | `https://oracle-free.tail6e4bc0.ts.net:9443/ko/admin` | Serve 9443 → `/run/caddy/private/admin.sock` → 기존 Next `127.0.0.1:3100` |
 
 웹 브라우저에서 쓰는 DB API 주소는 기존 `API_EXTERNAL_URL`이며, Studio 서버의 API 요청은 컨테이너 네트워크의 `supabase-kong:8000`을 사용한다. PostgreSQL과 postgres-meta 포트는 호스트에 공개하지 않는다. Studio에서 보여 주는 API 키·SQL·사용자 데이터도 소유자에게만 보여야 하므로 Studio 전체 경로가 같은 접근 제한을 받는다.
 
@@ -70,19 +70,40 @@ sudo docker compose --env-file /opt/beanmap-private-console/deploy/.env -f /opt/
 
 `caddy-private.conf`는 `/etc/systemd/system/caddy.service.d/private-console.conf`로 설치한다. 이 파일은 환경을 읽고, 배포판의 `--environ` 옵션을 제거해 재시작 시에도 secret이 journal에 출력되지 않게 한다. 기존 hardening drop-in과 Unix admin socket은 유지한다. 기존 전역 로그 filter에는 `X-Beanmap-Admin-Secret`, `Tailscale-User-Login`, `Tailscale-User-Name`, `Tailscale-User-Profile-Pic`, `Authorization`, `Cookie`의 치환/삭제를 추가한다. private listener의 access log는 기본적으로 켜지 않는다.
 
-환경 파일을 적용한 별도 프로세스에서 Caddy 구성 검증을 먼저 수행한다. 실제 secret으로 `caddy adapt` 전체 JSON을 출력하지 않는다. 검증 후:
+먼저 아래 승인된 운영 적용 순서의 1~3단계로 host 전송 경계를 설치한다. 그 뒤 환경 파일을 적용한 별도 프로세스에서 Caddy 구성을 검증한다. 실제 secret으로 `caddy adapt` 전체 JSON을 출력하지 않는다. 검증 후:
 
 ```sh
 sudo systemctl daemon-reload
 sudo systemctl reload caddy
-sudo tailscale serve --bg --https=443 http://127.0.0.1:9310
-sudo tailscale serve --bg --https=8443 http://127.0.0.1:9311
-sudo tailscale serve --bg --https=9443 http://127.0.0.1:9312
+sudo tailscale serve --bg --https=443 unix:/run/caddy/private/status.sock
+sudo tailscale serve --bg --https=8443 unix:/run/caddy/private/studio.sock
+sudo tailscale serve --bg --https=9443 unix:/run/caddy/private/admin.sock
 ```
 
-Serve 설정은 `--bg`로 재부팅 후 유지된다. **Funnel 명령은 실행하지 않는다.** Tailscale 네트워크만 허용하며 OCI·호스트 방화벽의 공개 포트는 추가하지 않는다. `tailscale serve status --json`에서 세 포트의 HTTP loopback 전달과 Funnel 미사용을 확인한다.
+Serve 설정은 `--bg`로 재부팅 후 유지된다. **Funnel 명령은 실행하지 않는다.** Tailscale 네트워크만 허용하며 OCI·호스트 방화벽의 공개 포트는 추가하지 않는다. `tailscale serve status --json`에서 세 포트의 Unix 소켓 전달과 Funnel 미사용을 확인한다.
 
-소유자 검증은 Serve가 덮어써서 전달하는 `Tailscale-User-Login`에 기반한다. Caddy의 세 포트는 `127.0.0.1`에만 바인딩한다. 다른 네트워크 인터페이스로 바꾸거나 임의 프록시를 앞에 두면 이 신뢰 경계가 달라진다. Studio의 쓰기 요청은 정확한 private Studio Origin을 요구하며, 다른 Origin이나 Origin 누락은 403이다.
+소유자 헤더는 **권한으로 보호된 전송 경로를 통과한 뒤에만** 신뢰한다. Caddy는 `/run/caddy/private`의 Unix 소켓만 열며 디렉터리는 Caddy 소유 `0700`, 소켓은 `0600`이다. root로 실행되는 tailscaled와 이미 관리 권한을 위임받은 Caddy만 접근할 수 있다. 사이트 이름에 남은 9310~9312는 Caddy 내부 라우트 구분용이며 TCP 포트를 열지 않는다. 단순히 loopback에 바인딩하거나 헤더를 지우는 것으로 대체하지 않는다. Studio 쓰기는 기존과 같이 정확한 private Origin을 요구한다.
+
+호스트의 일반 UID가 Studio 관리망 IP에 직접 연결하거나 자신의 Tailscale IP의 Serve에 접속해 노드 소유자 신원을 빌리는 경로도 차단해야 한다. `management-transport-guard.py`는 IPv4/IPv6 OUTPUT 첫 규칙에 두 전용 체인을 설치한다. 관리 bridge `bm-management`의 애플리케이션 연결은 root와 확인된 Caddy UID만(커널 IPv6 이웃 탐색 135·136은 유지), 자신의 Tailscale 주소의 443·8443·9443은 root만 허용한다. 원격 tailnet의 실제 사용자 요청은 이 로컬 OUTPUT 조건에 해당하지 않는다. 이 정책은 HTTP 경로와 무관해 모든 `/api/platform/*`, SQL, 프로젝트, 조직, 스니펫 경로에 적용된다. root 또는 Caddy 자체 침해까지 방어한다고 주장하지 않는다.
+
+### 승인된 운영 적용 순서
+
+이 절차는 운영 변경 승인을 받은 뒤 실행한다. 파일 준비나 테스트 통과만으로 운영 적용이 완료된 것은 아니다.
+
+1. 기존 private Caddyfile, Serve JSON, 해당 systemd drop-in, IPv4/IPv6 OUTPUT 규칙을 root 전용 백업에 보관한다. 원본을 화면이나 일반 로그에 출력하지 않는다.
+2. `management-transport-guard.py`를 `/usr/local/sbin/beanmap-private-transport`에 root:root `0755`로, `beanmap-private-transport.service`를 systemd unit 디렉터리에 root:root `0644`로 설치한다. `docker-private-transport.conf`는 Docker의 별도 drop-in으로 추가한다. 기존 drop-in을 덮어쓰거나 `ExecStartPost` 목록을 초기화하지 않는다.
+3. 준비 도구와 새 `caddy-private.conf`를 설치해 소켓 디렉터리 `0700`을 준비한다. Caddy는 기존 non-root UID, 기존 writable `/run/caddy`, 기존 admin Unix socket을 유지한다. `systemctl daemon-reload` 후 `systemctl enable --now beanmap-private-transport.service`로 경계를 먼저 적용하고 `beanmap-private-transport check`가 성공하는지 확인한다. 도구는 unit 설정·실제 프로세스 UID를 검증하고 호출자의 헤더나 UID 인자를 받지 않는다.
+4. 현재 전체 Caddy 환경에서 새 private Caddyfile을 포함한 후보를 검증한 뒤 교체·reload한다. 공개 Caddyfile 전체를 예제 파일로 교체하지 않는다. 이어 위의 세 Serve 대상만 Unix 주소로 갱신한다. 공유 loopback listener를 임시 fallback으로 남기지 않는다.
+5. `ss`에 9310~9312 TCP listener가 없고 소켓 세 개의 `0600`·상위 디렉터리 `0700`이 유지되는지 확인한다. 소유자 tailnet 브라우저에서 기존 운영 현황·Studio·관리자 UI를 확인한다. `nobody`의 위조 소유자 헤더 요청은 Unix connect 단계에서 거부되어야 하며 관리망 IP와 자신의 Tailscale IPv4/IPv6 주소 우회도 거부되어야 한다.
+6. 별도 승인된 재시작 점검에서 guard → Docker/Caddy 의존 순서와 guard 재적용을 확인한다. 보호 경계가 실패하면 의존 서비스 시작도 실패한다. 키·계정·DB 데이터 변경은 필요하지 않다.
+
+문제 발생 시 공개 앱을 변경하지 말고 추가한 private Serve 포트를 끈 상태에서 원인을 해결한다. 노출된 예전 TCP listener나 일반 UID의 관리망 접근을 복원하는 방식으로 되돌리지 않는다. root의 SSH/Tailscale 및 기존 공개 트래픽은 이 규칙의 대상이 아니다.
+
+### 격리 검증
+
+`python3 ops/private-console/deploy/test-private-transport.py`는 Caddy 2.11.4와 두 개의 일회용 Linux 컨테이너를 사용한다. 호스트 네트워크와 운영 계정은 사용하지 않는다. 실제 UID 65534가 소유자 헤더·정상 Origin을 모두 위조해도 Unix 소켓, 직접 관리망 IPv4/IPv6, 자신의 Serve 주소에서 거부되는지 검사한다. root의 정상 프록시 흐름, Caddy UID의 관리망 연결, 모든 대표 플랫폼 경로, 기존 Origin 제한, guard 두 번 적용, 예전 TCP listener 부재를 함께 확인한다.
+
+전송 지원 확인: [운영 Tailscale 1.102.3의 Unix HTTP proxy 구현](https://github.com/tailscale/tailscale/blob/v1.102.3/ipn/ipnlocal/serve.go), [Caddy Unix bind](https://caddyserver.com/docs/caddyfile/directives/bind), [Caddy 소켓 권한](https://caddyserver.com/docs/conventions#network-addresses).
 
 ## 확인과 복구
 

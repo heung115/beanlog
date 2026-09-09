@@ -1,5 +1,7 @@
 # Import this at top level from the existing /etc/caddy/Caddyfile.
-# All listeners are loopback-only. Tailscale Serve is the sole remote ingress.
+# Private listeners use owner-only Unix sockets; no shared loopback TCP ingress.
+# /run/caddy/private is 0700 and each socket is 0600. Root tailscaled can connect.
+# Keep the host management OUTPUT guard to prevent direct Studio-IP bypass.
 # Tailscale Serve replaces its identity headers; it must never be Funnel.
 
 (beanmap_private_headers) {
@@ -13,7 +15,7 @@
 }
 
 http://:9310 {
-	bind 127.0.0.1
+	bind unix//run/caddy/private/status.sock|0600
 	import beanmap_private_headers
 	@owner header Tailscale-User-Login {$BEANMAP_TAILSCALE_OWNER}
 	handle @owner {
@@ -39,7 +41,7 @@ http://:9310 {
 }
 
 http://:9311 {
-	bind 127.0.0.1
+	bind unix//run/caddy/private/studio.sock|0600
 	import beanmap_private_headers
 	@owner header Tailscale-User-Login {$BEANMAP_TAILSCALE_OWNER}
 	handle @owner {
@@ -72,7 +74,7 @@ http://:9311 {
 }
 
 http://:9312 {
-	bind 127.0.0.1
+	bind unix//run/caddy/private/admin.sock|0600
 	import beanmap_private_headers
 	@owner header Tailscale-User-Login {$BEANMAP_TAILSCALE_OWNER}
 	handle @owner {

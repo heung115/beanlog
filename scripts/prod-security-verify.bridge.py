@@ -1,10 +1,14 @@
 """Run only on the authorized Oracle host; never export its administrative key."""
 import base64
+import hashlib
+import hmac
 import json
 from pathlib import Path
 import re
 import subprocess
 import sys
+import secrets
+import time
 import urllib.error
 import urllib.request
 
@@ -37,9 +41,19 @@ def main():
     if operation == "create":
         if len(request["password"]) < 32:
             raise ValueError("Disposable password guard rejected")
+        # The guard above limits synthetic consent fixtures to disposable users.
+        # The signing key never leaves this host or appears in the response.
+        consent_key = Path("/etc/beanmap-private-console/signup-consent.secret").read_text().strip()
+        if not re.fullmatch(r"[a-f0-9]{64}", consent_key):
+            raise ValueError("Fixture signing configuration unavailable")
+        consent = {"email": email.lower(), "terms_version": "2026-08-26", "privacy_version": "2026-08-26",
+                   "issued_at": int(time.time()), "nonce": secrets.token_hex(32), "source": "email-signup", "path": "/signup"}
+        canonical = "\n".join(str(value) for value in ["beanmap-signup-v1", consent["email"], consent["terms_version"],
+            consent["privacy_version"], consent["issued_at"], consent["nonce"], consent["source"], consent["path"]])
+        consent["signature"] = hmac.new(bytes.fromhex(consent_key), canonical.encode(), hashlib.sha256).hexdigest()
         created = admin("POST", "users", {
             "email": email, "password": request["password"], "email_confirm": True,
-            "user_metadata": {"display_name": "Disposable security verification"},
+            "user_metadata": {"display_name": "Disposable security verification", "beanmap_signup_consent": consent},
         })
         return {"id": created["id"], "anonKey": settings["SUPABASE_ANON_KEY"]}
     user_id = request["id"]

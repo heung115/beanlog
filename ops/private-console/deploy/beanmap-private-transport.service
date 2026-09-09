@@ -1,0 +1,22 @@
+[Unit]
+Description=Protect host access to the private management bridge
+Before=docker.service caddy.service
+After=local-fs.target tailscaled.service
+Wants=tailscaled.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/beanmap-private-transport apply
+RemainAfterExit=yes
+User=root
+Group=root
+NoNewPrivileges=yes
+ProtectHome=yes
+ProtectSystem=strict
+ReadWritePaths=/run
+PrivateTmp=yes
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_DAC_READ_SEARCH
+RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target

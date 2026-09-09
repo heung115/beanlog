@@ -7,6 +7,10 @@ const privileged = new Set([
   "00031_mandatory_edit_version.sql",
   "00032_origin_contact_minimization.sql",
   "00033_required_bean_fields.sql",
+  "00034_bean_collection_invariants.sql",
+  "00035_ddl_defaults_and_network_privileges.sql",
+  "00036_verified_signup_consent.sql",
+  "00037_oauth_pending_consent.sql",
 ]);
 export function splitStagingMigrations(names) {
   const ordered = [...names].filter(name => /^\d+_.+\.sql$/.test(name)).sort();

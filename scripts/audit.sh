@@ -118,7 +118,15 @@ while IFS= read -r -d '' file; do
   IGNORED_COUNT+=1
   relative="${file#./}"
   mode="$(file_mode "$file")"
-  if ! git check-ignore -q -- "$relative" || git ls-files --error-unmatch "$relative" >/dev/null 2>&1 || [[ "$mode" != "600" ]]; then
+  permitted_mode=0
+  [[ "$mode" == "600" ]] && permitted_mode=1
+  # Only this runtime's explicit non-root Docker bind secrets may be read-only
+  # within its owner-only host directory. Other secret files still require 0600.
+  case "$ROOT/$relative" in
+    "$STAGING_RUNTIME_ROOT/api-database-url.secret"|"$STAGING_RUNTIME_ROOT/auth-rate-id.secret"|"$STAGING_RUNTIME_ROOT/signup-consent.secret"|"$STAGING_RUNTIME_ROOT/auth-client-ip.secret")
+      [[ "$mode" == "444" && "$(file_mode "$STAGING_RUNTIME_ROOT")" == "700" ]] && permitted_mode=1 ;;
+  esac
+  if ! git check-ignore -q -- "$relative" || git ls-files --error-unmatch "$relative" >/dev/null 2>&1 || [[ "$permitted_mode" != "1" ]]; then
     printf '%s\n' "$relative" >> "$BAD_LOCAL_PATHS"
   fi
 done < <(find . \
@@ -129,9 +137,9 @@ done < <(find . \
   -type f \( -name '.env' -o -name '.env.*' -o -name '*.env' -o -name '*.secret' -o -name '*client_secret*.json' -o -name '*.pem' -o -name '*.key' \) \
   -print0)
 if [[ -s "$BAD_LOCAL_PATHS" ]]; then
-  finding "HIGH" "secrets/local-files" "Local secret files are tracked, unignored, or not mode 0600" "Paths only: $(tr '\n' ' ' < "$BAD_LOCAL_PATHS")"
+  finding "HIGH" "secrets/local-files" "Local secret files are tracked, unignored, or outside the private permission policy" "Paths only: $(tr '\n' ' ' < "$BAD_LOCAL_PATHS")"
 else
-  finding "OK" "secrets/local-files" "$IGNORED_COUNT local secret files are ignored and mode 0600"
+  finding "OK" "secrets/local-files" "$IGNORED_COUNT local secret files are ignored and privately protected"
 fi
 
 # Full-history scanner. The report is redacted and deleted with TMP_ROOT.

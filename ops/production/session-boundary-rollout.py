@@ -23,7 +23,8 @@ APP = Path('/srv/beanlog/app')
 SOURCE = Path('/srv/beanlog/app-src')
 REPO = STATE / 'repository.git'
 SECRET = Path('/etc/beanmap-private-console/auth-rate-id.secret')
-MIGRATIONS = ('00029_', '00030_', '00031_', '00032_', '00033_')
+SIGNUP_SECRET = Path('/etc/beanmap-private-console/signup-consent.secret')
+MIGRATIONS = ('00029_', '00030_', '00031_', '00032_', '00033_', '00034_', '00035_', '00036_', '00037_')
 
 
 def migration_sources(source: Path) -> list[tuple[str, str, str]]:
@@ -48,7 +49,21 @@ def migration_sources(source: Path) -> list[tuple[str, str, str]]:
     return result
 
 
-def transaction_sql(source: Path, applied: dict[str, str]) -> str:
+def signup_key_sql(secret: str) -> str:
+    if re.fullmatch('[0-9a-f]{64}', secret) is None:
+        raise ValueError('Invalid signup signing key format')
+    # Never rotate an existing key or emit it through a SELECT result. This SQL
+    # is passed on stdin and saved only inside the root-private release backup.
+    return f"""do $key$ begin
+      if exists(select 1 from beanmap_signup.signing_key where id and secret <> decode('{secret}', 'hex')) then
+        raise exception 'Existing signup signing key differs; explicit rotation required';
+      end if;
+      insert into beanmap_signup.signing_key(id,secret) values (true,decode('{secret}', 'hex'))
+        on conflict (id) do nothing;
+    end; $key$;"""
+
+
+def transaction_sql(source: Path, applied: dict[str, str], signup_secret: str) -> str:
     migrations = migration_sources(source)
     expected = {name: checksum for name, checksum, _ in migrations}
     if applied and applied != expected:
@@ -62,26 +77,32 @@ def transaction_sql(source: Path, applied: dict[str, str]) -> str:
         alter table beanmap_security.release_migrations owner to postgres;
         revoke all on beanmap_security.release_migrations from public, anon, authenticated, service_role, beanmap_api_runtime;''')
         chunks.extend(f"insert into beanmap_security.release_migrations(name,sha256) values ('{name}','{checksum}');" for name, checksum, _ in migrations)
+    chunks.append(signup_key_sql(signup_secret))
     chunks.append((source / 'scripts/verify-function-acls.sql').read_text())
     chunks.append('commit;')
     return '\n'.join(chunks) + '\n'
 
 
 def verify_overlay(before: dict, after: dict) -> None:
-    """Permit only the reviewed API auth endpoint and private secret mount."""
+    """Permit only the reviewed API endpoint and API/web private secret mounts."""
     expected = copy.deepcopy(before)
     api = expected['services']['api']
     api.setdefault('environment', {}).update(AUTH_URL='http://supabase-auth:9999', AUTH_RATE_ID_SECRET_FILE='/run/secrets/auth_rate_id')
     api['secrets'] = [entry for entry in api.get('secrets', []) if entry['source'] != 'auth_rate_id']
     api['secrets'].append({'source': 'auth_rate_id', 'target': '/run/secrets/auth_rate_id'})
     expected.setdefault('secrets', {})['auth_rate_id'] = {'name': expected['name'] + '_auth_rate_id', 'file': str(SECRET)}
+    web = expected['services']['web']
+    web.setdefault('environment', {})['SIGNUP_CONSENT_SECRET_FILE'] = '/run/secrets/signup_consent'
+    web['secrets'] = [entry for entry in web.get('secrets', []) if entry['source'] != 'signup_consent']
+    web['secrets'].append({'source': 'signup_consent', 'target': '/run/secrets/signup_consent'})
+    expected['secrets']['signup_consent'] = {'name': expected['name'] + '_signup_consent', 'file': str(SIGNUP_SECRET)}
     # Compose sorts named collections. Secret sequence order is not material.
     for config in (expected, after):
         for service in config['services'].values():
             if 'secrets' in service:
                 service['secrets'] = sorted(service['secrets'], key=lambda entry: entry['source'])
     if expected != after:
-        raise ValueError('Candidate changes existing Compose fields beyond the reviewed API additions')
+        raise ValueError('Candidate changes existing Compose fields beyond the reviewed auth additions')
 
 
 def private_write(path: Path, content: str | bytes, mode=0o600):
@@ -169,17 +190,20 @@ class Rollout:
         private_write(attempt / 'previous-images.json', json.dumps(old_images))
         for name, image in old_images.items():
             self.run(['docker', 'image', 'tag', image, f'beanmap-rollout-backup/{name}:{attempt.name}'])
-        if SECRET.exists():
-            info = SECRET.lstat()
-            if SECRET.is_symlink() or info.st_uid != 1001 or info.st_gid != 1001 or info.st_mode & 0o777 != 0o400 or info.st_size != 64:
-                raise ValueError('Existing auth rate identity secret has unexpected metadata')
-        else:
-            fd = os.open(SECRET, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o400)
-            with os.fdopen(fd, 'wb') as out:
-                os.fchown(out.fileno(), 1001, 1001)
-                out.write(secrets.token_hex(32).encode())
-                out.flush()
-                os.fsync(out.fileno())
+        for secret_file in (SECRET, SIGNUP_SECRET):
+            if secret_file.exists():
+                info = secret_file.lstat()
+                if secret_file.is_symlink() or info.st_uid != 1001 or info.st_gid != 1001 or info.st_mode & 0o777 != 0o400 or info.st_size != 64:
+                    raise ValueError('Existing auth secret has unexpected metadata')
+                if re.fullmatch('[0-9a-f]{64}', secret_file.read_text()) is None:
+                    raise ValueError('Existing auth secret has invalid format')
+            else:
+                fd = os.open(secret_file, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o400)
+                with os.fdopen(fd, 'wb') as out:
+                    os.fchown(out.fileno(), 1001, 1001)
+                    out.write(secrets.token_hex(32).encode())
+                    out.flush()
+                    os.fsync(out.fileno())
         # The secret is private and never included in source archives or logs.
         self.run(['rsync', '-a', '--delete', '--exclude=.env*', '--exclude=.audit-report.md', '--exclude=CONTEXT.md', '--exclude=.staging/', str(source) + '/', str(SOURCE) + '/'])
         self.status('building', sha=sha, attempt=attempt.name)
@@ -199,7 +223,7 @@ class Rollout:
             subprocess.run(['docker', 'exec', '-i', 'supabase-db', 'pg_restore', '--list'], stdin=dump, stdout=self.log, stderr=self.log, check=True)
         ledger_exists = self.psql("select to_regclass('beanmap_security.release_migrations') is not null;", True) == 't'
         applied = json.loads(self.psql("select coalesce(json_object_agg(name,sha256),'{}'::json) from beanmap_security.release_migrations;", True)) if ledger_exists else {}
-        sql = transaction_sql(source, applied)
+        sql = transaction_sql(source, applied, SIGNUP_SECRET.read_text())
         private_write(attempt / 'migration-transaction.sql', sql)
         if self.verified_release() != sha:
             raise ValueError('Release identity changed during database backup')
