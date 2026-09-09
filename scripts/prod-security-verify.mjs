@@ -101,8 +101,13 @@ try {
 
   stage = "public Auth fresh-bearer PUT/PATCH rejection";
   for (const method of ["PUT", "PATCH"]) {
-    for (const path of ["/auth/v1/user", "/auth/v1//user", "/auth/v1/%75ser", "/auth/v1/user/"]) {
-      expect((await call(path, originalToken, method, { password: randomBytes(32).toString("hex") })).status).toBe(405);
+    for (const [path, expectedStatus] of [
+      ["/auth/v1/user", 405],
+      ["/auth/v1//user", 404],
+      ["/auth/v1/%75ser", 404],
+      ["/auth/v1/user/", 404],
+    ]) {
+      expect((await call(path, originalToken, method, { password: randomBytes(32).toString("hex") })).status).toBe(expectedStatus);
     }
   }
   report(stage);
