@@ -1,6 +1,6 @@
 -- Authentication budgets run after key-auth and ACL. No credentials, query
 -- strings, or client addresses are written to the application log.
-local Handler = { PRIORITY = 900, VERSION = "1.1.0" }
+local Handler = { PRIORITY = 900, VERSION = "1.1.1" }
 local limits = {
   user_read = 600, user_write = 30, password = 60, refresh = 120,
   signup = 10, recover = 10, otp = 10, verify = 30, logout = 30,
@@ -18,20 +18,52 @@ local function category()
   local name = path:match("^/auth/v1/([%a]+)$")
   return limits[name] and name or "other"
 end
+local function normalized_auth_endpoint()
+  -- Public Caddy rejects noncanonical paths already. Apply the same private
+  -- endpoint boundary to gateway peers without trusting any forwarded header.
+  local path = kong.request.get_path()
+  for _ = 1, 3 do path = ngx.unescape_uri(path) end
+  local segments = {}
+  for part in path:gmatch("[^/]+") do
+    if part == ".." then table.remove(segments)
+    elseif part ~= "." then segments[#segments + 1] = part end
+  end
+  path = "/" .. table.concat(segments, "/")
+  return path:match("^/auth/v1/([^/]+)")
+end
 function Handler:access(conf)
   -- This header is an internal identity, never a caller-controlled bypass.
   local ip = kong.client.get_forwarded_ip()
   kong.service.request.set_header("X-Beanmap-Auth-Rate-Identity", "public:" .. ip)
+  -- Account deletion uses its authenticated Go handler -> Auth:9999 directly;
+  -- there is deliberately no caller-controlled gateway exception for OTP.
+  local endpoint = normalized_auth_endpoint()
+  local trusted_web = kong.client.get_ip() == conf.signup_source_ip
+      and kong.request.get_header("X-Beanmap-Auth-Client-IP") ~= nil
+  if endpoint == "otp" or endpoint == "magiclink" or endpoint == "resend" then
+    return kong.response.exit(404, { message = "Not found" }, { ["Cache-Control"] = "no-store" })
+  end
+  -- Signup and password recovery use the verified Next server's socket peer,
+  -- never the forwarded client identity. Signup additionally uses a DB HMAC.
+  if (endpoint == "signup" or endpoint == "recover") and not trusted_web then
+    return kong.response.exit(404, { message = "Not found" })
+  end
+  if endpoint == "token" and not trusted_web then
+    local method = kong.request.get_method()
+    local content_type = (kong.request.get_header("Content-Type") or ""):lower()
+    local json = content_type == "application/json" or content_type:match("^application/json%s*;") ~= nil
+    -- Match Auth's FormValue precedence: rejecting form/multipart input is
+    -- required even when the query claims refresh_token. Duplicate/encoded
+    -- query keys are deliberately not an alternate public grant spelling.
+    if ngx.var.args ~= "grant_type=refresh_token" or (method ~= "POST" and method ~= "OPTIONS")
+        or (method ~= "OPTIONS" and not json) then
+      return kong.response.exit(404, { message = "Not found" }, { ["Cache-Control"] = "no-store" })
+    end
+  end
   if kong.request.get_method() == "OPTIONS" then return end
   local dict = ngx.shared.beanmap_auth_budgets
   if not dict then return kong.response.exit(503, { message = "Authentication temporarily unavailable" }) end
   local operation = category()
-  -- The signup gate uses the socket peer, never the forwarded client identity.
-  -- A DB HMAC assertion additionally binds the exact email and consent event.
-  if operation == "signup" and (kong.client.get_ip() ~= conf.signup_source_ip
-      or not kong.request.get_header("X-Beanmap-Auth-Client-IP")) then
-    return kong.response.exit(404, { message = "Not found" })
-  end
   if operation == "admin" then
     local consumer = kong.client.get_consumer()
     if not consumer or consumer.username ~= "service_role" then

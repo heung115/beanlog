@@ -7,6 +7,7 @@ import { z } from "zod";
 import * as redirectHelpers from "../src/lib/security/redirect.ts";
 import * as validation from "../src/lib/validation/auth.ts";
 import * as passwordPolicy from "../src/lib/security/password-policy.ts";
+import * as signInTiming from "../src/lib/security/sign-in-timing.ts";
 import * as authRecovery from "../src/lib/supabase/auth-recovery.ts";
 
 const source = readFileSync(new URL("../src/lib/actions/auth.ts", import.meta.url), "utf8");
@@ -38,6 +39,7 @@ function authModule(overrides = {}, recoveryProof = true) {
   vm.runInNewContext(compiled, {
     exports, URL, URLSearchParams, FormData,
     require(name) {
+      if (name === "@/lib/security/sign-in-timing") return signInTiming;
       if (name === "@/lib/security/oauth-consent") return { storeOAuthPreconsent: async () => { throw new Error("OAuth preconsent must not run during password reset or email signup"); } };
       if (name === "next/headers") return { headers: async () => new Headers() };
       if (name === "@/lib/security/signup-consent") return { controlledSignup: async () => { throw new Error("Unexpected signup during reset"); } };

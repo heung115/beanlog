@@ -1,54 +1,30 @@
+import { loadSignInAction } from "./fixtures/sign-in-action.mjs";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
 import test from "node:test";
-import vm from "node:vm";
-import ts from "typescript";
-import { z } from "zod";
 import { AuthApiError, AuthRetryableFetchError } from "@supabase/supabase-js";
-import { resolvePostAuthPath } from "../src/lib/security/redirect.ts";
-import * as authValidation from "../src/lib/validation/auth.ts";
-import * as authRecovery from "../src/lib/supabase/auth-recovery.ts";
+import { createSignInFailureResponse, SIGN_IN_FAILURE_FLOOR_MS } from "../src/lib/security/sign-in-timing.ts";
 
-const source = readFileSync(new URL("../src/lib/actions/auth.ts", import.meta.url), "utf8");
-const { outputText } = ts.transpileModule(source, {
-  compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
-});
-
-function signInWith(response, { throws = false, clientThrows = false } = {}) {
+function signInWith(response, { throws = false, clientThrows = false, clientDuration = 0, backendDuration = 0 } = {}) {
   const calls = [];
-  const exports = {};
-  vm.runInNewContext(outputText, {
-    exports,
-    require(name) {
-      if (name === "@/lib/security/oauth-consent") return { storeOAuthPreconsent: async () => { throw new Error("OAuth preconsent must not run during password sign-in"); } };
-      if (name === "next/headers") return { headers: async () => { throw new Error("Unexpected signup headers during password sign-in"); } };
-      if (name === "@/lib/security/signup-consent") return { controlledSignup: async () => { throw new Error("Unexpected signup during password sign-in"); } };
-      if (name === "@/lib/security/password-policy") return { newPasswordIssue: async () => { throw new Error("New-password policy must not run during password sign-in"); } };
-      if (name === "@/lib/security/password-recovery") return {};
-      if (name === "zod") return { z };
-      if (name === "@/lib/validation/auth") return authValidation;
-      if (name === "@/lib/supabase/auth-recovery") return authRecovery;
-      if (name === "@/lib/security/redirect") return { resolvePostAuthPath };
-      if (name === "@/lib/admin/private-access") return {};
-      if (name === "@/lib/supabase/server") return {
-        createClient: async ({ persistSession }) => {
-          calls.push(["client", persistSession]);
-          if (clientThrows) throw response;
-          return { auth: { signInWithPassword: async ({ email, password }) => {
-            calls.push(["signIn", email, password]);
-            if (throws) throw response;
-            return response;
-          } } };
-        },
-        setSessionPersistencePreference: async (value) => calls.push(["persistence", value]),
-      };
-      if (name === "next/navigation") return {
-        redirect: (path) => { calls.push(["redirect", path]); throw new Error("NEXT_REDIRECT"); },
-      };
-      throw new Error(`Unexpected dependency: ${name}`);
+  let elapsed = 0;
+  const timing = { now: () => elapsed, jitter: () => 0, sleep: async (milliseconds) => { elapsed += milliseconds; } };
+  const signIn = loadSignInAction({
+    timing: { createSignInFailureResponse: () => createSignInFailureResponse(timing) },
+    createClient: async ({ persistSession }) => {
+      calls.push(["client", persistSession]);
+      elapsed += clientDuration;
+      if (clientThrows) throw response;
+      return { auth: { signInWithPassword: async ({ email, password }) => {
+        calls.push(["signIn", email, password]);
+        elapsed += backendDuration;
+        if (throws) throw response;
+        return response;
+      } } };
     },
+    setSessionPersistencePreference: async (value) => calls.push(["persistence", value]),
+    redirect: (path) => { calls.push(["redirect", path]); throw new Error("NEXT_REDIRECT"); },
   });
-  return { signIn: exports.signInAction, calls };
+  return { signIn, calls, elapsed: () => elapsed };
 }
 
 function loginForm() {
@@ -74,10 +50,11 @@ const failures = [
 
 for (const [description, error, expected] of failures) {
   test(`${description} returns its own login guidance without discarding retry data`, async () => {
-    const { signIn, calls } = signInWith({ error });
+    const { signIn, calls, elapsed } = signInWith({ error });
     const form = loginForm();
     const before = [...form.entries()];
     assert.equal((await signIn({}, form)).error, expected);
+    assert.equal(elapsed(), SIGN_IN_FAILURE_FLOOR_MS);
     assert.deepEqual([...form.entries()], before);
     assert.deepEqual(calls, [["client", false], ["signIn", "retry@local.test", "unchanged-password"]]);
   });
@@ -85,32 +62,53 @@ for (const [description, error, expected] of failures) {
 
 for (const options of [{ throws: true }, { clientThrows: true }]) {
   test(`a thrown connection error ${options.clientThrows ? "creating the client" : "during sign-in"} remains retryable`, async () => {
-    const { signIn, calls } = signInWith(new TypeError("fetch failed"), options);
+    const { signIn, calls, elapsed } = signInWith(new TypeError("fetch failed"), options);
     assert.equal((await signIn({}, loginForm())).error, "temporarily_unavailable");
+    assert.equal(elapsed(), SIGN_IN_FAILURE_FLOOR_MS);
     assert.equal(calls.some(([name]) => ["redirect", "persistence"].includes(name)), false);
   });
 }
 
 test("successful retry honors the unchanged destination and session preference", async () => {
-  const { signIn, calls } = signInWith({ error: null });
+  const { signIn, calls, elapsed } = signInWith({ error: null });
   await assert.rejects(signIn({ error: "temporarily_unavailable" }, loginForm()), /NEXT_REDIRECT/);
+  assert.equal(elapsed(), 0);
   assert.deepEqual(calls.slice(-2), [["persistence", false], ["redirect", "/en/beans/new?draft=1"]]);
 });
 
 test("invalid form fields never contact authentication", async () => {
-  const { signIn, calls } = signInWith({ error: null });
+  const { signIn, calls, elapsed } = signInWith({ error: null });
   const form = loginForm();
   form.set("email", "invalid-email");
   assert.equal((await signIn({}, form)).error, "invalid_credentials");
+  assert.equal(elapsed(), SIGN_IN_FAILURE_FLOOR_MS);
   assert.deepEqual(calls, []);
 });
 
 test("a legacy six-character password still reaches sign-in and preserves its destination", async () => {
-  const { signIn, calls } = signInWith({ error: null });
+  const { signIn, calls, elapsed } = signInWith({ error: null });
   const form = loginForm();
   form.set("password", "123456");
   await assert.rejects(signIn({}, form), /NEXT_REDIRECT/);
   assert.equal(calls.filter(([name]) => name === "signIn").length, 1);
   assert.equal(calls.find(([name]) => name === "signIn")[2].length, 6);
+  assert.equal(elapsed(), 0);
   assert.deepEqual(calls.slice(-2), [["persistence", false], ["redirect", "/en/beans/new?draft=1"]]);
+});
+
+for (const backendDuration of [60, 165]) {
+  test(`client preparation and provider ${backendDuration}ms count toward the same total failure floor`, async () => {
+    const { signIn, elapsed } = signInWith({ error: failures[0][1] }, { clientDuration: 35, backendDuration });
+    assert.equal((await signIn({}, loginForm())).error, "invalid_credentials");
+    assert.equal(elapsed(), SIGN_IN_FAILURE_FLOOR_MS);
+  });
+}
+
+test("malformed action arguments also receive the failure floor without calling Auth", async () => {
+  for (const malformed of [null, undefined, {}, { get: "not-callable" }]) {
+    const { signIn, calls, elapsed } = signInWith({ error: null });
+    assert.equal((await signIn({}, malformed)).error, "invalid_credentials");
+    assert.equal(elapsed(), SIGN_IN_FAILURE_FLOOR_MS);
+    assert.deepEqual(calls, []);
+  }
 });

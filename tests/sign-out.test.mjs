@@ -18,6 +18,7 @@ function signOutWith(response) {
   vm.runInNewContext(outputText, {
     exports,
     require(name) {
+      if (name === "@/lib/security/sign-in-timing") return { createSignInFailureResponse: () => { throw new Error("Password sign-in timing must not run for another auth action"); } };
       if (name === "@/lib/security/oauth-consent") return { storeOAuthPreconsent: async () => { throw new Error("OAuth preconsent must not run during sign-out"); } };
       if (name === "next/headers") return { headers: async () => { throw new Error("Unexpected signup headers during sign-out"); } };
       if (name === "@/lib/security/signup-consent") return { controlledSignup: async () => { throw new Error("Unexpected signup during sign-out"); } };

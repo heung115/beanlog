@@ -32,10 +32,10 @@ if (mode === "exhaust-user") {
 } else if (mode === "token-other-client") {
   result={token:await status("http://fixture-caddy:8080/auth-token",{method:"POST"})};
 } else if (mode === "operation-budgets") {
-  const send = (path, headers={}) => status(`http://fixture-caddy:8081/auth/v1/${path}`, {method:"POST", headers:{apikey:"fixture-only-api-key",...headers}});
+  const send = (path, headers={}) => status(`http://fixture-caddy:8081/auth/v1/${path}`, {method:"POST", headers:{apikey:"fixture-only-api-key","Content-Type":"application/json",...headers}});
   result={forgedGrantStatus:await send("token?grant_type=password", {"X-Beanmap-Auth-Client-IP":otherIp,"X-Forwarded-For":otherIp})};
-  for (const path of ["signup","recover","otp"]) {
-    const count={}; for(let i=0;i<11;i++) {const code=path==="signup" ? await status("http://fixture-caddy:8080/auth-signup",{method:"POST"}) : await send(path);count[code]=(count[code]??0)+1;} result[path]=count;
+  for (const path of ["signup","recover"]) {
+    const count={}; for(let i=0;i<11;i++) {const code=await status(`http://fixture-caddy:8080/auth-${path}`,{method:"POST"});count[code]=(count[code]??0)+1;} result[path]=count;
   }
   for (const [key,path] of [["verify","verify"],["refresh","token?grant_type=refresh_token"],["logout","logout"]]) result[key]=await send(path);
   result.signupSpellingsBlocked=true;
@@ -66,6 +66,61 @@ if (mode === "exhaust-user") {
   }
   result.deniedTrafficCannotSpendGlobal=rejected===10000;
   result.adminAfterPublicExhaustion=await status("http://beanmap-auth-gateway:8000/auth/v1/admin/users",{headers:{apikey:"fixture-only-admin-key"}});
+} else if (mode === "otp-boundary") {
+  result = { publicUniform:true, publicSpellingsBlocked:true, directGatewayBlocked:true, preflightBlocked:true };
+  const options = email => ({method:"POST",headers:{apikey:"fixture-only-api-key","content-type":"application/json",
+    "X-Beanmap-Auth-Client-IP":otherIp,"X-Forwarded-For":otherIp,"X-Beanmap-Auth-Rate-Identity":"deletion:forged"},
+    body:JSON.stringify({email,create_user:false})});
+  for (const endpoint of ["otp","magiclink","recover","resend"]) {
+    const replies = [];
+    for (const email of ["existing@local.test","existing@local.test","absent@local.test","absent@local.test"]) {
+      const response=await fetch("http://fixture-caddy:8081/auth/v1/"+endpoint,options(email));
+      const body=await response.text();
+      // HTTP Date naturally varies by clock time; all stable headers must match.
+      const headers=[...response.headers].filter(([name])=>name!=="date").sort();
+      replies.push(JSON.stringify({status:response.status,headers,body}));
+      if(response.status!==404 || body!=="") result.publicUniform=false;
+    }
+    result.publicUniform=result.publicUniform && replies.every(reply=>reply===replies[0]);
+  }
+  for(const path of ["otp","otp/","%6ftp","%6Ftp","otp%2f","%256ftp","./otp","other/../otp","//otp","otp/anything",
+    "magiclink","magiclink/","%6dagiclink","magiclink%2f","%256dagiclink","other/../magiclink","//magiclink","magiclink/anything",
+    "recover","recover/","%72ecover","recover%2f","%2572ecover","other/../recover","//recover","recover/anything",
+    "resend","resend/","%72esend","resend%2f","%2572esend","other/../resend","//resend","resend/anything"]) {
+    if(await status(`http://fixture-caddy:8081/auth/v1/${path}`,options("absent@local.test"))!==404) result.publicSpellingsBlocked=false;
+    if(await status(`http://beanmap-auth-gateway:8000/auth/v1/${path}`,options("absent@local.test"))!==404) result.directGatewayBlocked=false;
+  }
+  for(const host of ["http://fixture-caddy:8081","http://beanmap-auth-gateway:8000"]) {
+    for(const endpoint of ["otp","magiclink","recover","resend"]) {
+      if(await status(host+"/auth/v1/"+endpoint,{method:"OPTIONS",headers:{apikey:"fixture-only-api-key"}})!==404) result.preflightBlocked=false;
+    }
+  }
+} else if (mode === "token-boundary") {
+  result = { publicGrantBlocked:true, queryVariantsBlocked:true, bodyOverrideBlocked:true };
+  const post = email => ({method:"POST",headers:{apikey:"fixture-only-api-key","Content-Type":"application/json",
+    "X-Beanmap-Auth-Client-IP":otherIp,"X-Forwarded-For":otherIp},body:JSON.stringify({email,password:"synthetic-invalid-value"})});
+  const replies=[];
+  for(const email of ["existing@local.test","existing@local.test","absent@local.test","absent@local.test"]) {
+    const response=await fetch("http://fixture-caddy:8081/auth/v1/token?grant_type=password",post(email));
+    const body=await response.text();
+    replies.push(JSON.stringify({status:response.status,body,headers:[...response.headers].filter(([name])=>name!=="date").sort()}));
+    if(response.status!==404 || body!=="") result.publicGrantBlocked=false;
+  }
+  result.publicGrantBlocked=result.publicGrantBlocked && replies.every(reply=>reply===replies[0]);
+  for(const host of ["http://fixture-caddy:8081","http://beanmap-auth-gateway:8000"]) {
+    for(const path of ["token?grant_type=password","token/?grant_type=password","%74oken?grant_type=password",
+      "token?grant_type=%70assword","token?%67rant_type=password","token?grant_type=password&grant_type=refresh_token",
+      "token?grant_type=refresh_token&grant_type=password","token?grant_type=refresh_token&grant_type=refresh_token",
+      "token?grant_type=refresh_token%00","token?grant_type=pkce","token"]) {
+      if(await status(host+"/auth/v1/"+path,post("absent@local.test"))!==404) result.queryVariantsBlocked=false;
+    }
+    for(const type of ["application/x-www-form-urlencoded","multipart/form-data; boundary=fixture","text/plain"]) {
+      if(await status(host+"/auth/v1/token?grant_type=refresh_token",{method:"POST",headers:{apikey:"fixture-only-api-key","Content-Type":type},body:"grant_type=password&email=existing%40local.test"})!==404) result.bodyOverrideBlocked=false;
+    }
+  }
+  result.publicRefreshStatus=await status("http://fixture-caddy:8081/auth/v1/token?grant_type=refresh_token",{method:"POST",headers:{apikey:"fixture-only-api-key","Content-Type":"application/json"},body:'{"refresh_token":"synthetic"}'});
+  result.internalGrantStatus=await status("http://fixture-caddy:8080/auth-token",{method:"POST"});
+  result.internalPkceStatus=await status("http://fixture-caddy:8080/auth-pkce",{method:"POST"});
 } else if (mode === "after-recreate") {
   result={user:await status("http://fixture-caddy:8080/auth-check")};
 }
@@ -98,7 +153,7 @@ else if (mode === "auth-boundaries") report = {
   privateDenied:httpStatus(result.privateDenied), privateAllowed:httpStatus(result.privateAllowed),
 };
 else if (mode === "operation-budgets") report = {
-  forgedGrantStatus:httpStatus(result.forgedGrantStatus), signup:histogram(result.signup), recover:histogram(result.recover), otp:histogram(result.otp),
+  forgedGrantStatus:httpStatus(result.forgedGrantStatus), signup:histogram(result.signup), recover:histogram(result.recover),
   verify:httpStatus(result.verify), refresh:httpStatus(result.refresh), logout:httpStatus(result.logout),
   signupSpellingsBlocked:result.signupSpellingsBlocked === true, untrustedDirectSignup:httpStatus(result.untrustedDirectSignup),
   adminDenied:httpStatus(result.adminDenied), internalAdminDenied:httpStatus(result.internalAdminDenied), admin:httpStatus(result.admin),
@@ -106,5 +161,18 @@ else if (mode === "operation-budgets") report = {
   aggregateBounded:result.aggregateBounded === true, deniedTrafficCannotSpendGlobal:result.deniedTrafficCannotSpendGlobal === true,
   adminAfterPublicExhaustion:httpStatus(result.adminAfterPublicExhaustion),
 };
+else if (mode === "otp-boundary") report = {
+  publicUniform:result.publicUniform===true, publicSpellingsBlocked:result.publicSpellingsBlocked===true,
+  directGatewayBlocked:result.directGatewayBlocked===true, preflightBlocked:result.preflightBlocked===true,
+};
+else if (mode === "token-boundary") {
+  if (result.publicGrantBlocked !== true || result.queryVariantsBlocked !== true || result.bodyOverrideBlocked !== true
+      || result.publicRefreshStatus !== 200 || result.internalGrantStatus !== 200 || result.internalPkceStatus !== 200) {
+    throw new Error("Token boundary fixture assertion failed");
+  }
+  // Emit an assertion receipt, never response-derived values (even status fields).
+  report = { publicGrantBlocked:true, queryVariantsBlocked:true, bodyOverrideBlocked:true,
+    publicRefreshStatus:200, internalGrantStatus:200, internalPkceStatus:200 };
+}
 else throw new Error("Unknown fixture mode");
 console.log(JSON.stringify(report));

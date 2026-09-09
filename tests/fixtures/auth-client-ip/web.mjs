@@ -25,8 +25,9 @@ http.createServer(async (request, response) => {
   if (request.url === "/health") { response.end("ok"); return; }
   try {
     const trustedFetch = createTrustedAuthFetch(new Headers(request.headers));
-    const token = request.url === "/auth-token" || request.url === "/auth-signup";
-    const endpoint = request.url === "/auth-signup" ? "signup" : token ? "token" : "user";
+    const token = ["/auth-token","/auth-pkce","/auth-signup","/auth-recover"].includes(request.url);
+    const endpoint = request.url === "/auth-signup" ? "signup" : request.url === "/auth-recover" ? "recover"
+      : request.url === "/auth-pkce" ? "token?grant_type=pkce" : token ? "token?grant_type=password" : "user";
     const result = await trustedFetch(`${process.env.SUPABASE_SERVER_URL}/auth/v1/${endpoint}`, {
       method: token ? "POST" : "GET",
       headers: { authorization: request.headers.authorization ?? "", apikey: "fixture-only-api-key" },
