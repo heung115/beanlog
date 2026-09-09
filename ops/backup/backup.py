@@ -17,7 +17,7 @@ import tempfile
 import time
 
 FORMAT = 1
-COMPONENTS = {'database.dump.age', 'roles.sql.age', 'recovery-config.tar.age', 'postgres-config.tar.age', 'runtime-inventory.json.age', 'images.tar.age', 'images.tar.gz.age', 'tailscale-serve.json.age'}
+COMPONENTS = {'database.dump.age', 'roles.sql.age', 'recovery-config.tar.age', 'postgres-config.tar.age', 'runtime-inventory.json.age', 'images.tar.age', 'images.tar.gz.age', 'images.delta.tar.gz.age', 'image-base.json.age', 'tailscale-serve.json.age'}
 NAME = re.compile(r'^backup-\d{8}T\d{6}Z-[0-9a-f]{8}$')
 CONTAINERS = ('supabase-db', 'supabase-auth', 'supabase-rest', 'supabase-kong',
               'beanlogapp-web-1', 'beanlogapp-api-1', 'beanmap-private-meta', 'beanmap-private-studio')

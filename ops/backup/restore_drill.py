@@ -15,9 +15,11 @@ import re
 import subprocess
 import sys
 import tarfile
+import tempfile
 import time
 import uuid
 import backup
+import image_delta
 
 LABEL = 'dev.beanmap.restore-drill'
 LIMIT = 256 * 1024 * 1024
@@ -137,6 +139,90 @@ def load_images(age, identity, path):
             for process in processes: process.wait()
 
 
+def runtime_images(inventory):
+    names = {'/' + name for name in backup.CONTAINERS}
+    if not isinstance(inventory, list) or len(inventory) != len(names):
+        raise ValueError('Runtime inventory must cover every reviewed service')
+    result = {}
+    for item in inventory:
+        if not isinstance(item, dict) or item.get('Name') not in names or item['Name'] in result or not image_delta.DIGEST.fullmatch(item.get('Image', '')):
+            raise ValueError('Runtime inventory has duplicate, missing or mutable images')
+        result[item['Name']] = item['Image']
+    return result
+
+
+def image_components(manifest):
+    full = set(manifest['files']) & {'images.tar.age', 'images.tar.gz.age'}
+    delta = set(manifest['files']) & {'images.delta.tar.gz.age', 'image-base.json.age'}
+    if len(full) == 1 and not delta:
+        return 'full', full.pop()
+    if not full and delta == {'images.delta.tar.gz.age', 'image-base.json.age'}:
+        return 'delta', None
+    raise ValueError('Baseline must contain one full archive or one complete delta pair')
+
+
+def load_verified_full_images(age, identity, path, expected_ids, workspace=None):
+    """Prove image presence inside the archive; host image cache is not evidence."""
+    workspace = image_delta.private(workspace) if workspace else None
+    with tempfile.TemporaryDirectory(prefix='restore-full-images-', dir=workspace) as temporary:
+        directory = Path(temporary); archive = directory / 'images.archive'; files = directory / 'files'; files.mkdir()
+        image_delta.decrypt(age, identity, path, archive)
+        result = image_delta.validate_oci(image_delta.read_archive(archive, files), expected_ids)
+        with archive.open('rb') as source, open(os.devnull, 'wb') as sink:
+            loaded = subprocess.run(['docker', 'image', 'load', '--quiet'], stdin=source, stdout=sink, stderr=subprocess.PIPE)
+            if loaded.returncode:
+                raise RestoreError('Verified full image archive import failed')
+        return result
+
+
+def load_recovery_images(args, identity, directory, manifest, inventory):
+    """Validate a complete inventory before loading any delta recovery images."""
+    runtime = runtime_images(inventory)
+    mode, filename = image_components(manifest)
+    result = {'mode': mode, 'runtime_images_verified': len(set(runtime.values()))}
+    if mode == 'full':
+        verified = load_verified_full_images(args.age, identity, directory / filename, list(runtime.values()), getattr(args, 'image_workspace', None))
+        result['archive_images_verified'] = verified['images_verified']
+    else:
+        if not getattr(args, 'parent_bundle', None) or not getattr(args, 'parent_receipt', None) or not getattr(args, 'image_workspace', None):
+            raise ValueError('Delta restore needs a full parent, pinned generation receipt and private workspace')
+        expected_ids = image_delta.image_ids(getattr(args, 'expected_delta_image_id', None))
+        parent_dir = Path(args.parent_bundle).expanduser().resolve()
+        parent = backup.validate(parent_dir)
+        parent_mode, parent_file = image_components(parent)
+        if parent_mode != 'full':
+            raise ValueError('Image delta parents cannot themselves be deltas')
+        receipt = image_delta.parent_reference(image_delta.read_json(args.parent_receipt))
+        if parent_dir.name != receipt['backup_name'] or parent_file != receipt['image_file'] or backup.digest(parent_dir / 'manifest.json') != receipt['manifest_sha256']:
+            raise ValueError('Parent manifest differs from generation-pinned receipt')
+        if parent['files'][parent_file] != {'bytes': receipt['ciphertext_bytes'], 'sha256': receipt['ciphertext_sha256']}:
+            raise ValueError('Parent image fingerprint differs from pinned receipt')
+        parent_inventory = runtime_images(json.loads(decrypt(args.age, identity, parent_dir / 'runtime-inventory.json.age', 2*1024*1024)))
+        changed = {image for name, image in runtime.items() if image != parent_inventory[name]}
+        if not changed <= set(expected_ids) <= set(runtime.values()):
+            raise ValueError('Delta images do not cover every changed runtime image')
+        workspace = image_delta.private(args.image_workspace)
+        with tempfile.TemporaryDirectory(prefix='restore-image-delta-', dir=workspace) as temporary:
+            output = Path(temporary) / 'images.tar'
+            verified = image_delta.reconstruct_encrypted(parent_dir / parent_file, directory / 'images.delta.tar.gz.age',
+                        directory / 'image-base.json.age', identity, receipt, expected_ids, output, workspace, args.age,
+                        expected_parent_ids=list(parent_inventory.values()))
+            # The full parent preserves unchanged services; the newly verified
+            # image archive replaces only reviewed immutable image IDs.
+            load_images(args.age, identity, parent_dir / parent_file)
+            with output.open('rb') as source, open(os.devnull, 'wb') as sink:
+                loaded = subprocess.run(['docker', 'image', 'load', '--quiet'], stdin=source, stdout=sink, stderr=subprocess.PIPE)
+                if loaded.returncode:
+                    raise RestoreError('Reconstructed image archive import failed')
+            result.update(parent_generation_pinned=True, delta_files_verified=verified['files_verified'],
+                          changed_runtime_images=len(changed), delta_images_verified=len(expected_ids),
+                          parent_archive_images_verified=verified['parent_images_verified'])
+    for image in sorted(set(runtime.values())):
+        if json.loads(run(['docker', 'image', 'inspect', image]))[0]['Id'] != image:
+            raise RestoreError('Archived runtime image identity mismatch')
+    return result
+
+
 class OfflineDatabase:
     def __init__(self, image):
         self.token = uuid.uuid4().hex
@@ -204,8 +290,7 @@ def drill(args):
     manifest = backup.validate(directory)
     required = {'database.dump.age', 'roles.sql.age', 'postgres-config.tar.age', 'runtime-inventory.json.age'}
     if not required <= manifest['files'].keys(): raise ValueError('Baseline lacks database recovery components')
-    image_files = set(manifest['files']) & {'images.tar.age', 'images.tar.gz.age'}
-    if len(image_files) != 1: raise ValueError('Baseline needs exactly one archived image bundle')
+    image_components(manifest)
     validate_local_engine()
     acl_script = Path(args.acl_check_script).read_bytes()
     if not acl_script or len(acl_script) > 1024*1024: raise ValueError('Invalid deployed ACL checker')
@@ -223,9 +308,7 @@ def drill(args):
     roles = restore_roles(decrypt(args.age, identity, directory / 'roles.sql.age', 2*1024*1024))
     dump = decrypt(args.age, identity, directory / 'database.dump.age')
     progress('loading archived immutable images')
-    load_images(args.age, identity, directory / image_files.pop())
-    if json.loads(run(['docker', 'image', 'inspect', image]))[0]['Id'] != image:
-        raise RestoreError('Archived database image identity mismatch')
+    image_verification = load_recovery_images(args, identity, directory, manifest, inventory)
     database = OfflineDatabase(image)
     restore_started = time.monotonic()
     try:
@@ -261,6 +344,7 @@ def drill(args):
         if vault.strip() != b't': raise RestoreError('Restored Vault configuration check failed')
         return {'status': 'passed', 'scope': 'production-database-only', 'baseline_created_at': manifest['created_at'],
                 'database_version': version, 'archived_image_match': True, 'ciphertext_integrity': True,
+                'image_verification': image_verification,
                 'table_data_fingerprints_match': True, 'sequence_states_match': True, 'tables_verified': len(expected), 'security_checks': checks,
                 'vault_roundtrip': True, 'database_restore_seconds': round(restored_at-restore_started, 3),
                 'total_seconds': round(time.monotonic()-started, 3), 'network': 'none',
@@ -284,6 +368,10 @@ def main():
     parser.add_argument('--bundle', required=True); parser.add_argument('--identity', required=True)
     parser.add_argument('--acl-check-script', required=True, help='Exact deployed revision read-only ACL checker')
     parser.add_argument('--age', default='age'); parser.add_argument('--report', required=True)
+    parser.add_argument('--parent-bundle', help='Previously verified full baseline; image delta chains are not supported')
+    parser.add_argument('--parent-receipt', help='Trusted exact-generation parent receipt from the reviewed GCS download')
+    parser.add_argument('--image-workspace', help='Owned mode-0700 temporary image reconstruction workspace')
+    parser.add_argument('--expected-delta-image-id', action='append', help='Reviewed immutable image ID, repeated for every delta image')
     args = parser.parse_args()
     try:
         report = drill(args)
