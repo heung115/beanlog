@@ -9,6 +9,26 @@
 		not expression `{http.request.uri}.matches('^/(auth|rest)/v1(/[A-Za-z0-9_-]+)*([?].*)?$') || {http.request.uri}.matches('^/auth/v1/[.]well-known/jwks[.]json([?].*)?$')`
 	}
 	respond @noncanonical_public_api 404
-	@controlled_signup path /auth/v1/signup /auth/v1/signup/*
+	# Auth chooses grants with FormValue, so form bodies can override a query.
+	# Public refresh accepts only the SDK's exact query and JSON request type.
+	@noncanonical_public_token {
+		path /auth/v1/token /auth/v1/token/*
+		not expression `{http.request.uri}.matches('^/auth/v1/token[?]grant_type=refresh_token$')`
+	}
+	respond @noncanonical_public_token 404
+	@unsupported_public_token_method {
+		path /auth/v1/token
+		not method POST OPTIONS
+	}
+	respond @unsupported_public_token_method 404
+	@nonjson_public_token {
+		path /auth/v1/token
+		not method OPTIONS
+		not header_regexp Content-Type `(?i)^application/json([ \t]*;.*)?$`
+	}
+	respond @nonjson_public_token 404
+	# Email OTP is issued by the authenticated deletion API; password recovery
+	# uses the verified Next server. Native email/throttle responses enumerate users.
+	@controlled_signup path /auth/v1/signup /auth/v1/signup/* /auth/v1/otp /auth/v1/otp/* /auth/v1/magiclink /auth/v1/magiclink/* /auth/v1/recover /auth/v1/recover/* /auth/v1/resend /auth/v1/resend/*
 	respond @controlled_signup 404
 }

@@ -8,16 +8,18 @@ from pathlib import Path
 import subprocess
 import tempfile
 import time
+import uuid
 
 ROOT = Path(__file__).resolve().parents[1]
 FIXTURE = ROOT / 'tests/fixtures/auth-client-ip'
 NODE = 'node:22.23.2-alpine3.24@sha256:c610fcdfb1d5b4740dd70c284ed3cb16bb857e0f7166196e36a5501df7a3aa32'
-KONG = 'public.ecr.aws/supabase/kong:2.8.1'
+KONG = os.environ.get('BEANMAP_TEST_KONG_IMAGE', 'public.ecr.aws/supabase/kong:2.8.1')
 CADDY = 'caddy:2.10.2-alpine@sha256:4c6e91c6ed0e2fa03efd5b44747b625fec79bc9cd06ac5235a779726618e530d'
-run_id = str(os.getpid())
+run_id = uuid.uuid4().hex
 network = 'beanmap-auth-ip-test-' + run_id
 names = {part: f'{network}-{part}' for part in ['web', 'kong', 'caddy', 'a', 'b', 'probe']}
-created = []
+created = {}
+network_id = None
 
 
 def run(args):
@@ -28,15 +30,27 @@ def run(args):
 
 
 def launch(part, address, image, extra, command=None, aliases=None):
-    args = ['docker', 'run', '-d', '--name', names[part], '--network', network]
+    args = ['docker', 'run', '-d', '--name', names[part], '--network', network,
+            '--label', 'org.beanmap.fixture-owner=' + run_id]
     if address:
         args += ['--ip', address]
     for alias in aliases or []:
         args += ['--network-alias', alias]
     args += extra + [image] + (command or [])
-    run(args)
-    if part not in created:
-        created.append(part)
+    created[part] = run(args)
+
+
+def remove(part):
+    identity = created.get(part)
+    if not identity:
+        return
+    result = subprocess.run(['docker', 'inspect', identity], capture_output=True, text=True)
+    if result.returncode:
+        return
+    item = json.loads(result.stdout)[0]
+    if item['Id'] == identity and item['Config']['Labels'].get('org.beanmap.fixture-owner') == run_id:
+        run(['docker', 'rm', '-f', identity])
+        created.pop(part)
 
 
 def client(part, mode, other=None):
@@ -57,7 +71,8 @@ web_ip, kong_ip = selected['web_ip'], selected['kong_ip']
 a_ip, b_ip = str(subnet.network_address+5), str(subnet.network_address+6)
 summary = {}
 try:
-    run(['docker', 'network', 'create', '--subnet', selected['subnet'], '--gateway', selected['gateway'], '--ip-range', selected['dynamic_range'], network])
+    network_id = run(['docker', 'network', 'create', '--internal', '--label', 'org.beanmap.fixture-owner=' + run_id,
+                     '--subnet', selected['subnet'], '--gateway', selected['gateway'], '--ip-range', selected['dynamic_range'], network])
     with tempfile.TemporaryDirectory(prefix='beanmap-auth-ip-fixture-') as temporary:
         proof = Path(temporary)/'proof'
         proof.write_text('a'*64+'\n')
@@ -119,7 +134,11 @@ try:
         summary['token_other_client_separate_write_limit'] = client('b', 'token-other-client')
         assert summary['token_other_client_separate_write_limit'] == {'token':200}, summary
         summary['independent_operation_budgets'] = client('a', 'operation-budgets', b_ip)
-        assert summary['independent_operation_budgets'] == {'forgedGrantStatus':429,'signup':{'200':10,'429':1},'recover':{'200':10,'429':1},'otp':{'200':10,'429':1},'verify':200,'refresh':200,'logout':200,'signupSpellingsBlocked':True,'untrustedDirectSignup':404,'adminDenied':404,'internalAdminDenied':403,'admin':200,'nativeIdentityReplaced':True,'adminSpellingsBlocked':True,'aggregateBounded':True,'deniedTrafficCannotSpendGlobal':True,'adminAfterPublicExhaustion':200}, summary
+        assert summary['independent_operation_budgets'] == {'forgedGrantStatus':404,'signup':{'200':10,'429':1},'recover':{'200':10,'429':1},'verify':200,'refresh':200,'logout':200,'signupSpellingsBlocked':True,'untrustedDirectSignup':404,'adminDenied':404,'internalAdminDenied':403,'admin':200,'nativeIdentityReplaced':True,'adminSpellingsBlocked':True,'aggregateBounded':True,'deniedTrafficCannotSpendGlobal':True,'adminAfterPublicExhaustion':200}, summary
+        summary['otp_server_only_boundary'] = client('b', 'otp-boundary', a_ip)
+        assert summary['otp_server_only_boundary'] == {'publicUniform':True,'publicSpellingsBlocked':True,'directGatewayBlocked':True,'preflightBlocked':True}, summary
+        summary['token_server_boundary'] = client('b', 'token-boundary', a_ip)
+        assert summary['token_server_boundary'] == {'publicGrantBlocked':True,'queryVariantsBlocked':True,'bodyOverrideBlocked':True,'publicRefreshStatus':200,'internalPasswordStatus':200,'internalPkceStatus':200}, summary
         fixture_logs = subprocess.check_output(['docker', 'logs', names['kong']], stderr=subprocess.STDOUT, text=True)
         assert 'scope=client-total' in fixture_logs, 'Aggregate IP limiter was not exercised'
         assert 'scope=public-total' not in fixture_logs, 'Rejected traffic consumed the global budget'
@@ -127,14 +146,15 @@ try:
         assert summary['client_b_after_client_a_total_exhaustion'] == {'user':200}, summary
         # Free the dynamic slot while the fixed web address is absent. An auto-IP
         # container must take .6, never the reserved .2; recreating web must work.
-        run(['docker','rm','-f',names['web'],names['b']])
+        remove('web')
+        remove('b')
         launch('probe', None, NODE, [], ['node','-e','setInterval(()=>{},10000)'])
         actual_probe = json.loads(run(['docker','inspect',names['probe']]))[0]['NetworkSettings']['Networks'][network]['IPAddress']
         assert actual_probe == b_ip and actual_probe != web_ip
         start_web()
         actual_web = json.loads(run(['docker','inspect',names['web']]))[0]['NetworkSettings']['Networks'][network]['IPAddress']
         assert actual_web == web_ip
-        run(['docker','rm','-f',names['probe']])
+        remove('probe')
         launch('b',b_ip,NODE,['-v',f'{FIXTURE}:/fixture:ro'],['node','-e','setInterval(()=>{},10000)'])
         time.sleep(.5)
         summary['recreation_preserves_static_ip'] = actual_web == web_ip
@@ -142,6 +162,11 @@ try:
         assert summary['lookup_after_recreate'] == {'user':200}, summary
         print(json.dumps(summary,indent=2))
 finally:
-    for part in reversed(created):
-        subprocess.run(['docker','rm','-f',names[part]],capture_output=True)
-    subprocess.run(['docker','network','rm',network],capture_output=True)
+    for part in reversed(list(created)):
+        remove(part)
+    if network_id:
+        result = subprocess.run(['docker', 'network', 'inspect', network_id], capture_output=True, text=True)
+        if result.returncode == 0:
+            item = json.loads(result.stdout)[0]
+            if item['Id'] == network_id and item['Labels'].get('org.beanmap.fixture-owner') == run_id:
+                subprocess.run(['docker','network','rm',network_id],capture_output=True)

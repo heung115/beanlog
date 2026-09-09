@@ -83,5 +83,5 @@ has requested source-only work.
 Verification consists of the signup-consent Node tests, the disposable
 `test-signup-consent.sql` and `test-oauth-consent.sql`, purpose-separated proof tests, candidate tests, and real local Caddy/Kong regression.
 The gateway fixture checks canonical/encoded signup denial, forged-source denial,
-normal internal signup, preserved refresh/recovery/OTP, independent rate budgets,
+normal internal signup, preserved refresh/Next recovery/direct internal OTP, independent rate budgets,
 and absence of global-capacity consumption by already-blocked requests.
