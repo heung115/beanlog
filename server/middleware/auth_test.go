@@ -68,12 +68,13 @@ func TestAuthRequiredValidatesTokenBoundary(t *testing.T) {
 	now := time.Now()
 	validClaims := func() jwt.MapClaims {
 		return jwt.MapClaims{
-			"sub":  "00000000-0000-0000-0000-000000000001",
-			"iss":  issuer,
-			"aud":  "authenticated",
-			"role": "authenticated",
-			"iat":  now.Unix(),
-			"exp":  now.Add(time.Hour).Unix(),
+			"sub":        "00000000-0000-0000-0000-000000000001",
+			"session_id": "00000000-0000-0000-0000-000000000002",
+			"iss":        issuer,
+			"aud":        "authenticated",
+			"role":       "authenticated",
+			"iat":        now.Unix(),
+			"exp":        now.Add(time.Hour).Unix(),
 		}
 	}
 
@@ -82,6 +83,10 @@ func TestAuthRequiredValidatesTokenBoundary(t *testing.T) {
 		mutate     func(jwt.MapClaims)
 		wantStatus int
 	}{
+		{name: "missing session", mutate: func(c jwt.MapClaims) { delete(c, "session_id") }, wantStatus: http.StatusUnauthorized},
+		{name: "malformed session", mutate: func(c jwt.MapClaims) { c["session_id"] = "not-a-session" }, wantStatus: http.StatusUnauthorized},
+		{name: "nonstring session", mutate: func(c jwt.MapClaims) { c["session_id"] = 12 }, wantStatus: http.StatusUnauthorized},
+		{name: "malformed subject", mutate: func(c jwt.MapClaims) { c["sub"] = "not-a-user" }, wantStatus: http.StatusUnauthorized},
 		{name: "valid", mutate: func(jwt.MapClaims) {}, wantStatus: http.StatusNoContent},
 		{name: "wrong issuer", mutate: func(c jwt.MapClaims) { c["iss"] = "https://evil.test" }, wantStatus: http.StatusUnauthorized},
 		{name: "wrong audience", mutate: func(c jwt.MapClaims) { c["aud"] = "anon" }, wantStatus: http.StatusUnauthorized},
@@ -99,6 +104,9 @@ func TestAuthRequiredValidatesTokenBoundary(t *testing.T) {
 			router := gin.New()
 			router.Use(AuthRequired(jwks.URL, issuer))
 			router.GET("/protected", func(context *gin.Context) {
+				if context.GetString(SessionIDKey) != claims["session_id"] {
+					t.Fatal("verified session id was lost")
+				}
 				context.Status(http.StatusNoContent)
 			})
 

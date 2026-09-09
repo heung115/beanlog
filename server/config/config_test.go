@@ -80,3 +80,20 @@ func TestLoadAdminIngressSecretRequiresReadableConfiguredFile(t *testing.T) {
 		})
 	}
 }
+
+func TestLoadDeletionAuthSettings(t *testing.T) {
+	t.Setenv("AUTH_URL", "http://supabase-auth:9999")
+	t.Setenv("AUTH_RATE_ID_SECRET_FILE", "")
+	t.Setenv("AUTH_RATE_ID_SECRET", "must-not-use-plain-environment")
+	if cfg := Load(); cfg.AuthURL != "http://supabase-auth:9999" || cfg.AuthRateIDSecret != "" {
+		t.Fatal("wrong private Auth settings")
+	}
+	path := filepath.Join(t.TempDir(), "auth-rate.secret")
+	if err := os.WriteFile(path, []byte("private-rate-limit-key-32-bytes-long\n"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("AUTH_RATE_ID_SECRET_FILE", path)
+	if Load().AuthRateIDSecret != "private-rate-limit-key-32-bytes-long" {
+		t.Fatal("secret file not read")
+	}
+}

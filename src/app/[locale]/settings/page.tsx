@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { LoadError } from "@/components/ui/load-error";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/toast";
-import { deleteAccount, exportData, updateProfile } from "@/lib/actions/beans";
+import { exportData, updateProfile } from "@/lib/actions/beans";
+import { deleteAccount, requestAccountDeletionCode, type AccountDeletionError } from "@/lib/actions/account";
 import { LogoutButton } from "@/components/auth/logout-button";
 import { RecordDraftNotice } from "@/components/beans/record-draft-notice";
 import { useRecordDraft } from "@/components/beans/use-record-draft";
@@ -100,7 +101,11 @@ export default function SettingsPage() {
   const [localePending, startLocaleTransition] = useTransition();
   const [localeError, setLocaleError] = useState<Locale | null>(null);
   const localeRefs = useRef<Partial<Record<Locale, HTMLButtonElement | null>>>({});
-  const [deleteError, setDeleteError] = useState(false);
+  const [deleteError, setDeleteError] = useState<AccountDeletionError | null>(null);
+  const [deletionCode, setDeletionCode] = useState("");
+  const [deletionCodeSent, setDeletionCodeSent] = useState(false);
+  const [sendingDeletionCode, setSendingDeletionCode] = useState(false);
+  const deletionPendingRef = useRef(false);
   const [exporting, setExporting] = useState(false);
   const [exportError, setExportError] = useState<"connection" | "limit" | null>(null);
   const exportPendingRef = useRef(false);
@@ -264,15 +269,35 @@ export default function SettingsPage() {
     }
   }
 
-  async function handleDeleteAccount() {
-    setDeleting(true);
-    setDeleteError(false);
+  async function handleSendDeletionCode() {
+    if (deletionPendingRef.current) return;
+    deletionPendingRef.current = true;
+    setSendingDeletionCode(true);
+    setDeleteError(null);
     try {
-      const result = await deleteAccount(locale);
-      if (result?.error) setDeleteError(true);
+      const result = await requestAccountDeletionCode();
+      if ("error" in result) setDeleteError(result.error);
+      else { setDeletionCodeSent(true); setDeletionCode(""); }
     } catch {
-      setDeleteError(true);
+      setDeleteError("temporarily_unavailable");
     } finally {
+      deletionPendingRef.current = false;
+      setSendingDeletionCode(false);
+    }
+  }
+
+  async function handleDeleteAccount() {
+    if (deletionPendingRef.current) return;
+    deletionPendingRef.current = true;
+    setDeleting(true);
+    setDeleteError(null);
+    try {
+      const result = await deleteAccount(locale, deletionCode);
+      if (result?.error) setDeleteError(result.error);
+    } catch {
+      setDeleteError("temporarily_unavailable");
+    } finally {
+      deletionPendingRef.current = false;
       setDeleting(false);
     }
   }
@@ -283,8 +308,8 @@ export default function SettingsPage() {
     if (event.key !== "Tab") return;
 
     const controls = Array.from(
-      event.currentTarget.querySelectorAll<HTMLButtonElement>(
-        "button:not([disabled])"
+      event.currentTarget.querySelectorAll<HTMLElement>(
+        "button:not([disabled]), input:not([disabled])"
       )
     );
     const first = controls[0];
@@ -491,7 +516,7 @@ export default function SettingsPage() {
             <Button
               ref={deleteTriggerRef}
               variant="ghost"
-              onClick={() => { setDeleteError(false); setConfirmOpen(true); }}
+              onClick={() => { setDeleteError(null); setConfirmOpen(true); }}
               className="self-start sm:shrink-0"
             >
               {t("deleteAccount")}
@@ -508,10 +533,10 @@ export default function SettingsPage() {
             onKeyDown={handleDeleteDialogKeyDown}
             onCancel={(event) => {
               event.preventDefault();
-              if (!deleting) setConfirmOpen(false);
+              if (!deleting && !sendingDeletionCode) setConfirmOpen(false);
             }}
             onClick={(event) => {
-              if (event.target !== event.currentTarget || deleting) return;
+              if (event.target !== event.currentTarget || deleting || sendingDeletionCode) return;
               const rect = event.currentTarget.getBoundingClientRect();
               const inside =
                 event.clientX >= rect.left &&
@@ -534,17 +559,28 @@ export default function SettingsPage() {
             >
               {t("deleteAccountConfirm")}
             </p>
-            {deleteError && <p role="alert" className="mt-4 text-sm leading-6 text-red-600">{t("deleteError")}</p>}
+            <div className="mt-4 space-y-3">
+              {deletionCodeSent && (
+                <>
+                  <p role="status" className="text-sm text-brown-light">{t("deletionCodeSent")}</p>
+                  <Input name="deletionCode" label={t("deletionCode")} autoComplete="one-time-code" inputMode="numeric" pattern="[0-9]{6,10}" maxLength={10} value={deletionCode} onChange={(event) => setDeletionCode(event.target.value.replace(/[^0-9]/g, ""))} disabled={deleting || sendingDeletionCode} />
+                </>
+              )}
+              <Button variant="ghost" onClick={handleSendDeletionCode} loading={sendingDeletionCode} disabled={deleting}>
+                {t(deletionCodeSent ? "resendDeletionCode" : "sendDeletionCode")}
+              </Button>
+            </div>
+            {deleteError && <p role="alert" className="mt-4 text-sm leading-6 text-red-600">{t(`deletionErrors.${deleteError}`)}</p>}
             <div className="mt-6 flex flex-wrap justify-end gap-3">
               <Button
                 ref={cancelDeleteRef}
                 variant="ghost"
                 onClick={() => setConfirmOpen(false)}
-                disabled={deleting}
+                disabled={deleting || sendingDeletionCode}
               >
                 {tCommon("cancel")}
               </Button>
-              <Button variant="danger" onClick={handleDeleteAccount} loading={deleting}>
+              <Button variant="danger" onClick={handleDeleteAccount} loading={deleting} disabled={!deletionCodeSent || !/^\d{6,10}$/.test(deletionCode) || sendingDeletionCode}>
                 {tCommon("confirm")}
               </Button>
             </div>

@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"beanmap-server/config"
+	"beanmap-server/db"
 	"beanmap-server/routes"
 
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -29,25 +30,10 @@ func main() {
 	if err := pool.Ping(context.Background()); err != nil {
 		log.Fatal("failed to connect to database")
 	}
-	var isSuperuser, bypassRLS, hasExactMembership bool
-	if err := pool.QueryRow(context.Background(),
-		`SELECT rolsuper,
-		        rolbypassrls,
-		        (
-		          SELECT count(*) = 1
-		             AND bool_and(granted_role.rolname = 'authenticated')
-		             AND bool_and(NOT membership.admin_option)
-		          FROM pg_auth_members membership
-		          JOIN pg_roles granted_role ON granted_role.oid = membership.roleid
-		          WHERE membership.member = (SELECT oid FROM pg_roles WHERE rolname = current_user)
-		        )
-		 FROM pg_roles WHERE rolname = current_user`,
-	).Scan(&isSuperuser, &bypassRLS, &hasExactMembership); err != nil {
-		log.Fatal("failed to verify database role")
+	if err := db.VerifyConnectionRole(context.Background(), pool); err != nil {
+		log.Fatal("unsafe database role: API requires a non-privileged private runtime role")
 	}
-	if isSuperuser || bypassRLS || !hasExactMembership {
-		log.Fatal("unsafe database role: API requires a non-privileged authenticated member")
-	}
+
 	log.Println("connected to database")
 
 	r := routes.Setup(cfg, pool)

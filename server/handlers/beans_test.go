@@ -28,6 +28,11 @@ func TestBeanMutationsValidateBlendPercentagePrecision(t *testing.T) {
 		{name: "one decimal", percentages: []float64{33.3, 66.7}, valid: true},
 		{name: "two decimals with binary rounding", percentages: []float64{1.13, 98.87}, valid: true},
 		{name: "smallest stored unit", percentages: []float64{0.01, 99.99}, valid: true},
+		{name: "thirds before rounding", percentages: []float64{33.333333, 33.333333, 33.333334}},
+		{name: "half-cent boundaries", percentages: []float64{0.005, 99.995}},
+		{name: "precision beyond float tolerance", percentages: []float64{33.3300000000001, 66.6699999999999}},
+		{name: "total one cent short", percentages: []float64{50, 49.99}},
+		{name: "total one cent over", percentages: []float64{50, 50.01}},
 		{name: "three decimals", percentages: []float64{33.333, 66.667}},
 		{name: "later component has three decimals", percentages: []float64{50, 25.001, 24.999}},
 		{name: "below stored unit", percentages: []float64{0.001, 99.999}},
@@ -49,11 +54,16 @@ func TestBeanMutationsValidateBlendPercentagePrecision(t *testing.T) {
 				for i, percentage := range test.percentages {
 					components[i] = models.BlendComponentInput{OriginCountry: "Ethiopia", Percentage: percentage}
 				}
-				body, err := json.Marshal(models.CreateBeanRequest{
+				request := models.CreateBeanRequest{
 					Name: "House Blend", Roastery: "Test Roastery", BeanType: "blend",
 					ProcessMethod: "washed", RoastLevel: "medium", PlaceType: "home",
-					OverallScore: 8, BlendComponents: components,
-				})
+					OverallScore: 8, BlendComponents: components, Tags: []models.TagInput{},
+				}
+				var payload any = request
+				if mutation.method == http.MethodPut {
+					payload = models.UpdateBeanRequest{CreateBeanRequest: request, ExpectedUpdatedAt: "2026-09-08T12:00:00.123456Z"}
+				}
+				body, err := json.Marshal(payload)
 				if err != nil {
 					t.Fatal(err)
 				}

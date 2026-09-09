@@ -11,10 +11,12 @@ import {
   productionQaBuildArguments,
   renderSupabaseConfig,
 } from "./staging-runtime.mjs";
+import { splitStagingMigrations, privilegedStagingMigration } from "./staging-migrations.mjs";
 import { ensureQaCredentials } from "./staging-credentials.mjs";
 import { prepareOcrAssets } from "./prepare-ocr-assets.mjs";
 import { waitForHttpStatus } from "./http-readiness.mjs";
 import { reserveLoopbackPort } from "./port-reservation.mjs";
+import { startQaIngress } from "./qa-ingress.mjs";
 import {
   signalSpawnedProcess,
   spawnOwnedProcess,
@@ -36,6 +38,9 @@ const runtimeRoot = runtime.runtimeRoot;
 const runtimeSupabase = path.join(runtimeRoot, "supabase");
 const envFile = path.join(runtimeRoot, "docker.env");
 const databaseSecretFile = path.join(runtimeRoot, "api-database-url.secret");
+const authRateSecretFile = path.join(runtimeRoot, "auth-rate-id.secret");
+const signupConsentSecretFile = path.join(runtimeRoot, "signup-consent.secret");
+const authClientIpSecretFile = path.join(runtimeRoot, "auth-client-ip.secret");
 const composeFile = path.join(root, "docker-compose.staging.yml");
 const command = process.argv[2] ?? "help";
 if (["up", "qa", "qa:production"].includes(command)) prepareOcrAssets();
@@ -82,6 +87,8 @@ function compose(args, options = {}) {
 }
 
 function copyRuntimeConfig() {
+  fs.mkdirSync(runtimeRoot, { recursive: true, mode: 0o700 });
+  fs.chmodSync(runtimeRoot, 0o700);
   fs.mkdirSync(runtimeSupabase, { recursive: true });
   const template = fs.readFileSync(
     path.join(root, "staging", "supabase", "config.toml"),
@@ -91,11 +98,27 @@ function copyRuntimeConfig() {
     path.join(runtimeSupabase, "config.toml"),
     renderSupabaseConfig(template, runtime)
   );
+  fs.mkdirSync(path.join(runtimeSupabase, "templates"), { recursive: true });
+  fs.copyFileSync(path.join(root, "public", "auth-templates", "magic-link.html"), path.join(runtimeSupabase, "templates", "magic-link.html"));
   fs.cpSync(path.join(root, "supabase", "seed.sql"), path.join(runtimeSupabase, "seed.sql"));
   fs.rmSync(path.join(runtimeSupabase, "migrations"), { recursive: true, force: true });
-  fs.cpSync(path.join(root, "supabase", "migrations"), path.join(runtimeSupabase, "migrations"), {
-    recursive: true,
-  });
+  const migrationRoot = path.join(root, "supabase", "migrations");
+  const plan = splitStagingMigrations(fs.readdirSync(migrationRoot));
+  fs.mkdirSync(path.join(runtimeSupabase, "migrations"), { recursive: true });
+  for (const name of plan.bootstrap) fs.copyFileSync(path.join(migrationRoot, name), path.join(runtimeSupabase, "migrations", name));
+}
+
+function applyPrivilegedStagingMigrations() {
+  const migrationRoot = path.join(root, "supabase", "migrations");
+  const plan = splitStagingMigrations(fs.readdirSync(migrationRoot));
+  for (const name of plan.privileged) {
+    const source = fs.readFileSync(path.join(migrationRoot, name), "utf8");
+    const result = spawnSync("docker", ["exec", "-i", `supabase_db_${runtime.supabaseProject}`, "psql", "-X", "-q", "-v", "ON_ERROR_STOP=1", "-U", "supabase_admin", "-d", "postgres"], {
+      cwd: root, input: privilegedStagingMigration(name, source), encoding: "utf8", stdio: ["pipe", "ignore", "pipe"],
+    });
+    if (result.status !== 0) throw new Error(`Privileged local migration failed (${name}): ${result.stderr?.trim() ?? "database unavailable"}`);
+    fs.copyFileSync(path.join(migrationRoot, name), path.join(runtimeSupabase, "migrations", name));
+  }
 }
 
 function supabase(args, options = {}) {
@@ -234,6 +257,7 @@ function ensurePrivateServiceNetworks() {
     databaseNetwork,
     "db"
   );
+  connectContainerToNetwork(`supabase_auth_${runtime.supabaseProject}`, databaseNetwork, "auth");
 }
 
 function removeSupabaseManagementContainers() {
@@ -262,27 +286,7 @@ begin
 end;
 $$;
 alter role beanmap_api with login noinherit nosuperuser nocreatedb nocreaterole noreplication nobypassrls password '${password}';
-do $$
-declare
-  granted_role record;
-begin
-  for granted_role in
-    select role.rolname, grantor.rolname as grantor_name
-    from pg_auth_members membership
-    join pg_roles role on role.oid = membership.roleid
-    join pg_roles member on member.oid = membership.member
-    join pg_roles grantor on grantor.oid = membership.grantor
-    where member.rolname = 'beanmap_api'
-  loop
-    execute format(
-      'revoke %I from beanmap_api granted by %I',
-      granted_role.rolname,
-      granted_role.grantor_name
-    );
-  end loop;
-end;
-$$;
-grant authenticated to beanmap_api;
+
 `;
   const result = spawnSync(
     "docker",
@@ -312,6 +316,35 @@ grant authenticated to beanmap_api;
   return `postgresql://beanmap_api:${encodeURIComponent(password)}@db:5432/postgres?sslmode=disable&application_name=beanmap-api`;
 }
 
+function grantApiRuntimeRole() {
+  const result = spawnSync("docker", ["exec", "-i", `supabase_db_${runtime.supabaseProject}`, "psql", "-X", "-q", "-v", "ON_ERROR_STOP=1", "-U", "supabase_admin", "-d", "postgres"], {
+    cwd: root, input: `BEGIN;
+do $$
+declare
+  granted_role record;
+begin
+  for granted_role in
+    select role.rolname, grantor.rolname as grantor_name
+    from pg_auth_members membership
+    join pg_roles role on role.oid = membership.roleid
+    join pg_roles member on member.oid = membership.member
+    join pg_roles grantor on grantor.oid = membership.grantor
+    where member.rolname = 'beanmap_api'
+  loop
+    execute format(
+      'revoke %I from beanmap_api granted by %I',
+      granted_role.rolname,
+      granted_role.grantor_name
+    );
+  end loop;
+end;
+$$;
+grant beanmap_api_runtime to beanmap_api with inherit false, set true;
+COMMIT;`, encoding: "utf8", stdio: ["pipe", "ignore", "pipe"],
+  });
+  if (result.status !== 0) throw new Error("Failed to restrict the staging API database role membership");
+}
+
 function writeEnvironment(status, databaseUrl) {
   const appUrl = `http://localhost:${runtime.web}`;
   const publicSupabaseUrl = `http://localhost:${runtime.supabaseApi}`;
@@ -329,12 +362,24 @@ function writeEnvironment(status, databaseUrl) {
     STAGING_SUPABASE_ANON_KEY: status.ANON_KEY,
     STAGING_SUPABASE_SERVICE_ROLE_KEY: status.SERVICE_ROLE_KEY,
     STAGING_DATABASE_URL_FILE: databaseSecretFile,
+    STAGING_AUTH_RATE_ID_SECRET_FILE: authRateSecretFile,
+    STAGING_SIGNUP_CONSENT_SECRET_FILE: signupConsentSecretFile,
+    STAGING_AUTH_CLIENT_IP_SECRET_FILE: authClientIpSecretFile,
     STAGING_JWKS_URL: "http://kong:8000/auth/v1/.well-known/jwks.json",
     STAGING_JWT_ISSUER: `${status.API_URL}/auth/v1`,
   };
   fs.mkdirSync(runtimeRoot, { recursive: true });
+  fs.chmodSync(runtimeRoot, 0o700);
+  if (!fs.existsSync(authRateSecretFile)) fs.writeFileSync(authRateSecretFile, randomBytes(32).toString("hex"), { mode: 0o600 });
+  // Docker Desktop bind secrets retain numeric ownership. A non-root container
+  // needs read-only file access; the enclosing host directory stays owner-only.
+  fs.chmodSync(authRateSecretFile, 0o444);
+  if (!fs.existsSync(signupConsentSecretFile)) fs.writeFileSync(signupConsentSecretFile, randomBytes(32).toString("hex"), { mode: 0o600 });
+  fs.chmodSync(signupConsentSecretFile, 0o444);
+  if (!fs.existsSync(authClientIpSecretFile)) fs.writeFileSync(authClientIpSecretFile, randomBytes(32).toString("hex"), { mode: 0o600 });
+  fs.chmodSync(authClientIpSecretFile, 0o444);
   fs.writeFileSync(databaseSecretFile, `${databaseUrl}\n`, { mode: 0o600 });
-  fs.chmodSync(databaseSecretFile, 0o600);
+  fs.chmodSync(databaseSecretFile, 0o444);
   fs.writeFileSync(
     envFile,
     `${Object.entries(values)
@@ -344,6 +389,24 @@ function writeEnvironment(status, databaseUrl) {
   );
   fs.chmodSync(envFile, 0o600);
   ensureQaCredentials(runtimeRoot);
+}
+
+function provisionSignupSigningKey() {
+  const secret = fs.readFileSync(signupConsentSecretFile, "utf8").trim();
+  if (!/^[0-9a-f]{64}$/.test(secret)) throw new Error("Invalid local signup signing key");
+  const sql = `BEGIN;
+DO $key$ BEGIN
+  IF EXISTS(SELECT 1 FROM beanmap_signup.signing_key WHERE id AND secret <> decode('${secret}','hex')) THEN
+    RAISE EXCEPTION 'Local signup signing key differs; explicit rotation required';
+  END IF;
+  INSERT INTO beanmap_signup.signing_key(id,secret) VALUES(true,decode('${secret}','hex'))
+    ON CONFLICT(id) DO NOTHING;
+END; $key$;
+COMMIT;`;
+  const result = spawnSync("docker", ["exec", "-i", `supabase_db_${runtime.supabaseProject}`, "psql", "-X", "-q", "-v", "ON_ERROR_STOP=1", "-U", "supabase_admin", "-d", "postgres"], {
+    cwd: root, input: sql, encoding: "utf8", stdio: ["pipe", "ignore", "pipe"],
+  });
+  if (result.status !== 0) throw new Error("Local signup signing-key provisioning failed; diagnostics suppressed");
 }
 
 function readStoredDatabaseUrl() {
@@ -381,6 +444,8 @@ function qaEnvironment(env, qaCredentials, baseURL) {
   return {
     ...process.env,
     QA_EXTERNAL_SERVER: "1",
+    QA_DB_CONTAINER: `supabase_db_${runtime.supabaseProject}`,
+    QA_MAIL_URL: `http://127.0.0.1:${runtime.supabaseMail}`,
     QA_BASE_URL: baseURL,
     QA_API_URL: `http://localhost:${env.STAGING_API_PORT}`,
     QA_SUPABASE_URL: env.STAGING_PUBLIC_SUPABASE_URL,
@@ -393,6 +458,7 @@ function qaEnvironment(env, qaCredentials, baseURL) {
     QA_ISOLATION_PASSWORD: qaCredentials.isolation.password,
     QA_EMPTY_EMAIL: qaCredentials.empty.email,
     QA_EMPTY_PASSWORD: qaCredentials.empty.password,
+    QA_SIGNUP_CONSENT_SECRET_FILE: signupConsentSecretFile,
   };
 }
 
@@ -437,19 +503,22 @@ async function up() {
       "supabase",
       "start",
       "--exclude",
-      "realtime,storage-api,imgproxy,logflare,vector,edge-runtime,meta,studio",
+      "realtime,storage-api,imgproxy,logflare,vector,edge-runtime,postgres-meta,studio",
       "--workdir",
       runtimeRoot,
     ],
     { capture: true, stdio: ["ignore", "pipe", "pipe"] }
   );
   removeSupabaseManagementContainers();
+  applyPrivilegedStagingMigrations();
   supabase(["migration", "up", "--local"]);
   const status = readStatus();
   ensurePrivateServiceNetworks();
   const storedDatabaseUrl = readStoredDatabaseUrl();
   const databaseUrl = storedDatabaseUrl ?? provisionApiDatabaseRole();
+  grantApiRuntimeRole();
   writeEnvironment(status, databaseUrl);
+  provisionSignupSigningKey();
   await hardenSupabaseBindings();
   if (storedDatabaseUrl) {
     // Source files are mounted into the Next.js development container, so an
@@ -459,7 +528,7 @@ async function up() {
     // A newly provisioned database password must be read by a fresh API
     // process. Recreate only the API; never replace the web container for an
     // API secret rotation.
-    compose(["up", "-d", "--build", "--remove-orphans", "web"]);
+    compose(["up", "-d", "--build", "--remove-orphans", "web", "ingress"]);
     compose(["up", "-d", "--build", "--force-recreate", "api"]);
   }
   await waitFor(
@@ -525,6 +594,8 @@ async function qaProduction() {
   const interruption = new AbortController();
   let qaLock;
   let appPortReservation;
+  let upstreamPortReservation;
+  let qaIngress;
   let buildProcess;
   let productionServer;
   let qaProcess;
@@ -557,6 +628,7 @@ async function qaProduction() {
       runtime.productionQaWeb,
       "Production QA app"
     );
+    upstreamPortReservation = await reserveLoopbackPort(0, "Production QA upstream");
     await waitFor(
       `http://localhost:${env.STAGING_API_PORT}/health`,
       "beanmap staging API",
@@ -592,14 +664,17 @@ async function qaProduction() {
     buildProcess = undefined;
 
     const { serverEntry, standaloneRoot } = prepareStandaloneRuntime();
-    await appPortReservation.release();
-    appPortReservation = undefined;
+    const upstreamPort = upstreamPortReservation.port;
+    await upstreamPortReservation.release();
+    upstreamPortReservation = undefined;
     productionServer = spawnOwnedProcess(
       process.execPath,
       [serverEntry],
       {
         cwd: standaloneRoot,
-        env: production.processEnv,
+        env: { ...production.processEnv, PORT: String(upstreamPort),
+          SIGNUP_CONSENT_SECRET_FILE: signupConsentSecretFile,
+          AUTH_CLIENT_IP_SECRET_FILE: authClientIpSecretFile },
         stdio: ["ignore", "inherit", "inherit"],
       }
     );
@@ -608,6 +683,10 @@ async function qaProduction() {
         `Production QA server exited before the test run completed (${signal ?? code ?? "unknown"}).`
       );
     });
+    await appPortReservation.release();
+    appPortReservation = undefined;
+    qaIngress = await startQaIngress({ port: runtime.productionQaWeb, upstreamPort,
+      proof: fs.readFileSync(authClientIpSecretFile, "utf8").trim() });
     await Promise.race([
       waitFor(
         `${production.appUrl}/api/health`,
@@ -640,9 +719,11 @@ async function qaProduction() {
     try {
       await runCleanupSteps([
         () => stopSpawnedProcess(qaProcess),
+        () => qaIngress?.close(),
         () => stopSpawnedProcess(productionServer),
         () => stopSpawnedProcess(buildProcess),
         () => appPortReservation?.release(),
+        () => upstreamPortReservation?.release(),
         () => qaLock?.release(),
       ]);
     } finally {

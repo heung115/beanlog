@@ -1,5 +1,8 @@
 # Trusted client addresses for server authentication reads
 
+> Historical GET-user-only rollout. The current all-Auth policy and activation
+> procedure are documented in [auth-gateway-budgets.md](auth-gateway-budgets.md).
+
 The ingress and gateway configuration was installed on the inspected Oracle
 installation on 2026-09-06. Caddy's loaded configuration contains both provenance
 injection points and the retry pages. Kong's running nginx configuration trusts

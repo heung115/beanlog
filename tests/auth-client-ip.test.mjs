@@ -22,7 +22,7 @@ test("only a constant-time matched ingress proof admits a single canonical clien
   assert.equal(verifiedClientIp(incoming(), "short"), null);
 });
 
-test("verified IP affects only exact internal GET user lookup and never leaks its proof", async () => {
+test("verified IP affects allowed internal Auth operations and never leaks its proof", async () => {
   const calls = [];
   const transport = createTrustedAuthFetch(incoming(), {
     secretFile: "/fixture/secret", internalUrl: "http://beanmap-auth-gateway:8000",
@@ -37,9 +37,9 @@ test("verified IP affects only exact internal GET user lookup and never leaks it
   assert.equal(calls[0].init.headers.get(AUTH_CLIENT_IP_HEADER), "192.0.2.24");
   assert.equal(calls[0].init.headers.get("authorization"), headers.authorization);
   for (const [url, method] of [
-    ["http://beanmap-auth-gateway:8000/auth/v1/token", "POST"],
-    ["http://beanmap-auth-gateway:8000/auth/v1/user", "PUT"],
-    ["http://beanmap-auth-gateway:8000/auth/v1/user?x=1", "GET"],
+    ["http://beanmap-auth-gateway:8000/auth/v1/admin/users", "POST"],
+    ["http://beanmap-auth-gateway:8000/auth/v1/user/", "PUT"],
+    ["http://beanmap-auth-gateway:8000/auth/v1/token", "DELETE"],
     ["https://api.beanmap.site/auth/v1/user", "GET"],
     ["http://different-host:8000/auth/v1/user", "GET"],
   ]) await transport(url, { method, headers });
@@ -64,5 +64,22 @@ test("missing, forged or unreadable ingress configuration keeps the original bou
     });
     await transport("http://beanmap-auth-gateway:8000/auth/v1/user");
     assert.equal(forwarded, null);
+  }
+});
+
+test("verified IP follows refresh, sign-in, OTP and user updates without trusting supplied headers", async () => {
+  const seen = [];
+  const transport = createTrustedAuthFetch(incoming(), {
+    secretFile: "/fixture/secret", internalUrl: "http://beanmap-auth-gateway:8000", readSecret: () => proof,
+    fetchImpl: async (_input, init) => { seen.push(init.headers); return new Response(); },
+  });
+  for (const endpoint of ["token?grant_type=password", "token?grant_type=refresh_token", "signup", "recover", "otp", "verify", "logout"]) {
+    await transport(`http://beanmap-auth-gateway:8000/auth/v1/${endpoint}`, { method: "POST", headers: { [AUTH_CLIENT_IP_HEADER]: "198.51.100.1" } });
+  }
+  await transport("http://beanmap-auth-gateway:8000/auth/v1/user", { method: "PUT" });
+  assert.equal(seen.length, 8);
+  for (const headers of seen) {
+    assert.equal(headers.get(AUTH_CLIENT_IP_HEADER), "192.0.2.24");
+    assert.equal(headers.get(CLIENT_PROOF_HEADER), null);
   }
 });

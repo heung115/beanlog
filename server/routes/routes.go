@@ -54,8 +54,14 @@ func Setup(cfg *config.Config, db *pgxpool.Pool) *gin.Engine {
 	adminH := handlers.NewAdminHandler(cfg.AdminIngressSecret)
 
 	budget := middleware.NewRequestBudget()
+	// Deletion owns short committed transactions so failed OTP attempts cannot
+	// roll back their persistent rate budget with the common request transaction.
+	deletionH := handlers.NewAccountDeletionHandler(db, cfg.AuthURL, cfg.AuthRateIDSecret)
+	account := r.Group("/api/account")
+	account.Use(middleware.AuthRequired(cfg.JWKSURL, cfg.JWTIssuer), budget.User())
+	account.POST("/deletion-challenge", deletionH.Challenge)
+	account.POST("/delete", deletionH.Delete)
 	auth := r.Group("/api")
-	auth.Use(budget.IP())
 	auth.Use(middleware.AuthRequired(cfg.JWKSURL, cfg.JWTIssuer))
 	auth.Use(budget.User())
 	auth.Use(middleware.RequestDatabase(db))
@@ -88,7 +94,7 @@ func Setup(cfg *config.Config, db *pgxpool.Pool) *gin.Engine {
 	// Reject public requests before JWT/database work and disable caching even on denial.
 	// Admin role lives in a private DB allowlist, independent of user metadata.
 	admin := r.Group("/api/admin")
-	admin.Use(adminH.NoStore, adminH.RequirePrivate, budget.IP())
+	admin.Use(adminH.NoStore, adminH.RequirePrivate)
 	admin.Use(middleware.AuthRequired(cfg.JWKSURL, cfg.JWTIssuer))
 	admin.Use(budget.User())
 	admin.Use(middleware.RequestDatabase(db))

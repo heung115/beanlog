@@ -67,3 +67,17 @@ func TestAutocompleteRejectsOversizedQueriesBeforeDatabaseAccess(t *testing.T) {
 		}
 	}
 }
+
+func TestOriginContactDisplayFiltering(t *testing.T) {
+	for _, value := range []string{"fixture@example.test", "+1 (202) 555-0100", "연락처", "contact", "123 4567"} {
+		if cleanEntityName(&value) != nil {
+			t.Fatal("contact-only label leaked")
+		}
+	}
+	for value, want := range map[string]string{"Valid Farm | fixture@example.test": "Valid Farm", "Lot 42": "Lot 42"} {
+		got := cleanEntityName(&value)
+		if got == nil || *got != want {
+			t.Fatal("valid origin label removed")
+		}
+	}
+}

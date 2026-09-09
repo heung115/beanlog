@@ -1,0 +1,14 @@
+# Import in the public API handle before reverse_proxy. Reject alternate path
+# spellings before a downstream normalizer can turn them into a private route.
+(beanmap_controlled_signup) {
+	@oauth_consent_rpc path /rest/v1/rpc/complete_oauth_consent
+	request_body @oauth_consent_rpc {
+		max_size 4KB
+	}
+	@noncanonical_public_api {
+		not expression `{http.request.uri}.matches('^/(auth|rest)/v1(/[A-Za-z0-9_-]+)*([?].*)?$') || {http.request.uri}.matches('^/auth/v1/[.]well-known/jwks[.]json([?].*)?$')`
+	}
+	respond @noncanonical_public_api 404
+	@controlled_signup path /auth/v1/signup /auth/v1/signup/*
+	respond @controlled_signup 404
+}

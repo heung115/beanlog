@@ -3,12 +3,14 @@ package middleware
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -113,7 +115,7 @@ func (writer *bufferedResponseWriter) flushTo(destination gin.ResponseWriter) er
 	return err
 }
 
-// RequestDatabase lowers the privileged connection to the authenticated role
+// RequestDatabase lowers the privileged connection to the private API role
 // for exactly one request and supplies auth.uid() from the already-verified JWT
 // subject. Every handler query is therefore enforced by PostgreSQL RLS even if
 // an application-level user_id predicate is accidentally omitted.
@@ -150,16 +152,29 @@ func requestDatabase(begin func(context.Context) (pgx.Tx, error)) gin.HandlerFun
 			c.AbortWithStatusJSON(http.StatusServiceUnavailable, gin.H{"error": "database unavailable"})
 			return
 		}
-		if _, err := tx.Exec(ctx, "SET LOCAL ROLE authenticated"); err != nil {
+		if _, err := tx.Exec(ctx, "SET LOCAL ROLE beanmap_api_runtime"); err != nil {
 			c.AbortWithStatusJSON(http.StatusServiceUnavailable, gin.H{"error": "database unavailable"})
 			return
 		}
+		claims, _ := json.Marshal(map[string]string{
+			"sub": c.GetString(UserIDKey), "session_id": c.GetString(SessionIDKey), "role": "authenticated",
+		})
 		if _, err := tx.Exec(ctx,
 			`SELECT set_config('request.jwt.claim.sub', $1, true),
-			        set_config('request.jwt.claim.role', 'authenticated', true)`,
-			c.GetString(UserIDKey),
+			        set_config('request.jwt.claim.role', 'authenticated', true),
+			        set_config('request.jwt.claims', $2, true)`,
+			c.GetString(UserIDKey), string(claims),
 		); err != nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid identity"})
+			return
+		}
+		if _, err := tx.Exec(ctx, "SELECT beanmap_security.require_current_session()"); err != nil {
+			var pgErr *pgconn.PgError
+			if errors.As(err, &pgErr) && pgErr.Code == "28000" {
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "session expired"})
+			} else {
+				c.AbortWithStatusJSON(http.StatusServiceUnavailable, gin.H{"error": "database unavailable"})
+			}
 			return
 		}
 

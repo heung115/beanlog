@@ -18,15 +18,16 @@ http.createServer((request, response) => {
     response.writeHead(401); response.end("invalid signature"); return;
   }
   response.writeHead(200, { "content-type": "application/json" });
-  response.end(JSON.stringify({ verified: request.url === "/auth/v1/user" }));
+  response.end(JSON.stringify({ verified: request.url === "/auth/v1/user", rateIdentity: request.headers["x-beanmap-auth-rate-identity"] }));
 }).listen(9999, "0.0.0.0");
 
 http.createServer(async (request, response) => {
   if (request.url === "/health") { response.end("ok"); return; }
   try {
     const trustedFetch = createTrustedAuthFetch(new Headers(request.headers));
-    const token = request.url === "/auth-token";
-    const result = await trustedFetch(`${process.env.SUPABASE_SERVER_URL}/auth/v1/${token ? "token" : "user"}`, {
+    const token = request.url === "/auth-token" || request.url === "/auth-signup";
+    const endpoint = request.url === "/auth-signup" ? "signup" : token ? "token" : "user";
+    const result = await trustedFetch(`${process.env.SUPABASE_SERVER_URL}/auth/v1/${endpoint}`, {
       method: token ? "POST" : "GET",
       headers: { authorization: request.headers.authorization ?? "", apikey: "fixture-only-api-key" },
       ...(token ? { body: "fixture" } : {}),

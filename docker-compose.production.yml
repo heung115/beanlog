@@ -12,8 +12,11 @@ services:
       LEGAL_CONTACT_EMAIL: ${LEGAL_CONTACT_EMAIL:?set LEGAL_CONTACT_EMAIL}
       SUPABASE_SERVER_URL: ${SUPABASE_SERVER_URL:?set SUPABASE_SERVER_URL}
       GO_API_URL: http://api:8080
+      SIGNUP_CONSENT_SECRET_FILE: /run/secrets/signup_consent
       NEXT_DEPLOYMENT_ID: ${NEXT_DEPLOYMENT_ID:?set NEXT_DEPLOYMENT_ID to the image release id}
       NEXT_SERVER_ACTIONS_ENCRYPTION_KEY: ${NEXT_SERVER_ACTIONS_ENCRYPTION_KEY:?set NEXT_SERVER_ACTIONS_ENCRYPTION_KEY}
+    secrets:
+      - signup_consent
     ports:
       - "127.0.0.1:${WEB_PORT:-3000}:3000"
     depends_on:
@@ -43,11 +46,14 @@ services:
       DATABASE_URL_FILE: /run/secrets/api_database_url
       JWKS_URL: ${JWKS_URL:?set JWKS_URL}
       JWT_ISSUER: ${JWT_ISSUER:?set JWT_ISSUER}
+      AUTH_URL: ${AUTH_URL:?set the internal Auth endpoint}
+      AUTH_RATE_ID_SECRET_FILE: /run/secrets/auth_rate_id
       CORS_ORIGIN: ${CORS_ORIGIN:?set CORS_ORIGIN}
     ports:
       - "127.0.0.1:${API_PORT:-8080}:8080"
     secrets:
       - api_database_url
+      - auth_rate_id
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/health"]
       interval: 10s
@@ -69,5 +75,9 @@ networks:
   beanmap:
 
 secrets:
+  signup_consent:
+    file: ./secrets/signup_consent
   api_database_url:
     file: ./secrets/api_database_url
+  auth_rate_id:
+    file: ./secrets/auth_rate_id

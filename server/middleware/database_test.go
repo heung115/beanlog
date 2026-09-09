@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -38,6 +39,8 @@ type deadlineTx struct {
 	committed     bool
 	rolledBack    bool
 	failStatement bool
+	sessionErr    error
+	claims        map[string]string
 }
 
 func (tx *deadlineTx) Exec(ctx context.Context, sql string, args ...any) (pgconn.CommandTag, error) {
@@ -45,6 +48,12 @@ func (tx *deadlineTx) Exec(ctx context.Context, sql string, args ...any) (pgconn
 		return pgconn.CommandTag{}, errors.New("missing deadline")
 	}
 	tx.statements = append(tx.statements, sql)
+	if len(args) == 2 {
+		_ = json.Unmarshal([]byte(args[1].(string)), &tx.claims)
+	}
+	if sql == "SELECT beanmap_security.require_current_session()" {
+		return pgconn.CommandTag{}, tx.sessionErr
+	}
 	if tx.failStatement {
 		return pgconn.CommandTag{}, errors.New("unavailable")
 	}
@@ -78,7 +87,7 @@ func TestRequestDatabaseAppliesTimeoutBeforeHandlerAndIdentity(t *testing.T) {
 		if !ok || time.Until(deadline) < 10*time.Second {
 			t.Fatal("request has wrong lifetime")
 		}
-		if len(tx.statements) != 4 || tx.statements[0] != "SET LOCAL statement_timeout = '8s'" || tx.statements[2] != "SET LOCAL ROLE authenticated" {
+		if len(tx.statements) != 5 || tx.statements[0] != "SET LOCAL statement_timeout = '8s'" || tx.statements[2] != "SET LOCAL ROLE beanmap_api_runtime" {
 			t.Fatalf("settings: %v", tx.statements)
 		}
 		c.Status(204)
@@ -98,5 +107,32 @@ func TestRequestDatabaseFailsClosedWhenTimeoutCannotBeSet(t *testing.T) {
 	r.ServeHTTP(rec, httptest.NewRequest("GET", "/", nil))
 	if rec.Code != 503 || !tx.rolledBack || tx.committed {
 		t.Fatal("failed setup was not rolled back")
+	}
+}
+
+func TestRequestDatabaseRejectsRevokedSessionBeforeHandler(t *testing.T) {
+	for _, test := range []struct {
+		name   string
+		err    error
+		status int
+	}{
+		{"revoked", &pgconn.PgError{Code: "28000"}, 401},
+		{"unavailable", errors.New("database error"), 503},
+	} {
+		t.Run(test.name, func(t *testing.T) {
+			tx := &deadlineTx{sessionErr: test.err}
+			r := gin.New()
+			r.Use(func(c *gin.Context) { c.Set(UserIDKey, "user"); c.Set(SessionIDKey, "session") })
+			r.Use(requestDatabase(func(context.Context) (pgx.Tx, error) { return tx, nil }))
+			r.GET("/", func(c *gin.Context) { t.Fatal("handler ran without current session") })
+			rec := httptest.NewRecorder()
+			r.ServeHTTP(rec, httptest.NewRequest("GET", "/", nil))
+			if rec.Code != test.status || !tx.rolledBack || tx.committed {
+				t.Fatalf("incorrect rejection: %d", rec.Code)
+			}
+			if tx.claims["sub"] != "user" || tx.claims["session_id"] != "session" || tx.claims["role"] != "authenticated" {
+				t.Fatal("verified identity not propagated")
+			}
+		})
 	}
 }

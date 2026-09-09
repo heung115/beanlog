@@ -1,6 +1,6 @@
 import { randomBytes, randomUUID } from "node:crypto";
 import { expect, test } from "@playwright/test";
-import { admin, ensureUser, qaApiURL, signIn } from "./helpers";
+import { admin, ensureUser, qaApiURL, signIn, localFixtureRpc } from "./helpers";
 import { loadExploreWindow } from "../../src/lib/coffee/explore-navigation";
 
 test("data filters, refreshed pagination, varietal statistics and atomic edit versions preserve records", async ({ request, page }) => {
@@ -11,7 +11,7 @@ test("data filters, refreshed pagination, varietal statistics and atomic edit ve
   try {
     const { session, client } = await signIn(user.email, user.password);
     const headers = { Authorization: `Bearer ${session.access_token}` };
-    const base = { roastery: "Fixture Roastery", bean_type: "single_origin", origin_country: "Ethiopia", process_method: "washed", roast_level: "medium", consumed_at: "2026-03-15", place_type: "home", overall_score: 7.5, note: "A disposable data-integrity fixture.", tags: [], blend_components: [] };
+    const base = { roastery: "Fixture Roastery", bean_type: "single_origin", origin_country: "Ethiopia", process_method: "washed", roast_level: "medium", consumed_at: "2026-03-15T12:00:00.000Z", place_type: "home", overall_score: 7.5, note: "A disposable data-integrity fixture.", tags: [], blend_components: [] };
     async function add(name: string, extra: Record<string, unknown> = {}) {
       const response = await request.post(`${qaApiURL}/api/beans`, { headers, data: { ...base, name, ...extra } });
       expect(response.status(), await response.text()).toBe(201);
@@ -51,8 +51,10 @@ test("data filters, refreshed pagination, varietal statistics and atomic edit ve
 
     await add("Korean Geisha", { varietal: "게이샤" });
     await add("English Geisha", { varietal: "Geisha" });
-    // A legacy direct-RPC record must also match the new canonical filter.
-    const legacy = await client.rpc("create_bean_record", { p_bean: { ...base, name: "Legacy Geisha", varietal: "게이샤" }, p_tags: [], p_components: [] });
+    // A legacy server-role record must also match the new canonical filter.
+    const { tags: _tags, blend_components: _components, ...legacyBase } = base;
+    void _tags; void _components;
+    const legacy = await localFixtureRpc(client, "create_bean_record", { p_bean: { ...legacyBase, name: "Legacy Geisha", varietal: "게이샤" }, p_tags: [], p_components: [] });
     expect(legacy.error).toBeNull();
     expect((await list({ varietal: "Geisha" })).count).toBe(3);
     expect((await list({ varietal: "게이샤" })).count).toBe(3);
@@ -77,6 +79,12 @@ test("data filters, refreshed pagination, varietal statistics and atomic edit ve
 
     const current = await (await request.get(`${qaApiURL}/api/beans/${inserted}`, { headers })).json();
     const record = current.bean ?? current;
+    for (const version of [undefined, null]) {
+      const withoutVersion = await request.put(`${qaApiURL}/api/beans/${inserted}`, {
+        headers, data: { ...base, name: "Rejected edit without version", expected_updated_at: version },
+      });
+      expect(withoutVersion.status()).toBe(400);
+    }
     const updates = await Promise.all(["Editor A", "Editor B"].map((note) => request.put(`${qaApiURL}/api/beans/${inserted}`, { headers, data: { ...base, name: "Concurrent edit", note, expected_updated_at: record.updated_at } })));
     expect(updates.map((r) => r.status()).sort()).toEqual([200, 409]);
     const conflict = updates.find((r) => r.status() === 409)!;
@@ -101,12 +109,12 @@ test("legacy whitespace and stale blend headers cannot create unselectable or mi
     const { session, client } = await signIn(user.email, user.password);
     const headers = { Authorization: `Bearer ${session.access_token}` };
     const whitespace = "\t\n\v\f\r \u0085\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000";
-    const base = { name: "Legacy whitespace record", roastery: `${whitespace}QA Unicode${whitespace}`, bean_type: "single_origin", origin_country: "Ethiopia", varietal: `${whitespace}Geisha${whitespace}, Bourbon`, process_method: "washed", roast_level: "medium", consumed_at: "2026-03-15", place_type: "home", overall_score: 7.5, note: "Legacy data preserved for filter regression" };
-    const single = await client.rpc("create_bean_record", { p_bean: base, p_tags: [], p_components: [] });
+    const base = { name: "Legacy whitespace record", roastery: `${whitespace}QA Unicode${whitespace}`, bean_type: "single_origin", origin_country: "Ethiopia", varietal: `${whitespace}Geisha${whitespace}, Bourbon`, process_method: "washed", roast_level: "medium", consumed_at: "2026-03-15T12:00:00.000Z", place_type: "home", overall_score: 7.5, note: "Legacy data preserved for filter regression" };
+    const single = await localFixtureRpc(client, "create_bean_record", { p_bean: base, p_tags: [], p_components: [] }, { roastery: base.roastery });
     expect(single.error).toBeNull();
-    const blend = await client.rpc("create_bean_record", { p_bean: { ...base, name: "Legacy stale blend header", roastery: "Blend roastery", bean_type: "blend", origin_country: "Kenya", varietal: "Bourbon, StaleHeaderVariety" }, p_tags: [], p_components: [{ origin_country: "Brazil", varietal: "Geisha", percentage: 100, sort_order: 0 }] });
+    const blend = await localFixtureRpc(client, "create_bean_record", { p_bean: { ...base, name: "Legacy stale blend header", roastery: "Blend roastery", bean_type: "blend", origin_country: "Kenya", varietal: "Bourbon, StaleHeaderVariety" }, p_tags: [], p_components: [{ origin_country: "Brazil", varietal: "Geisha", percentage: 100, sort_order: 0 }] });
     expect(blend.error).toBeNull();
-    const bom = await client.rpc("create_bean_record", { p_bean: { ...base, name: "Legacy BOM record", roastery: "\ufeffQA BOM\ufeff", varietal: "\ufeffGeisha\ufeff" }, p_tags: [], p_components: [] });
+    const bom = await localFixtureRpc(client, "create_bean_record", { p_bean: { ...base, name: "Legacy BOM record", roastery: "\ufeffQA BOM\ufeff", varietal: "\ufeffGeisha\ufeff" }, p_tags: [], p_components: [] }, { roastery: "\ufeffQA BOM\ufeff" });
     expect(bom.error).toBeNull();
     async function count(query: Record<string, string>) {
       const response = await request.get(`${qaApiURL}/api/beans`, { headers, params: query });

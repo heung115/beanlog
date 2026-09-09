@@ -109,7 +109,7 @@ func (h *OriginHandler) Regions(c *gin.Context) {
 
 var (
 	noisySegmentPattern = regexp.MustCompile(`(?i)^(contact|contact name|exporter name|phone|phone number|tel|mobile|email)$`)
-	contactValuePattern = regexp.MustCompile(`(?i)@|\b(phone|tel|mobile|email)\b|[0-9][0-9 -]{5,}`)
+	contactValuePattern = regexp.MustCompile(`(?i)@|\b(contact|phone|telephone|tel|mobile|e-?mail|fax)\b|연락처|전화|이메일|[0-9]([0-9\s().+\-]*[0-9]){6}`)
 )
 
 // cleanEntityName mirrors the frontend: split on "|", drop contact/noise
@@ -239,7 +239,7 @@ func (h *OriginHandler) Entities(c *gin.Context) {
 
 		opt := models.OriginEntityOption{ID: id, Name: *displayName, EntityType: entityType}
 		if name == *displayName {
-			opt.NameKo = nameKo
+			opt.NameKo = cleanEntityName(nameKo)
 		}
 		entities = append(entities, opt)
 	}

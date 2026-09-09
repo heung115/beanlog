@@ -1,6 +1,40 @@
 name: ${STAGING_COMPOSE_PROJECT_NAME:-beanmap-staging}
 
 services:
+  ingress:
+    build:
+      context: ./staging
+      dockerfile: ingress.Dockerfile
+    environment:
+      AUTH_CLIENT_IP_SECRET_FILE: /run/secrets/auth_client_ip
+    secrets:
+      - auth_client_ip
+    ports:
+      - "127.0.0.1:${STAGING_WEB_PORT:-3100}:8080"
+    depends_on:
+      web:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:8080/api/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+    init: true
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=32m,uid=1001,gid=1001,mode=0700
+      - /config:ro,noexec,nosuid,nodev,size=1m,mode=0555
+      - /data:ro,noexec,nosuid,nodev,size=1m,mode=0555
+    pids_limit: 100
+    mem_limit: 128m
+    cpus: 0.5
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
   web:
     build:
       context: .
@@ -14,15 +48,18 @@ services:
       SUPABASE_SERVER_URL: ${STAGING_INTERNAL_SUPABASE_URL:-http://kong:8000}
       # Server Actions reach the Go API by its compose service name.
       GO_API_URL: ${STAGING_GO_API_URL:-http://api:8080}
+      AUTH_CLIENT_IP_SECRET_FILE: /run/secrets/auth_client_ip
+      SIGNUP_CONSENT_SECRET_FILE: /run/secrets/signup_consent
       NEXT_DEPLOYMENT_ID: ${STAGING_DEPLOYMENT_ID:-beanmap-staging}
+    secrets:
+      - auth_client_ip
+      - signup_consent
     volumes:
       - ./src:/app/src:ro
       - ./public:/app/public:ro
       - ./next.config.ts:/app/next.config.ts:ro
       - ./postcss.config.mjs:/app/postcss.config.mjs:ro
       - ./tsconfig.json:/app/tsconfig.json:ro
-    ports:
-      - "127.0.0.1:${STAGING_WEB_PORT:-3100}:3000"
     healthcheck:
       test: ["CMD", "wget", "-q", "--spider", "http://127.0.0.1:3000/api/health"]
       interval: 5s
@@ -58,9 +95,12 @@ services:
       DATABASE_URL_FILE: /run/secrets/api_database_url
       JWKS_URL: ${STAGING_JWKS_URL:-http://kong:8000/auth/v1/.well-known/jwks.json}
       JWT_ISSUER: ${STAGING_JWT_ISSUER:-http://127.0.0.1:55321/auth/v1}
+      AUTH_URL: http://auth:9999
+      AUTH_RATE_ID_SECRET_FILE: /run/secrets/auth_rate_id
       CORS_ORIGIN: ${STAGING_APP_URL:-http://localhost:3100}
     secrets:
       - api_database_url
+      - auth_rate_id
     ports:
       - "127.0.0.1:${STAGING_API_PORT:-8180}:8080"
     healthcheck:
@@ -95,5 +135,11 @@ networks:
     name: ${STAGING_DATABASE_NETWORK:-beanmap-staging-database}
 
 secrets:
+  auth_client_ip:
+    file: ${STAGING_AUTH_CLIENT_IP_SECRET_FILE:?run npm run staging:up}
+  signup_consent:
+    file: ${STAGING_SIGNUP_CONSENT_SECRET_FILE:?run npm run staging:up}
   api_database_url:
     file: ${STAGING_DATABASE_URL_FILE:?run npm run staging:up}
+  auth_rate_id:
+    file: ${STAGING_AUTH_RATE_ID_SECRET_FILE:?run npm run staging:up}

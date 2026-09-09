@@ -1,0 +1,6 @@
+FROM caddy:2.11.4-alpine
+RUN apk add --no-cache python3 iptables iproute2
+COPY management-transport-guard.py /fixture/management-transport-guard.py
+COPY beanmap-private.Caddyfile /fixture/beanmap-private.Caddyfile
+COPY test_transport_linux.py /fixture/test_transport_linux.py
+ENTRYPOINT ["python3", "/fixture/test_transport_linux.py"]

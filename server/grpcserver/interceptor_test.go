@@ -67,12 +67,13 @@ func signToken(t *testing.T, privateKey *ecdsa.PrivateKey, claims jwt.MapClaims)
 func validClaims(issuer string) jwt.MapClaims {
 	now := time.Now()
 	return jwt.MapClaims{
-		"sub":  "00000000-0000-0000-0000-000000000001",
-		"iss":  issuer,
-		"aud":  "authenticated",
-		"role": "authenticated",
-		"iat":  now.Unix(),
-		"exp":  now.Add(time.Hour).Unix(),
+		"sub":        "00000000-0000-0000-0000-000000000001",
+		"iss":        issuer,
+		"aud":        "authenticated",
+		"role":       "authenticated",
+		"session_id": "00000000-0000-0000-0000-000000000002",
+		"iat":        now.Unix(),
+		"exp":        now.Add(time.Hour).Unix(),
 	}
 }
 
@@ -125,6 +126,7 @@ func TestAuthInterceptorValidatesTokenBoundary(t *testing.T) {
 		{name: "wrong audience", mutate: func(c jwt.MapClaims) { c["aud"] = "anon" }, wantCode: codes.Unauthenticated},
 		{name: "wrong role", mutate: func(c jwt.MapClaims) { c["role"] = "service_role" }, wantCode: codes.Unauthenticated},
 		{name: "expired", mutate: func(c jwt.MapClaims) { c["exp"] = time.Now().Add(-time.Minute).Unix() }, wantCode: codes.Unauthenticated},
+		{name: "missing session", mutate: func(c jwt.MapClaims) { delete(c, "session_id") }, wantCode: codes.Unauthenticated},
 		{name: "missing subject", mutate: func(c jwt.MapClaims) { delete(c, "sub") }, wantCode: codes.Unauthenticated},
 	}
 

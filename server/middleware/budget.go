@@ -10,14 +10,14 @@ import (
 )
 
 // Budgets are process-local: run one API replica or enforce an additional shared
-// edge budget when scaling out. ClientIP ignores forwarded headers by default.
+// edge budget when scaling out. The shared web proxy address is not a client identity.
 type RequestBudget struct {
-	mu        sync.Mutex
-	buckets   map[string]*budgetBucket
-	active    map[string]int
-	total     int
-	now       func() time.Time
-	lastSweep time.Time
+	mu             sync.Mutex
+	buckets        map[string]*budgetBucket
+	active         map[string]int
+	globalInFlight int
+	now            func() time.Time
+	lastSweep      time.Time
 }
 
 type budgetBucket struct {
@@ -45,7 +45,7 @@ func (b *RequestBudget) allow(key string, burst int, perMinute float64) bool {
 	}
 	bucket := b.buckets[key]
 	if bucket == nil {
-		// Bound attacker-controlled IP/identity cardinality, without evicting active
+		// Bound authenticated identity cardinality, without evicting active
 		// budgets (which would let callers reset a quota by churning identities).
 		if len(b.buckets) >= 10000 {
 			return false
@@ -68,39 +68,37 @@ func rejectBudget(c *gin.Context) {
 	c.AbortWithStatusJSON(http.StatusTooManyRequests, gin.H{"error": "request limit exceeded"})
 }
 
-func (b *RequestBudget) IP() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		key := "ip:" + c.ClientIP()
-		b.mu.Lock()
-		allowed := b.allow(key, 120, 600)
-		if allowed && expensiveRoute(c) {
-			allowed = b.allow(key+":expensive", 20, 120)
-		}
-		b.mu.Unlock()
-		if !allowed {
-			rejectBudget(c)
-			return
-		}
-		c.Next()
-	}
+// This is process capacity protection, separate from each subject's quota.
+const maxGlobalInFlight = 32
+
+func rejectGlobalCapacity(c *gin.Context) {
+	c.Header("Retry-After", "1")
+	c.Header("Cache-Control", "no-store")
+	c.AbortWithStatusJSON(http.StatusTooManyRequests, gin.H{"error": "server capacity limit exceeded"})
 }
 
 // User runs after JWT validation and before opening a database transaction.
 func (b *RequestBudget) User() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		key := "user:" + c.GetString(UserIDKey)
+		userID := c.GetString(UserIDKey)
+		if userID == "" {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "authentication required"})
+			return
+		}
+		key := "user:" + userID
 		expensiveKey := key + ":expensive"
 		expensive := expensiveRoute(c)
 		b.mu.Lock()
-		allowed := b.allow(key, 60, 120)
+		capacityLimited := b.globalInFlight >= maxGlobalInFlight
+		allowed := !capacityLimited && b.active[key] < 4 && (!expensive || b.active[expensiveKey] < 1)
+		if allowed {
+			allowed = b.allow(key, 60, 120)
+		}
 		if allowed && expensive {
 			allowed = b.allow(expensiveKey, 2, 6)
 		}
-		if b.total >= 32 || b.active[key] >= 4 || (expensive && b.active[expensiveKey] >= 1) {
-			allowed = false
-		}
 		if allowed {
-			b.total++
+			b.globalInFlight++
 			b.active[key]++
 			if expensive {
 				b.active[expensiveKey]++
@@ -108,13 +106,17 @@ func (b *RequestBudget) User() gin.HandlerFunc {
 		}
 		b.mu.Unlock()
 		if !allowed {
+			if capacityLimited {
+				rejectGlobalCapacity(c)
+				return
+			}
 			rejectBudget(c)
 			return
 		}
 		defer func() {
 			b.mu.Lock()
 			defer b.mu.Unlock()
-			b.total--
+			b.globalInFlight--
 			b.active[key]--
 			if b.active[key] == 0 {
 				delete(b.active, key)

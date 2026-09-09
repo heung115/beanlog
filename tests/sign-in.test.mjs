@@ -20,6 +20,10 @@ function signInWith(response, { throws = false, clientThrows = false } = {}) {
   vm.runInNewContext(outputText, {
     exports,
     require(name) {
+      if (name === "@/lib/security/oauth-consent") return { storeOAuthPreconsent: async () => { throw new Error("OAuth preconsent must not run during password sign-in"); } };
+      if (name === "next/headers") return { headers: async () => { throw new Error("Unexpected signup headers during password sign-in"); } };
+      if (name === "@/lib/security/signup-consent") return { controlledSignup: async () => { throw new Error("Unexpected signup during password sign-in"); } };
+      if (name === "@/lib/security/password-policy") return { newPasswordIssue: async () => { throw new Error("New-password policy must not run during password sign-in"); } };
       if (name === "@/lib/security/password-recovery") return {};
       if (name === "zod") return { z };
       if (name === "@/lib/validation/auth") return authValidation;
@@ -99,4 +103,14 @@ test("invalid form fields never contact authentication", async () => {
   form.set("email", "invalid-email");
   assert.equal((await signIn({}, form)).error, "invalid_credentials");
   assert.deepEqual(calls, []);
+});
+
+test("a legacy six-character password still reaches sign-in and preserves its destination", async () => {
+  const { signIn, calls } = signInWith({ error: null });
+  const form = loginForm();
+  form.set("password", "123456");
+  await assert.rejects(signIn({}, form), /NEXT_REDIRECT/);
+  assert.equal(calls.filter(([name]) => name === "signIn").length, 1);
+  assert.equal(calls.find(([name]) => name === "signIn")[2].length, 6);
+  assert.deepEqual(calls.slice(-2), [["persistence", false], ["redirect", "/en/beans/new?draft=1"]]);
 });

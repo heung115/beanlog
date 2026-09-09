@@ -34,18 +34,27 @@ export function PasswordRecoveryForm({ mode, locale, next, expired = false }: {
   const query = next !== "/explore" ? `?${new URLSearchParams({ next })}` : "";
   const message = state.error === "invalid_email" ? "invalidEmail"
     : state.error === "password_length" ? "passwordRequirements"
+    : state.error === "password_compromised" ? "passwordCompromised"
     : state.error === "password_mismatch" ? "passwordMismatch"
     : state.error === "same_password" ? "passwordMustDiffer"
     : state.error === "expired" ? "resetLinkExpired" : "resetUnavailable";
 
-  function submitForm(event: React.FormEvent<HTMLFormElement>) {
+  async function submitForm(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (inFlight.current || serverPending) return;
-    const data = new FormData(event.currentTarget);
-    const issue = mode === "update" ? validateNewPassword(data) : null;
+    inFlight.current = true;
+    const form = event.currentTarget;
+    const data = new FormData(form);
+    let issue;
+    try { issue = mode === "update" ? await validateNewPassword(data) : null; } catch {
+      inFlight.current = false;
+      setClientState({ error: "temporarily_unavailable" });
+      return;
+    }
     if (issue) {
       setClientState(issue);
-      event.currentTarget.querySelector<HTMLElement>(`[name="${issue.field}"]`)?.focus();
+      form.querySelector<HTMLElement>(`[name="${issue.field}"]`)?.focus();
+      inFlight.current = false;
       return;
     }
     inFlight.current = true;
@@ -80,10 +89,10 @@ export function PasswordRecoveryForm({ mode, locale, next, expired = false }: {
             aria-invalid={state.field === "email" || undefined} aria-describedby={state.field === "email" ? "password-reset-error" : undefined} />
         ) : (
           <>
-            <Input label={t("newPassword")} type="password" name="password" required minLength={6} maxLength={128} autoComplete="new-password"
+            <Input label={t("newPassword")} type="password" name="password" required minLength={15} maxLength={72} autoComplete="new-password"
               aria-invalid={state.field === "password" || undefined} aria-describedby={`password-requirements${state.field === "password" ? " password-reset-error" : ""}`} />
             <p id="password-requirements" className="-mt-2 text-xs leading-5 text-brown-light">{t("passwordRequirements")}</p>
-            <Input label={t("passwordConfirm")} type="password" name="passwordConfirm" required minLength={6} maxLength={128} autoComplete="new-password"
+            <Input label={t("passwordConfirm")} type="password" name="passwordConfirm" required minLength={15} maxLength={72} autoComplete="new-password"
               aria-invalid={state.field === "passwordConfirm" || undefined} aria-describedby={state.field === "passwordConfirm" ? "password-reset-error" : undefined} />
           </>
         )}

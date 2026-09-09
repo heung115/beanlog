@@ -9,11 +9,15 @@
   header_up -X-Beanmap-Auth-Client-IP
  }
 }
+import /signup-boundary.Caddyfile
 :8081 {
+ import beanmap_controlled_signup
+ @private_auth_admin path /auth/v1/admin /auth/v1/admin/*
+ respond @private_auth_admin 404
  reverse_proxy beanmap-auth-gateway:8000 {
   header_up -X-Beanmap-Client-IP
   header_up -X-Beanmap-Client-Proof
-  header_up -X-Beanmap-Auth-Client-IP
+  header_up X-Beanmap-Auth-Client-IP {remote_host}
  }
 }
 :8082 {
