@@ -15,7 +15,9 @@ class SignupBoundary(unittest.TestCase):
         result = boundary.kong_policy(service + service.replace('auth-v1','auth-v1-user-read'), '192.0.2.2')
         self.assertEqual(result.count('signup_source_ip: "192.0.2.2"'), 2)
         self.assertEqual(result.count('name: key-auth'), 2)
-        with self.assertRaises(ValueError): boundary.kong_policy(result, '192.0.2.2')
+        self.assertEqual(boundary.kong_policy(result, '192.0.2.2'), result)
+        with self.assertRaises(ValueError): boundary.kong_policy(result, '192.0.2.3')
+        with self.assertRaises(ValueError): boundary.kong_policy(result.replace('          signup_source_ip: "192.0.2.2"\n', '', 1), '192.0.2.2')
         with self.assertRaises(ValueError): boundary.kong_policy(service + service, '192.0.2.0/24')
 
     def test_existing_caddy_guards_preserved_and_unused_services_removed(self):

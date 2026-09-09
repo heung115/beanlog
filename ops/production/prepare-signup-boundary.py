@@ -12,7 +12,12 @@ def kong_policy(source, web_ip):
         raise ValueError('Expected the exact reserved IPv4 web address')
     pattern = r'(      - name: beanmap-auth-budgets\n        config:\n          scale: 1\n)'
     if 'signup_source_ip:' in source:
-        raise ValueError('Signup source already configured; review the installed policy')
+        # A fresh deployment installs the current budget policy first. It
+        # already pins signup to the same web source; preserve that exact gate.
+        existing = re.findall(pattern + r'          signup_source_ip: "' + re.escape(web_ip) + r'"\n', source)
+        if len(existing) < 2 or len(existing) != len(re.findall(pattern, source)) or len(existing) != source.count('signup_source_ip:'):
+            raise ValueError('Existing signup source differs or is incomplete; review the installed policy')
+        return source
     result, count = re.subn(pattern, lambda match: match.group(1) + f'          signup_source_ip: "{web_ip}"\n', source)
     if count < 2:
         raise ValueError('Expected existing Auth budget services')
