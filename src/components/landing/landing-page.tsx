@@ -57,7 +57,7 @@ export async function LandingPage({ locale }: { locale: LandingLocale }) {
           >
             <Link
               href={`/${locale}/login`}
-              className="inline-flex min-h-11 items-center whitespace-nowrap rounded-sm px-2 text-sm font-semibold text-brown-light transition-colors hover:bg-surface hover:text-brown focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              className={buttonClassName({ variant: "secondary", size: "sm", className: "whitespace-nowrap" })}
             >
               {copy.login}
             </Link>
@@ -87,13 +87,16 @@ export async function LandingPage({ locale }: { locale: LandingLocale }) {
               </p>
 
               <div className="mt-9 flex flex-wrap gap-3">
-                <Link href={`/${locale}/try`} className={buttonClassName({ size: "lg" })}>
-                  {copy.primaryAction}
+                <Link href={`/${locale}/login`} className={buttonClassName({ size: "lg", className: "min-w-28" })}>
+                  {copy.login}
                 </Link>
-                <Link href={`/${locale}/signup`} className={buttonClassName({ variant: "secondary", size: "lg" })}>
+                <Link href={`/${locale}/signup`} className={buttonClassName({ variant: "secondary", size: "lg", className: "min-w-28" })}>
                   {copy.secondaryAction}
                 </Link>
               </div>
+              <Link href={`/${locale}/try`} className="mt-3 inline-flex min-h-11 items-center text-sm font-medium text-brown-medium underline decoration-border underline-offset-4 transition-colors hover:text-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent">
+                {copy.primaryAction}
+              </Link>
             </div>
 
             <div className="relative mx-auto w-full max-w-[28rem] lg:mx-0 lg:justify-self-end">

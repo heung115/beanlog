@@ -10,6 +10,7 @@ import { signUpAction, type SignUpState } from "@/lib/actions/auth";
 import { resolvePostAuthPath } from "@/lib/security/redirect";
 import { SocialSignInButtons } from "@/components/auth/social-sign-in-buttons";
 import { AuthShell } from "@/components/auth/auth-shell";
+import { AuthModeNav } from "@/components/auth/auth-mode-nav";
 import { validateRegistrationFields } from "@/lib/validation/auth";
 import { useAuthFailureFocus } from "@/components/auth/use-auth-failure-focus";
 
@@ -73,6 +74,7 @@ export default function SignupPage() {
 
   return (
     <AuthShell>
+      <AuthModeNav mode="signup" query={authQuery} />
       <div className="mb-8">
         <h1 className="font-display text-2xl font-semibold tracking-[-0.025em] text-brown">
           {t("signup")}
@@ -180,15 +182,6 @@ export default function SignupPage() {
           <SocialSignInButtons acceptedTerms={acceptedTerms} nextPath={nextPath} />
         </div>
 
-        <p className="mt-8 text-center text-sm text-brown-light">
-          {t("hasAccount")}{" "}
-          <Link
-            href={`/${locale}/login${authQuery}`}
-            className="font-medium text-accent hover:underline"
-          >
-            {t("goLogin")}
-          </Link>
-        </p>
     </AuthShell>
   );
 }
