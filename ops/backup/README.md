@@ -120,11 +120,16 @@ PostgreSQL 역할 백업/복구 동작은 [공식 pg_dumpall 문서](https://www
 ## GCP 무료 범위의 운영 구성
 
 대상은 `gcp-free-deploy` 프로젝트의 미국 서부 `us-west1` Standard 전용 버킷이다.
-사용 중인 gcloud 인증을 Mac에서 이용하며 운영 서버에 서비스 계정 키나 GCP
-자격 증명을 두지 않는다. 키를 새로 발급하는 자동화도 없다. 일상 uploader의
-필요 권한은 대상 객체의 create/get/list 및 버킷 정책 읽기이며 삭제/overwrite는
-업로드에 필요하지 않다. 현재 설치는 사용자가 이미 가진 인증 범위로 실행되므로
-새로운 최소권한 계정이 구성됐다고 주장하지 않는다.
+Mac에서 서로 다른 두 전용 서비스 계정과 각 계정의 비공개 gcloud 구성을
+사용한다. `identities.writer`는 대상 버킷·정책·목록 조회와 `beanmap/` 객체
+생성·읽기를 담당하고, `identities.auditor`는 전체 결제 범위의 프로젝트·버킷·객체
+목록을 읽어 4GB 용량 제한을 검사한다. 두 identity의 이메일과 절대 구성 경로가
+모두 필수이며 개인 기본 인증으로 대체하지 않는다. 운영 서버에 GCP 자격 증명을
+두지 않고, 이 도구가 계정·키 발급이나 IAM 변경을 자동으로 수행하지도 않는다.
+writer는 기존 객체 수정·삭제·덮어쓰기나 버킷 설정 변경 권한을 필요로 하지 않는다.
+
+용량 조회에 사용하는 프로젝트에는 Cloud Billing API 활성화가 필요하며,
+[공식 가격 문서](https://cloud.google.com/billing/v1/pricing)에 따르면 이 API 사용은 무료다.
 
 - Uniform bucket-level access와 public access prevention을 강제한다.
 - soft delete, versioning, Autoclass, retention lock을 사용하지 않는다.
