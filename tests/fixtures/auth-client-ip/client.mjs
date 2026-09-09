@@ -69,4 +69,42 @@ if (mode === "exhaust-user") {
 } else if (mode === "after-recreate") {
   result={user:await status("http://fixture-caddy:8080/auth-check")};
 }
-console.log(JSON.stringify(result));
+// Never serialize response objects or arbitrary result properties. Project only
+// literal HTTP statuses, bounded numeric counters, and boolean assertions.
+function httpStatus(value) {
+  for (const code of [200, 401, 403, 404, 429]) if (value === code) return code;
+  throw new Error("Unexpected fixture HTTP status");
+}
+function histogram(value) {
+  const counts = {};
+  for (const code of [200, 429]) {
+    const count = value?.[code];
+    if (count === undefined) continue;
+    if (!Number.isSafeInteger(count) || count < 0 || count > 10000) throw new Error("Invalid fixture count");
+    counts[code] = Number(count);
+  }
+  if (Object.keys(value).length !== Object.keys(counts).length) throw new Error("Unexpected fixture count status");
+  return counts;
+}
+let report;
+if (mode === "exhaust-user" || mode === "exhaust-token") report = histogram(result);
+else if (mode === "second-client" || mode === "after-recreate") report = { user:httpStatus(result.user) };
+else if (mode === "token-other-client") report = { token:httpStatus(result.token) };
+else if (mode === "spoof") report = {
+  throughWeb:httpStatus(result.throughWeb), directKong:httpStatus(result.directKong), publicApi:httpStatus(result.publicApi),
+};
+else if (mode === "auth-boundaries") report = {
+  missingKey:httpStatus(result.missingKey), invalidJwt:httpStatus(result.invalidJwt),
+  privateDenied:httpStatus(result.privateDenied), privateAllowed:httpStatus(result.privateAllowed),
+};
+else if (mode === "operation-budgets") report = {
+  forgedPassword:httpStatus(result.forgedPassword), signup:histogram(result.signup), recover:histogram(result.recover), otp:histogram(result.otp),
+  verify:httpStatus(result.verify), refresh:httpStatus(result.refresh), logout:httpStatus(result.logout),
+  signupSpellingsBlocked:result.signupSpellingsBlocked === true, untrustedDirectSignup:httpStatus(result.untrustedDirectSignup),
+  adminDenied:httpStatus(result.adminDenied), internalAdminDenied:httpStatus(result.internalAdminDenied), admin:httpStatus(result.admin),
+  nativeIdentityReplaced:result.nativeIdentityReplaced === true, adminSpellingsBlocked:result.adminSpellingsBlocked === true,
+  aggregateBounded:result.aggregateBounded === true, deniedTrafficCannotSpendGlobal:result.deniedTrafficCannotSpendGlobal === true,
+  adminAfterPublicExhaustion:httpStatus(result.adminAfterPublicExhaustion),
+};
+else throw new Error("Unknown fixture mode");
+console.log(JSON.stringify(report));

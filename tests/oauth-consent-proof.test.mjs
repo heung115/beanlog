@@ -1,5 +1,4 @@
 import assert from "node:assert/strict";
-import { createHmac } from "node:crypto";
 import test from "node:test";
 import { issueOAuthPreconsent, verifyOAuthPreconsent, pkceConsentBinding, oauthConsentAssertion } from "../src/lib/security/oauth-consent-proof.ts";
 
@@ -24,8 +23,15 @@ test("PKCE binding includes only exact verifier cookie chunks and cannot migrate
 test("completion has a separate signing purpose and binds exact user and original session",()=>{
  const user="c3700000-0000-0000-0000-000000000001",session="d3700000-0000-0000-0000-000000000001";
  const proof=oauthConsentAssertion(user,session,"google",secret,nonce,now);
- const value=["beanmap-oauth-consent-v1",user,session,"google",proof.terms_version,proof.privacy_version,proof.issued_at,nonce,"oauth-signup","/consent"].join("\n");
- assert.equal(proof.signature,createHmac("sha256",Buffer.from(secret,"hex")).update(value).digest("hex"));
+ // Independent Python hmac.new(bytes.fromhex("a" * 64), canonical, hashlib.sha256)
+ // vector for the fixed fields below, prefixed by "beanmap-oauth-consent-v1\n".
+ assert.deepEqual(proof, {
+  user_id:user, session_id:session, provider:"google", terms_version:"2026-08-26",
+  privacy_version:"2026-08-26", issued_at:1788888888, nonce, source:"oauth-signup", path:"/consent",
+  signature:"79f7fc635f548db89759fc4cbf8de1af6ab572e2cee6a7d6695ee1063b08b32e",
+ });
+ const preconsent=issueOAuthPreconsent("google",binding,secret,now,nonce);
+ assert.notEqual(proof.signature,preconsent.split(".")[1]);
  assert.notEqual(proof.signature,oauthConsentAssertion(user,"d3700000-0000-0000-0000-000000000002","google",secret,nonce,now).signature);
  assert.notEqual(proof.signature,oauthConsentAssertion("c3700000-0000-0000-0000-000000000002",session,"google",secret,nonce,now).signature);
  assert.throws(()=>oauthConsentAssertion(user,"invalid","google",secret));

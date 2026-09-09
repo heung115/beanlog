@@ -160,3 +160,15 @@ GCP에서 별도 디렉터리로 다운로드한 실제 암호화본으로 복�
 catch-up은 가능하지만 Mac이 꺼져 있는 동안의 24시간 RPO는 보장하지 않는다.
 개인키는 Mac의 저장소 밖 비공개 설정 디렉터리에, 암호화 캐시는 별도 디렉터리에
 둔다. 복구키의 독립된 두 번째 보관본은 별도로 마련해야 한다.
+
+큰 복구 파일은 `gcs_download.py`로 다시 내려받을 수 있다. 먼저 완료본의 작은
+`manifest.json`을 비공개 복구 디렉터리에 받은 뒤 실행한다. 이 도구는 같은 GCS
+객체 세대를 고정하고 32MiB 범위별 응답, 전체 크기·MD5·SHA256을 검사한 후에만
+완료 파일명으로 바꾼다. 요청별 30초, 객체 전체 30분 제한을 두며 다른 호스트나
+HTTP로 인증 헤더를 전달하지 않는다. 기존에 검증된 작은 파일은 다시 받지 않는다.
+
+```sh
+python3 ops/backup/gcs_download.py --config /PRIVATE/PATH/gcs.json \
+  --directory /PRIVATE/RESTORE/backup-TIMESTAMP-ID \
+  --remote-prefix beanmap/baseline/backup-TIMESTAMP-ID
+```
