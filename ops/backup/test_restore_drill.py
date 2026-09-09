@@ -13,6 +13,96 @@ import restore_drill as drill
 
 
 class RestoreDrillTests(unittest.TestCase):
+    def runtime(self):
+        return [{'Name': '/' + name, 'Image': 'sha256:' + format(index + 1, '064x')} for index, name in enumerate(drill.backup.CONTAINERS)]
+
+    def test_full_inventory_requires_all_services_and_immutable_ids(self):
+        good = self.runtime()
+        self.assertEqual(len(drill.runtime_images(good)), 8)
+        for bad in [good[:-1], good + [good[0]], [good[0]] * 8, [dict(item, Image='latest') for item in good]]:
+            with self.assertRaises(ValueError): drill.runtime_images(bad)
+
+    def test_full_or_complete_delta_pair_are_mutually_exclusive(self):
+        self.assertEqual(drill.image_components({'files': {'images.tar.gz.age': {}}}), ('full', 'images.tar.gz.age'))
+        self.assertEqual(drill.image_components({'files': {'images.delta.tar.gz.age': {}, 'image-base.json.age': {}}}), ('delta', None))
+        for names in [[], ['images.delta.tar.gz.age'], ['image-base.json.age'], ['images.tar.age', 'images.tar.gz.age'], ['images.tar.age', 'images.delta.tar.gz.age', 'image-base.json.age']]:
+            with self.assertRaises(ValueError): drill.image_components({'files': dict.fromkeys(names, {})})
+
+    def test_full_restore_checks_every_runtime_image_not_only_database(self):
+        inventory = self.runtime()
+        def inspect(command, *args, **kwargs):
+            return json.dumps([{'Id': command[-1] if command[-1] != inventory[-1]['Image'] else 'sha256:' + 'f' * 64}]).encode()
+        with patch.object(drill, 'load_verified_full_images', return_value={'images_verified': 8}), patch.object(drill, 'run', side_effect=inspect):
+            with self.assertRaisesRegex(RuntimeError, 'runtime image identity'):
+                drill.load_recovery_images(SimpleNamespace(age='age'), Path('/private/key'), Path('/private/bundle'), {'files': {'images.tar.gz.age': {}}}, inventory)
+
+    def test_cached_runtime_images_cannot_hide_a_missing_full_archive_config(self):
+        from test_image_delta import images, archive
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp); files, ids = images(count=8)
+            missing_config = json.loads(files['manifest.json'])[-1]['Config']
+            files.pop(missing_config); source = root / 'missing-image.tar'; archive(source, files)
+            inventory = [{'Name': '/' + name, 'Image': image} for name, image in zip(drill.backup.CONTAINERS, ids)]
+            def decrypt(age, identity, encrypted, output):
+                output.write_bytes(source.read_bytes())
+            def cached(command):
+                return json.dumps([{'Id': command[-1]}]).encode()
+            with patch.object(drill.image_delta, 'decrypt', side_effect=decrypt), patch.object(drill, 'run', side_effect=cached) as cache, patch.object(drill.subprocess, 'run', return_value=SimpleNamespace(returncode=0)) as load:
+                with self.assertRaisesRegex(ValueError, 'Missing OCI descriptor'):
+                    drill.load_recovery_images(SimpleNamespace(age='age', image_workspace=root), root / 'key', root, {'files': {'images.tar.gz.age': {}}}, inventory)
+                load.assert_not_called(); cache.assert_not_called()
+            self.assertEqual(list(root.glob('restore-full-images-*')), [])
+
+    def test_delta_must_cover_later_web_api_changes_before_loading_anything(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp); parent = root / 'backup-20260909T040802Z-e55a4bc5'; parent.mkdir()
+            (parent / 'manifest.json').write_text('{}')
+            receipt = {'backup_name': parent.name, 'image_file': 'images.tar.gz.age', 'ciphertext_bytes': 123,
+                       'ciphertext_sha256': 'a' * 64, 'manifest_sha256': drill.backup.digest(parent / 'manifest.json'),
+                       'object_generation': '123', 'manifest_generation': '124'}
+            receipt_path = root / 'receipt.json'; receipt_path.write_text(json.dumps(receipt))
+            before = self.runtime(); after = self.runtime(); after[0]['Image'] = 'sha256:' + 'b' * 64; after[4]['Image'] = 'sha256:' + 'c' * 64
+            args = SimpleNamespace(age='age', parent_bundle=parent, parent_receipt=receipt_path, image_workspace=root,
+                                   expected_delta_image_id=[after[0]['Image']])
+            parent_manifest = {'files': {'images.tar.gz.age': {'bytes': 123, 'sha256': 'a' * 64}}}
+            with patch.object(drill.backup, 'validate', return_value=parent_manifest), patch.object(drill, 'decrypt', return_value=json.dumps(before).encode()), patch.object(drill, 'load_images') as load, patch.object(drill.image_delta, 'reconstruct_encrypted') as reconstruct:
+                with self.assertRaisesRegex(ValueError, 'every changed runtime'):
+                    drill.load_recovery_images(args, root / 'key', root, {'files': {'images.delta.tar.gz.age': {}, 'image-base.json.age': {}}}, after)
+                load.assert_not_called(); reconstruct.assert_not_called()
+
+    def test_delta_verification_precedes_all_loads_and_failure_leaves_no_output(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp); parent = root / 'backup-20260909T040802Z-e55a4bc5'; parent.mkdir()
+            (parent / 'manifest.json').write_text('{}')
+            receipt = {'backup_name': parent.name, 'image_file': 'images.tar.gz.age', 'ciphertext_bytes': 123,
+                       'ciphertext_sha256': 'a' * 64, 'manifest_sha256': drill.backup.digest(parent / 'manifest.json'),
+                       'object_generation': '123', 'manifest_generation': '124'}
+            receipt_path = root / 'receipt.json'; receipt_path.write_text(json.dumps(receipt))
+            before = self.runtime(); after = self.runtime(); after[0]['Image'] = 'sha256:' + 'b' * 64
+            args = SimpleNamespace(age='age', parent_bundle=parent, parent_receipt=receipt_path, image_workspace=root,
+                                   expected_delta_image_id=[after[0]['Image']])
+            parent_manifest = {'files': {'images.tar.gz.age': {'bytes': 123, 'sha256': 'a' * 64}}}
+            current = {'files': {'images.delta.tar.gz.age': {}, 'image-base.json.age': {}}}
+            events = []
+            def reconstruct(*arguments, **kwargs):
+                self.assertEqual(kwargs['expected_parent_ids'], [item['Image'] for item in before])
+                events.append('verified'); arguments[6].write_bytes(b'verified archive fixture')
+                return {'files_verified': 7, 'parent_images_verified': 8}
+            def inspect(command):
+                return json.dumps([{'Id': command[-1]}]).encode()
+            with patch.object(drill.backup, 'validate', return_value=parent_manifest), patch.object(drill, 'decrypt', return_value=json.dumps(before).encode()), patch.object(drill.image_delta, 'reconstruct_encrypted', side_effect=reconstruct), patch.object(drill, 'load_images', side_effect=lambda *args: events.append('parent-load')), patch.object(drill.subprocess, 'run', side_effect=lambda *args, **kwargs: (events.append('delta-load') or SimpleNamespace(returncode=0))), patch.object(drill, 'run', side_effect=inspect):
+                result = drill.load_recovery_images(args, root / 'key', root, current, after)
+            self.assertEqual(events, ['verified', 'parent-load', 'delta-load'])
+            self.assertEqual(result['runtime_images_verified'], 8)
+            self.assertEqual(result['changed_runtime_images'], 1)
+            self.assertFalse(any(path.name.startswith('restore-image-delta-') for path in root.iterdir()))
+            with patch.object(drill.backup, 'validate', return_value=parent_manifest), patch.object(drill, 'decrypt', return_value=json.dumps(before).encode()), patch.object(drill.image_delta, 'reconstruct_encrypted', side_effect=ValueError('Bad digest')), patch.object(drill, 'load_images') as load:
+                with self.assertRaises(ValueError): drill.load_recovery_images(args, root / 'key', root, current, after)
+                load.assert_not_called()
+            with patch.object(drill.backup, 'validate', return_value=current), patch.object(drill, 'load_images') as load:
+                with self.assertRaisesRegex(ValueError, 'cannot themselves'): drill.load_recovery_images(args, root / 'key', root, current, after)
+                load.assert_not_called()
+
     def test_authorization_precedes_all_io(self):
         with patch.object(drill, 'validate_identity') as check:
             with self.assertRaises(ValueError): drill.drill(SimpleNamespace(approved_production_restore=False))
