@@ -9,7 +9,7 @@ import { selectLabelSmallPrintRegion, extractLabelSmallPrintWeight } from "./bea
 import { prepareLabelSmallPrintImage } from "./bean-label-small-print-image.ts";
 import { labelTitleClassifiers } from "./bean-label-parser.ts";
 
-const ASSETS = "/ocr/paddle-0.4.2-v1/";
+const ASSETS = "/ocr/paddle-0.4.2-v2/";
 type FallbackReader = ReturnType<typeof import("./bean-label-ocr.ts").createBrowserLabelReader>;
 const textKey = (text: string) => text.normalize("NFKC").toLocaleLowerCase("en").replace(/[^\p{L}\p{N}]/gu, "");
 type Observation = ReturnType<typeof extractLabelPolygons>;

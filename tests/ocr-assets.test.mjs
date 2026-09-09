@@ -5,7 +5,13 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { spawnSync } from "node:child_process";
+import yaml from "js-yaml";
 import { assertAssetOutput, assetPath, downloadVerified, inventory, sha256, verifyBundle, verifyFile, writeVerified } from "../scripts/ocr/assets.mjs";
+
+test("YAML merge limits count empty source mappings while normal model settings still parse", () => {
+  assert.deepEqual(yaml.load("model: OCR\nshape: [3, 48, 320]\n"), { model: "OCR", shape: [3, 48, 320] });
+  assert.throws(() => yaml.load("empty: &empty [{}, {}, {}]\ntarget: { <<: *empty }\n", { maxTotalMergeKeys: 2 }), /maxTotalMergeKeys/);
+});
 
 test("the production archive extractor rejects unsafe members on the CI Python runtime", () => {
   const result = spawnSync(process.env.BEANMAP_OCR_PYTHON || "python3", [fileURLToPath(new URL("./ocr-archive.test.py", import.meta.url))],
@@ -91,7 +97,9 @@ test("a cache manifest cannot omit or replace required pinned model, ORT module 
 test("production source/model/toolchain pins and copied third-party notices are complete", async () => {
   const root = new URL("../scripts/ocr/", import.meta.url);
   const lock = JSON.parse(await fs.readFile(new URL("sources.lock.json", root), "utf8"));
-  assert.equal(lock.assetVersion, "paddle-0.4.2-v1");
+  assert.equal(lock.assetVersion, "paddle-0.4.2-v2");
+  assert.equal(lock.packages["js-yaml"], "4.3.2");
+  await verifyFile(new URL(`../node_modules/js-yaml/${lock.yamlModule.path}`, import.meta.url), lock.yamlModule);
   assert.deepEqual(Object.keys(lock.toolchains).sort(), ["darwin-arm64", "linux-arm64", "linux-x64"]);
   for (const input of [lock.opencvSource, ...Object.values(lock.toolchains), ...lock.models]) {
     assert.match(input.sha256, /^[a-f0-9]{64}$/u);

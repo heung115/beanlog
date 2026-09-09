@@ -1,7 +1,7 @@
 # Browser OCR asset build
 
 `node scripts/prepare-ocr-assets.mjs` prepares the existing Tesseract assets and the
-same-origin Paddle bundle at `public/ocr/paddle-0.4.2-v1/`. `npm run build` runs this
+same-origin Paddle bundle at `public/ocr/paddle-0.4.2-v2/`. `npm run build` runs this
 step automatically. Generated binaries are ignored by Git; the production build
 never reads `.staging`, a developer's Downloads folder, or an external OCR API.
 
@@ -15,7 +15,11 @@ HTTPS and their declared size and SHA-256; cached files are rehashed before use.
 The SDK's official npm source maps contain its original TypeScript sources. The
 build restores those files unchanged, checks the complete source inventory, and
 adds two missing re-export barrels. Module aliases select ONNX Runtime's WASM
-backend, the SDK's original js-yaml source, and the strict OpenCV wrapper. The SDK
+backend, the separately pinned js-yaml 4.3.2 security patch, and the strict OpenCV
+wrapper. The SDK's embedded js-yaml 4.1.1 is verified for provenance but never
+written to the generated source tree or included in the worker. The patched
+module's version, byte count and checksum are checked before bundling, and the
+worker's module inventory must include it. The SDK
 normalizer generates `config.json` from `config-input.json`; runtime configuration
 is validated again by the application worker client.
 
@@ -117,7 +121,7 @@ build output; retain additional space for those. The compiler cache stays out of
 the runtime image, and repeated deployments reuse it without another download or
 compile. No Docker image, volume or unrelated cache was pruned during validation.
 
-The final 24 browser asset files total 32,766,826 bytes before transport
+The original v1 bundle's 24 browser asset files total 32,766,826 bytes before transport
 compression, plus the manifest. Building those files on macOS and Linux around
 the same Linux-produced OpenCV artifact gave identical SHA-256 values for every
 file. The original native macOS OpenCV WASM itself differs from the Linux build;
@@ -135,3 +139,25 @@ The documented `--import-opencv` path is only an optional checksum-verified seed
 the source build and production Docker image do not require it. Python extraction
 regressions are also invoked by `tests/ocr-assets.test.mjs`, so the ordinary
 `npm run test:node` and project check runner execute them in CI.
+
+## YAML input boundary and security patch
+
+The SDK can parse YAML pipeline text and each model archive's `inference.yml`.
+Beanmap supplies an object from checked-in JSON for pipeline configuration and
+serves only checksum-pinned model archives. Uploaded photographs and recognized
+text are prediction data; they are not passed to the YAML parser. No public
+arbitrary-YAML entry point has been identified. The 4.3.2 patch nevertheless
+removes the vulnerable parser from both build configuration and the browser worker.
+See [GHSA-2883-xcg3-v3hh](https://github.com/nodeca/js-yaml/security/advisories/GHSA-2883-xcg3-v3hh).
+
+`tests/ocr-assets.test.mjs` runs a small empty-mapping merge-budget regression and
+checks the patched ESM module's pinned bytes in the ordinary Node CI suite. After
+preparing assets, `node scripts/ocr/verify-yaml-runtime.mjs` additionally initializes
+the real pinned models and reads a synthetic image in a local Chromium worker
+under the production worker CSP. This optional browser check needs Playwright's
+Chromium installation and opens only a loopback test server.
+
+The asset URL advances to `paddle-0.4.2-v2` so a new page cannot reuse an immutable
+v1 worker cache. Uncached requests from already open v1 pages are rewritten to the
+compatible patched v2 assets. A previously cached v1 worker cannot be remotely
+replaced; reloading the application selects v2.
