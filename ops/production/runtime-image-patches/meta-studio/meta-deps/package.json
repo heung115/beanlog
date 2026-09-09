@@ -1,0 +1,1 @@
+{"name":"beanmap-meta-runtime-patch","private":true,"version":"1.0.0","dependencies":{"fastify":"5.12.3","find-my-way":"9.9.0","@fastify/cors":"11.3.0","@fastify/swagger":"9.8.1","fastify-metrics":"12.1.0","pino":"9.14.0"},"overrides":{"pino":"9.14.0","find-my-way":"9.9.0"}}

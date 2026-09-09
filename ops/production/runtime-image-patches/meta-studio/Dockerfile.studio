@@ -1,0 +1,13 @@
+FROM node:20.20.2-bookworm-slim@sha256:2cf067cfed83d5ea958367df9f966191a942351a2df77d6f0193e162b5febfc0 AS dependencies
+WORKDIR /opt/beanmap-studio-runtime
+COPY studio-deps/package.json studio-deps/package-lock.json ./
+RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+
+# Existing reviewed local runtime image; no mutable base tag is resolved.
+FROM sha256:fbd09e43b4928bb4b3368808d2baa26ef7183dc4345b04c5ffe1e5a779927c42
+USER root
+COPY --from=dependencies /opt/beanmap-studio-runtime /opt/beanmap-studio-runtime
+COPY patch-studio.cjs purge-build-tools.cjs /tmp/
+RUN node /tmp/patch-studio.cjs && node /tmp/purge-build-tools.cjs \
+ && rm /tmp/patch-studio.cjs /tmp/purge-build-tools.cjs
+USER 1000:1000
