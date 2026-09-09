@@ -33,6 +33,19 @@ class BackupTests(unittest.TestCase):
                 else: (directory / 'unexpected').write_text('bad')
                 with self.assertRaises(ValueError): backup.validate(directory)
 
+    def test_serve_configuration_component_is_authenticated_and_not_node_state(self):
+        with tempfile.TemporaryDirectory() as temp:
+            directory = Path(temp); manifest = self.fixture(directory)
+            name = 'tailscale-serve.json.age'
+            (directory / name).write_bytes(b'encrypted-serve-declarations')
+            manifest['files'][name] = {'bytes': (directory / name).stat().st_size,
+                                       'sha256': backup.digest(directory / name)}
+            (directory / 'manifest.json').write_text(json.dumps(manifest))
+            self.assertEqual(backup.validate(directory), manifest)
+            (directory / name).write_bytes(b'tampered-serve-declarations')
+            with self.assertRaises(ValueError): backup.validate(directory)
+            self.assertNotIn('tailscaled.state', backup.COMPONENTS)
+
     def test_complete_archive_roundtrip(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp); source = root / 'source'; target = root / 'target'
