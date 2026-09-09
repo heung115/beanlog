@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """Prepare/apply controlled public Auth boundaries; preserve all live image pins."""
 import argparse
+from contextlib import contextmanager
+import fcntl
 import hashlib
 import importlib.util
 import json
 import os
 from pathlib import Path
 import shutil
+import stat
 import time
 
 HERE = Path(__file__).resolve().parent
@@ -26,6 +29,59 @@ PREVIOUS = {
     'handler': '9c72df24ad431464ef305883311b3697497345dd9a883aef7167bba8cf34e32c',
 }
 TOOLS = ['apply-otp-boundary.py', 'apply-auth-budgets.py', 'caddy-version-boundary.py']
+LOCKS = (Path('/var/lib/beanmap-deploy/deploy.lock'),
+         Path('/var/lib/beanmap-deploy/deploy-execution.lock'))
+
+
+@contextmanager
+def deployment_locks():
+    handles = []
+    try:
+        for path in LOCKS:
+            fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_NOFOLLOW, 0o600)
+            handles.append(fd)
+            if not stat.S_ISREG(os.fstat(fd).st_mode):
+                raise ValueError('Deployment lock must be a regular file')
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        yield
+    finally:
+        for fd in reversed(handles):
+            os.close(fd)
+
+
+def atomic_install(source, target):
+    previous = target.lstat()
+    if not stat.S_ISREG(previous.st_mode):
+        raise ValueError('Ingress target must be a regular file')
+    temporary = target.with_name(target.name + '.otp-boundary-candidate')
+    # A pre-existing temporary belongs to someone else; never replace/remove it.
+    fd = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+    identity = os.fstat(fd)
+    try:
+        stream = os.fdopen(fd, 'wb')
+        fd = None
+        with stream, source.open('rb') as incoming:
+            shutil.copyfileobj(incoming, stream)
+            stream.flush()
+            os.fchown(stream.fileno(), previous.st_uid, previous.st_gid)
+            os.fchmod(stream.fileno(), stat.S_IMODE(previous.st_mode))
+            os.fsync(stream.fileno())
+        os.replace(temporary, target)
+        directory = os.open(target.parent, os.O_RDONLY | os.O_DIRECTORY)
+        try:
+            os.fsync(directory)
+        finally:
+            os.close(directory)
+    except BaseException:
+        if fd is not None:
+            os.close(fd)
+        try:
+            current = temporary.lstat()
+            if (current.st_dev, current.st_ino) == (identity.st_dev, identity.st_ino):
+                temporary.unlink()
+        except FileNotFoundError:
+            pass
+        raise
 
 
 def guard_hashes():
@@ -113,21 +169,35 @@ def apply(state):
     assert_direct_internal_auth()
     for key, path in FILES.items():
         if (path.is_symlink() or base.digest(path) != records['files'][key]['before']
-                or base.digest(state / (key + '.candidate')) != records['files'][key]['candidate']):
+                or base.digest(state / (key + '.candidate')) != records['files'][key]['candidate']
+                or base.digest(state / (key + '.before')) != records['files'][key]['before']):
             raise ValueError('Live ingress or candidate changed after preparation')
     try:
-        base.atomic_install(state / 'snippet.candidate', FILES['snippet'])
+        atomic_install(state / 'snippet.candidate', FILES['snippet'])
         base.validate_caddy(base.FILES['caddy'])
         base.run(['systemctl', 'reload', 'caddy'])
-        base.atomic_install(state / 'handler.candidate', FILES['handler'])
+        atomic_install(state / 'handler.candidate', FILES['handler'])
         reload_kong()
         if records['guards'] != guard_hashes() or records['kong'] != service_identity():
             raise RuntimeError('Unexpected live configuration change during OTP activation')
-    except Exception:
+    except BaseException:
+        rollback_errors = []
         for key, path in FILES.items():
-            base.atomic_install(state / (key + '.before'), path)
-        base.run(['systemctl', 'reload', 'caddy'])
-        reload_kong()
+            try:
+                if base.digest(path) != records['files'][key]['before']:
+                    atomic_install(state / (key + '.before'), path)
+                if base.digest(path) != records['files'][key]['before']:
+                    raise RuntimeError('Restored file hash mismatch')
+            except BaseException:
+                rollback_errors.append(key)
+        for name, action in [('caddy', lambda: (base.validate_caddy(base.FILES['caddy']), base.run(['systemctl', 'reload', 'caddy']))),
+                             ('kong', reload_kong)]:
+            try:
+                action()
+            except BaseException:
+                rollback_errors.append(name)
+        if rollback_errors:
+            raise RuntimeError('OTP activation failed; rollback incomplete, review private backups: ' + ', '.join(rollback_errors)) from None
         raise RuntimeError('OTP activation failed; previous ingress files restored') from None
     (state / 'applied').write_text('activated\n')
     print('Public OTP ingress denied; internal Auth, compose, and image pins preserved.')
@@ -140,7 +210,8 @@ def main():
     args = parser.parse_args()
     if os.geteuid() != 0 or not args.state_dir.is_absolute() or args.state_dir.is_symlink():
         raise ValueError('Root and a private absolute state path are required')
-    {'prepare': prepare, 'apply': apply}[args.operation](args.state_dir)
+    with deployment_locks():
+        {'prepare': prepare, 'apply': apply}[args.operation](args.state_dir)
 
 
 if __name__ == '__main__':

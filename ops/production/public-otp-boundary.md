@@ -94,6 +94,12 @@ Rebase this change onto current main and stage those exact reviewed source files
 into a fresh root-private directory. This ingress change does not depend on the
 runtime image patch version, but must not run concurrently with another rollout.
 Do not reuse an earlier Compose overlay or replace the app/API image.
+Both preparation and application acquire the existing deployment locks in order:
+`/var/lib/beanmap-deploy/deploy.lock`, then
+`/var/lib/beanmap-deploy/deploy-execution.lock`. Acquisition is nonblocking; a busy
+lock stops the operation before it reads or changes rollout state. The deployment
+directory must already exist. Locks are held until the operation finishes,
+including any rollback.
 
 `apply-otp-boundary.py prepare --state-dir <new-private-path>` reads the current
 live configuration and pins its hashes. It requires the reviewed previous
@@ -107,8 +113,19 @@ After the coordinated GO,
 `apply-otp-boundary.py apply --state-dir <prepared-private-path>` verifies the
 hashes again, installs only the Caddy snippet and Kong plugin handler, reloads
 Caddy, and restarts the same Kong container. Its immutable image ID, container
-configuration, and unrelated file hashes must remain unchanged. A failure restores
-the two original files and reloads the existing services. Backups remain private.
+configuration, and unrelated file hashes must remain unchanged. Backup hashes are
+also checked before mutation. Each replacement exclusively creates its temporary
+file, preserves the live mode and owner, and syncs the file and containing
+directory. Failed replacements remove only a temporary inode created by that
+attempt; pre-existing temporary files are preserved.
+
+On failure, rollback attempts both original files independently, verifies their
+hashes, reloads Caddy, and verifies the restarted Kong container is healthy. It
+reports restoration only if all those checks pass; otherwise it reports incomplete
+rollback and identifies the affected file or service for recovery from the private
+backups. Failure-injection tests cover copy, ownership, permissions, file/directory
+sync, replacement before and after the rename, temporary-file conflicts, and
+service failures. Backups remain private.
 
 Complete with a small number of ordinary health/negative checks, then rerun the
 existing disposable-account enumeration probe against the newly blocked path.
