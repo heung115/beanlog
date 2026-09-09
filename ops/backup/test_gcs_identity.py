@@ -5,6 +5,7 @@ import os
 from pathlib import Path
 import tempfile
 import unittest
+import urllib.error
 from unittest.mock import patch
 
 spec = importlib.util.spec_from_file_location('gcs', Path(__file__).with_name('gcs.py'))
@@ -108,6 +109,20 @@ class IdentityTests(unittest.TestCase):
                 with self.subTest(role=role,missing=missing),self.assertRaises(ValueError):cloud.check_permissions('fixture-backup')
             cloud.get=lambda *a,**kw:{'permissions':list(gcs.READ_PERMISSIONS)}
             cloud.check_permissions('fixture-backup')
+
+    def test_ubla_permission_api_does_not_request_disabled_object_acl_permissions(self):
+        cloud=object.__new__(gcs.Cloud)
+        requested=[]
+        def ubla_api(path,**query):
+            permissions=set(query['permissions']);requested.append(permissions)
+            if permissions & {'storage.objects.getIamPolicy','storage.objects.setIamPolicy'}:
+                raise urllib.error.HTTPError('https://storage.googleapis.com/fixture',400,'Object ACL permission tests are disabled with UBLA',{},None)
+            return {'permissions':list(gcs.READ_PERMISSIONS)}
+        cloud.get=ubla_api
+        for role in ('writer','auditor'):
+            cloud.role=role;cloud.check_permissions('fixture-backup')
+        for permissions in requested:
+            self.assertTrue({'storage.objects.update','storage.objects.delete','storage.buckets.setIamPolicy','storage.buckets.update','storage.buckets.delete'} <= permissions)
 
     def test_writer_never_executes_billing_inventory(self):
         cloud=object.__new__(gcs.Cloud);cloud.role='writer'

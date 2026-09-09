@@ -209,6 +209,10 @@ drop-in도 포함한다. 복원 시 새 호스트의 Caddy UID와 Tailscale 주�
 대한 검사라 객체 prefix 조건부 권한을 모두 증명하지 못할 수 있다. 배포 시 사용자 지정
 IAM 역할 정의와 조건을 별도로 검토하고, 조건부 수정·삭제 권한을 주지 않는다.
 검사 통과를 모든 상속·조건부 권한의 완전한 부재 증명으로 표현하지 않는다.
+필수 설정인 uniform bucket-level access에서는 객체 ACL 자체가 비활성화되며,
+GCS가 `objects.getIamPolicy/setIamPolicy` 검사 요청을 400으로 거부한다. 이 두 객체
+ACL 권한은 API 검사에 넣지 않고 역할 정의 검토로 확인한다. 버킷의
+`buckets.setIamPolicy` 금지 검사는 그대로 유지한다.
 
 모든 gcloud 호출에 같은 전용 환경·고정 account·`default` 구성을 명시한다. 외부
 `CLOUDSDK_*`, ADC, impersonation, access-token, proxy/CA 환경 덮어쓰기는 거부한다.

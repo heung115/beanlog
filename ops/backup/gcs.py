@@ -45,7 +45,10 @@ def capacity(existing, incoming, maximum=HARD_BYTES):
         raise ValueError('Upload exceeds conservative free-tier capacity')
 
 
-DENIED_PERMISSIONS = {'storage.objects.update', 'storage.objects.delete', 'storage.objects.setIamPolicy',
+# Uniform bucket-level access disables object ACLs; GCS rejects testing
+# objects.getIamPolicy/setIamPolicy in this mode. eligible() requires UBLA.
+# Review role definitions separately; bucket IAM mutation remains forbidden.
+DENIED_PERMISSIONS = {'storage.objects.update', 'storage.objects.delete',
                       'storage.buckets.setIamPolicy', 'storage.buckets.update', 'storage.buckets.delete'}
 READ_PERMISSIONS = {'storage.buckets.get', 'storage.buckets.getIamPolicy', 'storage.objects.list'}
 
