@@ -18,6 +18,8 @@ import urllib.request
 
 spec = importlib.util.spec_from_file_location('backup', Path(__file__).with_name('backup.py'))
 backup = importlib.util.module_from_spec(spec); spec.loader.exec_module(backup)
+identity_spec = importlib.util.spec_from_file_location('gcs_identity', Path(__file__).with_name('gcs_identity.py'))
+identity_module = importlib.util.module_from_spec(identity_spec); identity_spec.loader.exec_module(identity_module)
 FREE_REGIONS = {'US-WEST1', 'US-CENTRAL1', 'US-EAST1'}
 HARD_BYTES = 4_000_000_000  # Conservative bound below advertised 5 GB-months.
 
@@ -43,25 +45,43 @@ def capacity(existing, incoming, maximum=HARD_BYTES):
         raise ValueError('Upload exceeds conservative free-tier capacity')
 
 
-class Cloud:
-    def __init__(self, executable):
-        self.executable = executable
-        self.token = subprocess.check_output([executable, 'auth', 'print-access-token'], stderr=subprocess.DEVNULL).decode().strip()
+DENIED_PERMISSIONS = {'storage.objects.update', 'storage.objects.delete', 'storage.objects.setIamPolicy',
+                      'storage.buckets.setIamPolicy', 'storage.buckets.update', 'storage.buckets.delete'}
+READ_PERMISSIONS = {'storage.buckets.get', 'storage.buckets.getIamPolicy', 'storage.objects.list'}
+
+
+class SameHostRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, request, fp, code, msg, headers, newurl):
+        parsed = urllib.parse.urlsplit(newurl)
+        if parsed.scheme != 'https' or parsed.hostname != 'storage.googleapis.com' or parsed.port not in (None, 443) or parsed.username or parsed.password:
+            raise ValueError('Refusing cross-host credential redirect')
+        return super().redirect_request(request, fp, code, msg, headers, newurl)
+
+
+class Cloud(identity_module.DedicatedIdentity):
+    def __init__(self, settings, role='writer'):
+        super().__init__(settings, role)
         self.requests = 0
 
-    def cli(self, args):
-        return json.loads(subprocess.check_output([self.executable, *args, '--format=json'], stderr=subprocess.DEVNULL))
-
     def get(self, path, **query):
+        if self.role == 'writer':
+            target = 'b/' + urllib.parse.quote(self.settings['bucket'], safe='')
+            if path != target and not path.startswith(target + '/'):
+                raise ValueError('Writer API request is outside the approved bucket')
+            if path.startswith(target + '/o/') and not urllib.parse.unquote(path[len(target + '/o/'):]).startswith('beanmap/'):
+                raise ValueError('Writer object read is outside the approved backup prefix')
+        if self.role == 'auditor' and query.get('alt') == 'media':
+            raise ValueError('The capacity auditor cannot download object contents')
         self.requests += 1
         if self.requests > 60:
             raise ValueError('Read request budget exceeded; refuse incomplete inventory')
         url = 'https://storage.googleapis.com/storage/v1/' + path
-        if query: url += '?' + urllib.parse.urlencode(query)
+        if query: url += '?' + urllib.parse.urlencode(query, doseq=True)
         request = urllib.request.Request(url, headers={'Authorization': 'Bearer ' + self.token})
         cafile = '/etc/ssl/cert.pem' if Path('/etc/ssl/cert.pem').is_file() else None
         context = ssl.create_default_context(cafile=cafile)
-        with urllib.request.urlopen(request, timeout=30, context=context) as response:
+        opener = urllib.request.build_opener(SameHostRedirect(), urllib.request.HTTPSHandler(context=context))
+        with opener.open(request, timeout=30) as response:
             return json.load(response)
 
     def pages(self, path, **query):
@@ -71,7 +91,8 @@ class Cloud:
             if not page.get('nextPageToken'): return found
             query['pageToken'] = page['nextPageToken']
 
-    def inventory(self, project, name):
+    def billing_inventory(self, project, name):
+        if self.role != 'auditor': raise ValueError('Only the dedicated capacity auditor can inspect billing scope')
         billing = self.cli(['billing', 'projects', 'describe', project])
         if not billing.get('billingEnabled') or not billing.get('billingAccountName'):
             raise ValueError('Cannot verify active free-tier billing scope')
@@ -105,6 +126,32 @@ class Cloud:
             raise ValueError('Public IAM binding found')
         return total, target, objects
 
+    def check_permissions(self, name):
+        denied = DENIED_PERMISSIONS | ({'storage.objects.get', 'storage.objects.create'} if self.role == 'auditor' else set())
+        checked = READ_PERMISSIONS | denied
+        result = self.get('b/' + urllib.parse.quote(name, safe='') + '/iam/testPermissions', permissions=sorted(checked))
+        granted = set(result.get('permissions', []))
+        if granted & denied or not READ_PERMISSIONS <= granted or granted - checked:
+            raise ValueError('Backup identity has missing read permissions or forbidden mutation permissions')
+
+    def inventory(self, project, name):
+        if self.role != 'writer': raise ValueError('Uploader inventory requires the dedicated writer identity')
+        if project != self.settings['project'] or name != self.settings['bucket']:
+            raise ValueError('Inventory target differs from reviewed settings')
+        auditor = Cloud(self.settings, role='auditor')
+        auditor.check_permissions(name)
+        total, reviewed, objects = auditor.billing_inventory(project, name)
+        self.check_permissions(name)
+        quoted = urllib.parse.quote(name, safe='')
+        current = self.get('b/' + quoted)
+        eligible(current)
+        if current.get('name') != name or current.get('projectNumber') != reviewed.get('projectNumber') or str(current.get('metageneration')) != str(reviewed.get('metageneration')):
+            raise ValueError('Target bucket changed during independent capacity review')
+        policy = self.cli(['storage', 'buckets', 'get-iam-policy', 'gs://' + name])
+        if any(member in ('allUsers', 'allAuthenticatedUsers') for binding in policy.get('bindings', []) for member in binding.get('members', [])):
+            raise ValueError('Public IAM binding found')
+        return total, current, objects
+
 
 def config(path):
     value = json.loads(Path(path).read_text())
@@ -131,10 +178,10 @@ def upload(settings, directory, mode, *, approved=False, cloud=None):
     if not approved: raise ValueError('Run upload only for the user-approved GCP backup target')
     if not backup.NAME.fullmatch(directory.name): raise ValueError('Invalid completed backup directory')
     manifest = backup.validate(directory)
-    if mode == 'daily' and any(name in manifest['files'] for name in ('images.tar.age', 'images.tar.gz.age')):
+    if mode == 'daily' and any(name in manifest['files'] for name in ('images.tar.age', 'images.tar.gz.age', 'images.delta.tar.gz.age', 'image-base.json.age')):
         raise ValueError('Daily image copies would exhaust free storage')
     if mode not in ('daily', 'baseline'): raise ValueError('Invalid backup kind')
-    cloud = cloud or Cloud(settings['gcloud'])
+    cloud = cloud or Cloud(settings)
     total, bucket, objects = cloud.inventory(settings['project'], settings['bucket'])
     verify_lifecycle(bucket, settings['bucket_metageneration'])
     incoming = sum(path.stat().st_size for path in directory.iterdir())
@@ -164,8 +211,7 @@ def upload(settings, directory, mode, *, approved=False, cloud=None):
             if int(prior['size']) != path.stat().st_size or prior.get('md5Hash') != encoded or prior.get('metadata', {}).get('sha256') != backup.digest(path):
                 raise ValueError('Existing object differs; never overwrite it')
             continue
-        environment = dict(os.environ, CLOUDSDK_STORAGE_PARALLEL_COMPOSITE_UPLOAD_ENABLED='false')
-        subprocess.run([settings['gcloud'], 'storage', 'cp', str(path), remote, '--if-generation-match=0', '--content-md5=' + encoded, '--content-type=application/octet-stream', '--custom-metadata=sha256=' + backup.digest(path), '--quiet'], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True, env=environment)
+        cloud.copy(path, remote, md5=encoded, sha256=backup.digest(path))
         obj = cloud.get('b/' + urllib.parse.quote(settings['bucket'], safe='') + '/o/' + urllib.parse.quote(prefix + path.name, safe=''))
         if int(obj['size']) != path.stat().st_size or obj.get('md5Hash') != encoded or obj.get('metadata', {}).get('sha256') != backup.digest(path):
             raise ValueError('Uploaded encrypted object failed integrity verification')
@@ -173,7 +219,7 @@ def upload(settings, directory, mode, *, approved=False, cloud=None):
 
 
 def remote_status(settings, cloud=None):
-    cloud = cloud or Cloud(settings['gcloud'])
+    cloud = cloud or Cloud(settings)
     total, bucket, objects = cloud.inventory(settings['project'], settings['bucket'])
     verify_lifecycle(bucket, settings['bucket_metageneration'])
     if total > settings.get('maximum_pool_bytes', HARD_BYTES):
@@ -208,7 +254,7 @@ def main():
     try:
         settings = config(args.config)
         if args.operation == 'preflight':
-            total, bucket, _ = Cloud(settings['gcloud']).inventory(settings['project'], settings['bucket'])
+            total, bucket, _ = Cloud(settings).inventory(settings['project'], settings['bucket'])
             verify_lifecycle(bucket, settings['bucket_metageneration']); capacity(total, 1, settings.get('maximum_pool_bytes', HARD_BYTES))
             result = {'status': 'eligible', 'pool_bytes': total, 'limit_bytes': settings.get('maximum_pool_bytes', HARD_BYTES), 'region': bucket['location']}
         elif args.operation == 'status':

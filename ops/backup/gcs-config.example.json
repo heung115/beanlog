@@ -5,5 +5,15 @@
   "prefix": "beanmap",
   "retention_days": 30,
   "maximum_pool_bytes": 4000000000,
-  "bucket_metageneration": "2"
+  "bucket_metageneration": "2",
+  "identities": {
+    "writer": {
+      "gcloud_config": "/PRIVATE/PATH/gcloud-backup-writer",
+      "account": "backup-writer@gcp-free-deploy.iam.gserviceaccount.com"
+    },
+    "auditor": {
+      "gcloud_config": "/PRIVATE/PATH/gcloud-capacity-auditor",
+      "account": "capacity-auditor@gcp-free-deploy.iam.gserviceaccount.com"
+    }
+  }
 }

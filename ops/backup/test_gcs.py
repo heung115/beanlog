@@ -50,6 +50,13 @@ class GcsTests(unittest.TestCase):
             with self.assertRaises(ValueError): gcs.upload({}, Path('/invalid'), 'daily')
             validate.assert_not_called()
 
+    def test_daily_rejects_all_image_payloads_before_cloud_authentication(self):
+        directory = Path('/fixture/backup-20260909T000000Z-00000000')
+        for name in ('images.tar.age', 'images.tar.gz.age', 'images.delta.tar.gz.age', 'image-base.json.age'):
+            with self.subTest(name=name), patch.object(gcs.backup, 'validate', return_value={'files': {name: {}}}), patch.object(gcs, 'Cloud') as cloud:
+                with self.assertRaises(ValueError): gcs.upload({}, directory, 'daily', approved=True)
+                cloud.assert_not_called()
+
     def test_pagination_includes_empty_intermediate_page(self):
         cloud = object.__new__(gcs.Cloud)
         pages = iter([{'items': [{'size': '1'}], 'nextPageToken': 'first'}, {'nextPageToken': 'second'}, {'items': [{'size': '2'}]}])
@@ -69,23 +76,25 @@ class GcsTests(unittest.TestCase):
             class FakeCloud:
                 def inventory(self, *args): return 23, target, [metadata(directory / 'database.dump.age')]
                 def get(self, path): return metadata(directory / urllib.parse.unquote(path.split('/o/')[1]).rsplit('/', 1)[-1])
+                def copy(self, source, target, **kwargs): calls.append((source,target,kwargs))
             settings = {'gcloud': '/fake/gcloud', 'bucket': 'fixture-backup', 'project': 'fixture-project', 'bucket_metageneration': '2'}
-            with patch.object(gcs.subprocess, 'run') as run:
-                result = gcs.upload(settings, directory, 'daily', approved=True, cloud=FakeCloud())
-            self.assertEqual(run.call_count, 2)
-            self.assertTrue(run.call_args_list[-1].args[0][4].endswith('/manifest.json'))
-            for call in run.call_args_list:
-                self.assertEqual(call.kwargs['env']['CLOUDSDK_STORAGE_PARALLEL_COMPOSITE_UPLOAD_ENABLED'], 'false')
-                self.assertIn('--if-generation-match=0', call.args[0])
+            calls = []
+            result = gcs.upload(settings, directory, 'daily', approved=True, cloud=FakeCloud())
+            self.assertEqual(len(calls), 2)
+            self.assertTrue(calls[-1][1].endswith('/manifest.json'))
+            for source,target,kwargs in calls:
+                self.assertEqual(kwargs['sha256'], gcs.backup.digest(source))
             self.assertEqual(result['status'], 'uploaded')
 
     def test_inventory_rejects_missing_target_or_inaccessible_billing(self):
         cloud = object.__new__(gcs.Cloud)
+        cloud.role = 'auditor'
         cloud.cli = lambda args: {'billingEnabled': False}
-        with self.assertRaises(ValueError): cloud.inventory('fixture-project', 'fixture-backup')
+        with self.assertRaises(ValueError): cloud.billing_inventory('fixture-project', 'fixture-backup')
 
     def test_inventory_counts_complete_billing_pool_and_versions(self):
         cloud = object.__new__(gcs.Cloud)
+        cloud.role = 'auditor'
         def cli(args):
             if args[:3] == ['billing', 'projects', 'describe']:
                 return {'billingEnabled': True, 'billingAccountName': 'billingAccounts/fixture'}
@@ -100,7 +109,7 @@ class GcsTests(unittest.TestCase):
             self.assertEqual(kwargs.get('versions'), 'true')
             return [{'name': 'object', 'size': '150', 'storageClass': 'STANDARD'}, {'name': 'object', 'size': '150', 'storageClass': 'STANDARD'}]
         cloud.cli, cloud.pages = cli, pages
-        total, target, objects = cloud.inventory('fixture-project', 'fixture-backup')
+        total, target, objects = cloud.billing_inventory('fixture-project', 'fixture-backup')
         self.assertEqual(total, 300); self.assertEqual(target['name'], 'fixture-backup'); self.assertEqual(len(objects), 2)
 
 
