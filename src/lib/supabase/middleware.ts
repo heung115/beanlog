@@ -194,6 +194,19 @@ export async function updateSession(request: NextRequest, preferredLocale?: "ko"
     return preserveAuthResponse(supabaseResponse, NextResponse.redirect(url));
   }
 
+  const isHomeNavigation = /^\/(?:ko|en)\/?$/.test(pathname)
+    && ["GET", "HEAD"].includes(request.method);
+  if (user && !authError && isHomeNavigation) {
+    const url = new URL(
+      `/${locale}/${user.app_metadata?.beanmap_pending_consent === true ? "consent" : "explore"}`,
+      request.url
+    );
+    const response = preserveAuthResponse(supabaseResponse, NextResponse.redirect(url));
+    // Session-dependent navigation must not survive sign-out in a shared cache.
+    response.headers.set("Cache-Control", "no-store");
+    return response;
+  }
+
   if (user?.app_metadata?.beanmap_pending_consent === true && (isProtectedPath(pathname) || isAuthPage)
     && !/^\/(?:ko|en)\/consent\/?$/.test(pathname)) {
     const url = request.nextUrl.clone();

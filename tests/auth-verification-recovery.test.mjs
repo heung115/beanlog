@@ -84,6 +84,88 @@ test("a verified missing session still requires login with its return path", asy
   assert.equal(new URL(response.headers.get("location")).pathname, "/ko/login");
 });
 
+test("verified sessions opening localized home pages go directly to their journal without caching the redirect", async () => {
+  const { updateSession } = middlewareModuleWith(null, false, () => ({
+    auth: { getUser: async () => ({ data: { user: { id: "verified-fixture-user" } }, error: null }) },
+  }));
+  for (const locale of ["ko", "en"]) {
+    for (const method of ["GET", "HEAD"]) {
+      for (const suffix of ["", "/", "?draft=1&next=%2Fen%2Fsettings&utm_source=home"]) {
+        const request = new NextRequest(`http://localhost:3100/${locale}${suffix}`, { method });
+        const response = await updateSession(request);
+        assert.equal(response.status, 307, `${method} ${request.nextUrl.pathname}`);
+        assert.equal(response.headers.get("location"), `http://localhost:3100/${locale}/explore`);
+        assert.equal(response.headers.get("cache-control"), "no-store");
+      }
+    }
+  }
+});
+
+for (const [description, error, throws] of [
+  ["anonymous visit", null],
+  ["missing session", { name: "AuthSessionMissingError", status: 400 }],
+  ["rejected refresh token", { code: "refresh_token_not_found", status: 400 }],
+  ["invalid identity", { status: 401 }],
+  ["rate-limited verification", { status: 429 }],
+  ["unavailable verification", { status: 503 }],
+  ["thrown network failure", new TypeError("fetch failed"), true],
+]) {
+  test(`${description} leaves localized home pages public`, async () => {
+    for (const locale of ["ko", "en"]) {
+      for (const method of ["GET", "HEAD"]) {
+        const request = new NextRequest(`http://localhost:3100/${locale}`, {
+          method, headers: { cookie: error ? "auth-cookie=unverified-cookie; theme=mist" : "theme=mist" },
+        });
+        const response = await middlewareWith(error, throws)(request);
+        assert.equal(response.status, 200);
+        assert.equal(response.headers.get("location"), null);
+        assert.equal(response.headers.get("x-middleware-rewrite"), null);
+        assert.equal(request.cookies.get("theme").value, "mist");
+        if (authRecovery.isTemporaryAuthError(error)) {
+          assert.equal(request.cookies.get("auth-cookie").value, "unverified-cookie");
+          assert.deepEqual(response.cookies.getAll(), []);
+        }
+      }
+    }
+  });
+}
+
+test("a failed identity lookup cannot redirect home even if it returns user data", async () => {
+  const { updateSession } = middlewareModuleWith(null, false, () => ({
+    auth: { getUser: async () => ({ data: { user: { id: "unverified-fixture-user" } }, error: { status: 503 } }) },
+  }));
+  const response = await updateSession(new NextRequest("http://localhost:3100/en"));
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("location"), null);
+});
+
+test("home visits by users awaiting consent go directly to the localized consent screen", async () => {
+  const { updateSession } = middlewareModuleWith(null, false, () => ({
+    auth: { getUser: async () => ({ data: { user: { id: "pending-fixture-user", app_metadata: { beanmap_pending_consent: true } } }, error: null }) },
+  }));
+  for (const locale of ["ko", "en"]) {
+    for (const method of ["GET", "HEAD"]) {
+      const response = await updateSession(new NextRequest(`http://localhost:3100/${locale}?next=%2Fen%2Fsettings&draft=1`, { method }));
+      assert.equal(response.status, 307);
+      assert.equal(response.headers.get("location"), `http://localhost:3100/${locale}/consent`);
+      assert.equal(response.headers.get("cache-control"), "no-store");
+    }
+  }
+});
+
+test("home form posts are not redirected by the automatic journal entry", async () => {
+  for (const pendingConsent of [false, true]) {
+    const { updateSession } = middlewareModuleWith(null, false, () => ({
+      auth: { getUser: async () => ({ data: { user: { id: "verified-fixture-user", app_metadata: { beanmap_pending_consent: pendingConsent } } }, error: null }) },
+    }));
+    for (const locale of ["ko", "en"]) {
+      const response = await updateSession(new NextRequest(`http://localhost:3100/${locale}`, { method: "POST" }));
+      assert.equal(response.status, 200);
+      assert.equal(response.headers.get("location"), null);
+    }
+  }
+});
+
 test("signed-in users opening authentication pages retain a trusted next destination", async () => {
   const { updateSession } = middlewareModuleWith(null, false, () => ({
     auth: { getUser: async () => ({ data: { user: { id: "verified-fixture-user" } }, error: null }) },
@@ -98,6 +180,9 @@ test("signed-in users opening authentication pages retain a trusted next destina
         assert.equal(actual.origin, "http://localhost:3100");
         assert.equal(`${actual.pathname}${actual.search}`, destination.startsWith("/") ? destination : `/${locale}/explore`);
       }
+      const draft = await updateSession(new NextRequest(`http://localhost:3100/${locale}/${authPage}?draft=1&next=%2Fen%2Fsettings`));
+      assert.equal(draft.status, 307);
+      assert.equal(draft.headers.get("location"), `http://localhost:3100/${locale}/beans/new?draft=1`);
     }
   }
 });
@@ -110,7 +195,7 @@ test("public recovery and origin pages remain reachable during an auth outage", 
   }
 });
 
-function proxyWith(error) {
+function proxyWith(error, clientFactory) {
   const proxySource = readFileSync(new URL("../src/proxy.ts", import.meta.url), "utf8");
   const compiled = ts.transpileModule(proxySource, {
     compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 },
@@ -121,7 +206,7 @@ function proxyWith(error) {
     require(name) {
       if (name === "@/lib/security/csp") return csp;
       if (name === "next/server") return { NextRequest, NextResponse };
-      if (name === "@/lib/supabase/middleware") return middlewareModuleWith(error);
+      if (name === "@/lib/supabase/middleware") return middlewareModuleWith(error, false, clientFactory);
       if (name === "./i18n/routing") return { routing };
       if (name === "@/lib/security/redirect") return {};
       if (name === "@/lib/security/admin-boundary") return { isAdminPath: () => false };
@@ -134,6 +219,26 @@ function proxyWith(error) {
   });
   return exports.proxy;
 }
+
+test("a signed-in root visit keeps the Korean canonical redirect and then enters the journal", async () => {
+  const proxy = proxyWith(null, () => ({
+    auth: { getUser: async () => ({ data: { user: { id: "verified-fixture-user" } }, error: null }) },
+  }));
+  for (const method of ["GET", "HEAD"]) {
+    const headers = { cookie: "NEXT_LOCALE=en; auth-cookie=fixture-session" };
+    const root = await proxy(new NextRequest("http://localhost:3100/?utm_source=home", { method, headers }));
+    assert.equal(root.status, 308);
+    assert.equal(root.headers.get("location"), "http://localhost:3100/ko?utm_source=home");
+    const home = await proxy(new NextRequest(root.headers.get("location"), { method, headers }));
+    assert.equal(home.status, 307);
+    assert.equal(home.headers.get("location"), "http://localhost:3100/ko/explore");
+    assert.equal(home.headers.get("cache-control"), "no-store");
+    assert.match(home.headers.get("content-security-policy"), /'nonce-/);
+    const journal = await proxy(new NextRequest(home.headers.get("location"), { method, headers }));
+    assert.equal(journal.status, 200);
+    assert.equal(journal.headers.get("location"), null);
+  }
+});
 
 test("locale proxy composition preserves the recovery rewrite, status, retry delay, and locale cookie", async () => {
   const request = new NextRequest("http://localhost:3100/en/settings?from=journal");
@@ -194,7 +299,7 @@ const fixtureUser = {
   id: "00000000-0000-0000-0000-000000000001", aud: "authenticated", role: "authenticated",
   email: "fixture@local.test", created_at: "2020-01-01T00:00:00Z",
 };
-function expiredSessionRequest() {
+function expiredSessionRequest(pathname = "/en/settings") {
   const session = {
     access_token: "fixture.expired.signature", refresh_token: "fixture-refresh-token",
     token_type: "bearer", expires_in: 3600, expires_at: Math.floor(Date.now() / 1000) - 60,
@@ -202,7 +307,7 @@ function expiredSessionRequest() {
   };
   const encoded = `base64-${Buffer.from(JSON.stringify(session)).toString("base64url")}`;
   const half = Math.floor(encoded.length / 2);
-  return new NextRequest("http://localhost:3100/en/settings", { headers: {
+  return new NextRequest(`http://localhost:3100${pathname}`, { headers: {
     cookie: `auth-cookie.0=${encoded.slice(0, half)}; auth-cookie.1=${encoded.slice(half)}; beanmap-session-only=1; theme=mist`,
   } });
 }
@@ -263,6 +368,57 @@ for (const userStatus of [200, 503]) {
     assert.equal(request.cookies.get("beanmap-session-only").value, "1");
   });
 }
+
+for (const locale of ["ko", "en"]) {
+  for (const userStatus of [200, 503]) {
+    test(`${locale} home preserves real SDK token rotation and session-only cookies after user HTTP ${userStatus}`, async () => {
+      const request = expiredSessionRequest(`/${locale}`);
+      const paths = [];
+      const response = await middlewareWithSdk(async (url) => {
+        const path = new URL(url).pathname;
+        paths.push(path);
+        return path.endsWith("/token") ? authResponse(200, {
+          access_token: "fixture.rotated.signature", refresh_token: "rotated-fixture-refresh-token",
+          token_type: "bearer", expires_in: 3600, user: fixtureUser,
+        }) : authResponse(userStatus, userStatus === 200 ? fixtureUser : { msg: "Temporarily unavailable" });
+      })(request);
+      assert.deepEqual(paths, ["/auth/v1/token", "/auth/v1/user"]);
+      assert.equal(response.status, userStatus === 200 ? 307 : 200);
+      assert.equal(response.headers.get("location"), userStatus === 200 ? `http://localhost:3100/${locale}/explore` : null);
+      assert.match(response.headers.get("cache-control"), /no-store/);
+      assert.equal(response.headers.get("pragma"), "no-cache");
+      assert.equal(response.headers.get("expires"), "0");
+      const updated = response.cookies.get("auth-cookie");
+      assert.ok(updated?.value.startsWith("base64-"));
+      const session = JSON.parse(Buffer.from(updated.value.slice(7), "base64url").toString());
+      assert.equal(session.refresh_token, "rotated-fixture-refresh-token");
+      assert.equal(session.access_token, "fixture.rotated.signature");
+      assert.equal(request.cookies.get("auth-cookie").value, updated.value);
+      assert.equal(updated.maxAge, undefined);
+      assert.equal(updated.expires, undefined);
+      for (const chunk of ["auth-cookie.0", "auth-cookie.1"]) {
+        assert.equal(response.cookies.get(chunk).maxAge, 0);
+      }
+      assert.equal(request.cookies.get("theme").value, "mist");
+      assert.equal(request.cookies.get("beanmap-session-only").value, "1");
+    });
+  }
+}
+
+test("a real SDK rejected refresh token clears home session chunks without hiding the public page", async (t) => {
+  t.mock.method(console, "error", () => {});
+  const request = expiredSessionRequest("/en");
+  const response = await middlewareWithSdk(async () => authResponse(400, {
+    code: "refresh_token_not_found", msg: "Invalid Refresh Token: Refresh Token Not Found",
+  }))(request);
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("location"), null);
+  for (const chunk of ["auth-cookie.0", "auth-cookie.1"]) {
+    assert.equal(response.cookies.get(chunk).maxAge, 0);
+    assert.equal(request.cookies.has(chunk), false);
+  }
+  assert.equal(request.cookies.get("theme").value, "mist");
+});
 
 test("the real SDK still clears rejected refresh tokens and requires login", async (t) => {
   t.mock.method(console, "error", () => {});

@@ -30,7 +30,7 @@ for (const locale of ["ko", "en"] as const) {
       await page.goto(`/${locale}/session-unavailable?next=${encodeURIComponent("https://example.com/private")}`);
       await expect(page.getByRole("link", { name: t.auth.sessionRetry, exact: true })).toHaveAttribute("href", `/${locale}/explore`);
       await page.getByRole("link", { name: t.auth.sessionHome, exact: true }).click();
-      await expect(page).toHaveURL(new RegExp(`/${locale}$`));
+      await expect(page).toHaveURL(new RegExp(`/${locale}/explore$`));
     } finally {
       await admin.auth.admin.deleteUser(id);
     }
