@@ -24,10 +24,14 @@ LIMIT = 256 * 1024 * 1024
 COPY = re.compile(rb'^COPY ((?:"(?:[^"]|"")+"|[a-z_][a-z_0-9]*)\.(?:"(?:[^"]|"")+"|[a-z_][a-z_0-9]*)) \(.*\) FROM stdin;\n$')
 
 
+class RestoreError(RuntimeError):
+    """A fixed, non-sensitive diagnostic safe to include in the result."""
+
+
 def run(command, data=None, limit=LIMIT):
     result = subprocess.run(command, input=data, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if result.returncode or len(result.stdout) > limit:
-        raise RuntimeError('Private restore subprocess failed')
+        raise RestoreError('Private restore subprocess failed')
     return result.stdout
 
 
@@ -87,19 +91,20 @@ def sequence_states(data):
 
 
 def copy_fingerprints(data):
-    result, current, count, digest = {}, None, 0, None
+    result, current, row_digests = {}, None, []
     for line in io.BytesIO(data):
         if current is not None:
             if line == b'\\.\n':
-                result[current] = (count, digest.digest())
+                # SQL table order is unspecified; retain duplicate multiplicity.
+                result[current] = (len(row_digests), hashlib.sha256(b"".join(sorted(row_digests))).digest())
                 current = None
             else:
-                count += 1; digest.update(line)
+                row_digests.append(hashlib.sha256(line).digest())
         elif match := COPY.match(line):
             current = match.group(1)
             if current in result:
                 raise ValueError('Repeated COPY table in archive')
-            count, digest = 0, hashlib.sha256()
+            row_digests = []
     if current is not None or not result:
         raise ValueError('Incomplete or empty COPY data archive')
     return result
@@ -110,7 +115,7 @@ def load_images(age, identity, path):
     with open(os.devnull, 'wb') as sink:
         result = subprocess.run([age, '-d', '-i', str(identity), str(path)], stdout=sink, stderr=subprocess.PIPE)
         if result.returncode:
-            raise RuntimeError('Image archive authentication failed')
+            raise RestoreError('Image archive authentication failed')
     commands = [[age, '-d', '-i', str(identity), str(path)]]
     if path.name == 'images.tar.gz.age':
         commands.append(['gzip', '-d'])
@@ -125,7 +130,7 @@ def load_images(age, identity, path):
                 if previous is not None: previous.close()
                 processes.append(process)
             codes = [process.wait() for process in reversed(processes)]
-            if any(codes): raise RuntimeError('Image archive import failed')
+            if any(codes): raise RestoreError('Image archive import failed')
         finally:
             for process in processes:
                 if process.poll() is None: process.kill()
@@ -153,9 +158,9 @@ class OfflineDatabase:
             self.volumes.append(name)
         mounts = ['--mount', 'type=volume,src=' + self.volumes[0] + ',dst=/drill-data', '--mount', 'type=volume,src=' + self.volumes[1] + ',dst=/etc/postgresql-custom']
         run(['docker', 'run', '--rm', '-i', '--network', 'none', '--read-only', '--cap-drop', 'ALL', '--cap-add', 'CHOWN', '--cap-add', 'DAC_OVERRIDE', *mounts, '--entrypoint', 'sh', self.image, '-ec',
-             'tar -xf - -C /etc/postgresql-custom; chown -R 100:101 /drill-data /etc/postgresql-custom; chmod 700 /drill-data'], config)
+             'tar -xf - -C /etc/postgresql-custom; chmod 700 /drill-data; chown -R 100:101 /drill-data /etc/postgresql-custom'], config)
         mounts[-1] += ',readonly'
-        init = ('initdb -U supabase_admin -D /drill-data --auth-local=trust --auth-host=reject >/tmp/init.log 2>&1; '
+        init = ('initdb -U supabase_admin -D /drill-data --auth-local=trust --auth-host=reject >/dev/null; '
                 'exec postgres -D /drill-data -c config_file=/etc/postgresql/postgresql.conf '
                 '-c hba_file=/drill-data/pg_hba.conf -c data_directory=/drill-data '
                 '-c listen_addresses= -c unix_socket_directories=/tmp -c ssl=off '
@@ -171,18 +176,19 @@ class OfflineDatabase:
             try:
                 if self.psql(b'SELECT 1;').strip() == b'1': return
             except RuntimeError:
-                pass
+                if run(['docker', 'inspect', '--format', '{{.State.Running}}', self.name]).strip() != b'true':
+                    raise RestoreError('Isolated database exited during initialization')
             time.sleep(1)
-        raise RuntimeError('Isolated database did not become ready')
+        raise RestoreError('Isolated database did not become ready')
 
     def close(self):
         if self.started and run(['docker', 'container', 'ls', '-aq', '--filter', 'name=^/' + self.name + '$']).strip():
             labels = json.loads(run(['docker', 'inspect', '--format', '{{json .Config.Labels}}', self.name]))
-            if labels.get(LABEL) != self.token: raise RuntimeError('Refusing cleanup of an unowned container')
+            if labels.get(LABEL) != self.token: raise RestoreError('Refusing cleanup of an unowned container')
             run(['docker', 'rm', '-f', '-v', self.name])
         for volume in reversed(self.volumes):
             labels = json.loads(run(['docker', 'volume', 'inspect', '--format', '{{json .Labels}}', volume]))
-            if labels.get(LABEL) != self.token: raise RuntimeError('Refusing cleanup of an unowned volume')
+            if labels.get(LABEL) != self.token: raise RestoreError('Refusing cleanup of an unowned volume')
             run(['docker', 'volume', 'rm', volume])
 
 
@@ -209,7 +215,7 @@ def drill(args):
     with open(os.devnull, 'wb') as sink:
         for filename in manifest['files']:
             checked = subprocess.run([args.age, '-d', '-i', str(identity), str(directory / filename)], stdout=sink, stderr=subprocess.PIPE)
-            if checked.returncode: raise RuntimeError('Encrypted component authentication failed')
+            if checked.returncode: raise RestoreError('Encrypted component authentication failed')
     inventory = json.loads(decrypt(args.age, identity, directory / 'runtime-inventory.json.age', 2*1024*1024))
     image = database_image(inventory)
     config = decrypt(args.age, identity, directory / 'postgres-config.tar.age', 16*1024*1024)
@@ -219,7 +225,7 @@ def drill(args):
     progress('loading archived immutable images')
     load_images(args.age, identity, directory / image_files.pop())
     if json.loads(run(['docker', 'image', 'inspect', image]))[0]['Id'] != image:
-        raise RuntimeError('Archived database image identity mismatch')
+        raise RestoreError('Archived database image identity mismatch')
     database = OfflineDatabase(image)
     restore_started = time.monotonic()
     try:
@@ -234,8 +240,8 @@ def drill(args):
         progress('verifying data, privileges and Vault')
         actual_sql = run(database.command('pg_dump', '-U', 'supabase_admin', '-d', 'postgres', '--data-only'))
         actual = copy_fingerprints(actual_sql)
-        if sequence_states(expected_sql) != sequence_states(actual_sql): raise RuntimeError('Restored sequence state differs from archive')
-        if expected != actual: raise RuntimeError('Restored table data differs from the archived snapshot')
+        if sequence_states(expected_sql) != sequence_states(actual_sql): raise RestoreError('Restored sequence state differs from archive')
+        if expected != actual: raise RestoreError('Restored table data differs from the archived snapshot')
         # Role attributes and current production RLS boundary must survive restore.
         checks = database.psql(b"""SELECT json_build_object(
           'postgres_not_superuser', NOT (SELECT rolsuper FROM pg_roles WHERE rolname='postgres'),
@@ -244,7 +250,7 @@ def drill(args):
           'public_tables_rls', (SELECT bool_and(relrowsecurity) FROM pg_class c JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND c.relkind='r'));
         """)
         checks = json.loads(checks)
-        if not all(value is True for value in checks.values()): raise RuntimeError('Restored database security checks failed')
+        if not all(value is True for value in checks.values()): raise RestoreError('Restored database security checks failed')
         database.psql(acl_script)
         checks['deployed_function_acl_checker'] = True
         version = database.psql(b'SHOW server_version;').decode().strip()
@@ -252,7 +258,7 @@ def drill(args):
         vault = database.psql(br"""BEGIN; SELECT vault.create_secret('restore-drill-synthetic-value', 'restore-drill-' || gen_random_uuid()::text) AS id \gset
         SELECT decrypted_secret = 'restore-drill-synthetic-value' FROM vault.decrypted_secrets WHERE id = :'id'; ROLLBACK;
         """)
-        if vault.strip() != b't': raise RuntimeError('Restored Vault configuration check failed')
+        if vault.strip() != b't': raise RestoreError('Restored Vault configuration check failed')
         return {'status': 'passed', 'scope': 'production-database-only', 'baseline_created_at': manifest['created_at'],
                 'database_version': version, 'archived_image_match': True, 'ciphertext_integrity': True,
                 'table_data_fingerprints_match': True, 'sequence_states_match': True, 'tables_verified': len(expected), 'security_checks': checks,
@@ -267,6 +273,11 @@ def drill(args):
         database.close()
 
 
+def write_report(path, report):
+    with open(path, 'x', opener=lambda name, flags: os.open(name, flags, 0o600)) as target:
+        json.dump(report, target, indent=2); target.write('\n')
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--approved-production-restore', action='store_true')
@@ -276,13 +287,12 @@ def main():
     args = parser.parse_args()
     try:
         report = drill(args)
-        path = Path(args.report)
-        with path.open('x', opener=lambda name, flags: os.open(name, flags, 0o600)) as target:
-            json.dump(report, target, indent=2); target.write('\n')
+        write_report(Path(args.report), report)
         print(json.dumps(report))
         return 0
     except Exception as error:
-        print('Production restore drill failed (' + type(error).__name__ + '); private diagnostics suppressed.', file=sys.stderr)
+        reason = str(error) if isinstance(error, RestoreError) else type(error).__name__
+        print('Production restore drill failed: ' + reason + '; private subprocess diagnostics suppressed.', file=sys.stderr)
         return 1
 
 

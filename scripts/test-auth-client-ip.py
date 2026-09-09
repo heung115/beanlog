@@ -119,7 +119,7 @@ try:
         summary['token_other_client_separate_write_limit'] = client('b', 'token-other-client')
         assert summary['token_other_client_separate_write_limit'] == {'token':200}, summary
         summary['independent_operation_budgets'] = client('a', 'operation-budgets', b_ip)
-        assert summary['independent_operation_budgets'] == {'forgedPassword':429,'signup':{'200':10,'429':1},'recover':{'200':10,'429':1},'otp':{'200':10,'429':1},'verify':200,'refresh':200,'logout':200,'signupSpellingsBlocked':True,'untrustedDirectSignup':404,'adminDenied':404,'internalAdminDenied':403,'admin':200,'nativeIdentityReplaced':True,'adminSpellingsBlocked':True,'aggregateBounded':True,'deniedTrafficCannotSpendGlobal':True,'adminAfterPublicExhaustion':200}, summary
+        assert summary['independent_operation_budgets'] == {'forgedGrantStatus':429,'signup':{'200':10,'429':1},'recover':{'200':10,'429':1},'otp':{'200':10,'429':1},'verify':200,'refresh':200,'logout':200,'signupSpellingsBlocked':True,'untrustedDirectSignup':404,'adminDenied':404,'internalAdminDenied':403,'admin':200,'nativeIdentityReplaced':True,'adminSpellingsBlocked':True,'aggregateBounded':True,'deniedTrafficCannotSpendGlobal':True,'adminAfterPublicExhaustion':200}, summary
         fixture_logs = subprocess.check_output(['docker', 'logs', names['kong']], stderr=subprocess.STDOUT, text=True)
         assert 'scope=client-total' in fixture_logs, 'Aggregate IP limiter was not exercised'
         assert 'scope=public-total' not in fixture_logs, 'Rejected traffic consumed the global budget'

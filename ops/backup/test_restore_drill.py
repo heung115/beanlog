@@ -62,6 +62,18 @@ class RestoreDrillTests(unittest.TestCase):
         for malformed in (b'', data[:-3], data + data):
             with self.assertRaises(ValueError): drill.copy_fingerprints(malformed)
 
+    def test_copy_fingerprints_ignore_order_but_preserve_duplicates(self):
+        prefix = b'COPY auth.audit_log_entries (id) FROM stdin;\n'
+        first = prefix + b'one\ntwo\none\n\\.\n'
+        reordered = prefix + b'two\none\none\n\\.\n'
+        changed = prefix + b'two\none\ntwo\n\\.\n'
+        self.assertEqual(drill.copy_fingerprints(first), drill.copy_fingerprints(reordered))
+        self.assertNotEqual(drill.copy_fingerprints(first), drill.copy_fingerprints(changed))
+        missing = prefix + b'one\ntwo\n\\.\n'
+        extra = prefix + b'one\ntwo\none\none\n\\.\n'
+        self.assertNotEqual(drill.copy_fingerprints(first), drill.copy_fingerprints(missing))
+        self.assertNotEqual(drill.copy_fingerprints(first), drill.copy_fingerprints(extra))
+
     def test_remote_docker_endpoint_rejected(self):
         with patch.dict('os.environ', {}, clear=True), patch.object(drill, 'run', return_value=json.dumps([{'Endpoints':{'docker':{'Host':'ssh://production'}}}]).encode()):
             with self.assertRaises(ValueError): drill.validate_local_engine()
@@ -83,6 +95,8 @@ class RestoreDrillTests(unittest.TestCase):
             self.assertIn('--cap-drop', command)
             self.assertNotIn('-p', command)
             self.assertNotIn('--publish', command)
+        prep = docker_runs[0][-1]
+        self.assertLess(prep.index('chmod 700'), prep.index('chown -R'))
         server = docker_runs[-1]
         self.assertIn('max_worker_processes=0', server[-1])
         self.assertTrue(any('postgresql-custom,readonly' in value for value in server))
@@ -92,6 +106,16 @@ class RestoreDrillTests(unittest.TestCase):
         first = b"SELECT pg_catalog.setval('public.id_seq', 4, true);\n"
         second = b"SELECT pg_catalog.setval('public.id_seq', 5, true);\n"
         self.assertNotEqual(drill.sequence_states(first), drill.sequence_states(second))
+
+    def test_report_is_private_and_never_overwrites_existing_files(self):
+        with tempfile.TemporaryDirectory() as temp:
+            path = Path(temp) / 'report.json'
+            drill.write_report(path, {'status': 'passed'})
+            self.assertEqual(json.loads(path.read_text()), {'status': 'passed'})
+            self.assertEqual(path.stat().st_mode & 0o777, 0o600)
+            with self.assertRaises(FileExistsError): drill.write_report(path, {})
+            link = Path(temp) / 'symlink.json'; link.symlink_to(path)
+            with self.assertRaises(FileExistsError): drill.write_report(link, {})
 
     def test_cleanup_refuses_foreign_volume(self):
         database=drill.OfflineDatabase('sha256:'+'a'*64); database.volumes=['foreign']
