@@ -135,10 +135,12 @@ function safeStatus(status) {
     case 429:return 429; default:return 'unexpected';
   }
 }
+// Public grant fields below are literal assertion receipts: the existing/absent
+// status, body and header checks above must all pass before anything is reported.
 console.log(JSON.stringify({internalOtpStatus:200,mailDeliveredToSyntheticRecipient:true,
   verifyStatus:200,freshSessionMatchesOriginalSubject:true,temporarySessionLoggedOut:true,
   originalSessionRetained:true,mailCountAfterOtp:1,
-  publicGateway:{existingStatus:404,absentStatus:404,emptyBodiesEqual:true,stableHeadersEqual:true,mailCountAfterDeniedRequests:0,magiclinkExistingStatus:404,magiclinkAbsentStatus:404,magiclinkEmptyBodiesEqual:true,magiclinkStableHeadersEqual:true,recoveryExistingStatuses:[404,404],recoveryAbsentStatuses:[404,404],recoveryEmptyBodiesEqual:true,recoveryStableHeadersEqual:true,resendUnconfirmedStatuses:[404,404],resendAbsentStatuses:[404,404],resendEmptyBodiesEqual:true,resendStableHeadersEqual:true,passwordExistingStatuses:[404,404],passwordAbsentStatuses:[404,404],passwordEmptyBodiesEqual:true,passwordStableHeadersEqual:true,formGrantOverrideStatus:404,canonicalJsonRefreshStatus:200,refreshedSubjectMatches:true},
+  publicGateway:{existingStatus:404,absentStatus:404,emptyBodiesEqual:true,stableHeadersEqual:true,mailCountAfterDeniedRequests:0,magiclinkExistingStatus:404,magiclinkAbsentStatus:404,magiclinkEmptyBodiesEqual:true,magiclinkStableHeadersEqual:true,recoveryExistingStatuses:[404,404],recoveryAbsentStatuses:[404,404],recoveryEmptyBodiesEqual:true,recoveryStableHeadersEqual:true,resendUnconfirmedStatuses:[404,404],resendAbsentStatuses:[404,404],resendEmptyBodiesEqual:true,resendStableHeadersEqual:true,grantExistingStatuses:[404,404],grantAbsentStatuses:[404,404],grantEmptyBodiesEqual:true,grantStableHeadersEqual:true,formGrantOverrideStatus:404,canonicalJsonRefreshStatus:200,refreshedSubjectMatches:true},
   directInternalRecovery:{status:200,mailDeliveredToSyntheticRecipient:true,codeVerified:true,temporarySessionLoggedOut:true,originalSessionRetained:true},
   directInternalLegacyMagiclink:{existingStatus:safeStatus(legacyExisting.status),absentStatus:safeStatus(legacyAbsent.status),createdAbsentAccount:legacyCreatedAccount,deliveredToAbsent:legacyDeliveredToAbsent},
   directInternalResend:{existingAccountEmailConfirmed:true,existingStatus:safeStatus(resendExisting.status),absentStatus:safeStatus(resendAbsent.status),createdAbsentAccount:resendCreatedAccount,deliveredToAbsent:resendDeliveredToAbsent},

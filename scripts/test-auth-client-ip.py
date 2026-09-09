@@ -138,7 +138,7 @@ try:
         summary['otp_server_only_boundary'] = client('b', 'otp-boundary', a_ip)
         assert summary['otp_server_only_boundary'] == {'publicUniform':True,'publicSpellingsBlocked':True,'directGatewayBlocked':True,'preflightBlocked':True}, summary
         summary['token_server_boundary'] = client('b', 'token-boundary', a_ip)
-        assert summary['token_server_boundary'] == {'publicGrantBlocked':True,'queryVariantsBlocked':True,'bodyOverrideBlocked':True,'publicRefreshStatus':200,'internalPasswordStatus':200,'internalPkceStatus':200}, summary
+        assert summary['token_server_boundary'] == {'publicGrantBlocked':True,'queryVariantsBlocked':True,'bodyOverrideBlocked':True,'publicRefreshStatus':200,'internalGrantStatus':200,'internalPkceStatus':200}, summary
         fixture_logs = subprocess.check_output(['docker', 'logs', names['kong']], stderr=subprocess.STDOUT, text=True)
         assert 'scope=client-total' in fixture_logs, 'Aggregate IP limiter was not exercised'
         assert 'scope=public-total' not in fixture_logs, 'Rejected traffic consumed the global budget'

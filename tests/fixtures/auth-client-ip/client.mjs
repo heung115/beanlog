@@ -119,7 +119,7 @@ if (mode === "exhaust-user") {
     }
   }
   result.publicRefreshStatus=await status("http://fixture-caddy:8081/auth/v1/token?grant_type=refresh_token",{method:"POST",headers:{apikey:"fixture-only-api-key","Content-Type":"application/json"},body:'{"refresh_token":"synthetic"}'});
-  result.internalPasswordStatus=await status("http://fixture-caddy:8080/auth-token",{method:"POST"});
+  result.internalGrantStatus=await status("http://fixture-caddy:8080/auth-token",{method:"POST"});
   result.internalPkceStatus=await status("http://fixture-caddy:8080/auth-pkce",{method:"POST"});
 } else if (mode === "after-recreate") {
   result={user:await status("http://fixture-caddy:8080/auth-check")};
@@ -165,10 +165,14 @@ else if (mode === "otp-boundary") report = {
   publicUniform:result.publicUniform===true, publicSpellingsBlocked:result.publicSpellingsBlocked===true,
   directGatewayBlocked:result.directGatewayBlocked===true, preflightBlocked:result.preflightBlocked===true,
 };
-else if (mode === "token-boundary") report = {
-  publicGrantBlocked:result.publicGrantBlocked===true, queryVariantsBlocked:result.queryVariantsBlocked===true,
-  bodyOverrideBlocked:result.bodyOverrideBlocked===true, publicRefreshStatus:httpStatus(result.publicRefreshStatus),
-  internalPasswordStatus:httpStatus(result.internalPasswordStatus), internalPkceStatus:httpStatus(result.internalPkceStatus),
-};
+else if (mode === "token-boundary") {
+  if (result.publicGrantBlocked !== true || result.queryVariantsBlocked !== true || result.bodyOverrideBlocked !== true
+      || result.publicRefreshStatus !== 200 || result.internalGrantStatus !== 200 || result.internalPkceStatus !== 200) {
+    throw new Error("Token boundary fixture assertion failed");
+  }
+  // Emit an assertion receipt, never response-derived values (even status fields).
+  report = { publicGrantBlocked:true, queryVariantsBlocked:true, bodyOverrideBlocked:true,
+    publicRefreshStatus:200, internalGrantStatus:200, internalPkceStatus:200 };
+}
 else throw new Error("Unknown fixture mode");
 console.log(JSON.stringify(report));
