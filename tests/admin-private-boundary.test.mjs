@@ -225,6 +225,7 @@ for (const [name, requestHeaders, expectedOrigin] of [
     const calls = [];
     const oauthLifecycle = [];
     const actions = loadModule("../src/lib/actions/auth.ts", {
+      "@/lib/security/sign-in-timing": { createSignInFailureResponse: () => { throw new Error("Password timing must not run during OAuth"); } },
       "next/headers": { headers: async () => requestHeaders },
       "@/lib/security/oauth-consent": { storeOAuthPreconsent: async (provider) => { oauthLifecycle.push(["preconsent", provider]); } },
       "@/lib/security/signup-consent": { controlledSignup: async () => { throw new Error("Email signup must not run during OAuth"); } },

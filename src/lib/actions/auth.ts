@@ -16,6 +16,7 @@ import { resolvePostAuthPath } from "@/lib/security/redirect";
 import { getRequestAppOrigin } from "@/lib/admin/private-access";
 import { validateRegistrationFields, validateNewPassword, type RegistrationField } from "@/lib/validation/auth";
 import { checkPasswordRecoveryProof } from "@/lib/security/password-recovery";
+import { createSignInFailureResponse } from "@/lib/security/sign-in-timing";
 import { isTemporaryAuthError } from "@/lib/supabase/auth-recovery";
 
 export type SignInState = {
@@ -156,13 +157,17 @@ export async function signInAction(
   _previousState: SignInState,
   formData: FormData
 ): Promise<SignInState> {
+  const failureResponse = createSignInFailureResponse();
+  if (!formData || typeof formData.get !== "function") {
+    return failureResponse({ error: "invalid_credentials" });
+  }
   const credentials = signInSchema.safeParse({
     email: formData.get("email"),
     password: formData.get("password"),
   });
 
   if (!credentials.success) {
-    return { error: "invalid_credentials" };
+    return failureResponse({ error: "invalid_credentials" });
   }
 
   const persistSession = formData.get("remember") === "on";
@@ -173,9 +178,9 @@ export async function signInAction(
       email: credentials.data.email,
       password: credentials.data.password,
     });
-    if (error) return signInError(error);
+    if (error) return failureResponse(signInError(error));
   } catch (error) {
-    return signInError(error);
+    return failureResponse(signInError(error));
   }
 
   await setSessionPersistencePreference(persistSession);
