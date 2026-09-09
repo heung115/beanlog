@@ -10,6 +10,7 @@ import { signInAction, type SignInState } from "@/lib/actions/auth";
 import { resolvePostAuthPath } from "@/lib/security/redirect";
 import { SocialSignInButtons } from "@/components/auth/social-sign-in-buttons";
 import { AuthShell } from "@/components/auth/auth-shell";
+import { AuthModeNav } from "@/components/auth/auth-mode-nav";
 import { useSocialAuthConsent } from "@/components/auth/use-social-auth-consent";
 import { useAuthFailureFocus } from "@/components/auth/use-auth-failure-focus";
 
@@ -65,6 +66,7 @@ export default function LoginPage() {
 
   return (
     <AuthShell>
+      <AuthModeNav mode="login" query={authQuery} />
       <div className="mb-8">
         <h1 className="font-display text-2xl font-semibold tracking-[-0.025em] text-brown">
           {t("login")}
@@ -163,15 +165,6 @@ export default function LoginPage() {
           <SocialSignInButtons acceptedTerms={socialTermsAccepted} nextPath={nextPath} />
         </div>
 
-        <p className="mt-8 text-center text-sm text-brown-light">
-          {t("noAccount")}{" "}
-          <Link
-            href={`/${locale}/signup${authQuery}`}
-            className="font-medium text-accent hover:underline"
-          >
-            {t("goSignup")}
-          </Link>
-        </p>
     </AuthShell>
   );
 }
