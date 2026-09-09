@@ -5,7 +5,7 @@ import { createRequire } from "node:module";
 import { cvCache, prepareCv } from "./prepare-opencv.mjs";
 import { randomUUID } from "node:crypto";
 import { build } from "esbuild";
-import { assertAssetOutput, assetPath, downloadVerified, inventory, sha256, verifyBundle, writeVerified } from "./assets.mjs";
+import { assertAssetOutput, assetPath, downloadVerified, inventory, sha256, verifyBundle, verifyFile, writeVerified } from "./assets.mjs";
 
 const directory = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(directory, "../..");
@@ -24,6 +24,8 @@ export async function preparePaddleAssets() {
     const actual = JSON.parse(await fs.readFile(path.join(dependencies, name, "package.json"), "utf8"));
     if (actual.version !== expected) throw new Error(`OCR package version changed: ${name}`);
   }
+  const yamlModule = path.join(dependencies, "js-yaml", lock.yamlModule.path);
+  await verifyFile(yamlModule, lock.yamlModule);
   const cv = await prepareCv();
   // Host builds may differ in bytes despite identical pinned inputs. Never
   // reuse a worker bundled around another factory or WASM artifact.
@@ -57,6 +59,8 @@ export async function preparePaddleAssets() {
           const content = map.sourcesContent[index];
           if (typeof content !== "string" || sha256(content) !== lock.sourceInventory[name] || (recovered[name] && recovered[name] !== sha256(content))) throw new Error("Paddle SDK recovered source changed");
           recovered[name] = sha256(content);
+          // Verify the SDK's historical embedded copy, but never materialize or bundle it.
+          if (name === "vendor/js-yaml.mjs") continue;
           const target = assetPath(generated, name);
           await fs.mkdir(path.dirname(target), { recursive: true });
           await fs.writeFile(target, content);
@@ -68,7 +72,7 @@ export async function preparePaddleAssets() {
         "models/index.ts": 'export { createDetModel } from "./det"; export { createRecModel } from "./rec";\n',
       })) await fs.writeFile(path.join(generated, "src", name), content);
       const shared = { bundle: true, nodePaths: [dependencies], target: "es2022", logLevel: "warning", legalComments: "inline",
-        alias: { "js-yaml": path.join(generated, "vendor/js-yaml.mjs") } };
+        alias: { "js-yaml": yamlModule } };
       const configModule = path.join(generated, "resolve-options.cjs");
       await build({ ...shared, entryPoints: [path.join(generated, "src/pipelines/ocr/shared.ts")], outfile: configModule, platform: "node", format: "cjs" });
       const input = JSON.parse(await fs.readFile(path.join(directory, "config-input.json"), "utf8"));
@@ -79,12 +83,14 @@ export async function preparePaddleAssets() {
         outfile: path.join(temporary, "worker.js"), platform: "browser", format: "esm", minify: true, metafile: true,
         alias: { ...shared.alias, "onnxruntime-web": "onnxruntime-web/wasm", "@techstark/opencv-js": path.join(directory, "opencv-wrapper.mjs"),
           "beanmap-opencv-factory": path.join(cvCache, "opencv_js.js") } });
+      const inputs = Object.keys(result.metafile.inputs).map(name => path.resolve(root, name));
+      if (!inputs.includes(yamlModule) || inputs.some(name => name.endsWith("/vendor/js-yaml.mjs"))) throw new Error("Paddle must bundle only the patched YAML module");
       if (Object.keys(result.metafile.inputs).some(name => /ort\.all|jsep|@techstark\/opencv-js/u.test(name))) throw new Error("Unexpected Paddle runtime backend");
       await writeVerified(path.join(cvCache, "opencv_js.wasm"), temporary, "opencv/opencv_js.wasm", cv.files["opencv_js.wasm"]);
       for (const asset of lock.ortFiles) await writeVerified(path.join(dependencies, "onnxruntime-web/dist", path.basename(asset.path)), temporary, asset.path, asset);
       for (const asset of lock.models) await writeVerified(await downloadVerified(asset, cache), temporary, asset.path, asset);
       for (const license of lock.licenses) await writeVerified(path.join(directory, "licenses", license.path), temporary, `licenses/${license.path}`, license);
-      await fs.writeFile(path.join(temporary, "NOTICE.txt"), "PaddleOCR.js 0.4.2 and OpenCV 4.10.0: Apache-2.0. ONNX Runtime 1.24.3 and js-yaml 4.1.1: MIT.\nOpenCV JS bindings are rebuilt from pinned official source with DYNAMIC_EXECUTION=0. The SDK source is recovered unchanged from its official npm source maps; only module resolution and missing re-export barrels are adapted.\nSee licenses/ for original notices, including OpenCV internal dependencies, Emscripten, Clipper, and JSBN.\nSources and exact input hashes are maintained in scripts/ocr/sources.lock.json in the Beanmap repository.\n");
+      await fs.writeFile(path.join(temporary, "NOTICE.txt"), "PaddleOCR.js 0.4.2 and OpenCV 4.10.0: Apache-2.0. ONNX Runtime 1.24.3 and js-yaml 4.3.2: MIT.\nOpenCV JS bindings are rebuilt from pinned official source with DYNAMIC_EXECUTION=0. The SDK source is recovered unchanged from its official npm source maps; module resolution selects patched js-yaml 4.3.2 and adapts missing re-export barrels.\nSee licenses/ for original notices, including OpenCV internal dependencies, Emscripten, Clipper, and JSBN.\nSources and exact input hashes are maintained in scripts/ocr/sources.lock.json in the Beanmap repository.\n");
       const manifest = { schemaVersion: 1, assetVersion: lock.assetVersion, inputDigest, packages: lock.packages, opencv: cv, files: await inventory(temporary) };
       await fs.writeFile(path.join(temporary, "manifest.json"), JSON.stringify(manifest, null, 2) + "\n");
       await checkBundle(temporary);

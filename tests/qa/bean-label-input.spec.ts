@@ -39,7 +39,7 @@ const requestedBlend = {
 };
 const requestedBlendText = [requestedBlend.name, ...requestedBlend.composition, requestedBlend.notesEn, requestedBlend.notesKo, "200g"].join("\n");
 const workerPath = "/ocr/tesseract-7.0.0/worker.min.js";
-const paddleWorkerPath = "/ocr/paddle-0.4.2-v1/worker.js";
+const paddleWorkerPath = "/ocr/paddle-0.4.2-v2/worker.js";
 
 type OcrReply = { text?: string; error?: string; deferred?: boolean; scores?: number[] };
 type OcrSnapshot = {
@@ -229,11 +229,11 @@ async function mockBrowserOcr(page: Page, replies: OcrReply[] = [{ text: labelTe
       const tesseract = state.workerUrls.includes(`${origin}${workerPath}`);
       expect(state.workerUrls.every((url) => [workerPath, paddleWorkerPath].some(path => url === `${origin}${path}`))).toBe(true);
       expect(state.corePaths.length).toBeGreaterThan(0);
-      expect(state.corePaths.every(path => [`${origin}/ocr/tesseract-7.0.0/core`, `${origin}/ocr/paddle-0.4.2-v1/ort/`].includes(new URL(path, origin).href))).toBe(true);
+      expect(state.corePaths.every(path => [`${origin}/ocr/tesseract-7.0.0/core`, `${origin}/ocr/paddle-0.4.2-v2/ort/`].includes(new URL(path, origin).href))).toBe(true);
       if (paddle) {
-        expect(state.corePaths).toContain(`${origin}/ocr/paddle-0.4.2-v1/ort/`);
+        expect(state.corePaths).toContain(`${origin}/ocr/paddle-0.4.2-v2/ort/`);
         expect(state.modelPaths.length).toBeGreaterThanOrEqual(2);
-        expect(state.modelPaths.every((path) => path.startsWith(`${origin}/ocr/paddle-0.4.2-v1/models/`))).toBe(true);
+        expect(state.modelPaths.every((path) => path.startsWith(`${origin}/ocr/paddle-0.4.2-v2/models/`))).toBe(true);
       }
       if (tesseract) {
         expect(state.corePaths.map(path => new URL(path, origin).href)).toContain(`${origin}/ocr/tesseract-7.0.0/core`);

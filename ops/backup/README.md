@@ -52,6 +52,7 @@ age는 [공식 프로젝트](https://github.com/FiloSottile/age)의 검증된 �
 | `roles.sql.age` | 전역 역할·멤버십·역할 암호 해시 | 복구 시 격리 환경과 기존 bootstrap 역할을 검토해야 함 |
 | `recovery-config.tar.age` | 선택한 운영 환경·비밀·Compose·Caddy·Kong 설정 | 현재 경로 허용 목록을 검토하고 새 설정 경로는 추가해야 함 |
 | `postgres-config.tar.age` | `/etc/postgresql-custom` 전용 볼륨 | Vault/확장 키 관련 복구에서 누락하면 안 됨 |
+| `tailscale-serve.json.age` | 현재 Tailscale Serve 경로 선언 | 노드 인증 상태/개인키는 포함하지 않으며 새 노드 가입 후 검토해 적용 |
 | `runtime-inventory.json.age` | 8개 실행 컨테이너의 이미지·마운트·환경 정보 | 설정·비밀 포함; 반드시 암호화 유지 |
 | `images.tar.gz.age` | 선택 시 현재 실행 중인 커스텀 이미지들(암호화 전 gzip 압축) | 용량이 큼; 보관 용량·빈도를 승인받아야 함 |
 | `manifest.json` | 암호화본 크기·해시·생성 시각·범위 | 개인 정보와 키를 포함하지 않음; 복호화/복구 성공을 뜻하지 않음 |
@@ -172,3 +173,8 @@ python3 ops/backup/gcs_download.py --config /PRIVATE/PATH/gcs.json \
   --directory /PRIVATE/RESTORE/backup-TIMESTAMP-ID \
   --remote-prefix beanmap/baseline/backup-TIMESTAMP-ID
 ```
+
+관리 콘솔 복구 설정에는 전송 경계 root helper, 해당 systemd unit, Docker/Caddy
+drop-in도 포함한다. 복원 시 새 호스트의 Caddy UID와 Tailscale 주소로 helper를
+다시 실행하고 unit을 enable해야 한다. 과거 방화벽 규칙 전체나 `/run` 소켓을
+복사하지 않는다. Serve 선언을 검토해 기존 다른 경로를 보존하며 Funnel은 켜지 않는다.

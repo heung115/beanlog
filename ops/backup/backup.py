@@ -17,7 +17,7 @@ import tempfile
 import time
 
 FORMAT = 1
-COMPONENTS = {'database.dump.age', 'roles.sql.age', 'recovery-config.tar.age', 'postgres-config.tar.age', 'runtime-inventory.json.age', 'images.tar.age', 'images.tar.gz.age'}
+COMPONENTS = {'database.dump.age', 'roles.sql.age', 'recovery-config.tar.age', 'postgres-config.tar.age', 'runtime-inventory.json.age', 'images.tar.age', 'images.tar.gz.age', 'tailscale-serve.json.age'}
 NAME = re.compile(r'^backup-\d{8}T\d{6}Z-[0-9a-f]{8}$')
 CONTAINERS = ('supabase-db', 'supabase-auth', 'supabase-rest', 'supabase-kong',
               'beanlogapp-web-1', 'beanlogapp-api-1', 'beanmap-private-meta', 'beanmap-private-studio')
@@ -102,7 +102,11 @@ def export(args):
                  Path('/srv/beanlog/supabase/docker/.env'), Path('/etc/caddy'),
                  Path('/srv/beanlog/supabase/docker/volumes/api'),
                  Path('/opt/beanmap-private-console/deploy/.env'),
-                 Path('/opt/beanmap-private-console/deploy/compose.yml')]
+                 Path('/opt/beanmap-private-console/deploy/compose.yml'),
+                 Path('/usr/local/sbin/beanmap-private-transport'),
+                 Path('/etc/systemd/system/beanmap-private-transport.service'),
+                 Path('/etc/systemd/system/docker.service.d/beanmap-private-transport.conf'),
+                 Path('/etc/systemd/system/caddy.service.d/private-console.conf')]
         for directory in ('/srv/beanlog/app', '/srv/beanlog/supabase/docker'):
             paths.extend(Path(directory).glob('docker-compose*.yml'))
         paths.extend(Path('/srv/beanlog/supabase/docker/volumes/db').glob('*.sql'))
@@ -111,6 +115,8 @@ def export(args):
         commands['recovery-config.tar.age'] = ['tar', '-C', '/', '-cf', '-'] + [str(path.relative_to('/')) for path in paths]
         commands['postgres-config.tar.age'] = ['docker', 'exec', 'supabase-db', 'tar', '-C', '/etc/postgresql-custom', '-cf', '-', '.']
         commands['runtime-inventory.json.age'] = ['docker', 'inspect', *CONTAINERS]
+        # Capture only Serve routing declarations, never tailscaled.state or node keys.
+        commands['tailscale-serve.json.age'] = ['tailscale', 'serve', 'status', '--json']
         scope += '-runtime-config'
     # Shared lock excludes the existing exclusive deployment/migration wrapper.
     # Other manual role/schema changes must follow the same operator lock.

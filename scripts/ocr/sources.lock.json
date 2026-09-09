@@ -1,10 +1,11 @@
 {
   "schemaVersion": 1,
-  "assetVersion": "paddle-0.4.2-v1",
+  "assetVersion": "paddle-0.4.2-v2",
   "packages": {
     "@paddleocr/paddleocr-js": "0.4.2",
     "onnxruntime-web": "1.24.3",
-    "esbuild": "0.25.12"
+    "esbuild": "0.25.12",
+    "js-yaml": "4.3.2"
   },
   "sourceMaps": {
     "index.mjs.map": "c3bff6784b1e1e54b133e8d48df609f5dd53e3bd2943450061224fc4a6eb3ce5",
@@ -158,7 +159,7 @@
       "sha256": "3840c5c0c61c294264d2dd77b8777be6ddd90121ef4e0e64abcd22edea581d6e"
     },
     {
-      "path": "js-yaml-4.1.1-LICENSE.txt",
+      "path": "js-yaml-4.3.2-LICENSE.txt",
       "bytes": 1084,
       "sha256": "a07bc24468b9654ce76a547d47a2db282d07733b715db4c73a98bd63961f9550"
     },
@@ -198,5 +199,10 @@
       "sha256": "f9bc4423732350eb0b3f7ed7e91d530298476f8fec0c6c427a1c04ade22655af",
       "url": "https://raw.githubusercontent.com/emscripten-core/emscripten/3.1.64/system/lib/libc/musl/COPYRIGHT"
     }
-  ]
+  ],
+  "yamlModule": {
+    "path": "dist/js-yaml.mjs",
+    "bytes": 104118,
+    "sha256": "cea276c7e15f409a1adbe5d177aba7824398a474f7cf702bd57962c7d570636f"
+  }
 }

@@ -40,6 +40,10 @@ const nextConfig: NextConfig = {
     // Keep the bounded memory cache, but never try to rewrite those image files.
     isrFlushToDisk: isDevelopment,
   },
+  async rewrites() {
+    // Keep already-open v1 pages working with patched assets after deployment.
+    return [{ source: "/ocr/paddle-0.4.2-v1/:path*", destination: "/ocr/paddle-0.4.2-v2/:path*" }];
+  },
   async headers() {
     return [
       {
@@ -51,7 +55,7 @@ const nextConfig: NextConfig = {
         headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
       },
       {
-        source: "/ocr/paddle-0.4.2-v1/:path*",
+        source: "/ocr/paddle-0.4.2-:version(v1|v2)/:path*",
         headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
       },
       {
@@ -64,7 +68,7 @@ const nextConfig: NextConfig = {
         }],
       },
       {
-        source: "/ocr/paddle-0.4.2-v1/worker.js",
+        source: "/ocr/paddle-0.4.2-:version(v1|v2)/worker.js",
         headers: [{
           key: "Content-Security-Policy",
           value: "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; connect-src 'self'; worker-src 'none'; object-src 'none'",
