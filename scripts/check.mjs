@@ -22,6 +22,7 @@ const checks = [
   { name: "Node unit tests", command: "npm", args: ["run", "test:node"] },
   { name: "Credential hygiene", command: "node", args: ["scripts/check-secret-files.mjs"] },
   { name: "Container boundary", command: "python3", args: ["-m", "unittest", "discover", "-s", "ops/production", "-p", "test_*.py"] },
+  { name: "Runtime image rollout", command: "python3", args: ["-m", "unittest", "discover", "-s", "ops/production/runtime-image-patches", "-p", "test_*.py"] },
   { name: "Private management boundary", command: "python3", args: ["-m", "unittest", "discover", "-s", "ops/private-console/deploy", "-p", "test_*.py"] },
   { name: "Backup tooling", command: "python3", args: ["-m", "unittest", "discover", "-s", "ops/backup", "-p", "test_*.py"] },
   { name: "Go race tests", command: "npm", args: ["run", "test:go"] },

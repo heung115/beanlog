@@ -1,0 +1,10 @@
+# Preserve the tested PostgreSQL 17.11 / Supabase extension closure unchanged.
+# Alpine signatures authenticate the exact packages from the existing stable repo.
+FROM sha256:c61e973bda4604a04677fa7aeacc49928d5e0a5ef0eb66c9ca426723b3ae6bf3
+USER root
+RUN apk add --no-cache curl=8.22.0-r0 libcurl=8.22.0-r0 \
+ && apk info -v | grep -qx 'curl-8.22.0-r0' \
+ && apk info -v | grep -qx 'libcurl-8.22.0-r0' \
+ && test "$(postgres --version)" = "postgres (PostgreSQL) 17.11" \
+ && /usr/bin/curl --version
+LABEL org.beanmap.security.patch="2026-09-09-curl-8.22.0-r0"

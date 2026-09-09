@@ -6,7 +6,7 @@ services:
   # Do not use the names "meta" or "studio": Compose adds service names as DNS
   # aliases, and the existing public Kong has dormant routes to those aliases.
   private-meta:
-    image: beanmap-postgres-meta@sha256:855f489860828f8cdb6f4110a467d2670ba5a2cec1ef7d2c5b7f7fcd93601b0b
+    image: beanmap-postgres-meta@sha256:a00bb79d9de0e98323c4ac822cdfc741d8e8911753ca7b80a338228458d4ab0f
     container_name: beanmap-private-meta
     user: "1000:1000"
     read_only: true
@@ -43,7 +43,7 @@ services:
       - management
 
   private-studio:
-    image: beanmap-studio@sha256:fbd09e43b4928bb4b3368808d2baa26ef7183dc4345b04c5ffe1e5a779927c42
+    image: beanmap-studio@sha256:a567424f246a1d610a5e01c3624dacc55a7d951a59f07e22216d96aa23d1f8b8
     container_name: beanmap-private-studio
     user: "1000:1000"
     read_only: true

@@ -41,6 +41,7 @@ services:
       GOTRUE_SESSIONS_INACTIVITY_TIMEOUT: "168h"
       GOTRUE_SECURITY_UPDATE_PASSWORD_REQUIRE_REAUTHENTICATION: "true"
   rest:
+    image: beanlog-postgrest@sha256:6ff5557cc4f235639ab4d5227e3db429547de37fa7e481f098e306e1f8f1f036
     logging: *bounded-logs
     read_only: true
     tmpfs:
@@ -53,7 +54,7 @@ services:
     environment:
       PGRST_DB_SCHEMAS: public
   db:
-    image: beanlog-postgres@sha256:c61e973bda4604a04677fa7aeacc49928d5e0a5ef0eb66c9ca426723b3ae6bf3
+    image: beanlog-postgres@sha256:50c0b1bc0d0650eeea6c8fdf6b40ce7ac143e9c4457b3ca91499c7dc07882144
     logging: *bounded-logs
     # Existing initialized data only: rehearse against an isolated restore before use.
     # The reviewed image starts root, fixes ownership, then becomes postgres (100:101).

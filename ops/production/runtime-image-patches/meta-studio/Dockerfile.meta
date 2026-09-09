@@ -1,0 +1,12 @@
+FROM node:20.20.2-bookworm-slim@sha256:2cf067cfed83d5ea958367df9f966191a942351a2df77d6f0193e162b5febfc0 AS dependencies
+WORKDIR /opt/beanmap-meta-runtime
+COPY meta-deps/package.json meta-deps/package-lock.json ./
+RUN npm ci --omit=dev --ignore-scripts --no-audit --no-fund
+
+# Existing reviewed local runtime image; no mutable base tag is resolved.
+FROM sha256:855f489860828f8cdb6f4110a467d2670ba5a2cec1ef7d2c5b7f7fcd93601b0b
+USER root
+COPY --from=dependencies /opt/beanmap-meta-runtime /opt/beanmap-meta-runtime
+COPY patch-meta.cjs /tmp/patch-meta.cjs
+RUN node /tmp/patch-meta.cjs && rm /tmp/patch-meta.cjs
+USER 1000:1000
