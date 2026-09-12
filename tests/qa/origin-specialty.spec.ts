@@ -63,7 +63,9 @@ test('region facts preserve flavors and varieties without naming sales offerings
   await page.goto('/ko/origins/madagascar/haute-matsiatra');
   await expect(page.locator('[data-specialty-lot]')).toHaveCount(getPublishedLots('madagascar-haute-matsiatra').length);
   await expect(page.getByTestId('region-flavors')).toContainText('헤이즐넛');
-  await expect(page.locator('#region-varieties-title')).toBeVisible();
+  await expect(page.getByTestId('region-variety-profiles').locator(':scope > summary')).toBeVisible();
+  await expect(page.getByTestId('region-variety-profiles')).not.toHaveAttribute('open');
+  await expect(page.getByTestId('region-processing')).toBeVisible();
   await expect(page.getByTestId('region-sources')).not.toHaveAttribute('open');
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
 });

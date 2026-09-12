@@ -571,8 +571,8 @@ export function ExploreClient({
             placeholder={t("searchPlaceholder")}
             aria-label={t("search")}
             className={cn(
-              "min-h-11 w-full rounded-md border border-border-light bg-surface py-2.5 pl-10 pr-3 text-sm text-brown",
-              "placeholder:text-brown-light/60 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15",
+              "min-h-12 w-full rounded-md border border-border-light bg-surface py-2 pl-10 pr-3 text-base leading-relaxed text-brown",
+              "placeholder:text-brown-light focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15",
               "transition-colors duration-150 disabled:cursor-wait disabled:opacity-70"
             )}
           />

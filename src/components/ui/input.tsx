@@ -11,9 +11,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ className, label, optional, optionalLabel = "선택", id, ...props }, ref) => {
     const inputId = id || props.name;
     return (
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-1">
         {label && (
-          <label htmlFor={inputId} className="text-[0.8125rem] font-semibold text-brown">
+          <label htmlFor={inputId} className="text-sm font-medium text-brown">
             {label}
             {optional && (
               <span className="ml-1.5 text-xs font-normal text-brown-light">{optionalLabel}</span>
@@ -24,7 +24,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           id={inputId}
           className={cn(
-            "min-h-12 w-full rounded-md border border-border-light bg-surface px-3.5 py-2.5 text-sm text-brown placeholder:text-brown-light/60",
+            "min-h-12 w-full rounded-md border border-border-light bg-surface px-3.5 py-2 text-base leading-relaxed text-brown placeholder:text-brown-light",
             "focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15",
             "transition-colors duration-150",
             className

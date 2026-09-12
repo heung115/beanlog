@@ -1,12 +1,13 @@
 import type { CoffeeVarietyGuide } from "@/data/coffee-varieties/types";
 
-export function VarietyProfiles({ guides, locale }: { guides: CoffeeVarietyGuide[]; locale: string }) {
-  if (guides.length === 0) return null;
+export function VarietyProfiles({ names, guides, locale }: { names: string[]; guides: CoffeeVarietyGuide[]; locale: string }) {
+  if (names.length === 0 && guides.length === 0) return null;
   const language = locale === "en" ? "en" : "ko";
   const ko = language === "ko";
   return (
     <details className="mt-6 border-t border-border-light" data-testid="region-variety-profiles">
-      <summary className="min-h-11 cursor-pointer py-3 text-sm font-medium text-brown">{ko ? "품종별 특성" : "Variety profiles"}</summary>
+      <summary className="min-h-11 cursor-pointer py-3 text-sm font-medium text-brown">{ko ? "재배 품종" : "Grown varieties"}</summary>
+      {names.length > 0 && <p className="pb-4 text-sm leading-7 text-brown-medium" data-testid="region-variety-names">{names.join(" · ")}</p>}
       <div className="divide-y divide-border-light">
         {guides.map((guide) => (
           <section key={guide.id} className="py-5" data-variety-profile={guide.id} aria-labelledby={`variety-${guide.id}`}>

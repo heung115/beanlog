@@ -1090,7 +1090,6 @@ export function BeanForm({
               onChange={(origin_subregions) =>
                 set("origin_subregions", origin_subregions)
               }
-              inputClassName="py-2.5 text-sm"
               showLabel
               optional
               optionalLabel={tc("optional")}
