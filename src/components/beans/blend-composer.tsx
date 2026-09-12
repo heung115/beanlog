@@ -383,7 +383,6 @@ export function BlendComposer({ value, onChange, errorProps }: BlendComposerProp
                     if (matched) handleCountryPick(i, matched);
                   }}
                   placeholder={t("componentOrigin")}
-                  inputClassName="py-2 text-xs"
                 />
                 <div className="relative">
                   <Input
@@ -425,7 +424,6 @@ export function BlendComposer({ value, onChange, errorProps }: BlendComposerProp
                     if (matched) handleRegionPick(i, comp, matched);
                   }}
                   placeholder={t("originRegionPlaceholder")}
-                  inputClassName="py-2 text-xs"
                 />
                 <SubregionInput
                   name={`blend_origin_subregions_${i}`}
@@ -460,7 +458,6 @@ export function BlendComposer({ value, onChange, errorProps }: BlendComposerProp
                     if (matched) handleEntityPick(i, comp, matched);
                   }}
                   placeholder={t("farmProducerPlaceholder")}
-                  inputClassName="py-2 text-xs"
                 />
               ) : (
                 <button
@@ -487,7 +484,6 @@ export function BlendComposer({ value, onChange, errorProps }: BlendComposerProp
                   }
                   onPick={(o) => updateComponent(i, { varietal: canonicalVarietal(o.value) })}
                   placeholder={t("varietalPlaceholder")}
-                  inputClassName="py-2 text-xs"
                 />
                 <Select
                   aria-label={t("processMethod")}
@@ -497,7 +493,6 @@ export function BlendComposer({ value, onChange, errorProps }: BlendComposerProp
                       process_method: (e.target.value || undefined) as ProcessMethod | undefined,
                     })
                   }
-                  className="py-2 text-xs"
                 >
                   <option value="">{t("processMethod")} —</option>
                   {(["washed", "natural", "honey", "anaerobic", "carbonic", "decaf", "other"] as ProcessMethod[]).map(
@@ -520,7 +515,6 @@ export function BlendComposer({ value, onChange, errorProps }: BlendComposerProp
                   updateComponent(i, { process_detail: e.target.value || undefined })
                 }
                 placeholder={t("processDetailPlaceholder")}
-                className="py-2 text-xs"
               />
             </div>
 

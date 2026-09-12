@@ -100,7 +100,7 @@ export function SubregionInput({
 
   return (
     <div
-      className="relative flex flex-col gap-1.5"
+      className="relative flex flex-col gap-1"
       onFocus={() => setFocused(true)}
       onBlur={(event) => {
         if (event.currentTarget.contains(event.relatedTarget)) return;
@@ -132,7 +132,7 @@ export function SubregionInput({
         }}
         placeholder={placeholder}
         className={cn(
-          "w-full rounded-md border border-border-light bg-surface px-3 py-2 text-xs text-brown placeholder:text-brown-light/40",
+          "min-h-12 w-full rounded-md border border-border-light bg-surface px-3 py-2 text-base leading-relaxed text-brown placeholder:text-brown-light",
           "transition-colors duration-150 focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/30",
           inputClassName
         )}

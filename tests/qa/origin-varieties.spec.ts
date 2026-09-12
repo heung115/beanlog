@@ -12,14 +12,20 @@ test('origin search excludes products, roasters, varieties and tasting notes', a
 test('expanded varieties keep mobile details concise and source list closed', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 800 });
   await page.goto('/ko/origins/colombia/pitalito');
-  const varieties = page.locator('section[aria-labelledby="region-varieties-title"]');
+  const varieties = page.getByTestId('region-variety-profiles');
   await expect(varieties).toContainText('재배 품종');
-  await expect(varieties).toContainText('Laurina');
-  await expect(varieties).toContainText('Ombligon');
+  await expect(varieties).not.toHaveAttribute('open');
+  await expect(varieties.getByTestId('region-variety-names')).toBeHidden();
+  await varieties.locator(':scope > summary').click();
+  await expect(varieties.getByTestId('region-variety-names')).toBeVisible();
+  await expect(varieties.getByTestId('region-variety-names')).toContainText('Laurina');
+  await expect(varieties.getByTestId('region-variety-names')).toContainText('Ombligon');
   await expect(page.getByTestId('region-sources')).not.toHaveAttribute('open');
   await expect(page.getByTestId('origin-guide-notes')).toHaveCount(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.goto('/ko/origins/ethiopia/yirgacheffe');
-  await expect(page.locator('section[aria-labelledby="region-varieties-title"]')).toContainText('Kurume');
-  await expect(page.locator('section[aria-labelledby="region-varieties-title"]')).toContainText('Wolisho');
+  await varieties.locator(':scope > summary').click();
+  await expect(varieties.getByTestId('region-variety-names')).toBeVisible();
+  await expect(varieties.getByTestId('region-variety-names')).toContainText('Kurume');
+  await expect(varieties.getByTestId('region-variety-names')).toContainText('Wolisho');
 });

@@ -145,17 +145,14 @@ export default async function OriginRegionPage({ params }: { params: Promise<Reg
       </div>
 
 
-      <section className="mt-10" aria-labelledby="region-varieties-title">
-        <h2 id="region-varieties-title" className="text-lg font-semibold tracking-[-0.015em] text-brown">{isKorean ? "품종과 가공" : "Varieties and processing"}</h2>
-        <dl className="mt-4 grid gap-5 md:grid-cols-2 md:gap-12">
-          <div><dt className="folio-label">{isKorean ? "재배 품종" : "Grown varieties"}</dt><dd className="mt-2 text-sm leading-7 text-brown-medium">{varietyDisplayNames(guide.varieties).join(" · ")}</dd></div>
-          <div><dt className="folio-label">{isKorean ? "가공" : "Processing"}</dt><dd className="mt-2 text-sm leading-7 text-brown-medium">{guide.processes[language].join(" · ")}</dd></div>
-        </dl>
+      <section className="mt-10" aria-labelledby="region-processing-title" data-testid="region-processing">
+        <h2 id="region-processing-title" className="text-lg font-semibold tracking-[-0.015em] text-brown">{isKorean ? "가공" : "Processing"}</h2>
+        <p className="mt-4 text-sm leading-7 text-brown-medium">{guide.processes[language].join(" · ")}</p>
       </section>
 
-      <SpecialtyLots lots={getPublishedLots(guide.id)} locale={locale} />
+      <VarietyProfiles names={varietyDisplayNames(guide.varieties)} guides={getVarietyGuides(guide.varieties)} locale={locale} />
 
-      <VarietyProfiles guides={getVarietyGuides(guide.varieties)} locale={locale} />
+      <SpecialtyLots lots={getPublishedLots(guide.id)} locale={locale} />
 
       <details className="mt-10" data-testid="region-sources">
         <summary className="cursor-pointer py-3 text-sm font-medium text-brown">{isKorean ? "출처" : "Sources"}</summary>

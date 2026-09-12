@@ -99,9 +99,9 @@ components:
   input:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.primary}"
-    typography: "{typography.body-sm}"
+    typography: "{typography.body-md}"
     rounded: "{rounded.md}"
-    padding: 0.625rem 0.75rem
+    padding: 0.5rem 0.875rem
   journal-panel:
     backgroundColor: "{colors.surface}"
     textColor: "{colors.primary}"
@@ -185,7 +185,7 @@ Pills are not a default container. Reserve circles for controls whose meaning or
 ## Components
 
 - **Buttons:** Buttons use the 6px control radius. Primary buttons use the espresso fill with cream text. Secondary buttons use the surface tone with a quiet neutral border. Ghost buttons are for low-priority actions. Only destructive actions use red.
-- **Inputs:** Inputs use the surface token, a one-pixel neutral border, 6px radius, and accent focus treatment. Labels remain outside the control. Placeholder text must be visibly subordinate but legible.
+- **Inputs:** Inputs use the surface token, a one-pixel neutral border, 6px radius, and accent focus treatment. Labels remain outside the control with a 4px gap. Input values use 16px SUIT with a 1.625 line height and a minimum 48px single-line control height. Default input boundaries keep the existing light-neutral token; focus and error treatments carry emphasis. Placeholder text uses the secondary text color without reduced opacity.
 - **Journal panels:** Use the surface token and an 8px radius for standard panels, and the quieter surface token for subordinate content. Prefer whitespace and tonal surfaces; add a light-neutral hairline only when separation would otherwise be unclear.
 - **Bean cards:** Lead with bean name and score, then roastery and origin. Process, roast, and type are supporting metadata. Notes and tasting tags must not overpower identity and score.
 - **Badges and filter controls:** Badges describe data and use compact 4px corners. Compact filter chips use the same 4px radius, while full-size form controls use the 6px control radius. An active filter uses the primary fill. Category colors must keep consistent meanings across lists, detail pages, forms, and charts.

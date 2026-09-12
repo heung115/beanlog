@@ -194,7 +194,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
     }
 
     return (
-      <div className={cn("flex flex-col gap-1.5", className)}>
+      <div className={cn("flex flex-col gap-1", className)}>
         {label && (
           <label
             htmlFor={inputId}
@@ -248,7 +248,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(
             }}
             onKeyDown={handleKeyDown}
             className={cn(
-              "w-full rounded-md border border-border-light bg-surface px-3 py-2.5 pr-9 text-sm text-brown placeholder:text-brown-light/40",
+              "min-h-12 w-full rounded-md border border-border-light bg-surface px-3 py-2 pr-9 text-base leading-relaxed text-brown placeholder:text-brown-light",
               "focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent/30",
               "transition-colors duration-150",
               inputClassName

@@ -140,7 +140,7 @@ export function TagInput({ value, onChange, draft, onDraftChange, "aria-invalid"
           }}
           placeholder={t("tastingNotesPlaceholder")}
           className={cn(
-            "min-h-12 min-w-0 flex-1 rounded-md border border-border-light bg-surface px-3.5 py-2.5 text-sm text-brown placeholder:text-brown-light/60",
+            "min-h-12 min-w-0 flex-1 rounded-md border border-border-light bg-surface px-3.5 py-2 text-base leading-relaxed text-brown placeholder:text-brown-light",
             "transition-colors duration-150 focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/15"
           )}
         />

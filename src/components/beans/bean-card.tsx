@@ -46,7 +46,7 @@ export function BeanCard({ bean, view = "grid", returnTo }: BeanCardProps) {
     >
       <div className="flex h-full flex-1 flex-col">
         <div className="mb-3 flex items-center justify-end">
-          <time className="folio-label" dateTime={bean.consumed_at}>
+          <time className="text-sm leading-5 tabular-nums text-brown-light" dateTime={bean.consumed_at}>
             {formatCalendarDate(bean.consumed_at, locale)}
           </time>
         </div>
@@ -62,8 +62,8 @@ export function BeanCard({ bean, view = "grid", returnTo }: BeanCardProps) {
                 {bean.name}
               </Link>
             </h3>
-            <p className="mt-1 truncate text-xs font-semibold uppercase tracking-[0.05em] text-brown-light">{bean.roastery}</p>
-            <p className="mt-3 text-xs font-semibold text-brown-medium">
+            <p className="mt-1 break-words text-sm leading-5 text-brown-medium">{bean.roastery}</p>
+            <p className="mt-3 text-sm leading-5 text-brown-medium">
               {countryName}
               {bean.origin_region ? ` · ${bean.origin_region}` : ""}
             </p>
@@ -73,7 +73,7 @@ export function BeanCard({ bean, view = "grid", returnTo }: BeanCardProps) {
 
         <p
           data-testid="bean-card-metadata"
-          className="mt-4 border-l border-accent-light pl-3 font-mono text-[10px] font-semibold uppercase tracking-[0.04em] text-brown-medium"
+          className="mt-3 text-sm leading-5 text-brown-light"
         >
           {[
             tProcess(bean.process_method),
@@ -114,7 +114,7 @@ export function BeanCard({ bean, view = "grid", returnTo }: BeanCardProps) {
             view === "grid" ? "mt-auto" : "mt-5"
           )}
         >
-          <span className="folio-label">
+          <span className="text-sm leading-5 tabular-nums text-brown-light">
             {bean.place_type === "cafe" ? t("cafe") : t("home")}
           </span>
           <span aria-hidden="true" className="pointer-events-none font-display text-lg text-accent transition-transform group-hover:translate-x-1">→</span>
